@@ -8,10 +8,10 @@
   "compilerOptions": {
     "checkJs": true,
     "lib": [
-      "ES2021",
+      "ES2022",
       "DOM"
     ],
-    "target": "ES2021",
+    "target": "ES2022",
     "baseUrl": "./",
     "moduleResolution": "node"
   }
