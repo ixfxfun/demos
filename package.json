@@ -1,0 +1,56 @@
+{
+  "name": "ixfx-demos",
+  "version": "1.0.0",
+  "description": "Demos of ixfx",
+  "main": "index.html",
+  "private": "true",
+  "type": "module",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "clone:npm": "node copy-for-npm.js",
+    "clone:light": "node copy-for-light.js",
+    "clone:glitch": "node copy-for-glitch.js",
+    "clone": "concurrently npm:clone:*",
+    "copy:ml": "rimraf ./ml/lib && npx copyfiles --up 3 \"../ixfx-ml/dist/bundle.*\" ./ml/lib && copyfiles --up 3 \"../ixfx-ml/dist/*.wasm\" ./ml/pose/sender/",
+    "serve:ws": "node ws-server.js",
+    "serve:http": "five-server",
+    "serve:express": "node express-ws-server.js",
+    "serve": "concurrently npm:serve:*",
+    "ngrok": "ngrok start --all --config ./ngrok.yml",
+    "start": "npm run serve:express"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClintH/ixfx-demos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ClintH/ixfx-demos/issues"
+  },
+  "homepage": "https://github.com/ClintH/ixfx-demos#readme",
+  "dependencies": {
+    "five-server": "^0.3.2",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^6.21.0",
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
+    "cpy": "^11.0.0",
+    "del": "^7.1.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-unicorn": "^51.0.1",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "replace-in-file": "^7.1.0",
+    "rimraf": "^5.0.5"
+  },
+  "stackblitz": {
+    "startCommand": "concurrently 'npm:serve:*'"
+  }
+}
