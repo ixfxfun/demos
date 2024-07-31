@@ -1,5 +1,10 @@
 {
   "port": 5500,
-  "root": "/",
-  "open": "index.html"
+  "host": "0.0.0.0",
+  "open": "index.html",
+  "openTerminal": false,
+  "watch": [
+    "**/*"
+  ],
+  "navigate": false
 }

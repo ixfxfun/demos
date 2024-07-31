@@ -1,13 +1,13 @@
 /**
- * This script mirrors source files into ../ixfx-demos-glitch,
+ * This script mirrors source files into ../demos-glitch,
  * re-writing the imports so they use URL imports.
  */
 import cpy from 'cpy';
 import replace from 'replace-in-file';
 import { deleteSync } from 'del';
 
-const destination = `../ixfx-demos-glitch`;
-const categories  =`audio camera data dom flow geometry io ml modulation pointer starters visuals`.split(` `);
+const destination = `../demos-glitch`;
+const categories = `audio camera data dom flow geometry io ml modulation pointer starters visuals`.split(` `);
 const deletePatterns = categories.map(c => `${destination}/${c}/`);
 
 // Delete previous sketch categories

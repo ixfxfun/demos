@@ -1,14 +1,14 @@
 /**
- * This script mirrors source files into ../ixfx-demos-npm.
+ * This script mirrors source files into ../demos-npm.
  */
 import cpy from 'cpy';
 import { deleteSync } from 'del';
 
-const destinationRoot = `../ixfx-demos-npm`;
+const destinationRoot = `../demos-npm`;
 const destination = `${destinationRoot}/src`;
 
 // Delete previous src
-deleteSync([ destination ], { force: true });
+deleteSync([destination], { force: true });
 
 const categories = `audio camera data dom flow geometry io ml modulation pointer starters visuals`.split(` `);
 
