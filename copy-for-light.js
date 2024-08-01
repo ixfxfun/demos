@@ -3,7 +3,7 @@
  * re-writing the imports so they use URL imports.
  */
 import cpy from 'cpy';
-import replace from 'replace-in-file';
+import { replaceInFileSync } from 'replace-in-file';
 import { deleteSync } from 'del';
 
 const destination = `../demos-light`;
@@ -19,7 +19,7 @@ for (const c of categories) {
 }
 
 // Copy loose files
-await cpy([`index.html`, `favicon.ico`, `demos.css`], `${destination}/`);
+await cpy([`index.html`, `favicon.ico`, `demos.css`, `.eslintrc.json`], `${destination}/`);
 
 // Re-write imports
 const replaceOptions = {
@@ -29,7 +29,7 @@ const replaceOptions = {
 };
 
 try {
-  replace.sync(replaceOptions);
+  replaceInFileSync(replaceOptions);
   console.log(`copy-for-light done`);
 }
 catch (error) {

@@ -3,10 +3,10 @@
  * re-writing the imports so they use URL imports.
  */
 import cpy from 'cpy';
-import replace from 'replace-in-file';
+import { replaceInFileSync } from 'replace-in-file';
 import { deleteSync } from 'del';
 
-const destination = `../demos-glitch`;
+const destination = `../../ixfx-demos-glitch`;
 const categories = `audio camera data dom flow geometry io ml modulation pointer starters visuals`.split(` `);
 const deletePatterns = categories.map(c => `${destination}/${c}/`);
 
@@ -26,7 +26,7 @@ const replaceOptions = {
 };
 
 try {
-  replace.sync(replaceOptions);
+  replaceInFileSync(replaceOptions);
   console.log(`copy-for-glitch done`);
 }
 catch (error) {
