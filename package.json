@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/ClintH/ixfx-demos#readme",
   "dependencies": {
-    "five-server": "^0.3.3",
+    "five-server": "0.3.3",
     "ws": "^8.18.0"
   },
   "devDependencies": {

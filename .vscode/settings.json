@@ -55,5 +55,13 @@
   "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
   "typescript.format.insertSpaceAfterTypeAssertion": true,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
-  "typescript.format.indentSwitchCase": true
+  "typescript.format.indentSwitchCase": true,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/*.fiveserverrc"
+      ],
+      "url": "/.vscode/fiveserver.schema.json"
+    }
+  ]
 }

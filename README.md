@@ -1,6 +1,6 @@
 # ixfx-demos
  
-* [Demos can be run online](https://clinth.github.io/ixfx-demos/)
+* [Demos can be run online](https://demos.ixfx.fun/)
 * [Source code on GitHub](https://github.com/clinth/ixfx-demos/)
 * If you find a bug in a demo, please [report it](https://github.com/ClintH/ixfx-demos/issues).
 
@@ -11,8 +11,8 @@ Good to know:
 
 About ixfx:
 
-* [ixfx Guide](https://clinth.github.io/ixfx-docs/)
-* [ixfx API documentation](https://clinth.github.io/ixfx/) and [source code](https://github.com/clinth/ixfx)
+* [ixfx Guide](https://ixfx.fun/)
+* [ixfx API documentation](https://api.ixfx.fun/) and [source code](https://github.com/clinth/ixfx)
 
 ## Getting started
 

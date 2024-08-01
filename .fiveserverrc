@@ -2,7 +2,6 @@
   "port": 5500,
   "host": "0.0.0.0",
   "open": "index.html",
-  "openTerminal": false,
   "watch": [
     "**/*"
   ],
