@@ -5,6 +5,6 @@ This sketch demonstrates using key events to make a very simple typewriter. By a
 [See demo online](https://demos.ixfx.fun/io/keyboard/typer/)
 
 Demonstrates:
-* [`intervalTracker`](https://api.ixfx.fun/functions/Trackers.interval.html)
+* [`intervalTracker`](https://api.ixfx.fun/funcs/Trackers.interval.html)
 
 [Read more about ixfx trackers](https://ixfx.fun/data/trackers/)

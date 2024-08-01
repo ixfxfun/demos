@@ -9,6 +9,6 @@ Guides
 * [Trackers guide](https://ixfx.fun/data/trackers/)
 
 APIs
-* [Data.pointTracker](https://api.ixfx.fun/functions/Trackers.points.html)
-* [Data.numberTracker](https://api.ixfx.fun/functions/Trackers.number.html)
+* [Data.pointTracker](https://api.ixfx.fun/funcs/Trackers.points.html)
+* [Data.numberTracker](https://api.ixfx.fun/funcs/Trackers.number.html)
 * [Geometry.Points](https://api.ixfx.fun/modules/Geometry.Points.html)

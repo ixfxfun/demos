@@ -24,4 +24,4 @@ The benefit of using state machines and the state machine 'driver' is that the s
 This could all be done with some big switch statements and if-then-else blocks, but here we get simplicity and safety.
 
 Read more:
-* [flow/StateMachine.drive](https://api.ixfx.fun/functions/Flow.StateMachine.driver.html)
+* [flow/StateMachine.drive](https://api.ixfx.fun/funcs/Flow.StateMachine.driver.html)
