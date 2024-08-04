@@ -23,15 +23,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ClintH/ixfx-demos.git"
+    "url": "git+https://github.com/ixfxfun/demos.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ClintH/ixfx-demos/issues"
+    "url": "https://github.com/ixfxfun/demos/issues"
   },
-  "homepage": "https://github.com/ClintH/ixfx-demos#readme",
+  "homepage": "https://github.com/ixfxfun/demos#readme",
   "dependencies": {
     "five-server": "0.3.3",
     "ws": "^8.18.0"

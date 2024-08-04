@@ -11,23 +11,22 @@ import {
   delay,
   delayLoop,
   everyNth,
-  forEach,
-  forEachSync,
   promiseFromEvent,
   promiseWithResolvers,
-  repeat,
-  repeatSync,
   retryFunction,
   retryTask,
   runOnce,
   singleItem,
-  sleep,
-  sleepWhile,
   throttle,
   updateOutdated,
   waitFor
-} from "./chunk-757M56I7.js";
-import "./chunk-TNZP4XTK.js";
+} from "./chunk-UWIXPZLC.js";
+import {
+  repeat,
+  repeatSync,
+  sleep,
+  sleepWhile
+} from "./chunk-QGXH7WIG.js";
 import {
   StateMachine_exports,
   Stopwatch_exports,
@@ -93,8 +92,6 @@ export {
   elapsedTicksAbsolute,
   elapsedToHumanString,
   everyNth,
-  forEach,
-  forEachSync,
   frequencyTimer,
   hasElapsed,
   intervalToMs,

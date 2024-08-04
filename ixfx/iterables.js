@@ -11,6 +11,8 @@ import {
   flatten,
   forEach,
   fromArray,
+  fromFunction,
+  fromFunctionAwaited,
   fromIterable,
   map,
   max,
@@ -23,28 +25,28 @@ import {
   uniqueByValue,
   until,
   zip
-} from "./chunk-EGHRYFIR.js";
+} from "./chunk-NRKPUZCJ.js";
 import {
   chain_exports
-} from "./chunk-OVYFUBD2.js";
-import "./chunk-NSBD5Z5D.js";
-import "./chunk-OFFDJ4UM.js";
-import "./chunk-M2XIICMK.js";
+} from "./chunk-H7AMVA5Z.js";
+import "./chunk-H7I6Z5BU.js";
+import "./chunk-4NERCN4W.js";
+import "./chunk-N447RINQ.js";
 import "./chunk-DIMQ6WOR.js";
-import "./chunk-5ED3IWLA.js";
+import "./chunk-T635PI44.js";
 import "./chunk-ZRXEXVUC.js";
 import "./chunk-FKXNN6PM.js";
 import {
   IterableAsync_exports
-} from "./chunk-INQNQFRA.js";
+} from "./chunk-XVNM3IGC.js";
 import {
   IterableSync_exports
-} from "./chunk-33YLZAWN.js";
+} from "./chunk-ZFBWYADV.js";
 import "./chunk-XFNQJV53.js";
 import "./chunk-QY7TSMVO.js";
 import "./chunk-4SO3XXQP.js";
-import "./chunk-757M56I7.js";
-import "./chunk-TNZP4XTK.js";
+import "./chunk-UWIXPZLC.js";
+import "./chunk-QGXH7WIG.js";
 import "./chunk-TXNE2NDG.js";
 import {
   fromEvent,
@@ -78,7 +80,7 @@ import "./chunk-GISMJX5E.js";
 import "./chunk-5VWJ6TUI.js";
 import "./chunk-46F56PDU.js";
 import "./chunk-Q5FM47RE.js";
-import "./chunk-DWAKOV2F.js";
+import "./chunk-54PXOMGL.js";
 import "./chunk-S5D7YRXR.js";
 import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
@@ -101,6 +103,8 @@ export {
   forEach,
   fromArray,
   fromEvent,
+  fromFunction,
+  fromFunctionAwaited,
   fromIterable,
   isAsyncIterable,
   isIterable,
