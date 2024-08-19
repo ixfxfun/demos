@@ -5,7 +5,7 @@ import { K as KeyValue } from './PrimitiveTypes-F6miV4Zn.js';
 import { Ref } from 'lit/directives/ref.js';
 import { C as CanvasHelper } from './CanvasHelper-BMdwHWEB.js';
 import { a as RectPositioned, R as Rect } from './RectTypes-Brg8Cmy-.js';
-import { C as Colourish } from './Colour-B60StqKZ.js';
+import { C as Colourish } from './Colour-jbiYG85Y.js';
 import { D as DrawingHelper } from './Drawing-BmSQo1F4.js';
 import './Scaler-C_gjBH0I.js';
 import './PointType-DYug3Yo5.js';
