@@ -107,8 +107,6 @@ declare function flatten$2<V>(it: AsyncIterable<V>): AsyncGenerator<any, void, u
  * Iterates over an async iterable or array, calling `fn` for each value, with optional
  * interval between each loop. If the async `fn` returns _false_, iterator cancels.
  *
- * Use {@link forEachSync} for a synchronous version.
- *
  * ```
  * import { forEach } from "https://unpkg.com/ixfx/dist/flow.js"
  * // Prints items from array every second
@@ -341,7 +339,7 @@ declare function fill$1<V>(it: Iterable<V>, v: V): Generator<V, void, unknown>;
  * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
  *
  * Alternatives:
- * * {@link repeat}/{@link repeatSync}: if you want to call something a given number of times and get the result
+ * * {@link Flow.repeat}/{@link Flow.repeatSync}: if you want to call something a given number of times and get the result
  * @param iterator Iterable or array
  * @typeParam T Type of iterable's values
  * @param fn Function to call for each item. If function returns _false_, iteration cancels

@@ -50,7 +50,7 @@ declare const chance: <T>(p: number | (() => number), a: T | (() => T), b: T | (
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-declare const floatSource: (maxOrOptions?: number | RandomOptions) => RandomSource;
+declare const floatSource: (maxOrOptions?: (number | RandomOptions)) => RandomSource;
 /**
  * Returns a random float between `max` (exclusive) and 0 (inclusive). Max is 1 if unspecified.
  * Use {@link floatSource} to get a function that produces values. This is used internally.
@@ -71,7 +71,7 @@ declare const floatSource: (maxOrOptions?: number | RandomOptions) => RandomSour
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-declare const float: (maxOrOptions?: number | RandomOptions) => number;
+declare const float: (maxOrOptions?: (number | RandomOptions)) => number;
 
 /**
  * Returns a random number with gaussian (ie. bell-curved) distribution

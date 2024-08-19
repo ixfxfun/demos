@@ -4,7 +4,7 @@ import {
   peek,
   pop,
   push
-} from "./chunk-ZFBWYADV.js";
+} from "./chunk-Y4GCTNKN.js";
 
 // src/collections/stack/StackImmutable.ts
 var StackImmutable = class _StackImmutable {
@@ -46,4 +46,4 @@ export {
   StackImmutable,
   immutable
 };
-//# sourceMappingURL=chunk-N447RINQ.js.map
+//# sourceMappingURL=chunk-PYXKDEZY.js.map

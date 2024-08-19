@@ -1,7 +1,7 @@
 import {
   Ops,
   sources_exports
-} from "./chunk-XVNM3IGC.js";
+} from "./chunk-DIDLUAVA.js";
 import {
   resolveEl
 } from "./chunk-ZNCB3DZ2.js";
@@ -135,4 +135,4 @@ export {
   parentSizeCanvas,
   fullSizeCanvas
 };
-//# sourceMappingURL=chunk-XPL6S77D.js.map
+//# sourceMappingURL=chunk-ZH73HSFP.js.map

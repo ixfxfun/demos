@@ -1,23 +1,23 @@
 import {
   Drawing_exports
-} from "./chunk-XFPD5L7G.js";
+} from "./chunk-ELWYZI4A.js";
 import "./chunk-3GT6MPPF.js";
-import "./chunk-OXLA42KW.js";
-import "./chunk-ESCWBI3W.js";
-import "./chunk-UBWL5KAS.js";
-import "./chunk-OVLG22EY.js";
-import "./chunk-N447RINQ.js";
+import "./chunk-ELUBO76T.js";
+import "./chunk-MFEHQK6D.js";
+import "./chunk-L5HI4DQX.js";
+import "./chunk-K4DHQO6I.js";
+import "./chunk-PYXKDEZY.js";
 import "./chunk-DIMQ6WOR.js";
-import "./chunk-T635PI44.js";
-import "./chunk-3FPREOWI.js";
+import "./chunk-FLMDFNEF.js";
+import "./chunk-6WWUBSCA.js";
 import "./chunk-72HWREB4.js";
 import "./chunk-MM6D35JS.js";
 import "./chunk-FT4AY56C.js";
 import "./chunk-ZRXEXVUC.js";
 import {
   CanvasHelper
-} from "./chunk-UH7QM55R.js";
-import "./chunk-XPL6S77D.js";
+} from "./chunk-JFJ6RW65.js";
+import "./chunk-ZH73HSFP.js";
 import "./chunk-QQ6D5TQU.js";
 import "./chunk-MVQCQHQL.js";
 import "./chunk-VUEFATQ3.js";
@@ -27,10 +27,10 @@ import "./chunk-FKXNN6PM.js";
 import "./chunk-AGCCB7IA.js";
 import {
   Pathed_exports
-} from "./chunk-XVNM3IGC.js";
-import "./chunk-ZFBWYADV.js";
+} from "./chunk-DIDLUAVA.js";
+import "./chunk-Y4GCTNKN.js";
 import "./chunk-XFNQJV53.js";
-import "./chunk-QY7TSMVO.js";
+import "./chunk-W4JV7GMT.js";
 import "./chunk-4SO3XXQP.js";
 import "./chunk-UWIXPZLC.js";
 import "./chunk-QGXH7WIG.js";
@@ -1091,13 +1091,14 @@ var PlotElement = class extends s3 {
     super();
     __privateAdd(this, _PlotElement_instances);
     this.streaming = true;
+    this.hideLegend = false;
     this.maxLength = 500;
     this.dataWidth = 5;
     this.fixedMax = Number.NaN;
     this.fixedMin = Number.NaN;
     this.lineWidth = 2;
     this.renderStyle = `dot`;
-    this.autoRedraw = true;
+    this.manualDraw = false;
     this.padding = 5;
     this.paused = false;
     __privateAdd(this, _series, /* @__PURE__ */ new Map());
@@ -1106,6 +1107,7 @@ var PlotElement = class extends s3 {
     __privateAdd(this, _legendColour, ``);
     __privateAdd(this, _hue, 0);
     this.canvasEl = e5();
+    this.seriesRanges = /* @__PURE__ */ new Map();
     __privateAdd(this, _swatchSize, 10);
   }
   get series() {
@@ -1173,23 +1175,25 @@ var PlotElement = class extends s3 {
   updateColours() {
     __privateSet(this, _legendColour, Colour_exports.getCssVariable(`legend-fg`, `black`));
   }
-  // protected updated(_changedProperties: PropertyValues): void {
-  //   this.#setupCanvas();
-  // }
-  plot(value, seriesName = ``) {
+  plot(value, seriesName = ``, skipDrawing = false) {
     let s6 = __privateGet(this, _series).get(seriesName.toLowerCase());
     if (s6 === void 0) {
       s6 = new PlotSeries(seriesName, this.colourGenerator(seriesName), this);
       __privateGet(this, _series).set(seriesName.toLowerCase(), s6);
     }
     s6.push(value);
-    if (this.autoRedraw) this.draw();
+    if (!this.manualDraw && !skipDrawing) this.draw();
     return s6;
   }
+  /**
+   * Draw a set of key-value pairs as a batch.
+   * @param value 
+   */
   plotObject(value) {
     for (const p4 of Pathed_exports.getPathsAndData(value, true)) {
-      this.plot(p4.value, p4.path);
+      this.plot(p4.value, p4.path, true);
     }
+    this.draw();
   }
   colourGenerator(series) {
     const c6 = Colour_exports.fromHsl(__privateGet(this, _hue), 0.9, 0.4);
@@ -1215,14 +1219,17 @@ var PlotElement = class extends s3 {
     if (!Number.isNaN(this.fixedMax) && !Number.isNaN(this.fixedMin)) {
       globalScaler = scaler(this.fixedMin, this.fixedMax);
     }
-    ctx.save();
-    ctx.translate(cl.x + padding, cl.y + padding);
-    this.drawLegend(cl, d3);
-    ctx.restore();
+    if (!this.hideLegend) {
+      ctx.save();
+      ctx.translate(cl.x + padding, cl.y + padding);
+      this.drawLegend(cl, d3);
+      ctx.restore();
+    }
     ctx.save();
     ctx.translate(cp.x + padding, cp.y + padding);
     for (const series of __privateGet(this, _series).values()) {
-      const data = globalScaler === void 0 ? series.getScaled() : series.getScaledBy(globalScaler);
+      const seriesScale = this.seriesRanges.get(series.name);
+      const data = seriesScale !== void 0 ? series.getScaledBy(scaler(seriesScale[0], seriesScale[1])) : globalScaler === void 0 ? series.getScaled() : series.getScaledBy(globalScaler);
       const colour = Colour_exports.resolveToString(series.colour);
       switch (this.renderStyle) {
         case `line`:
@@ -1307,6 +1314,12 @@ var PlotElement = class extends s3 {
     return 0;
   }
   computeLegend(c6, maxWidth, padding) {
+    if (this.hideLegend) {
+      return {
+        bounds: { width: 0, height: 0 },
+        parts: []
+      };
+    }
     const ctx = c6.ctx;
     const series = [...__privateGet(this, _series).values()];
     let largestH = 0;
@@ -1375,6 +1388,9 @@ __decorateClass([
   n4({ attribute: `streaming`, type: Boolean })
 ], PlotElement.prototype, "streaming", 2);
 __decorateClass([
+  n4({ attribute: `hide-legend`, type: Boolean })
+], PlotElement.prototype, "hideLegend", 2);
+__decorateClass([
   n4({ attribute: `max-length`, type: Number })
 ], PlotElement.prototype, "maxLength", 2);
 __decorateClass([
@@ -1392,6 +1408,9 @@ __decorateClass([
 __decorateClass([
   n4({ attribute: `render`, type: String })
 ], PlotElement.prototype, "renderStyle", 2);
+__decorateClass([
+  n4({ attribute: `manual-draw`, type: Boolean })
+], PlotElement.prototype, "manualDraw", 2);
 PlotElement = __decorateClass([
   t3(`plot-element`)
 ], PlotElement);

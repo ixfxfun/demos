@@ -115,23 +115,26 @@ declare class FrequencyHistogramPlot {
  * * line-width: stroke width of drawing line (default:2)
  *
  * * render: 'dot' or 'line' (default: 'dot')
- *
+ * * hide-legend: If added, legend is not shown
+ * * manual-draw: If added, automatic drawning is disabled
  * Styling variables
  * * --legend-fg: legend foreground text
  */
 declare class PlotElement extends LitElement {
     #private;
     streaming: boolean;
+    hideLegend: boolean;
     maxLength: number;
     dataWidth: number;
     fixedMax: number;
     fixedMin: number;
     lineWidth: number;
     renderStyle: string;
-    autoRedraw: boolean;
+    manualDraw: boolean;
     padding: number;
     paused: boolean;
     canvasEl: Ref<HTMLCanvasElement>;
+    seriesRanges: Map<string, [min: number, max: number]>;
     constructor();
     get series(): PlotSeries[];
     get seriesCount(): number;
@@ -160,7 +163,11 @@ declare class PlotElement extends LitElement {
     connectedCallback(): void;
     protected firstUpdated(_changedProperties: PropertyValues): void;
     updateColours(): void;
-    plot(value: number, seriesName?: string): PlotSeries;
+    plot(value: number, seriesName?: string, skipDrawing?: boolean): PlotSeries;
+    /**
+     * Draw a set of key-value pairs as a batch.
+     * @param value
+     */
     plotObject(value: object): void;
     colourGenerator(series: string): Colourish;
     draw(): void;

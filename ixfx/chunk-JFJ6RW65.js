@@ -1,6 +1,6 @@
 import {
   windowResize
-} from "./chunk-XPL6S77D.js";
+} from "./chunk-ZH73HSFP.js";
 import {
   empty,
   guard,
@@ -252,4 +252,4 @@ var CanvasHelper = class extends SimpleEventEmitter {
 export {
   CanvasHelper
 };
-//# sourceMappingURL=chunk-UH7QM55R.js.map
+//# sourceMappingURL=chunk-JFJ6RW65.js.map
