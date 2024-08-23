@@ -2,6 +2,7 @@ import {
   Normalise_exports,
   applyToValues,
   averageWeighted,
+  differenceFromLast,
   filter,
   isApprox,
   isValid,
@@ -15,7 +16,7 @@ import {
   proportion,
   relativeDifference,
   softmax
-} from "./chunk-FRTAUKL3.js";
+} from "./chunk-WLS3RXA6.js";
 import {
   Bipolar_exports,
   flip
@@ -75,7 +76,7 @@ import "./chunk-B3EBEJZ3.js";
 import "./chunk-GFZVK53G.js";
 import {
   minMaxAvg
-} from "./chunk-Q7MQJ5XJ.js";
+} from "./chunk-5XZFO6U6.js";
 import "./chunk-GISMJX5E.js";
 import "./chunk-5VWJ6TUI.js";
 import "./chunk-ZVECQWBZ.js";
@@ -94,6 +95,7 @@ export {
   clamp,
   clampIndex,
   count,
+  differenceFromLast,
   dotProduct,
   filter,
   flip,

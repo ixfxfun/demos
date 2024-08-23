@@ -5,7 +5,7 @@ import {
   annotate,
   annotateWithOp,
   average2 as average,
-  batch,
+  chunk,
   cloneFromFields,
   combineLatestToArray,
   combineLatestToObject,
@@ -17,7 +17,6 @@ import {
   field,
   filter2 as filter,
   interpolate,
-  interpolateToTarget,
   manual,
   max3 as max,
   min3 as min,
@@ -42,20 +41,23 @@ import {
   tapProcess,
   tapStream,
   throttle,
-  timeoutTrigger,
+  timeoutPing,
+  timeoutValue,
   to,
   toArray2 as toArray,
   toArrayOrThrow,
   toGenerator,
   transform,
+  valueToPing,
   withValue,
-  wrap
-} from "./chunk-ULVVU6HP.js";
-import "./chunk-FMDUFF7U.js";
+  wrap,
+  writable
+} from "./chunk-ZCVS6SFU.js";
+import "./chunk-XA3MFF52.js";
 import "./chunk-XFNQJV53.js";
 import "./chunk-ODFCQPOV.js";
 import "./chunk-XZAKN3JC.js";
-import "./chunk-CBFABWW2.js";
+import "./chunk-SCQC6LJE.js";
 import {
   hasLast,
   isPingable,
@@ -72,7 +74,7 @@ import {
   opify,
   resolveTriggerValue
 } from "./chunk-4IGV3ZF6.js";
-import "./chunk-UGKAIACQ.js";
+import "./chunk-Y22PKHUJ.js";
 import "./chunk-YLRZZLGG.js";
 import "./chunk-4FD2KCBI.js";
 import "./chunk-L6MUVYKY.js";
@@ -87,15 +89,15 @@ import "./chunk-GHCV5Z5H.js";
 import "./chunk-ZJSCF2A4.js";
 import "./chunk-B3EBEJZ3.js";
 import "./chunk-GFZVK53G.js";
-import "./chunk-SKJEG4UC.js";
+import "./chunk-QEOF2KQ6.js";
 import "./chunk-MZFSDYZE.js";
 import "./chunk-CF6OEEVD.js";
-import "./chunk-Q4BIFISJ.js";
+import "./chunk-XN3FNKKY.js";
 import "./chunk-BGQOJZFW.js";
 import "./chunk-HKC65PTS.js";
-import "./chunk-HR4MJJP4.js";
+import "./chunk-F6WHOKNI.js";
 import "./chunk-F3LKPXTP.js";
-import "./chunk-Q7MQJ5XJ.js";
+import "./chunk-5XZFO6U6.js";
 import "./chunk-7U6QARGK.js";
 import "./chunk-GISMJX5E.js";
 import "./chunk-5VWJ6TUI.js";
@@ -115,7 +117,7 @@ export {
   annotate,
   annotateWithOp,
   average,
-  batch,
+  chunk,
   cloneFromFields,
   combineLatestToArray,
   combineLatestToObject,
@@ -128,7 +130,6 @@ export {
   filter,
   hasLast,
   interpolate,
-  interpolateToTarget,
   isPingable,
   isReactive,
   isTrigger,
@@ -165,13 +166,16 @@ export {
   tapProcess,
   tapStream,
   throttle,
-  timeoutTrigger,
+  timeoutPing,
+  timeoutValue,
   to,
   toArray,
   toArrayOrThrow,
   toGenerator,
   transform,
+  valueToPing,
   withValue,
-  wrap
+  wrap,
+  writable
 };
 //# sourceMappingURL=rx.js.map
