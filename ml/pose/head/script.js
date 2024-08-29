@@ -1,10 +1,8 @@
-// @ts-ignore
-import { Remote } from "https://unpkg.com/@clinth/remote@latest/dist/index.mjs";
 import * as Dom from '../../../ixfx/dom.js';
 import { Points } from '../../../ixfx/geometry.js';
-import * as MpVision from "../util/Poses.js";
+import { Poses, PosesConsumer } from "../util/Poses.js";
 
-const pc = new MpVision.PosesConsumer({ maxAgeMs: 500 });
+const pc = new PosesConsumer({ maxAgeMs: 500 });
 
 const settings = Object.freeze({
   // How quickly to call update()
@@ -62,7 +60,7 @@ const update = () => {
 
 /**
  * Returns a circle based on a few head landmarks
- * @param {MpVision.PoseTracker} pose
+ * @param {Poses.PoseTracker} pose
  * @return {Head} 
  */
 const computeHead = (pose) => {
@@ -133,7 +131,7 @@ const drawHead = (context, head) => {
  * @param {*} event 
  */
 const onPoseAdded = (event) => {
-  const poseTracker = /** @type MpVision.PoseTracker */(event.detail);
+  const poseTracker = /** @type Poses.PoseTracker */(event.detail);
   //console.log(`Pose added: ${poseTracker.guid}`);
 };
 
@@ -142,7 +140,7 @@ const onPoseAdded = (event) => {
  * @param {*} event 
  */
 const onPoseExpired = (event) => {
-  const poseTracker = /** @type MpVision.PoseTracker */(event.detail);
+  const poseTracker = /** @type Poses.PoseTracker */(event.detail);
   //console.log(`Pose expired: ${poseTracker.guid}`);
 };
 
@@ -151,9 +149,8 @@ const onPoseExpired = (event) => {
  */
 function setup() {
   const { updateRateMs, poses } = settings;
-
-  poses.events.addEventListener(`added`, onPoseAdded);
-  poses.events.addEventListener(`expired`, onPoseExpired);
+  poses.addEventListener(`added`, onPoseAdded);
+  poses.addEventListener(`expired`, onPoseExpired);
 
   Dom.fullSizeCanvas(`#canvas`, arguments_ => {
     // Update state with new size of canvas

@@ -1,11 +1,12 @@
 import * as Dom from '../../../ixfx/dom.js';
-import * as MpVision from "../util/Poses.js";
+import { Poses, PosesConsumer } from "../util/Poses.js";
 import * as Util from './util.js';
 
 // Will connect and receive poses for us
-const poses = new MpVision.PosesConsumer();
+const pc = new PosesConsumer();
 
 const settings = Object.freeze({
+  poses: pc.poses,
   dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } })
 });
 
@@ -24,6 +25,21 @@ let state = Object.freeze({
 
 
 const update = () => {
+  const { poses } = settings;
+
+  // Work with PosesTracker somehow...
+
+  // We'll just dump the data
+  for (const rawData of poses.getRawPosesByAge()) {
+    console.log(rawData);
+  }
+
+  // Or to take advantage of the trackers:
+  for (const pose of poses.get()) {
+    // eg. get center point of a body
+    // pose.centroid;
+  }
+
   // Save it
   //const s = saveState({ stuffToSave });
 
@@ -41,6 +57,7 @@ const update = () => {
 const use = (state) => {
   // get stuff from state
   // do stuff with it...
+
 };
 
 

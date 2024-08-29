@@ -1,3 +1,4 @@
+// @ts-ignore
 import { LitElement } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 import { MlVision, Client } from "../../lib/index.js";
 import { shortGuid } from '../../../ixfx/random.js';
@@ -12,6 +13,8 @@ const peerId = params.get(`peerId`) ?? shortGuid();
 const ds = new MlVision(`#is`, {
   // Mode to run: pose, hand, objects, face
   mode: `hand`,
+  // How often to run computation on image
+  computeFreqMs: 10,
   // Remote id
   remote: {
     peerId
@@ -21,14 +24,14 @@ const ds = new MlVision(`#is`, {
     facingMode: `user`,
   },
   hand: {
+    // See: https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker#configurations_options
     minHandDetectionConfidence: 0.5,
     minHandPresenceConfidence: 0.5,
     minTrackingConfidence: 0.5,
-    numHands: 2
+    numHands: 2,
+    modelPath: `hand_landmarker.task`,
+    verbosity: `errors`
   },
-  // How often to run computation on image
-  computeFreqMs: 10,
-
   // For troubleshooting, try 'info' or 'debug'
   verbosity: `errors`,
   wasmBase: `/ml/lib`,

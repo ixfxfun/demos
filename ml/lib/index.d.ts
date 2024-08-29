@@ -431,13 +431,6 @@ declare global {
     }
 }
 
-/**
- * An example element.
- *
- * @fires count-changed - Indicates when the count changes
- * @slot - This element has a slot
- * @csspart button - The button
- */
 declare class RecPanel extends LitElement {
     static styles: lit.CSSResult;
     recordings: SourceData[];
@@ -540,22 +533,6 @@ declare class PoseDetector implements IModel {
     dispose(): void;
 }
 
-type PoseLandmarks = "nose" | "left_eye_inner" | "left_eye" | "left_eye_outer" | "right_eye_inner" | "right_eye" | "right_eye_outer" | "left_ear" | "right_ear" | "mouth_left" | "mouth_right" | "left_shoulder" | "right_shoulder" | "left_elbow" | "right_elbow" | "left_wrist" | "right_wrist" | "left_pinky" | "right_pinky" | "left_index" | "right_index" | "left_thumb" | "right_thumb" | "left_hip" | "right_hip" | "left_knee" | "right_knee" | "left_ankle" | "right_ankle" | "left_heel" | "right_heel" | "left_foot_index" | "right_foot_index";
-/**
- * Returns landmark index by name, or _undefined_ if not found
- * @param name
- * @returns
- */
-declare const getPoseLandmarkIndexByName: (name: PoseLandmarks | string) => number | undefined;
-/**
- * Returns landmark name by index, throws if 'index' out of range.
- * @param index
- * @returns
- */
-declare const getPoseLandmarkNameByIndex: (index: number) => PoseLandmarks;
-declare const getLandmark: (pose: PoseData, indexOrName: number | PoseLandmarks) => NormalizedLandmark | undefined;
-declare const getWorldLandmark: (pose: PoseData, indexOrName: number | PoseLandmarks) => Landmark | undefined;
-
 type OnReceivedData = (msg: unknown) => void;
 declare class Client extends EventTarget {
     #private;
@@ -587,4 +564,4 @@ declare class Processing extends EventTarget {
     get currentMode(): ProcessorModes;
 }
 
-export { type BoundingBox, type CameraOptions, type Category, Client, type CommonModelOptions, type ComputeCallback, type Detection, type FaceDetectorOptions, type HandDetectorOptions, type HandLandmarkerResult, type IModel, type ISource, type Landmark, MlVision, ModelElement, type NormalizedKeypoint, type NormalizedLandmark, type ObjectDetectorOptions, type OnDispatcherData, type OnReceivedData, type Options, OverlayElement, type OverlayOptions, type PoseData, PoseDetector, type PoseDetectorOptions, type PoseLandmarks, PoseMatcher, type PoseMatcherOptions, Processing, type ProcessingStates, RecPanel, type RecordingData, type SourceData, type SourceKinds, type Verbosity, VideoSourceElement, type VideoSourceStates, VisionElement, defaults, getLandmark, getLowest, getPoseLandmarkIndexByName, getPoseLandmarkNameByIndex, getWorldLandmark };
+export { type BoundingBox, type CameraOptions, type Category, Client, type CommonModelOptions, type ComputeCallback, type Detection, type FaceDetectorOptions, type HandDetectorOptions, type HandLandmarkerResult, type IModel, type ISource, type Landmark, MlVision, ModelElement, type NormalizedKeypoint, type NormalizedLandmark, type ObjectDetectorOptions, type OnDispatcherData, type OnReceivedData, type Options, OverlayElement, type OverlayOptions, type PoseData, PoseDetector, type PoseDetectorOptions, PoseMatcher, type PoseMatcherOptions, Processing, type ProcessingStates, RecPanel, type RecordingData, type SourceData, type SourceKinds, type Verbosity, VideoSourceElement, type VideoSourceStates, VisionElement, defaults, getLowest };

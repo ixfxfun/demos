@@ -1,7 +1,4 @@
-export * from './Util.js';
-export * from './PoseTracker.js';
-export * from './PosesTracker.js';
-export * from '../../lib/index.js';
+export * from '../../lib/client/index.js';
 export * from './PosesConsumer.js';
 
 /**

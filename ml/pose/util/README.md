@@ -1,8 +1,10 @@
-# ml
+# ml/pose
 
 Acronyms
 * ML: Machine Learning
-* TF: TensorFlow
+* MP: MediaPipe
+
+* [MediaPipe overview](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
 
 # Architecture
 

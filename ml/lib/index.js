@@ -898,15 +898,6 @@ var Kt = e3(class extends $t {
   }
 });
 
-// src/util/text.ts
-var snipBefore = (input, match) => {
-  const pos = input.indexOf(match);
-  if (pos >= 0) {
-    return input.substring(0, pos);
-  }
-  return input;
-};
-
 // src/components/video-selector.ts
 var _fileInputEl, _selectEl;
 var VideoSelector = class extends h3 {
@@ -5789,7 +5780,7 @@ var string = (lengthOrOptions = 5) => {
 var Text_exports = {};
 __export(Text_exports, {
   abbreviate: () => abbreviate,
-  afterMatch: () => afterMatch2,
+  afterMatch: () => afterMatch,
   beforeAfterMatch: () => beforeAfterMatch,
   beforeMatch: () => beforeMatch,
   between: () => between,
@@ -5871,7 +5862,7 @@ var beforeMatch = (source, match, options = {}) => {
   const ba2 = beforeAfterMatch(source, match, options);
   return ba2[0];
 };
-var afterMatch2 = (source, match, options = {}) => {
+var afterMatch = (source, match, options = {}) => {
   const ba2 = beforeAfterMatch(source, match, options);
   return ba2[1];
 };
@@ -6338,12 +6329,12 @@ var addKeepingExisting = (set3, hasher, ...values) => {
   }
   return s3;
 };
-var sortByValueProperty = (map3, property2, compareFunction) => {
+var sortByValueProperty = (map3, property, compareFunction) => {
   const cfn = typeof compareFunction === `undefined` ? defaultComparer : compareFunction;
   return [...map3.entries()].sort((aE, bE) => {
     const a4 = aE[1];
     const b4 = bE[1];
-    return cfn(a4[property2], b4[property2]);
+    return cfn(a4[property], b4[property]);
   });
 };
 var hasAnyValue = (map3, value2, comparer) => {
@@ -6535,7 +6526,7 @@ var ExpiringMap = class extends SimpleEventEmitter {
    * @param property Basis for deletion 'get','set' or 'either'
    * @returns Items removed
    */
-  deleteWithElapsed(interval2, property2) {
+  deleteWithElapsed(interval2, property) {
     const entries2 = [...this.store.entries()];
     const prune = [];
     const intervalMs = intervalToMs(interval2, 1e3);
@@ -6543,7 +6534,7 @@ var ExpiringMap = class extends SimpleEventEmitter {
     for (const entry of entries2) {
       const elapsedGet = now - entry[1].lastGet;
       const elapsedSet = now - entry[1].lastSet;
-      const elapsed3 = property2 === `get` ? elapsedGet : property2 === `set` ? elapsedSet : Math.max(elapsedGet, elapsedSet);
+      const elapsed3 = property === `get` ? elapsedGet : property === `set` ? elapsedSet : Math.max(elapsedGet, elapsedSet);
       if (elapsed3 >= intervalMs) {
         prune.push([entry[0], entry[1].value]);
       }
@@ -14754,33 +14745,33 @@ function addSpaceAccessors(id, space) {
         return ret;
       }
       return new Proxy(ret, {
-        has: (obj, property2) => {
+        has: (obj, property) => {
           try {
-            ColorSpace.resolveCoord([space, property2]);
+            ColorSpace.resolveCoord([space, property]);
             return true;
           } catch (e5) {
           }
-          return Reflect.has(obj, property2);
+          return Reflect.has(obj, property);
         },
-        get: (obj, property2, receiver) => {
-          if (property2 && typeof property2 !== "symbol" && !(property2 in obj)) {
-            let { index } = ColorSpace.resolveCoord([space, property2]);
+        get: (obj, property, receiver) => {
+          if (property && typeof property !== "symbol" && !(property in obj)) {
+            let { index } = ColorSpace.resolveCoord([space, property]);
             if (index >= 0) {
               return obj[index];
             }
           }
-          return Reflect.get(obj, property2, receiver);
+          return Reflect.get(obj, property, receiver);
         },
-        set: (obj, property2, value2, receiver) => {
-          if (property2 && typeof property2 !== "symbol" && !(property2 in obj) || property2 >= 0) {
-            let { index } = ColorSpace.resolveCoord([space, property2]);
+        set: (obj, property, value2, receiver) => {
+          if (property && typeof property !== "symbol" && !(property in obj) || property >= 0) {
+            let { index } = ColorSpace.resolveCoord([space, property]);
             if (index >= 0) {
               obj[index] = value2;
               this.setAll(id, obj);
               return true;
             }
           }
-          return Reflect.set(obj, property2, value2, receiver);
+          return Reflect.set(obj, property, value2, receiver);
         }
       });
     },
@@ -15837,7 +15828,7 @@ function initStream(options = {}) {
     }
   };
 }
-function setProperty(property2, selectors, value2) {
+function setProperty(property, selectors, value2) {
   let elements2 = [];
   const set3 = (v3) => {
     const typ = typeof v3;
@@ -15846,7 +15837,7 @@ function setProperty(property2, selectors, value2) {
       elements2 = resolveEls(selectors);
     }
     for (const element of elements2) {
-      element[property2] = vv;
+      element[property] = vv;
     }
     return vv;
   };
@@ -18159,7 +18150,7 @@ __export(Dom_exports, {
 function* stringSegmentsWholeToEnd(source, delimiter = `.`) {
   while (source.length > 0) {
     yield source;
-    const trimmed = afterMatch2(source, delimiter);
+    const trimmed = afterMatch(source, delimiter);
     if (trimmed === source) {
       break;
     }
@@ -18473,7 +18464,7 @@ var elements = (source, options) => {
   }
 };
 var getRootedPath = (path2) => {
-  const after = afterMatch2(path2, `.`);
+  const after = afterMatch(path2, `.`);
   return after === path2 ? `_root` : `_root.` + after;
 };
 function win() {
@@ -30320,6 +30311,15 @@ var Processing = class extends EventTarget {
   }
 };
 
+// src/util/text.ts
+var snipBefore = (input, match) => {
+  const pos = input.indexOf(match);
+  if (pos >= 0) {
+    return input.substring(0, pos);
+  }
+  return input;
+};
+
 // src/sources/camera-sources.ts
 var CameraSources = class {
   constructor(sources) {
@@ -32250,38 +32250,6 @@ var MlVision2 = class extends EventTarget {
   }
 };
 
-// src/mediapipe/pose-points.ts
-var posePoints = ["nose", "left_eye_inner", "left_eye", "left_eye_outer", "right_eye_inner", "right_eye", "right_eye_outer", "left_ear", "right_ear", "mouth_left", "mouth_right", "left_shoulder", "right_shoulder", "left_elbow", "right_elbow", "left_wrist", "right_wrist", "left_pinky", "right_pinky", "left_index", "right_index", "left_thumb", "right_thumb", "left_hip", "right_hip", "left_knee", "right_knee", "left_ankle", "right_ankle", "left_heel", "right_heel", "left_foot_index", "right_foot_index"];
-var getPoseLandmarkIndexByName = (name) => {
-  for (let i4 = 0; i4 < posePoints.length; i4++) {
-    if (posePoints[i4] === name) return i4;
-  }
-};
-var getPoseLandmarkNameByIndex = (index) => {
-  if (typeof index !== `number`) throw new Error(`Expected numeric index. Got: ${typeof index}`);
-  if (index < 0) throw new Error(`Index should be at least 0`);
-  if (index >= posePoints.length) throw new Error(`Index is higher than expected (${index})`);
-  return posePoints[index];
-};
-var getLandmark = (pose, indexOrName) => {
-  if (typeof indexOrName === `number`) {
-    return pose.landmarks[indexOrName];
-  } else {
-    const index = getPoseLandmarkIndexByName(indexOrName);
-    if (!index) return;
-    return pose.landmarks[index];
-  }
-};
-var getWorldLandmark = (pose, indexOrName) => {
-  if (typeof indexOrName === `number`) {
-    return pose.world[indexOrName];
-  } else {
-    const index = getPoseLandmarkIndexByName(indexOrName);
-    if (!index) return;
-    return pose.world[index];
-  }
-};
-
 // src/client.ts
 var Client = class extends EventTarget {
   #remote;
@@ -32313,11 +32281,7 @@ export {
   VideoSourceElement,
   VisionElement,
   defaults2 as defaults,
-  getLandmark,
-  getLowest,
-  getPoseLandmarkIndexByName,
-  getPoseLandmarkNameByIndex,
-  getWorldLandmark
+  getLowest
 };
 /*! Bundled license information:
 

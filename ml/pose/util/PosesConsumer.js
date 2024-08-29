@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Remote } from "https://unpkg.com/@clinth/remote@latest/dist/index.mjs";
-import * as MpVision from './Poses.js';
+import { Poses } from './Poses.js';
 
 export class PosesConsumer {
   remote;
@@ -9,11 +9,11 @@ export class PosesConsumer {
 
   /**
    * 
-   * @param {undefined|(Partial<import("./PosesTracker").PosesTrackerOptions> & MpVision.RemoteOptions)} [options]
+   * @param {undefined|(Partial<Poses.PosesTrackerOptions> & import("./Poses.js").RemoteOptions)} [options]
    */
   constructor(options) {
     this.options = options;
-    this.poses = new MpVision.PosesTracker(options);
+    this.poses = new Poses.PosesTracker(options);
     setTimeout(() => this.init(), 100);
   }
 
@@ -24,7 +24,7 @@ export class PosesConsumer {
 
   onReceivedPoses(packet) {
     const { _from, data } = packet;
-    const poseData =/** @type MpVision.PoseData[] */(JSON.parse(data));
+    const poseData =/** @type Poses.PoseData[] */(JSON.parse(data));
 
     if (!Array.isArray(poseData)) {
       console.warn(`Not getting an array as expected. ${typeof poseData} Is sender set to 'pose'?`);

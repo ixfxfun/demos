@@ -1,10 +1,10 @@
 import { Arrays } from '../../../ixfx/data.js';
 import { Points } from '../../../ixfx/geometry.js';
-import * as MpVision from "../util/Poses.js";
+import { Poses, PosesConsumer } from "../util/Poses.js";
 import * as Things from './thing.js';
 import * as Util from './util.js';
 
-const pc = new MpVision.PosesConsumer({ maxAgeMs: 1000 });
+const pc = new PosesConsumer({ maxAgeMs: 1000 });
 
 const settings = Object.freeze({
   // How often to update the Things
@@ -46,7 +46,7 @@ const update = () => {
  * @param {*} event 
  */
 const onPoseAdded = (event) => {
-  const poseTracker = /** @type MpVision.PoseTracker */(event.detail);
+  const poseTracker = /** @type Poses.PoseTracker */(event.detail);
 
   // Create a thing for this pose
   const x = poseTracker.middle.x;
@@ -63,7 +63,7 @@ const onPoseAdded = (event) => {
 const onPoseExpired = (event) => {
   const { poses } = settings;
   const { things } = state;
-  const poseTracker = /** @type MpVision.PoseTracker */(event.detail);
+  const poseTracker = /** @type Poses.PoseTracker */(event.detail);
 
   // Synchronise list of things with current poses
 
@@ -91,8 +91,8 @@ const getThing = (guid) => state.things.find(t => t.id === guid);
 
 function setup() {
   const { poses } = settings;
-  poses.events.addEventListener(`added`, onPoseAdded);
-  poses.events.addEventListener(`expired`, onPoseExpired);
+  poses.addEventListener(`added`, onPoseAdded);
+  poses.addEventListener(`expired`, onPoseExpired);
 
   // Update things
   setInterval(() => {

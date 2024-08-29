@@ -1,10 +1,10 @@
 import { Points } from '../../../ixfx/geometry.js';
 import { Bipolar, interpolate } from '../../../ixfx/numbers.js';
 import * as Dom from '../../../ixfx/dom.js';
-import * as MpVision from "../util/Poses.js";
+import { Poses, PosesConsumer } from "../util/Poses.js";
 import * as Util from './util.js';
 
-const pc = new MpVision.PosesConsumer({ maxAgeMs: 2000 });
+const pc = new PosesConsumer({ maxAgeMs: 2000 });
 
 const settings = Object.freeze({
   poses: pc.poses,
@@ -102,7 +102,7 @@ const use = (state) => {
 
 /**
  * Return angle (in radians) between left and right shoulder
- * @param {MpVision.PoseTracker} pose 
+ * @param {Poses.PoseTracker} pose 
  */
 const computeShoulderAngle = (pose) => {
   const left = pose.landmark(`left_shoulder`);
