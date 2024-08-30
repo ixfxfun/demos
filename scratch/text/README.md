@@ -1,3 +1,0 @@
-# barebones
-
-Starter empty sketch
