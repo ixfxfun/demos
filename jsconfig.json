@@ -1,18 +1,23 @@
 {
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "./ixfx/**/*"
-  ],
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection":"force",
+    "target": "ES2023",
+    "jsx": "react",
+    "allowImportingTsExtensions": false,
     "checkJs": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "paths": {
+      "ixfx/*": ["./ixfx/*"]
+    },
     "lib": [
-      "ES2022",
-      "DOM"
-    ],
-    "target": "ES2022",
-    "baseUrl": "./",
-    "moduleResolution": "node"
-  }
+      "DOM","ESNext"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*"
+  ]
 }
