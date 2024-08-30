@@ -1,4 +1,4 @@
-import { Points, Rects, Grids } from '../../ixfx/geometry.js';
+import { Points, Rects, Grids } from 'ixfx/geometry.js';
 
 const settings = Object.freeze({
   numberOfParticles: 500,
@@ -7,7 +7,7 @@ const settings = Object.freeze({
 
 let state = Object.freeze({
   /** @type {Particle[]} */
-  particles:[],
+  particles: [],
   pixelCanvas: setupCanvas(`pixelsCanvas`, 300, 200),
   charCanvas: setupCanvas(`charsCanvas`, 300, 200),
 
@@ -16,7 +16,7 @@ let state = Object.freeze({
 const testCharsDom = () => {
   const { sampleEl } = settings;
   const outputElement = /** @type {HTMLElement} */(document.querySelector(`#charsDom`));
-  
+
   const chars = (sampleEl.textContent ?? ``).split(``);
 
   for (const ch of chars) {
@@ -29,21 +29,21 @@ const testCharsDom = () => {
 const testChars = () => {
   const { charCanvas } = state;
   const context = charCanvas.ready();
-  
+
   const drawX = (x, stroke) => {
     context.strokeStyle = stroke;
     context.beginPath();
     context.lineWidth = 2;
-    context.moveTo(x,0);
+    context.moveTo(x, 0);
     context.lineTo(x, charCanvas.height);
     context.stroke();
   };
-  
+
   const drawY = (y, stroke) => {
     context.strokeStyle = stroke;
     context.lineWidth = 2;
     context.beginPath();
-    context.moveTo(0,y);
+    context.moveTo(0, y);
     context.lineTo(charCanvas.width, y);
     context.stroke();
   };
@@ -74,7 +74,7 @@ const testPixels = () => {
   context.fillStyle = `red`;
   context.textBaseline = `top`;
   context.font = `24pt Helvetica`;
-  context.fillText (`Hello1234`, 0, 0);
+  context.fillText(`Hello1234`, 0, 0);
 
   const textP = readParticles(context, pixelCanvas);
   context.restore();
@@ -94,7 +94,7 @@ const drawParticles = (context, particles) => {
   for (const p of particles) {
     //context.fillStyle = `red`;
     context.fillStyle = `rgba(${p.colour[0]}, ${p.colour[1]}, ${p.colour[2]}, 1)`;
-    context.fillRect(p.x, p.y, 1,1);
+    context.fillRect(p.x, p.y, 1, 1);
   }
   context.restore();
 };
@@ -105,18 +105,18 @@ const drawParticles = (context, particles) => {
  * @param {Rects.RectPositioned} rect
  */
 const readParticles = (context, rect) => {
-  const id = context.getImageData(rect.x, rect.y, rect.width, rect.height, );
+  const id = context.getImageData(rect.x, rect.y, rect.width, rect.height,);
   const d = id.data;
   const pts = [];
-  for (let index=0;index<d.length;index+=4) {
+  for (let index = 0; index < d.length; index += 4) {
     let ii = index / 4;
-    if (d[index+3] === 0) continue;
+    if (d[index + 3] === 0) continue;
     const p = {
       x: ii % rect.width,
       y: Math.floor(ii / rect.width),
-      colour: [ d[index], d[index+1], d[index+2], d[index+3] ]
+      colour: [d[index], d[index + 1], d[index + 2], d[index + 3]]
     };
-    
+
     pts.push(p);
   }
   return pts;
@@ -131,10 +131,10 @@ const readParticles = (context, rect) => {
 function setupCanvas(id, w, h) {
   const canvasElement = /** @type {HTMLCanvasElement} */(document.querySelector(`#${id}`));
   const r = window.devicePixelRatio;
-  canvasElement.width = w*r;
-  canvasElement.height = h*r;
-  canvasElement.style.width = w +`px`;
-  canvasElement.style.height = h +`px`;
+  canvasElement.width = w * r;
+  canvasElement.height = h * r;
+  canvasElement.style.width = w + `px`;
+  canvasElement.style.height = h + `px`;
 
   const context = canvasElement.getContext(`2d`);
   if (!context) throw new Error(`could not create ctx`);
@@ -154,7 +154,7 @@ function setupCanvas(id, w, h) {
     height: h,
     width: w,
     x: 0,
-    y:0
+    y: 0
   };
 }
 
@@ -180,7 +180,7 @@ setup();
  * Update state
  * @param {Partial<state>} s 
  */
-function updateState (s) {
+function updateState(s) {
   state = Object.freeze({
     ...state,
     ...s
