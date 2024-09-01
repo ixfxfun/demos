@@ -127,7 +127,10 @@ declare class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, 
     private evictPolicy;
     private autoDeleteElapsedMs;
     private autoDeletePolicy;
+    private autoDeleteTimer;
+    private disposed;
     constructor(opts?: Opts);
+    dispose(): void;
     /**
      * Returns the number of keys being stored.
      */

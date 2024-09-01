@@ -20,19 +20,23 @@ import {
   throttle,
   updateOutdated,
   waitFor
-} from "./chunk-SCQC6LJE.js";
+} from "./chunk-EVFKSYEG.js";
 import {
   repeat,
   repeatSync,
   sleep,
   sleepWhile
-} from "./chunk-4IGV3ZF6.js";
+} from "./chunk-AXY45SLD.js";
 import {
   StateMachine_exports,
   Stopwatch_exports,
+  infinity,
+  interval,
+  once,
   run,
-  runSingle
-} from "./chunk-Y22PKHUJ.js";
+  runSingle,
+  since
+} from "./chunk-MUEKL35F.js";
 import "./chunk-YLRZZLGG.js";
 import {
   rateMinimum,
@@ -47,12 +51,14 @@ import {
   ofTotal,
   ofTotalTicks,
   relative,
+  timerAlwaysDone,
+  timerNeverDone,
   timerWithFunction
-} from "./chunk-2VXZ54M3.js";
+} from "./chunk-OH26WXXP.js";
 import "./chunk-4IJNRUE7.js";
 import "./chunk-BWJ5AMOD.js";
 import "./chunk-IQEKYUOH.js";
-import "./chunk-ZJSCF2A4.js";
+import "./chunk-I2PHDNRW.js";
 import "./chunk-B3EBEJZ3.js";
 import {
   elapsedToHumanString,
@@ -94,10 +100,13 @@ export {
   everyNth,
   frequencyTimer,
   hasElapsed,
+  infinity,
+  interval,
   intervalToMs,
   isInterval,
   ofTotal,
   ofTotalTicks,
+  once,
   promiseFromEvent,
   promiseWithResolvers,
   rateMinimum,
@@ -109,11 +118,14 @@ export {
   run,
   runOnce,
   runSingle,
+  since,
   singleItem,
   sleep,
   sleepWhile,
   throttle,
   timeout,
+  timerAlwaysDone,
+  timerNeverDone,
   timerWithFunction,
   updateOutdated,
   waitFor
