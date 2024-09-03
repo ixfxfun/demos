@@ -21,11 +21,11 @@ for (const c of categories) {
 // Copy loose files
 await cpy([`index.html`, `favicon.ico`, `demos.css`, `.eslintrc.json`], `${destination}/`);
 
-// Re-write imports
+// Re-write import map
 const replaceOptions = {
-  files: `${destination}/**/*.js`,
-  from: /(\.\.\/)*ixfx/g,
-  to: `https://unpkg.com/ixfx/dist`,
+  files: `${destination}/**/*.html`,
+  from: /{ "ixfx\/": "\/ixfx\/" }/g,
+  to: `{ "ixfx/": "https://unpkg.com/ixfx/dist/" }`
 };
 
 try {

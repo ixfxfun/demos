@@ -18,11 +18,14 @@ for (const c of categories) {
   await cpy([`${c}/**/*`], `${destination}/${c}`);
 }
 
-// // Re-write imports
+// Copy loose files
+await cpy([`index.html`, `favicon.ico`, `demos.css`, `.eslintrc.json`], `${destination}/`);
+
+// Re-write import map
 const replaceOptions = {
-  files: `${destination}/**/*.js`,
-  from: /(\.\.\/)*ixfx/g,
-  to: `https://unpkg.com/ixfx/dist`,
+  files: `${destination}/**/*.html`,
+  from: /{ "ixfx\/": "\/ixfx\/" }/g,
+  to: `{ "ixfx/": "https://unpkg.com/ixfx/dist/" }`
 };
 
 try {
@@ -30,5 +33,5 @@ try {
   console.log(`copy-for-glitch done`);
 }
 catch (error) {
-  console.error(`copy-for-glitch error occurred:`, error);
+  console.error(`copy -for-glitch error occurred:`, error);
 }

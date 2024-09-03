@@ -4,7 +4,6 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "eslint.format.enable": true,
-  "eslint.alwaysShowStatus": true,
   "html.format.enable": true,
   "js/ts.implicitProjectConfig.checkJs": true,
   "search.exclude": {
