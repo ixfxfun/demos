@@ -90,6 +90,7 @@ __export(modulation_exports, {
   ticks: () => ticks,
   time: () => time,
   timeModulator: () => timeModulator,
+  timingSourceFactory: () => timingSourceFactory,
   triangleShape: () => triangleShape,
   wave: () => wave,
   waveFromSource: () => waveFromSource,
@@ -163,14 +164,20 @@ var AdsrBase = class extends SimpleEventEmitter {
   get isDisposed() {
     return this.#disposed;
   }
-  switchStateIfNeeded() {
+  /**
+   * Changes state based on timer status
+   * @returns _True_ if state was changed
+   */
+  switchStateIfNeeded(allowLooping) {
     if (this.#timer === void 0) return false;
     let elapsed2 = this.#timer.elapsed;
     const wasHeld = this.#holdingInitial && !this.#holding;
     let hasChanged = false;
+    let state = this.#sm.state;
     do {
       hasChanged = false;
-      switch (this.#sm.state) {
+      state = this.#sm.state;
+      switch (state) {
         case `attack`: {
           if (elapsed2 > this.attackDuration || wasHeld) {
             this.#sm.next();
@@ -202,24 +209,24 @@ var AdsrBase = class extends SimpleEventEmitter {
           break;
         }
         case `complete`: {
-          if (this.shouldLoop) {
+          if (this.shouldLoop && allowLooping) {
             this.trigger(this.#holdingInitial);
           }
         }
       }
-    } while (hasChanged);
+    } while (hasChanged && state !== `complete`);
     return hasChanged;
   }
   /**
-   * Computes a stage progress from 0-1
+   * Computes a stage's progress from 0-1
    * @param allowStateChange
    * @returns
    */
-  computeRaw(allowStateChange = true) {
+  computeRaw(allowStateChange = true, allowLooping = true) {
     if (this.#timer === void 0) {
       return [void 0, 0, this.#sm.state];
     }
-    if (allowStateChange) this.switchStateIfNeeded();
+    if (allowStateChange) this.switchStateIfNeeded(allowLooping);
     const previousStage = this.#sm.state;
     const elapsed2 = this.#timer.elapsed;
     let relative = 0;
@@ -242,7 +249,7 @@ var AdsrBase = class extends SimpleEventEmitter {
         break;
       }
       case `complete`: {
-        return [void 0, 1, previousStage];
+        return [`complete`, 1, previousStage];
       }
       default: {
         throw new Error(`State machine in unknown state: ${state}`);
@@ -259,12 +266,18 @@ var AdsrBase = class extends SimpleEventEmitter {
   onTrigger() {
   }
   /**
-   * Triggers envelope.
+   * Triggers envelope, optionally _holding_ it.
+   * 
+   * If `hold` is _false_ (default), envelope will run through all stages,
+   * but sustain stage won't have an affect.
+   * 
+   * If `hold` is _true_, it will run to, and stay at the sustain stage. 
+   * Use {@link release} to later release the envelope.
    *
-   * If event is already trigged,
-   * it will be _retriggered_. If`opts.retriggered` is false (default)
-   * envelope starts again at `opts.initialValue`. Otherwise it starts at
-   * the current value.
+   * If event is already trigged it will be _retriggered_. 
+   * Initial value depends on `opts.retrigger`
+   * * _false_ (default): envelope continues at current value.
+   * * _true_: envelope value resets to `opts.initialValue`.
    *
    * @param hold If _true_ envelope will hold at sustain stage
    */
@@ -359,7 +372,7 @@ var Adsr = class extends AdsrBase {
   onTrigger() {
     this.initialLevelOverride = void 0;
     if (!this.retrigger) {
-      const [_stage, scaled, _raw] = this.compute();
+      const [_stage, scaled, _raw] = this.compute(true, false);
       if (!Number.isNaN(scaled) && scaled > 0) {
         this.initialLevelOverride = scaled;
       }
@@ -381,8 +394,8 @@ var Adsr = class extends AdsrBase {
    * Returns an array of [stage, scaled, raw]. Most likely you want to use {@link value} to just get the scaled value.
    * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
    */
-  compute(allowStateChange = true) {
-    const [stage, amt] = super.computeRaw(allowStateChange);
+  compute(allowStateChange = true, allowLooping = true) {
+    const [stage, amt] = super.computeRaw(allowStateChange, allowLooping);
     if (stage === void 0) return [void 0, Number.NaN, Number.NaN];
     let v;
     switch (stage) {
@@ -525,11 +538,11 @@ function elapsed(interval, options = {}) {
     return elapsedCycle % intervalMs / intervalMs;
   };
 }
-function bpm(bpm2, options) {
+function bpm(bpm2, options = {}) {
   const interval = 60 * 1e3 / bpm2;
   return elapsed(interval, options);
 }
-function hertz(hz, options) {
+function hertz(hz, options = {}) {
   const interval = 1e3 / hz;
   return elapsed(interval, options);
 }
@@ -537,8 +550,11 @@ function hertz(hz, options) {
 // src/modulation/source/PerSecond.ts
 var perSecond = (amount, options = {}) => {
   const perMilli = amount / 1e3;
-  const min = options.min ?? Number.MIN_SAFE_INTEGER;
-  const max = options.max ?? Number.MAX_SAFE_INTEGER;
+  let min = options.min ?? Number.MIN_SAFE_INTEGER;
+  let max = options.max ?? Number.MAX_SAFE_INTEGER;
+  const clamp2 = options.clamp ?? false;
+  if (clamp2 && options.max) throw new Error(`Use either 'max' or 'clamp', not both.`);
+  if (clamp2) max = amount;
   let called = performance.now();
   return () => {
     const now = performance.now();
@@ -1065,6 +1081,20 @@ var springShape = (opts = {}) => {
   }
 };
 
+// src/modulation/TimingSourceFactory.ts
+var timingSourceFactory = (source, duration, options = {}) => {
+  switch (source) {
+    case `elapsed`:
+      return () => elapsed(duration, options);
+    case `bpm`:
+      return () => bpm(duration, options);
+    case `hertz`:
+      return () => hertz(duration, options);
+    default:
+      throw new Error(`Unknown source '${source}'. Expected: 'elapsed', 'hertz' or 'bpm'`);
+  }
+};
+
 // src/modulation/Waveforms.ts
 function triangleShape(period = 1) {
   period = 1 / period;
@@ -1174,6 +1204,7 @@ export {
   spring,
   springValue,
   springShape,
+  timingSourceFactory,
   triangleShape,
   squareShape,
   sineShape,
@@ -1184,4 +1215,4 @@ export {
   weightedAverage,
   modulation_exports
 };
-//# sourceMappingURL=chunk-XOQI5EKB.js.map
+//# sourceMappingURL=chunk-3L6NN3IX.js.map

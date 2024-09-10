@@ -2016,9 +2016,9 @@ function ifUndefined(fn) {
 // src/rx/ops/Tap.ts
 function tapProcess(input, ...processors) {
   const inputStream = resolveSource(input);
-  const chain2 = (void 0)(...processors);
+  const chain = flow(...processors);
   inputStream.onValue((value) => {
-    chain2(value);
+    chain(value);
   });
   return inputStream;
 }
@@ -4546,4 +4546,4 @@ export {
   to,
   rx_exports
 };
-//# sourceMappingURL=chunk-Y2M6UVIQ.js.map
+//# sourceMappingURL=chunk-FUJYFJRJ.js.map

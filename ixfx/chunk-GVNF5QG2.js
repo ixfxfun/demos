@@ -11,7 +11,7 @@ import {
   isEqualContextString,
   mapObjectByObject,
   mapObjectShallow
-} from "./chunk-Y2M6UVIQ.js";
+} from "./chunk-FUJYFJRJ.js";
 import {
   resolve,
   resolveSync,
@@ -84,6 +84,7 @@ __export(data_exports, {
   piPi: () => piPi,
   resolve: () => resolve,
   resolveFields: () => resolveFields,
+  resolveFieldsSync: () => resolveFieldsSync,
   resolveSync: () => resolveSync,
   resolveWithFallback: () => resolveWithFallback,
   resolveWithFallbackSync: () => resolveWithFallbackSync
@@ -719,6 +720,15 @@ async function resolveFields(object) {
   const entries = zip(keys, results);
   return Object.fromEntries(entries);
 }
+function resolveFieldsSync(object) {
+  const entries = [];
+  for (const entry of Object.entries(object)) {
+    const resolvable = entry[1];
+    const value = resolveSync(resolvable);
+    entries.push([entry[0], value]);
+  }
+  return Object.fromEntries(entries);
+}
 
 // src/data/maps/index.ts
 var maps_exports = {};
@@ -758,8 +768,9 @@ export {
   keysToNumbers,
   Pool_exports,
   resolveFields,
+  resolveFieldsSync,
   maps_exports,
   piPi,
   data_exports
 };
-//# sourceMappingURL=chunk-YUEB7A2F.js.map
+//# sourceMappingURL=chunk-GVNF5QG2.js.map

@@ -4,8 +4,9 @@ import {
   keysToNumbers,
   maps_exports,
   piPi,
-  resolveFields
-} from "./chunk-YUEB7A2F.js";
+  resolveFields,
+  resolveFieldsSync
+} from "./chunk-GVNF5QG2.js";
 import "./chunk-72HWREB4.js";
 import {
   arrays_exports
@@ -20,7 +21,7 @@ import {
   isEqualContextString,
   mapObjectByObject,
   mapObjectShallow
-} from "./chunk-Y2M6UVIQ.js";
+} from "./chunk-FUJYFJRJ.js";
 import "./chunk-262WU67A.js";
 import "./chunk-XFNQJV53.js";
 import "./chunk-X2FI26A6.js";
@@ -92,6 +93,7 @@ export {
   piPi,
   resolve,
   resolveFields,
+  resolveFieldsSync,
   resolveSync,
   resolveWithFallback,
   resolveWithFallbackSync

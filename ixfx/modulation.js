@@ -19,11 +19,12 @@ import {
   springShape,
   springValue,
   squareShape,
+  timingSourceFactory,
   triangleShape,
   wave,
   waveFromSource,
   weightedAverage
-} from "./chunk-XOQI5EKB.js";
+} from "./chunk-3L6NN3IX.js";
 import "./chunk-ZQCINZHO.js";
 import "./chunk-UTOEERYG.js";
 import "./chunk-BHY7TTTH.js";
@@ -100,6 +101,7 @@ export {
   ticks,
   time,
   timeModulator,
+  timingSourceFactory,
   triangleShape,
   wave,
   waveFromSource,

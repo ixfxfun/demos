@@ -1,5 +1,5 @@
 import { I as Interval } from './IntervalType-B4PbUkjV.js';
-import { E as EasingName } from './index-DECwW_N1.js';
+import { E as EasingName } from './index-CVS-IuSd.js';
 
 declare const piPi: number;
 /**

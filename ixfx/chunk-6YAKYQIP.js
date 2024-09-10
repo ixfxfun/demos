@@ -23,20 +23,20 @@ import {
 } from "./chunk-BHY7TTTH.js";
 import {
   StackImmutable
-} from "./chunk-YGCI45ON.js";
+} from "./chunk-WHF3XEB3.js";
 import {
   ofArrayMutable,
   ofCircularMutable
 } from "./chunk-UU6RGBIQ.js";
 import {
   immutable
-} from "./chunk-YNS5GM6I.js";
+} from "./chunk-WI3JRKTS.js";
 import {
   Ops,
   getField,
   getPaths,
   sources_exports
-} from "./chunk-Y2M6UVIQ.js";
+} from "./chunk-FUJYFJRJ.js";
 import {
   resolveEl
 } from "./chunk-ZNCB3DZ2.js";
@@ -2718,8 +2718,65 @@ var plot = (parentElementOrQuery, opts) => {
 var plot_exports = {};
 __export(plot_exports, {
   CartesianCanvasPlot: () => CartesianCanvasPlot,
-  DataSet: () => DataSet
+  DataSet: () => DataSet,
+  absoluteCompute: () => absoluteCompute,
+  computeAxisMark: () => computeAxisMark,
+  computeMinMax: () => computeMinMax,
+  relativeCompute: () => relativeCompute
 });
+
+// src/visual/plot/Cartesian.ts
+var computeMinMax = (mm) => {
+  const x = mm.map((m) => m.x);
+  const y = mm.map((m) => m.y);
+  const minX = Math.min(...x);
+  const maxX = Math.max(...x);
+  const minY = Math.min(...y);
+  const maxY = Math.max(...y);
+  const width = maxX - minX;
+  const height = maxY - minY;
+  return {
+    min: { x: minX, y: minY },
+    max: { x: maxX, y: maxY },
+    width,
+    height,
+    minDim: Math.min(width, height),
+    maxDim: Math.max(width, height)
+  };
+};
+var relativeCompute = (minMax) => {
+  const xScale = scaler(minMax.min.x, minMax.max.x);
+  const yScale = scaler(minMax.min.y, minMax.max.y);
+  return (point) => ({
+    x: xScale(point.x),
+    y: yScale(point.y)
+  });
+};
+var absoluteCompute = (minMax) => {
+  const xScale = scaler(0, 1, minMax.min.x, minMax.max.x);
+  const yScale = scaler(0, 1, minMax.min.y, minMax.max.y);
+  return (point) => ({
+    x: xScale(point.x),
+    y: yScale(point.y)
+  });
+};
+var computeAxisMark = (mm, increments, major) => {
+  const xValues = [];
+  let count = 0;
+  for (let x = mm.min.x; x < mm.max.x; x += increments) {
+    const isMajor = count % major === 0;
+    xValues.push({ x, y: 0, major: isMajor });
+    count++;
+  }
+  count = 0;
+  const yValues = [];
+  for (let y = mm.min.y; y < mm.max.y; y += increments) {
+    const isMajor = count % major === 0;
+    yValues.push({ x: 0, y, major: isMajor });
+    count++;
+  }
+  return { x: xValues, y: yValues };
+};
 
 // src/dom/CanvasHelper.ts
 var CanvasHelper = class extends SimpleEventEmitter {
@@ -2961,59 +3018,6 @@ var CanvasHelper = class extends SimpleEventEmitter {
   get center() {
     return { x: this.width / 2, y: this.height / 2 };
   }
-};
-
-// src/visual/plot/Cartesian.ts
-var computeMinMax = (mm) => {
-  const x = mm.map((m) => m.x);
-  const y = mm.map((m) => m.y);
-  const minX = Math.min(...x);
-  const maxX = Math.max(...x);
-  const minY = Math.min(...y);
-  const maxY = Math.max(...y);
-  const width = maxX - minX;
-  const height = maxY - minY;
-  return {
-    min: { x: minX, y: minY },
-    max: { x: maxX, y: maxY },
-    width,
-    height,
-    minDim: Math.min(width, height),
-    maxDim: Math.max(width, height)
-  };
-};
-var relativeCompute = (minMax) => {
-  const xScale = scaler(minMax.min.x, minMax.max.x);
-  const yScale = scaler(minMax.min.y, minMax.max.y);
-  return (point) => ({
-    x: xScale(point.x),
-    y: yScale(point.y)
-  });
-};
-var absoluteCompute = (minMax) => {
-  const xScale = scaler(0, 1, minMax.min.x, minMax.max.x);
-  const yScale = scaler(0, 1, minMax.min.y, minMax.max.y);
-  return (point) => ({
-    x: xScale(point.x),
-    y: yScale(point.y)
-  });
-};
-var computeAxisMark = (mm, increments, major) => {
-  const xValues = [];
-  let count = 0;
-  for (let x = mm.min.x; x < mm.max.x; x += increments) {
-    const isMajor = count % major === 0;
-    xValues.push({ x, y: 0, major: isMajor });
-    count++;
-  }
-  count = 0;
-  const yValues = [];
-  for (let y = mm.min.y; y < mm.max.y; y += increments) {
-    const isMajor = count % major === 0;
-    yValues.push({ x: 0, y, major: isMajor });
-    count++;
-  }
-  return { x: xValues, y: yValues };
 };
 
 // src/visual/plot/CartesianCanvasPlot.ts
@@ -3503,4 +3507,4 @@ export {
   plot_exports,
   visual_exports
 };
-//# sourceMappingURL=chunk-SBDIIAAB.js.map
+//# sourceMappingURL=chunk-6YAKYQIP.js.map

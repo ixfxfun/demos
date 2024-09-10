@@ -565,6 +565,8 @@ type ResolvedObject<T extends Record<string, ResolveToValue<any>>> = {
  * for the return object. If the property is a function or generator, its value
  * is used instead. Async functions and generators are also usable.
  *
+ * Use {@link resolveFieldsSync} for a synchronous version.
+ *
  * Not recursive.
  *
  * In the below example, the function for the property `random` is invoked.
@@ -594,6 +596,7 @@ type ResolvedObject<T extends Record<string, ResolveToValue<any>>> = {
  * @returns
  */
 declare function resolveFields<T extends Record<string, ResolveToValue<any>>>(object: T): Promise<ResolvedObject<T>>;
+declare function resolveFieldsSync<T extends Record<string, ResolveToValue<any>>>(object: T): ResolvedObject<T>;
 
 /**
  * Gets the closest integer key to `target` in `data`.
@@ -1111,11 +1114,12 @@ declare const index_mapObjectShallow: typeof mapObjectShallow;
 declare const index_piPi: typeof piPi;
 declare const index_resolve: typeof resolve;
 declare const index_resolveFields: typeof resolveFields;
+declare const index_resolveFieldsSync: typeof resolveFieldsSync;
 declare const index_resolveSync: typeof resolveSync;
 declare const index_resolveWithFallback: typeof resolveWithFallback;
 declare const index_resolveWithFallbackSync: typeof resolveWithFallbackSync;
 declare namespace index {
-  export { index$2 as Arrays, index_ChangeKind as ChangeKind, index_ChangeRecord as ChangeRecord, index_CompareChangeSet as CompareChangeSet, index_Correlate as Correlate, index_IsEqualContext as IsEqualContext, type index_MapObjectArgs as MapObjectArgs, index$1 as Maps, index_NumberFunction as NumberFunction, index_Pathed as Pathed, Pool$1 as Pool, index_Process as Process, index_RankArrayOptions as RankArrayOptions, index_RankFunction as RankFunction, index_RankOptions as RankOptions, index_ResolveFallbackOpts as ResolveFallbackOpts, index_ResolveToValue as ResolveToValue, index_ResolveToValueAsync as ResolveToValueAsync, index_ResolveToValueSync as ResolveToValueSync, type index_ResolvedObject as ResolvedObject, index_ValueType as ValueType, index_changedDataFields as changedDataFields, index_compareArrays as compareArrays, index_compareData as compareData, index_compareKeys as compareKeys, index_isEmptyEntries as isEmptyEntries, index_isEqualContextString as isEqualContextString, index_keysToNumbers as keysToNumbers, index_mapObjectByObject as mapObjectByObject, index_mapObjectShallow as mapObjectShallow, index_piPi as piPi, index_resolve as resolve, index_resolveFields as resolveFields, index_resolveSync as resolveSync, index_resolveWithFallback as resolveWithFallback, index_resolveWithFallbackSync as resolveWithFallbackSync };
+  export { index$2 as Arrays, index_ChangeKind as ChangeKind, index_ChangeRecord as ChangeRecord, index_CompareChangeSet as CompareChangeSet, index_Correlate as Correlate, index_IsEqualContext as IsEqualContext, type index_MapObjectArgs as MapObjectArgs, index$1 as Maps, index_NumberFunction as NumberFunction, index_Pathed as Pathed, Pool$1 as Pool, index_Process as Process, index_RankArrayOptions as RankArrayOptions, index_RankFunction as RankFunction, index_RankOptions as RankOptions, index_ResolveFallbackOpts as ResolveFallbackOpts, index_ResolveToValue as ResolveToValue, index_ResolveToValueAsync as ResolveToValueAsync, index_ResolveToValueSync as ResolveToValueSync, type index_ResolvedObject as ResolvedObject, index_ValueType as ValueType, index_changedDataFields as changedDataFields, index_compareArrays as compareArrays, index_compareData as compareData, index_compareKeys as compareKeys, index_isEmptyEntries as isEmptyEntries, index_isEqualContextString as isEqualContextString, index_keysToNumbers as keysToNumbers, index_mapObjectByObject as mapObjectByObject, index_mapObjectShallow as mapObjectShallow, index_piPi as piPi, index_resolve as resolve, index_resolveFields as resolveFields, index_resolveFieldsSync as resolveFieldsSync, index_resolveSync as resolveSync, index_resolveWithFallback as resolveWithFallback, index_resolveWithFallbackSync as resolveWithFallbackSync };
 }
 
-export { Correlate as C, type MapObjectArgs as M, Pool$1 as P, type ResolvedObject as R, index$1 as a, mapObjectByObject as b, index as i, keysToNumbers as k, mapObjectShallow as m, piPi as p, resolveFields as r };
+export { Correlate as C, type MapObjectArgs as M, Pool$1 as P, type ResolvedObject as R, index$1 as a, mapObjectByObject as b, resolveFieldsSync as c, index as i, keysToNumbers as k, mapObjectShallow as m, piPi as p, resolveFields as r };

@@ -925,31 +925,6 @@ declare namespace PlotOld {
   export { type PlotOld_Axis as Axis, type PlotOld_BufferType as BufferType, type PlotOld_DrawingOpts as DrawingOpts, type PlotOld_PlotOpts as PlotOpts, type PlotOld_Plotter as Plotter, type PlotOld_Series as Series, type PlotOld_SeriesColours as SeriesColours, PlotOld_add as add, PlotOld_calcScale as calcScale, PlotOld_defaultAxis as defaultAxis, PlotOld_draw as draw, PlotOld_drawValue as drawValue, PlotOld_plot as plot };
 }
 
-declare class DataSet<TValue, TSeriesMeta> {
-    #private;
-    lastChange: number;
-    constructor();
-    get metaCount(): number;
-    clear(): void;
-    set(series: string, data: TValue[]): void;
-    deleteBySeries(series: string): boolean;
-    setMeta(series: string, meta: TSeriesMeta): void;
-    hasMeta(series: string): boolean;
-    getMeta(series: string): TSeriesMeta | undefined;
-    getValues(): Generator<TValue, any, undefined>;
-    getEntries(): Generator<[key: string, value: TValue[]], any, undefined>;
-    getSeries(): Generator<readonly TValue[], any, undefined>;
-    add(value: TValue, series?: string): void;
-}
-
-type PointMinMax = {
-    min: Point;
-    max: Point;
-    width: number;
-    height: number;
-    minDim: number;
-    maxDim: number;
-};
 type TextStyle = {
     font: string;
     colour: string;
@@ -969,14 +944,44 @@ type ShowOptions = {
     grid: boolean;
     whiskers: boolean;
 };
-type PlotPoint = Point & {
-    fillStyle?: string;
-    radius?: number;
-};
 type SeriesMeta = {
     colour: string;
     lineWidth: number;
     dotRadius: number;
+};
+
+type PointMinMax = {
+    min: Point;
+    max: Point;
+    width: number;
+    height: number;
+    minDim: number;
+    maxDim: number;
+};
+type PlotPoint = Point & {
+    fillStyle?: string;
+    radius?: number;
+};
+type CartesianScaler = (pt: Point) => Point;
+type CartesianDataRange = {
+    /**
+     * Converts a data value to relative value (0..1)
+     */
+    valueToRelative: CartesianScaler;
+    /**
+     * Converts a relative value to element-based coordinates
+     * (ie 0,0 is top-left of CANVAS)
+     */
+    relativeToElementSpace: CartesianScaler;
+    /**
+     * Converts canvas coordinate to relative
+     */
+    elementSpaceToRelative: CartesianScaler;
+    /**
+     * Converts relative coordinate to value
+     */
+    relativeToValue: CartesianScaler;
+    range: PointMinMax;
 };
 type CartesianPlotOptions = {
     show: Partial<ShowOptions>;
@@ -1015,28 +1020,40 @@ type CartesianPlotOptions = {
     textStyle: TextStyle;
     whiskerLength: number;
 };
-
-type Scaler = (pt: Point) => Point;
-type DataRangeDependencies = {
-    /**
-     * Converts a data value to relative value (0..1)
-     */
-    valueToRelative: Scaler;
-    /**
-     * Converts a relative value to element-based coordinates
-     * (ie 0,0 is top-left of CANVAS)
-     */
-    relativeToElementSpace: Scaler;
-    /**
-     * Converts canvas coordinate to relative
-     */
-    elementSpaceToRelative: Scaler;
-    /**
-     * Converts relative coordinate to value
-     */
-    relativeToValue: Scaler;
-    range: PointMinMax;
+declare const computeMinMax: (mm: Point[]) => PointMinMax;
+declare const relativeCompute: (minMax: PointMinMax) => (point: Point) => {
+    x: number;
+    y: number;
 };
+declare const absoluteCompute: (minMax: PointMinMax) => (point: Point) => {
+    x: number;
+    y: number;
+};
+type AxisMark = Point & {
+    major: boolean;
+};
+declare const computeAxisMark: (mm: PointMinMax, increments: number, major: number) => {
+    x: AxisMark[];
+    y: AxisMark[];
+};
+
+declare class DataSet<TValue, TSeriesMeta> {
+    #private;
+    lastChange: number;
+    constructor();
+    get metaCount(): number;
+    clear(): void;
+    set(series: string, data: TValue[]): void;
+    deleteBySeries(series: string): boolean;
+    setMeta(series: string, meta: TSeriesMeta): void;
+    hasMeta(series: string): boolean;
+    getMeta(series: string): TSeriesMeta | undefined;
+    getValues(): Generator<TValue, any, undefined>;
+    getEntries(): Generator<[key: string, value: TValue[]], any, undefined>;
+    getSeries(): Generator<readonly TValue[], any, undefined>;
+    add(value: TValue, series?: string): void;
+}
+
 /**
  * Simple plotting of cartesian values.
  *
@@ -1088,7 +1105,7 @@ declare class CartesianCanvasPlot {
     computeRenderArea(): Point & Rect & {
         dimensionMin: number;
     };
-    getCurrentRange(): DataRangeDependencies;
+    getCurrentRange(): CartesianDataRange;
     /**
      * Converts a point in data space to viewport space
      * @param pt
@@ -1132,12 +1149,27 @@ declare class CartesianCanvasPlot {
     setMeta(series: string, meta: Partial<SeriesMeta>): void;
 }
 
+type index$1_AxisMark = AxisMark;
 type index$1_CartesianCanvasPlot = CartesianCanvasPlot;
 declare const index$1_CartesianCanvasPlot: typeof CartesianCanvasPlot;
+type index$1_CartesianDataRange = CartesianDataRange;
+type index$1_CartesianPlotOptions = CartesianPlotOptions;
+type index$1_CartesianScaler = CartesianScaler;
 type index$1_DataSet<TValue, TSeriesMeta> = DataSet<TValue, TSeriesMeta>;
 declare const index$1_DataSet: typeof DataSet;
+type index$1_GridStyle = GridStyle;
+type index$1_LineStyle = LineStyle;
+type index$1_PlotPoint = PlotPoint;
+type index$1_PointMinMax = PointMinMax;
+type index$1_SeriesMeta = SeriesMeta;
+type index$1_ShowOptions = ShowOptions;
+type index$1_TextStyle = TextStyle;
+declare const index$1_absoluteCompute: typeof absoluteCompute;
+declare const index$1_computeAxisMark: typeof computeAxisMark;
+declare const index$1_computeMinMax: typeof computeMinMax;
+declare const index$1_relativeCompute: typeof relativeCompute;
 declare namespace index$1 {
-  export { index$1_CartesianCanvasPlot as CartesianCanvasPlot, index$1_DataSet as DataSet };
+  export { type index$1_AxisMark as AxisMark, index$1_CartesianCanvasPlot as CartesianCanvasPlot, type index$1_CartesianDataRange as CartesianDataRange, type index$1_CartesianPlotOptions as CartesianPlotOptions, type index$1_CartesianScaler as CartesianScaler, index$1_DataSet as DataSet, type index$1_GridStyle as GridStyle, type index$1_LineStyle as LineStyle, type index$1_PlotPoint as PlotPoint, type index$1_PointMinMax as PointMinMax, type index$1_SeriesMeta as SeriesMeta, type index$1_ShowOptions as ShowOptions, type index$1_TextStyle as TextStyle, index$1_absoluteCompute as absoluteCompute, index$1_computeAxisMark as computeAxisMark, index$1_computeMinMax as computeMinMax, index$1_relativeCompute as relativeCompute };
 }
 
 /**

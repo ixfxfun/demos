@@ -1,4 +1,4 @@
-export { B as BipolarView, C as CartesianCanvasPlot, I as ImageDataGrid, P as Palette, c as Plot, a as Plot2, b as PlotOld, S as SceneGraph, s as scaleCanvas } from './index-B96214u9.js';
+export { B as BipolarView, C as CartesianCanvasPlot, I as ImageDataGrid, P as Palette, c as Plot, a as Plot2, b as PlotOld, S as SceneGraph, s as scaleCanvas } from './index-CxUT1hz8.js';
 export { a as Drawing } from './Drawing-DX_48Ltm.js';
 export { S as Svg } from './Svg-D94XTP5k.js';
 export { a as Colour } from './Colour-jbiYG85Y.js';

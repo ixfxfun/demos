@@ -12,7 +12,7 @@ import {
   parentSizeCanvas,
   resizeObservable,
   windowResize
-} from "./chunk-SBDIIAAB.js";
+} from "./chunk-6YAKYQIP.js";
 import {
   SvgElements_exports
 } from "./chunk-EQEFMXMU.js";
@@ -24,7 +24,7 @@ import {
   setHtml,
   setProperty,
   setText
-} from "./chunk-Y2M6UVIQ.js";
+} from "./chunk-FUJYFJRJ.js";
 import {
   getErrorMessage
 } from "./chunk-4IJNRUE7.js";
@@ -2774,4 +2774,4 @@ export {
   byId,
   dom_exports
 };
-//# sourceMappingURL=chunk-TAYZACKL.js.map
+//# sourceMappingURL=chunk-WZWDQ4IW.js.map

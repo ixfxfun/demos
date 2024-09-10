@@ -1,4 +1,4 @@
-import { M as ModSettableOptions, a as ModSettable, b as ModSource, c as Modulate, d as ModulatorTimed, S as SpringOptions, e as ModSettableFeedback, i as index$3 } from './index-DECwW_N1.js';
+import { M as ModSettableOptions, a as ModSettable, b as ModSource, c as Modulate, d as ModulatorTimed, S as SpringOptions, e as ModSettableFeedback, i as index$3 } from './index-CVS-IuSd.js';
 import { P as Path } from './PathType-9cjB2t-Y.js';
 import { S as SimpleEventEmitter } from './Events-DJgOvcWD.js';
 import { I as Interval } from './IntervalType-B4PbUkjV.js';
@@ -123,25 +123,35 @@ declare class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
     constructor(opts?: AdsrTimingOpts);
     dispose(): void;
     get isDisposed(): boolean;
-    protected switchStateIfNeeded(): boolean;
     /**
-     * Computes a stage progress from 0-1
+     * Changes state based on timer status
+     * @returns _True_ if state was changed
+     */
+    protected switchStateIfNeeded(allowLooping: boolean): boolean;
+    /**
+     * Computes a stage's progress from 0-1
      * @param allowStateChange
      * @returns
      */
-    protected computeRaw(allowStateChange?: boolean): [stage: string | undefined, amount: number, prevStage: string];
+    protected computeRaw(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, amount: number, prevStage: string];
     /**
      * Returns _true_ if envelope has finished
      */
     get isDone(): boolean;
     protected onTrigger(): void;
     /**
-     * Triggers envelope.
+     * Triggers envelope, optionally _holding_ it.
      *
-     * If event is already trigged,
-     * it will be _retriggered_. If`opts.retriggered` is false (default)
-     * envelope starts again at `opts.initialValue`. Otherwise it starts at
-     * the current value.
+     * If `hold` is _false_ (default), envelope will run through all stages,
+     * but sustain stage won't have an affect.
+     *
+     * If `hold` is _true_, it will run to, and stay at the sustain stage.
+     * Use {@link release} to later release the envelope.
+     *
+     * If event is already trigged it will be _retriggered_.
+     * Initial value depends on `opts.retrigger`
+     * * _false_ (default): envelope continues at current value.
+     * * _true_: envelope value resets to `opts.initialValue`.
      *
      * @param hold If _true_ envelope will hold at sustain stage
      */
@@ -205,7 +215,7 @@ declare class AdsrIterator implements Iterator<number> {
  * shouldLoop: boolean
  * ```
  *
- * If `retrigger` is false, re-triggers will continue at current level
+ * If `retrigger` is _false_ (default), a re-triggered envelope continues at current value
  * rather than resetting to `initialLevel`.
  *
  * If `shouldLoop` is true, envelope loops until `release()` is called.
@@ -287,7 +297,7 @@ declare class Adsr extends AdsrBase implements Iterable<number> {
      * Returns an array of [stage, scaled, raw]. Most likely you want to use {@link value} to just get the scaled value.
      * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
      */
-    compute(allowStateChange?: boolean): [stage: string | undefined, scaled: number, raw: number];
+    compute(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, scaled: number, raw: number];
 }
 
 /**
@@ -382,8 +392,11 @@ type TicksModSettableOptions = ModSettableOptions & {
  *
  * Ie. if totalTicks = 10, we get: 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
  *
- * Use 'exclusiveStart' or 'exclusiveEnd' to shift range. Eg 'exclusiveStart' will begin at 0.1 and
- * include 1.0, while 'exclusiveEnd' will start at 0 and run up to and including 0.9.
+ * Use 'exclusiveStart' and 'exclusiveEnd' flags to shift range. Eg, with `totalTicks` of 10:
+ * * 'exclusiveStart:true': first value is 0.1, last value is 1.0 (10 values total)
+ * * 'exclusiveEnd:true': first value is 0, last value is 0.9 (10 values total)
+ * * If both are true, first value is 0.1, last value is 0.9 (9 values total)
+ * * If both are false (or not set), we get the case described earlier, first value is 0, last value is 1 (11 values total)
  *
  * Other examples:
  * * totalTicks: 20, value goes up by 0.05
@@ -395,9 +408,11 @@ type TicksModSettableOptions = ModSettableOptions & {
 declare function ticks$1(totalTicks: number, options?: Partial<TicksModSettableOptions>): ModSettable;
 
 /**
- * Returns an elapsed number of milliseconds up to `interval`.
- * If `oneShot` is _false_ (default), it will loop, resetting to 0 when `interval` is reached.
- * If `oneShot` is _true_, once `interval` is reached, this value will be returned.
+ * Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
+ * using different units for time.
+ *
+ * By default, it continues forever, cycling from 0..1 repeatedly for each interval. Use
+ * `cycleLimit` to restrict this. A value of 1 means it won't loop.
  *
  * The starting 'position' is `performance.now()`. If `startAt` option is provided, this will be used instead.
  * It probably should be an offset of `performance.now()`, eg: `{ startAt: performance.now() - 500 }` to shift
@@ -405,29 +420,32 @@ declare function ticks$1(totalTicks: number, options?: Partial<TicksModSettableO
  *
  * When using `startAtRelative`, the starting position will be set backward by the relative amount. A value
  * of 0.5, for example, will set the timer back 50% of the interval, meaning the cycle will start half way through.
+ *
  * @param interval
  * @param options
  * @returns
  */
 declare function elapsed(interval: Interval, options?: Partial<ModSettableOptions>): ModSettable;
 /**
- * Counts beats based on a BPM
+ * Counts beats based on a BPM.
+ * Uses {@link elapsed} internally.
  * @param bpm
  * @param options
  * @returns
  */
-declare function bpm(bpm: number, options: Partial<ModSettableOptions>): ModSettable;
+declare function bpm(bpm: number, options?: Partial<ModSettableOptions>): ModSettable;
 /**
- * Counts based on hertz (oscillations per second)
+ * Counts based on hertz (oscillations per second).
+ * Uses {@link elapsed} internally.
  * @param hz
  * @param options
  * @returns
  */
-declare function hertz(hz: number, options: Partial<ModSettableOptions>): ModSettable;
+declare function hertz(hz: number, options?: Partial<ModSettableOptions>): ModSettable;
 
 /**
  * Returns a proportion of `amount` depending on elapsed time.
- * The idea being that cumulatively, `amount` is yielded every second.
+ * Cumulatively, `amount` is yielded every second.
  *
  * ```js
  * // Calculate a proportion of 0.1 every second
@@ -442,7 +460,7 @@ declare function hertz(hz: number, options: Partial<ModSettableOptions>): ModSet
  * ```js
  * const settings = {
  *  ageMod: perSecond(0.1);
-* };
+ * };
  *
  * let state = {
  *  age: 1
@@ -461,13 +479,13 @@ declare function hertz(hz: number, options: Partial<ModSettableOptions>): ModSet
  * });
  * ```
  *
- * Options:
- * * max: if specified, the max return value
- * * min: if specified, the min return value
+ * Use the `clamp` option so the returned value never exceeds `amount`.
+ * Alternatively, `min`/`max` options allow you to set arbitrary limits.
  * @param amount
  * @returns
  */
 declare const perSecond: (amount: number, options?: Partial<{
+    clamp: boolean;
     max: number;
     min: number;
 }>) => ModSource;
@@ -478,6 +496,7 @@ declare const perSecond: (amount: number, options?: Partial<{
  * @returns
  */
 declare const perMinute: (amount: number, options?: Partial<{
+    clamp: boolean;
     max: number;
     min: number;
 }>) => ModSource;
@@ -1115,11 +1134,22 @@ declare const jitterAbsolute: (options: JitterOpts) => Jitterer;
 declare const jitter: (options?: JitterOpts) => Jitterer;
 
 /**
- * Mixes in modulation
+ * Mixes in modulation. This is used when you want to
+ * fold in a controllable amount of modulation.
+ *
+ * For example, we have a base value of 0.5 (50%) that we want to modulate
+ * by 0.9 (90%). That is, reduce its value by 10%. `mix` allows us
+ * to slowly ramp up to the fully modulated value.
  *
  * ```js
- * // Modulates the value of 100 by 90% at 100% strength
- * mix(1, 0.5, 0.9);
+ * import { mix } from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * // When 'amt' is 0, modulation doesn't affect value at all,
+ * // original is returned
+ * mix(0, 0.5, 0.9); // 0.5
+ * // Mixing in 50% of modulation
+ * mix(0.5, 0.5, 0.9); // 0.475
+ * // All modulation applied, so now we get 90% of 0.5
+ * mix(1, 0.5, 0.9); // 0.45 (ie. 90% of 0.5)
  * ```
  * @param amount Amount of modulation (0..1). 0 means modulation value has no effect
  * @param original Original value to modulate
@@ -1146,21 +1176,23 @@ declare const mix: (amount: number, original: number, modulation: number) => num
  */
 declare const mixModulators: (balance: number, a: Modulate, b: Modulate) => Modulate;
 /**
- * Returns a 'crossfade' of two easing functions, synchronised with the progress through the easing. That is:
+ * Returns a 'crossfader` function of two easing functions, synchronised with the progress through the easing.
+ *
+ * Example `amt` values:
  * * 0.0 will yield 100% of easingA at its `easing(0)` value.
- * * 0.2 will yield 80% of a, 20% of b, with both at their `easing(0.2)` values
+ * * 0.2 will yield 80% of easingA, 20% of easingB, both at their `easing(0.2)` values
  * * 0.5 will yield 50% of both functions both at their `easing(0.5)` values
- * * 0.8 will yield 20% of a, 80% of a, with both at their `easing(0.8)` values
+ * * 0.8 will yield 20% of easingA, 80% of easingB, with both at their `easing(0.8)` values
  * * 1.0 will yield 100% of easingB at its `easing(1)` value.
  *
- * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower valus.
+ * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower values.
  *
  * ```js
  * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * Easings.crossFade(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  * ```
- * @param a
- * @param b
+ * @param a Easing A
+ * @param b Easing B
  * @returns Numeric value
  */
 declare const crossfade: (a: Modulate, b: Modulate) => Modulate;
@@ -1488,6 +1520,36 @@ declare function springValue(opts?: SpringOptions, timerOrFreq?: Timer | number 
  */
 declare const springShape: (opts?: SpringOptions) => Modulate;
 
+type TimingSources = `elapsed` | `hertz` | `bpm`;
+/**
+ * A factory function for creating a timing source. It returns
+ * a function which creates a designated timer.
+ *
+ * This is useful in times where you need to recreate timers, eg for reset
+ * type of behaviours because the options for the timer to be
+ * consolidated in one place.
+ *
+ * ```js
+ * // Get a factory for an elapsed timer
+ * const factory = sources(`elapsed`, 1000);
+ *
+ * // Create the timer
+ * let t = factory();
+ *
+ * // Get a value from the timer
+ * const value = t();
+ *
+ * // Recreate the timer, note we don't need any options
+ * t = factory();
+ * ```
+ *
+ * @param source Kind of timer to make
+ * @param duration Duration depends on the timer used. Will be milliseconds, hertz or bpm.
+ * @param options Options to pass to timer.
+ * @returns
+ */
+declare const timingSourceFactory: (source: TimingSources, duration: number, options?: Partial<ModSettableOptions>) => () => ModSettable;
+
 type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
 /**
  * Options for the wave function. Defaults to a sine wave of one cycle per-second.
@@ -1589,10 +1651,29 @@ declare function sineBipolarShape(period?: number): Modulate;
  * const v = m();
  * ```
  *
+ * @example
+ * ```js
+ * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { resolveFields } from 'https://unpkg.com/ixfx/dist/data.js';
+ *
+ * const state = {
+ *  intensity: wave({secs: 2, shape: `sine` }),
+ *  someOtherState: 10
+ * }
+ *
+ * const use = async () {
+ *  const { intensity } = await resolveFields(state);
+ *  // Do something with intensity value...
+ * }
+ * ```
  * @param options
  * @returns
  */
 declare function wave(options: Partial<WaveOptions>): (feedback?: Partial<WaveShaperFeedback>) => number;
+/**
+ * Wave shaper feedback.
+ * Feedback allows you to dynamically control tempo for advanced uses.
+ */
 type WaveShaperFeedback = {
     /**
      * Data to feedback to clock source
@@ -1624,18 +1705,18 @@ declare const weightedAverage: (currentValue: number, targetValue: number, slowD
 /**
  * Easings module
  *
- * [See the guide](https://ixfx.fun/modulation/easings/introduction/)
+ * [See the ixfx Guide](https://ixfx.fun/modulation/easings/introduction/)
  *
  * Overview:
  * * {@link Easings.create}: Create an easing with provided settings
  * * {@link Easings.time}: Ease by time
  * * {@link Easings.ticks}: Ease by tick
  * * {@link Easings.get}: Get an easing function by name
+ * * {@link Easings.line}: Get an easing function that uses a warped line
  *
  * @example Importing
  * ```js
- * // If library is stored two directories up under `ixfx/`
- * import { Easings } from '../../ixfx/dist/modulation.js';
+ * import { Easings } from 'ixfx/modulation.js';
  * Easings.time(...);
  *
  * // Import from web
@@ -1655,6 +1736,7 @@ declare const index_ModSource: typeof ModSource;
 declare const index_Modulate: typeof Modulate;
 declare const index_ModulatorTimed: typeof ModulatorTimed;
 declare const index_SpringOptions: typeof SpringOptions;
+type index_TimingSources = TimingSources;
 type index_WaveOptions = WaveOptions;
 type index_WaveShaperFeedback = WaveShaperFeedback;
 type index_Waveforms = Waveforms;
@@ -1680,12 +1762,13 @@ declare const index_tickModulator: typeof tickModulator;
 declare const index_ticks: typeof ticks;
 declare const index_time: typeof time;
 declare const index_timeModulator: typeof timeModulator;
+declare const index_timingSourceFactory: typeof timingSourceFactory;
 declare const index_triangleShape: typeof triangleShape;
 declare const index_wave: typeof wave;
 declare const index_waveFromSource: typeof waveFromSource;
 declare const index_weightedAverage: typeof weightedAverage;
 declare namespace index {
-  export { type index_Drifter as Drifter, index$3 as Easings, index$2 as Envelopes, index_Forces as Forces, type index_JitterOpts as JitterOpts, type index_Jitterer as Jitterer, index_ModSettable as ModSettable, index_ModSettableFeedback as ModSettableFeedback, index_ModSettableOptions as ModSettableOptions, index_ModSource as ModSource, index_Modulate as Modulate, index_ModulatorTimed as ModulatorTimed, Oscillator as Oscillators, index$1 as Sources, index_SpringOptions as SpringOptions, type index_WaveOptions as WaveOptions, type index_WaveShaperFeedback as WaveShaperFeedback, type index_Waveforms as Waveforms, index_arcShape as arcShape, index_crossfade as crossfade, index_cubicBezierShape as cubicBezierShape, index_drift as drift, index_gaussian as gaussian, index_jitter as jitter, index_jitterAbsolute as jitterAbsolute, index_mix as mix, index_mixModulators as mixModulators, index_noop as noop, index_pingPong as pingPong, index_pingPongPercent as pingPongPercent, index_sineBipolarShape as sineBipolarShape, index_sineShape as sineShape, index_spring as spring, index_springShape as springShape, index_springValue as springValue, index_squareShape as squareShape, index_tickModulator as tickModulator, index_ticks as ticks, index_time as time, index_timeModulator as timeModulator, index_triangleShape as triangleShape, index_wave as wave, index_waveFromSource as waveFromSource, index_weightedAverage as weightedAverage };
+  export { type index_Drifter as Drifter, index$3 as Easings, index$2 as Envelopes, index_Forces as Forces, type index_JitterOpts as JitterOpts, type index_Jitterer as Jitterer, index_ModSettable as ModSettable, index_ModSettableFeedback as ModSettableFeedback, index_ModSettableOptions as ModSettableOptions, index_ModSource as ModSource, index_Modulate as Modulate, index_ModulatorTimed as ModulatorTimed, Oscillator as Oscillators, index$1 as Sources, index_SpringOptions as SpringOptions, type index_TimingSources as TimingSources, type index_WaveOptions as WaveOptions, type index_WaveShaperFeedback as WaveShaperFeedback, type index_Waveforms as Waveforms, index_arcShape as arcShape, index_crossfade as crossfade, index_cubicBezierShape as cubicBezierShape, index_drift as drift, index_gaussian as gaussian, index_jitter as jitter, index_jitterAbsolute as jitterAbsolute, index_mix as mix, index_mixModulators as mixModulators, index_noop as noop, index_pingPong as pingPong, index_pingPongPercent as pingPongPercent, index_sineBipolarShape as sineBipolarShape, index_sineShape as sineShape, index_spring as spring, index_springShape as springShape, index_springValue as springValue, index_squareShape as squareShape, index_tickModulator as tickModulator, index_ticks as ticks, index_time as time, index_timeModulator as timeModulator, index_timingSourceFactory as timingSourceFactory, index_triangleShape as triangleShape, index_wave as wave, index_waveFromSource as waveFromSource, index_weightedAverage as weightedAverage };
 }
 
-export { arcShape as A, sineBipolarShape as B, wave as C, type Drifter as D, type WaveShaperFeedback as E, Forces as F, waveFromSource as G, weightedAverage as H, type JitterOpts as J, Oscillator as O, type Waveforms as W, index$2 as a, index$1 as b, cubicBezierShape as c, drift as d, type Jitterer as e, jitter as f, gaussian as g, mixModulators as h, index as i, jitterAbsolute as j, crossfade as k, timeModulator as l, mix as m, ticks as n, tickModulator as o, noop as p, pingPongPercent as q, pingPong as r, spring as s, time as t, springValue as u, springShape as v, type WaveOptions as w, triangleShape as x, squareShape as y, sineShape as z };
+export { sineShape as A, arcShape as B, sineBipolarShape as C, type Drifter as D, wave as E, Forces as F, type WaveShaperFeedback as G, waveFromSource as H, weightedAverage as I, type JitterOpts as J, Oscillator as O, type TimingSources as T, type Waveforms as W, index$2 as a, index$1 as b, cubicBezierShape as c, drift as d, type Jitterer as e, jitter as f, gaussian as g, mixModulators as h, index as i, jitterAbsolute as j, crossfade as k, timeModulator as l, mix as m, ticks as n, tickModulator as o, noop as p, pingPongPercent as q, pingPong as r, spring as s, time as t, springValue as u, springShape as v, timingSourceFactory as w, type WaveOptions as x, triangleShape as y, squareShape as z };
