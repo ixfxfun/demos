@@ -2,7 +2,7 @@ import {
   PriorityMutable,
   manual,
   priority
-} from "./chunk-FUJYFJRJ.js";
+} from "./chunk-RSQF2LVP.js";
 import {
   dequeue,
   enqueue,
@@ -112,4 +112,4 @@ export {
   asResponsive,
   queue_exports
 };
-//# sourceMappingURL=chunk-WI3JRKTS.js.map
+//# sourceMappingURL=chunk-OFWDYE6A.js.map

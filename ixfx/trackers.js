@@ -1,14 +1,16 @@
 import {
   FrequencyTracker,
   IntervalTracker,
+  RateTracker,
   frequency,
-  interval
-} from "./chunk-AVGWIQGS.js";
+  interval,
+  rate
+} from "./chunk-XIRUROFH.js";
 import {
   NumberTracker,
   PrimitiveTracker,
   number
-} from "./chunk-WHZ5E4CW.js";
+} from "./chunk-FE6AHT2O.js";
 import {
   ObjectTracker,
   PointTracker,
@@ -17,16 +19,17 @@ import {
   points,
   unique,
   uniqueInstances
-} from "./chunk-YLGRFVGL.js";
+} from "./chunk-JJUBUUOU.js";
 import {
   TrackedValueMap,
   TrackerBase
-} from "./chunk-6RELP2EL.js";
+} from "./chunk-NPVYFW4F.js";
 import "./chunk-BHY7TTTH.js";
 import "./chunk-WIACRXTW.js";
 import "./chunk-RQSMVGEL.js";
 import "./chunk-LQL3AMYF.js";
 import "./chunk-AGCCB7IA.js";
+import "./chunk-FPIABZNM.js";
 import "./chunk-IQEKYUOH.js";
 import "./chunk-5OQDSTBK.js";
 import "./chunk-QFI6HZJS.js";
@@ -58,6 +61,7 @@ export {
   ObjectTracker,
   PointTracker,
   PrimitiveTracker,
+  RateTracker,
   TrackedPointMap,
   TrackedValueMap,
   TrackerBase,
@@ -66,6 +70,7 @@ export {
   number,
   point,
   points,
+  rate,
   unique,
   uniqueInstances
 };

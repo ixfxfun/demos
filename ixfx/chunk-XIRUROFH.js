@@ -2,7 +2,7 @@ import {
   NumberTracker,
   PrimitiveTracker,
   number
-} from "./chunk-WHZ5E4CW.js";
+} from "./chunk-FE6AHT2O.js";
 import {
   ObjectTracker,
   PointTracker,
@@ -11,11 +11,14 @@ import {
   points,
   unique,
   uniqueInstances
-} from "./chunk-YLGRFVGL.js";
+} from "./chunk-JJUBUUOU.js";
 import {
   TrackedValueMap,
   TrackerBase
-} from "./chunk-6RELP2EL.js";
+} from "./chunk-NPVYFW4F.js";
+import {
+  timeout
+} from "./chunk-FPIABZNM.js";
 import {
   SimpleEventEmitter
 } from "./chunk-NYK32323.js";
@@ -36,6 +39,7 @@ __export(trackers_exports, {
   ObjectTracker: () => ObjectTracker,
   PointTracker: () => PointTracker,
   PrimitiveTracker: () => PrimitiveTracker,
+  RateTracker: () => RateTracker,
   TrackedPointMap: () => TrackedPointMap,
   TrackedValueMap: () => TrackedValueMap,
   TrackerBase: () => TrackerBase,
@@ -44,6 +48,7 @@ __export(trackers_exports, {
   number: () => number,
   point: () => point,
   points: () => points,
+  rate: () => rate,
   unique: () => unique,
   uniqueInstances: () => uniqueInstances
 });
@@ -184,11 +189,104 @@ var IntervalTracker = class extends NumberTracker {
 };
 var interval = (options) => new IntervalTracker(options);
 
+// src/trackers/RateTracker.ts
+var RateTracker = class {
+  #events = [];
+  #fromTime;
+  #resetAfterSamples;
+  #sampleLimit;
+  #resetTimer;
+  constructor(opts = {}) {
+    this.#resetAfterSamples = opts.resetAfterSamples ?? Number.MAX_SAFE_INTEGER;
+    this.#sampleLimit = opts.sampleLimit ?? Number.MAX_SAFE_INTEGER;
+    if (opts.timeoutInterval) {
+      this.#resetTimer = timeout(() => {
+        this.reset();
+      }, opts.timeoutInterval);
+    }
+    this.#fromTime = performance.now();
+  }
+  /**
+   * Mark that an event has happened
+   */
+  mark() {
+    if (this.#events.length >= this.#resetAfterSamples) {
+      this.reset();
+    } else if (this.#events.length >= this.#sampleLimit) {
+      this.#events = this.#events.slice(1);
+      this.#fromTime = this.#events[0];
+    }
+    this.#events.push(performance.now());
+    if (this.#resetTimer) {
+      this.#resetTimer.start();
+    }
+  }
+  /**
+   * Compute {min,max,avg} for the interval _between_ events.
+   * @returns 
+   */
+  computeIntervals() {
+    let intervals = [];
+    let min = Number.MAX_SAFE_INTEGER;
+    let max = Number.MIN_SAFE_INTEGER;
+    let total = 0;
+    let count = 0;
+    let start = 0;
+    for (let e of this.#events) {
+      if (count > 0) {
+        const i = e - start;
+        min = Math.min(i, min);
+        max = Math.max(i, max);
+        total += i;
+        intervals.push(i);
+      }
+      start = e;
+      count++;
+    }
+    let avg = total / count;
+    return {
+      min,
+      max,
+      avg
+    };
+  }
+  /**
+   * Returns the time period (in milliseconds) that encompasses
+   * the data set. Eg, a result of 1000 means there's data that
+   * covers a one second period.
+   */
+  get elapsed() {
+    return performance.now() - this.#fromTime;
+  }
+  /**
+   * Resets the tracker.
+   */
+  reset() {
+    this.#events = [];
+    this.#fromTime = performance.now();
+  }
+  /**
+   * Get the number of events per second
+   */
+  get perSecond() {
+    return this.#events.length / (this.elapsed / 1e3);
+  }
+  /**
+   * Get the number of events per minute
+   */
+  get perMinute() {
+    return this.#events.length / (this.elapsed / 1e3 / 60);
+  }
+};
+var rate = (opts = {}) => new RateTracker(opts);
+
 export {
   FrequencyTracker,
   frequency,
   IntervalTracker,
   interval,
+  RateTracker,
+  rate,
   trackers_exports
 };
-//# sourceMappingURL=chunk-AVGWIQGS.js.map
+//# sourceMappingURL=chunk-XIRUROFH.js.map

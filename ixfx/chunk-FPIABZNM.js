@@ -80,30 +80,7 @@ var timeout = (callback, interval) => {
   };
 };
 
-// src/flow/RateMinimum.ts
-var rateMinimum = (options) => {
-  let disposed = false;
-  const t = timeout(() => {
-    if (disposed) return;
-    t.start();
-    options.whatToCall(options.fallback());
-  }, options.interval);
-  if (options.abort) {
-    options.abort.addEventListener(`abort`, (_) => {
-      disposed = true;
-      t.cancel();
-    });
-  }
-  t.start();
-  return (args) => {
-    if (disposed) throw new Error(`AbortSignal has been fired`);
-    t.start();
-    options.whatToCall(args);
-  };
-};
-
 export {
-  timeout,
-  rateMinimum
+  timeout
 };
-//# sourceMappingURL=chunk-A36MC2YH.js.map
+//# sourceMappingURL=chunk-FPIABZNM.js.map

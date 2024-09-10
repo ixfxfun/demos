@@ -3,10 +3,11 @@ import { T as ToString } from './ToString-DO94OWoh.js';
 import { S as SortSyles } from './KeyValue-vMMe-ezw.js';
 import { S as SimpleEventEmitter } from './Events-DJgOvcWD.js';
 import { K as KeyValue } from './PrimitiveTypes-F6miV4Zn.js';
-import { N as NumberTracker, T as TrackedValueOpts, a as TrackerBase, b as TimestampedObject, c as TrimReason, d as TrackedValueMap, e as NumberTrackerResults, P as PrimitiveTracker, f as Timestamped, g as TimestampedPrimitive, n as number } from './NumberTracker-Bf9DQUa_.js';
+import { N as NumberTracker, T as TrackedValueOpts, a as TrackerBase, b as TimestampedObject, c as TrimReason, d as TrackedValueMap, e as NumberTrackerResults, P as PrimitiveTracker, f as Timestamped, g as TimestampedPrimitive, n as number } from './NumberTracker-MX95UoKm.js';
 import { P as PointRelationResult, a as PointRelation, C as Coord } from './PointRelationTypes-Dw4GvWQq.js';
 import { P as PolyLine, L as Line } from './LineType-DkIFzpdp.js';
 import { P as Point, a as Point3d } from './PointType-BDlA07rn.js';
+import { I as Interval } from './IntervalType-B4PbUkjV.js';
 
 type FrequencyEventMap = {
     readonly change: {
@@ -471,6 +472,100 @@ declare const points: (options?: TrackedValueOpts) => TrackedPointMap;
  */
 declare const point: (opts?: TrackedValueOpts) => PointTracker;
 
+type RateTrackerOpts = Readonly<{
+    /**
+   * If above zero, tracker will reset after this many samples
+   */
+    resetAfterSamples?: number;
+    /**
+     * If set, tracker will reset after this much time
+     * since last `mark()` call.
+     */
+    timeoutInterval?: Interval;
+    /**
+     * If above zero, there will be a limit to intermediate values kept.
+     *
+     * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
+     * to `sampleLimit`. We only do this when the values are double the size so that
+     * the collections do not need to be trimmed repeatedly whilst we are at the limit.
+     *
+     * Automatically implies storeIntermediate
+     */
+    sampleLimit?: number;
+}>;
+/**
+ * Tracks the rate of events.
+ * It's also able to compute the min,max and average interval between events.
+ *
+ * @example
+ * ```js
+ * const clicks = Trackers.rate();
+ *
+ * // Mark when a click happens
+ * document.addEventListener(`click`, () => clicks.mark());
+ *
+ * // Get details
+ * clicks.perSecond; // How many clicks per second
+ * clicks.perMinute; // How many clicks per minute
+ * ```
+ *
+ * `timeoutInterval` is a useful option to make the tracker reset
+ * after some period without `mark()` being called.
+ *
+ * Another useful option is `sampleLimit`, which sets an upper bound
+ * for how many events to track. A smaller value means the results
+ * will more accurately track, but it might be less smooth.
+ *
+ * ```js
+ * // Eg reset tracker after 5 seconds of inactivity
+ * const clicks = Trackers.rate({
+ *  sampleLimit: 10,
+ *  timeoutInterval: { secs: 5 }
+ * });
+ * ```
+ */
+declare class RateTracker {
+    #private;
+    constructor(opts?: Partial<RateTrackerOpts>);
+    /**
+     * Mark that an event has happened
+     */
+    mark(): void;
+    /**
+     * Compute {min,max,avg} for the interval _between_ events.
+     * @returns
+     */
+    computeIntervals(): {
+        min: number;
+        max: number;
+        avg: number;
+    };
+    /**
+     * Returns the time period (in milliseconds) that encompasses
+     * the data set. Eg, a result of 1000 means there's data that
+     * covers a one second period.
+     */
+    get elapsed(): number;
+    /**
+     * Resets the tracker.
+     */
+    reset(): void;
+    /**
+     * Get the number of events per second
+     */
+    get perSecond(): number;
+    /**
+     * Get the number of events per minute
+     */
+    get perMinute(): number;
+}
+/**
+ * @inheritdoc RateTracker
+ * @param opts
+ * @returns
+ */
+declare const rate: (opts?: Partial<RateTrackerOpts>) => RateTracker;
+
 type TrackUnique<T> = (value: T) => boolean;
 /**
  * Tracks unique values. Returns _true_ if value is unique.
@@ -519,6 +614,9 @@ type index_PointTracker = PointTracker;
 declare const index_PointTracker: typeof PointTracker;
 type index_PointTrackerResults = PointTrackerResults;
 declare const index_PrimitiveTracker: typeof PrimitiveTracker;
+type index_RateTracker = RateTracker;
+declare const index_RateTracker: typeof RateTracker;
+type index_RateTrackerOpts = RateTrackerOpts;
 declare const index_Timestamped: typeof Timestamped;
 declare const index_TimestampedObject: typeof TimestampedObject;
 declare const index_TimestampedPrimitive: typeof TimestampedPrimitive;
@@ -534,10 +632,11 @@ declare const index_interval: typeof interval;
 declare const index_number: typeof number;
 declare const index_point: typeof point;
 declare const index_points: typeof points;
+declare const index_rate: typeof rate;
 declare const index_unique: typeof unique;
 declare const index_uniqueInstances: typeof uniqueInstances;
 declare namespace index {
-  export { type index_FrequencyEventMap as FrequencyEventMap, index_FrequencyTracker as FrequencyTracker, index_IntervalTracker as IntervalTracker, index_NumberTracker as NumberTracker, index_NumberTrackerResults as NumberTrackerResults, index_ObjectTracker as ObjectTracker, type index_PointTrack as PointTrack, index_PointTracker as PointTracker, type index_PointTrackerResults as PointTrackerResults, index_PrimitiveTracker as PrimitiveTracker, index_Timestamped as Timestamped, index_TimestampedObject as TimestampedObject, index_TimestampedPrimitive as TimestampedPrimitive, type index_TrackUnique as TrackUnique, index_TrackedPointMap as TrackedPointMap, index_TrackedValueMap as TrackedValueMap, index_TrackedValueOpts as TrackedValueOpts, index_TrackerBase as TrackerBase, index_TrimReason as TrimReason, index_frequency as frequency, index_interval as interval, index_number as number, index_point as point, index_points as points, index_unique as unique, index_uniqueInstances as uniqueInstances };
+  export { type index_FrequencyEventMap as FrequencyEventMap, index_FrequencyTracker as FrequencyTracker, index_IntervalTracker as IntervalTracker, index_NumberTracker as NumberTracker, index_NumberTrackerResults as NumberTrackerResults, index_ObjectTracker as ObjectTracker, type index_PointTrack as PointTrack, index_PointTracker as PointTracker, type index_PointTrackerResults as PointTrackerResults, index_PrimitiveTracker as PrimitiveTracker, index_RateTracker as RateTracker, type index_RateTrackerOpts as RateTrackerOpts, index_Timestamped as Timestamped, index_TimestampedObject as TimestampedObject, index_TimestampedPrimitive as TimestampedPrimitive, type index_TrackUnique as TrackUnique, index_TrackedPointMap as TrackedPointMap, index_TrackedValueMap as TrackedValueMap, index_TrackedValueOpts as TrackedValueOpts, index_TrackerBase as TrackerBase, index_TrimReason as TrimReason, index_frequency as frequency, index_interval as interval, index_number as number, index_point as point, index_points as points, index_rate as rate, index_unique as unique, index_uniqueInstances as uniqueInstances };
 }
 
-export { type FrequencyEventMap as F, IntervalTracker as I, ObjectTracker as O, PointTracker as P, TrackedPointMap as T, FrequencyTracker as a, interval as b, point as c, type TrackUnique as d, uniqueInstances as e, frequency as f, type PointTrack as g, type PointTrackerResults as h, index as i, points as p, unique as u };
+export { type FrequencyEventMap as F, IntervalTracker as I, ObjectTracker as O, PointTracker as P, type RateTrackerOpts as R, TrackedPointMap as T, FrequencyTracker as a, interval as b, point as c, RateTracker as d, type TrackUnique as e, frequency as f, uniqueInstances as g, type PointTrack as h, index as i, type PointTrackerResults as j, points as p, rate as r, unique as u };
