@@ -1,4 +1,5 @@
 import { Espruino } from 'ixfx/io.js';
+import * as HtmlUtil from './html.js';
 
 /** @type NormaliseData|undefined  */
 let normaliseData;
@@ -24,36 +25,17 @@ function onConnected(connected) {
   bc.postMessage({ connected });
 
   // Add some CSS classes to body depending on connection state
-  if (connected) {
-    document.body.classList.add(`espruino-connected`);
-    document.body.classList.remove(`espruino-disconnected`);
-  } else {
-    document.body.classList.remove(`espruino-connected`);
-    document.body.classList.add(`espruino-disconnected`);
-  }
+  HtmlUtil.cssBiToggle(`body`, connected, `espruino-connected`, `espruino-disconnected`);
 
   // And also add/remove .hidden for elements that opt-in
-  for (const el of document.querySelectorAll(`.hide-when-connected`)) {
-    if (connected) {
-      el.classList.add(`hidden`);
-    } else {
-      el.classList.remove(`hidden`);
-    }
-  }
-
-  for (const el of document.querySelectorAll(`.show-when-connected`)) {
-    if (connected) {
-      el.classList.remove(`hidden`);
-    } else {
-      el.classList.add(`hidden`);
-    }
-  }
+  HtmlUtil.cssToggle(`.hide-when-connected`, connected, `hidden`);
+  HtmlUtil.cssToggle(`.show-when-connected`, !connected, `hidden`);
 };
 
 /**
  * Connect to Espruino
- * @param {string} script 
- * @param {string} deviceFilter
+ * @param {string} script Script to execute on the board
+ * @param {string} deviceFilter Filter to use when displaying devices
  */
 export async function connect(script, deviceFilter) {
   try {
@@ -62,11 +44,10 @@ export async function connect(script, deviceFilter) {
 
     // Connect to Puck
     const p = await Espruino.puck(options);
-    console.log(`Connected`);
 
     // Listen for state change event (for debugging)
     p.addEventListener(`change`, event => {
-      console.log(`${event.priorState} -> ${event.newState}`);
+      console.log(`Espruino state change: ${event.priorState} -> ${event.newState}`);
     });
 
     // After a short delay...
@@ -79,7 +60,7 @@ export async function connect(script, deviceFilter) {
 
       // Listen for incoming data
       p.addEventListener(`data`, onData);
-    }, 1000);
+    }, 500);
   } catch (error) {
     console.error(error);
   }
