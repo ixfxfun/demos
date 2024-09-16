@@ -8,7 +8,7 @@ const settings = Object.freeze({
     // If there's been no input after 5 secs, reset
     timeoutInterval: { secs: 5 }
   }),
-  rateEl: /** HTMLElement */(document.querySelector(`#rate`))
+  rateEl: /** @type HTMLElement */(document.querySelector(`#rate`))
 });
 
 /**
