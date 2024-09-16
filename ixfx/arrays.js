@@ -12,14 +12,7 @@ import {
   mergeByKey,
   sample,
   until
-} from "./chunk-MEBAXZ4B.js";
-import {
-  zip
-} from "./chunk-FT4AY56C.js";
-import {
-  isContentsTheSame,
-  isEqual
-} from "./chunk-ZRXEXVUC.js";
+} from "./chunk-2IOKFKMU.js";
 import {
   sortByNumericProperty,
   sortByProperty
@@ -39,6 +32,11 @@ import {
   pairwise,
   pairwiseReduce
 } from "./chunk-BGQOJZFW.js";
+import {
+  isContentsTheSame,
+  isEqual,
+  zip
+} from "./chunk-SWN6L5MR.js";
 import {
   randomElement,
   randomElementWeightedSource,
