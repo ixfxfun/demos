@@ -62,5 +62,12 @@
       ],
       "url": "/.vscode/fiveserver.schema.json"
     }
+  ],
+  "cSpell.words": [
+    "Arduino",
+    "Espruino",
+    "importmap",
+    "ixfx",
+    "WLED"
   ]
 }
