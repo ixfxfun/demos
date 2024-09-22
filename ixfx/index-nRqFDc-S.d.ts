@@ -1,5 +1,5 @@
 import { S as SimpleEventEmitter, I as ISimpleEventEmitter } from './Events-DJgOvcWD.js';
-import { T as Transitions, S as StateChangeEvent, a as StateMachineWithEvents } from './StateMachine-De8q7h_5.js';
+import { T as Transitions, a as StateChangeEvent, b as StateMachineWithEvents } from './StateMachine-CzXxeVX_.js';
 import { I as Interval } from './IntervalType-B4PbUkjV.js';
 import { Q as QueueMutable } from './QueueMutable-D_WD8izv.js';
 import { C as Continuously } from './Continuously-Cw65D1Lv.js';
@@ -235,10 +235,6 @@ declare class AudioVisualiser {
     onPointer(evt: MouseEvent | PointerEvent): void;
 }
 
-declare namespace AudioVisualiser$1 {
-  export { AudioVisualiser as default };
-}
-
 /**
  * Options for audio processing
  *
@@ -278,12 +274,12 @@ type DataAnalyser = (node: AnalyserNode, analyser: AudioAnalyser) => void;
  *  // Demo: Get FFT value for a particular frequency (1KHz)
  *  const amt = freq[analyser.getIndexForFrequency(1000)];
  * }
- * basic(onData, {fftSize: 512});
+ * analyserBasic(onData, {fftSize: 512});
  * ```
  *
  * An `Analyser` instance is returned and can be controlled:
  * ```js
- * const analyser = basic(onData);
+ * const analyser = analyserBasic(onData);
  * analyser.paused = true;
  * ```
  *
@@ -293,7 +289,7 @@ type DataAnalyser = (node: AnalyserNode, analyser: AudioAnalyser) => void;
  * @param opts Options
  * @returns Analyser instance
  */
-declare const basic: (onData: (freq: Float32Array, wave: Float32Array, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
+declare const analyserBasic: (onData: (freq: Float32Array, wave: Float32Array, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
 /**
  * Basic audio analyser. Returns FFT analysis. Use {@link peakLevel} if you want the sound level, or {@link basic} if you also want the waveform.
  *
@@ -305,7 +301,7 @@ declare const basic: (onData: (freq: Float32Array, wave: Float32Array, analyser:
  *    console.log(`${i}. frequency: ${f} amount: ${freq[i]}`);
  *  }
  * }
- * freq(onData, {fftSize:512});
+ * analyserFrequency(onData, {fftSize:512});
  * ```
  *
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
@@ -314,12 +310,12 @@ declare const basic: (onData: (freq: Float32Array, wave: Float32Array, analyser:
  * @param opts
  * @returns
  */
-declare const freq: (onData: (freq: Float32Array, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
+declare const analyserFrequency: (onData: (freq: Float32Array, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
 /**
  * Basic audio analyser which reports the peak sound level.
  *
  * ```js
- * peakLevel(level => {
+ * analyserPeakLevel(level => {
  *  console.log(level);
  * });
  * ```
@@ -329,7 +325,7 @@ declare const freq: (onData: (freq: Float32Array, analyser: AudioAnalyser) => vo
  * @param opts
  * @returns
  */
-declare const peakLevel: (onData: (level: number, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
+declare const analyserPeakLevel: (onData: (level: number, analyser: AudioAnalyser) => void, opts?: Opts) => AudioAnalyser;
 /**
  * Helper for doing audio analysis. It takes case of connecting the audio stream, running in a loop and pause capability.
  *
@@ -395,15 +391,82 @@ declare class AudioAnalyser {
     getIndexForFrequency(freq: number): number;
 }
 
-type AudioAnalyser$1_AudioAnalyser = AudioAnalyser;
-declare const AudioAnalyser$1_AudioAnalyser: typeof AudioAnalyser;
-type AudioAnalyser$1_DataAnalyser = DataAnalyser;
-type AudioAnalyser$1_Opts = Opts;
-declare const AudioAnalyser$1_basic: typeof basic;
-declare const AudioAnalyser$1_freq: typeof freq;
-declare const AudioAnalyser$1_peakLevel: typeof peakLevel;
-declare namespace AudioAnalyser$1 {
-  export { AudioAnalyser$1_AudioAnalyser as AudioAnalyser, type AudioAnalyser$1_DataAnalyser as DataAnalyser, type AudioAnalyser$1_Opts as Opts, AudioAnalyser$1_basic as basic, AudioAnalyser$1_freq as freq, AudioAnalyser$1_peakLevel as peakLevel };
+type AudioOscillatorOptions = {
+    type: OscillatorType;
+    frequency: number;
+    id: string;
+};
+type BasicAudio = {
+    ctx: AudioContext;
+    pan: StereoPannerNode;
+    gain: GainNode;
+    filter: BiquadFilterNode;
+    id: string;
+};
+type BasicAudioElement = BasicAudio & {
+    el: HTMLMediaElement;
+};
+type BasicAudioOscillator = BasicAudio & {
+    osc: OscillatorNode;
+};
+
+/**
+ * Scans page for <AUDIO> elements and creates playable controllers for them.
+ * It uses the element's 'id' attribute as a way of fetching one later.
+ *
+ * ```js
+ * const ae = new AudioElements();
+ * ae.init(); // Initialise
+ *
+ * const a = ae.get('kick'); // Get the source that had id 'kick'
+ * ```
+ */
+declare class AudioElements {
+    #private;
+    filterType: BiquadFilterType;
+    constructor();
+    init(): void;
+    /**
+     * Gets a BasicAudio instance by key
+     * @param key
+     * @returns BasicAudio instance, or undefined
+     */
+    get(key: string): BasicAudioElement | undefined;
+}
+/**
+ * Create a BasicAudioElement instance from an <AUDIO> tag in the HTML document.
+ *
+ * See {@link AudioElements} to automatically create sources from all <AUDIO> elements.
+ * @param audioElementOrQuery Element or query (eg '#some-id')
+ * @param filterType Filter type. Defaults to 'lowpass'
+ * @returns
+ */
+declare function createFromAudioElement(audioElementOrQuery: HTMLMediaElement | string, filterType?: BiquadFilterType): BasicAudioElement;
+
+/**
+ * Initialise audio with an oscillator source
+ * @param oscillatorOptions
+ * @returns BasicAudio instance
+ */
+declare function createOscillator(oscillatorOptions?: Partial<AudioOscillatorOptions>): BasicAudioOscillator;
+
+type index$1_AudioAnalyser = AudioAnalyser;
+declare const index$1_AudioAnalyser: typeof AudioAnalyser;
+type index$1_AudioElements = AudioElements;
+declare const index$1_AudioElements: typeof AudioElements;
+type index$1_AudioOscillatorOptions = AudioOscillatorOptions;
+type index$1_BasicAudio = BasicAudio;
+type index$1_BasicAudioElement = BasicAudioElement;
+type index$1_BasicAudioOscillator = BasicAudioOscillator;
+type index$1_DataAnalyser = DataAnalyser;
+type index$1_Opts = Opts;
+declare const index$1_analyserBasic: typeof analyserBasic;
+declare const index$1_analyserFrequency: typeof analyserFrequency;
+declare const index$1_analyserPeakLevel: typeof analyserPeakLevel;
+declare const index$1_createFromAudioElement: typeof createFromAudioElement;
+declare const index$1_createOscillator: typeof createOscillator;
+declare namespace index$1 {
+  export { index$1_AudioAnalyser as AudioAnalyser, index$1_AudioElements as AudioElements, type index$1_AudioOscillatorOptions as AudioOscillatorOptions, type index$1_BasicAudio as BasicAudio, type index$1_BasicAudioElement as BasicAudioElement, type index$1_BasicAudioOscillator as BasicAudioOscillator, type index$1_DataAnalyser as DataAnalyser, type index$1_Opts as Opts, index$1_analyserBasic as analyserBasic, index$1_analyserFrequency as analyserFrequency, index$1_analyserPeakLevel as analyserPeakLevel, index$1_createFromAudioElement as createFromAudioElement, index$1_createOscillator as createOscillator };
 }
 
 /**
@@ -1352,7 +1415,7 @@ declare const index_VideoFile: typeof VideoFile;
 declare const index_genericStateTransitionsInstance: typeof genericStateTransitionsInstance;
 declare const index_reconnectingWebsocket: typeof reconnectingWebsocket;
 declare namespace index {
-  export { AudioAnalyser$1 as AudioAnalysers, AudioVisualiser$1 as AudioVisualisers, NordicBleDevice$1 as Bluetooth, index_Camera as Camera, index_Codec as Codec, index_Espruino as Espruino, index_FrameProcessor as FrameProcessor, type index_FrameProcessorOpts as FrameProcessorOpts, type index_GenericStateTransitions as GenericStateTransitions, type index_IoDataEvent as IoDataEvent, type index_IoEvents as IoEvents, type index_ReconnectingOptions as ReconnectingOptions, type index_ReconnectingWebsocket as ReconnectingWebsocket, type index_ReconnectingWebsocketStates as ReconnectingWebsocketStates, index_Serial as Serial, index_StateChangeEvent as StateChangeEvent, index_StringReceiveBuffer as StringReceiveBuffer, index_StringWriteBuffer as StringWriteBuffer, type Opts$3 as StringWriteBufferOpts, index_VideoFile as VideoFile, index_genericStateTransitionsInstance as genericStateTransitionsInstance, index_reconnectingWebsocket as reconnectingWebsocket };
+  export { index$1 as Audio, NordicBleDevice$1 as Bluetooth, index_Camera as Camera, index_Codec as Codec, index_Espruino as Espruino, index_FrameProcessor as FrameProcessor, type index_FrameProcessorOpts as FrameProcessorOpts, type index_GenericStateTransitions as GenericStateTransitions, type index_IoDataEvent as IoDataEvent, type index_IoEvents as IoEvents, type index_ReconnectingOptions as ReconnectingOptions, type index_ReconnectingWebsocket as ReconnectingWebsocket, type index_ReconnectingWebsocketStates as ReconnectingWebsocketStates, index_Serial as Serial, index_StateChangeEvent as StateChangeEvent, index_StringReceiveBuffer as StringReceiveBuffer, index_StringWriteBuffer as StringWriteBuffer, type Opts$3 as StringWriteBufferOpts, index_VideoFile as VideoFile, index_genericStateTransitionsInstance as genericStateTransitionsInstance, index_reconnectingWebsocket as reconnectingWebsocket };
 }
 
-export { AudioAnalyser$1 as A, Codec as C, Espruino as E, FrameProcessor as F, type GenericStateTransitions as G, type IoDataEvent as I, NordicBleDevice$1 as N, type Opts$3 as O, type ReconnectingWebsocket as R, StringReceiveBuffer as S, VideoFile as V, AudioVisualiser$1 as a, StringWriteBuffer as b, Camera as c, type FrameProcessorOpts as d, Serial as e, type IoEvents as f, genericStateTransitionsInstance as g, type ReconnectingWebsocketStates as h, index as i, type ReconnectingOptions as j, reconnectingWebsocket as r };
+export { Codec as C, Espruino as E, FrameProcessor as F, type GenericStateTransitions as G, type IoDataEvent as I, NordicBleDevice$1 as N, type Opts$3 as O, type ReconnectingWebsocket as R, StringReceiveBuffer as S, VideoFile as V, index$1 as a, StringWriteBuffer as b, Camera as c, type FrameProcessorOpts as d, Serial as e, type IoEvents as f, genericStateTransitionsInstance as g, type ReconnectingWebsocketStates as h, index as i, type ReconnectingOptions as j, reconnectingWebsocket as r };

@@ -7,7 +7,7 @@ import { R as ResolveToValue, c as ResolveToValueSync } from './Resolve-DjAlLZ_n
 import { S as SimpleEventEmitter } from './Events-DJgOvcWD.js';
 import { R as Result } from './Results-adq5iCSD.js';
 import { S as SleepOpts, s as sleep, a as sleepWhile } from './Sleep-DkIg67lN.js';
-import { b as StateMachine } from './StateMachine-De8q7h_5.js';
+import { S as StateMachine } from './StateMachine-CzXxeVX_.js';
 import { C as CompletionTimer, M as ModulationTimer, R as RelativeTimerOpts, T as Timer, a as TimerOpts, b as TimerSource, e as elapsedMillisecondsAbsolute, c as elapsedTicksAbsolute, f as frequencyTimer, h as hasElapsed, o as ofTotal, d as ofTotalTicks, r as relative, t as timerAlwaysDone, g as timerNeverDone, i as timerWithFunction } from './Timer-D6OLmRpI.js';
 
 type TaskState = `Failed` | `Running` | `Success`;
