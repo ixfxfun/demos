@@ -1,10 +1,12 @@
 {
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
   "editor.formatOnPaste": false,
   "editor.formatOnType": false,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "eslint.format.enable": true,
-  "html.format.enable": true,
   "js/ts.implicitProjectConfig.checkJs": true,
   "search.exclude": {
     "**/node_modules": true,
