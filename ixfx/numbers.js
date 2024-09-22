@@ -11,11 +11,11 @@ import {
   proportion,
   relativeDifference,
   softmax
-} from "./chunk-BFTDI4NV.js";
+} from "./chunk-S5ATO4NG.js";
 import {
   Bipolar_exports,
   flip
-} from "./chunk-ECFWM2B2.js";
+} from "./chunk-ZZPLTXBK.js";
 import {
   count
 } from "./chunk-UTOEERYG.js";
@@ -23,25 +23,21 @@ import {
   linearSpace
 } from "./chunk-RQSMVGEL.js";
 import {
-  interpolate,
+  averageWeighted,
+  interpolate2 as interpolate,
   interpolateAngle,
   interpolatorInterval,
   interpolatorStepped,
-  piPi
-} from "./chunk-5BN75CQZ.js";
-import "./chunk-DXXG3IJQ.js";
-import "./chunk-OTISJOPU.js";
-import {
-  averageWeighted,
   movingAverage,
   movingAverageLight,
   movingAverageTimed,
   noiseFilter,
+  piPi,
   quantiseEvery,
   wrap,
   wrapInteger,
   wrapRange
-} from "./chunk-N6JMHV7C.js";
+} from "./chunk-JPZ2VYYG.js";
 import {
   scale,
   scaleClamped,
@@ -49,7 +45,8 @@ import {
   scalePercentages,
   scaler,
   scalerPercent
-} from "./chunk-CDMRYGTZ.js";
+} from "./chunk-X4CPBFN6.js";
+import "./chunk-TYALAIXN.js";
 import {
   average,
   dotProduct,
@@ -64,23 +61,36 @@ import {
   validNumbers,
   weight
 } from "./chunk-NGZXMICH.js";
-import "./chunk-HBIA234B.js";
+import "./chunk-XFNQJV53.js";
+import "./chunk-IV5E4EHV.js";
+import "./chunk-4GOV2D4X.js";
+import "./chunk-QKQKTBVV.js";
 import {
   clamp,
   clampIndex
 } from "./chunk-I2PHDNRW.js";
-import "./chunk-TNTXBVIU.js";
+import "./chunk-67VZAFWN.js";
+import "./chunk-4IJNRUE7.js";
+import "./chunk-N6YIY4CM.js";
 import "./chunk-XGQNP3YG.js";
-import "./chunk-SWN6L5MR.js";
+import "./chunk-ZNCB3DZ2.js";
+import "./chunk-Q444COJ6.js";
+import "./chunk-BGQOJZFW.js";
+import "./chunk-MZFSDYZE.js";
+import "./chunk-UXBT5HQE.js";
+import "./chunk-7HPQVR47.js";
 import {
   minMaxAvg
-} from "./chunk-5XZFO6U6.js";
+} from "./chunk-BDIBLBFS.js";
 import "./chunk-GISMJX5E.js";
+import "./chunk-PJHYZUYG.js";
 import "./chunk-5VWJ6TUI.js";
-import "./chunk-ZVECQWBZ.js";
+import "./chunk-27HWJFP3.js";
+import "./chunk-54PXOMGL.js";
 import {
   round
 } from "./chunk-OTGZJTOP.js";
+import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
 import "./chunk-BLACMGG6.js";
 import "./chunk-L5EJU35C.js";

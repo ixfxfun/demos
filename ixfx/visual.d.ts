@@ -1,5 +1,5 @@
-export { B as BipolarView, C as CartesianCanvasPlot, I as ImageDataGrid, P as Palette, c as Plot, a as Plot2, b as PlotOld, S as SceneGraph, s as scaleCanvas } from './index-CxUT1hz8.js';
-export { a as Drawing } from './Drawing-DX_48Ltm.js';
+export { B as BipolarView, C as CartesianCanvasPlot, I as ImageDataGrid, P as Palette, c as Plot, a as Plot2, b as PlotOld, S as SceneGraph, s as scaleCanvas } from './index-Op2Sg8Q2.js';
+export { a as Drawing } from './Drawing-BofY7szZ.js';
 export { S as Svg } from './Svg-D94XTP5k.js';
 export { a as Colour } from './Colour-jbiYG85Y.js';
 export { V as Video } from './Video-W9xZZbzn.js';
@@ -17,7 +17,7 @@ import './CanvasHelper-CEcMKz0U.js';
 import './Scaler-XwDjxOLc.js';
 import './PathType-9cjB2t-Y.js';
 import './CircleType-D9Xd-yDE.js';
-import './ArcType-DrQBEPB7.js';
+import './Ellipse-Cie3ckUe.js';
 import './IStackImmutable-BNEmWxct.js';
 import 'colorjs.io';
 import './Types-CR0Pe5zY.js';

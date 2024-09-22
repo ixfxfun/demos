@@ -6,7 +6,7 @@ import { Ref } from 'lit/directives/ref.js';
 import { C as CanvasHelper } from './CanvasHelper-CEcMKz0U.js';
 import { a as RectPositioned, R as Rect } from './RectTypes-BVWwyVKg.js';
 import { C as Colourish } from './Colour-jbiYG85Y.js';
-import { D as DrawingHelper } from './Drawing-DX_48Ltm.js';
+import { D as DrawingHelper } from './Drawing-BofY7szZ.js';
 import './Scaler-XwDjxOLc.js';
 import './PointType-BDlA07rn.js';
 import './Events-DJgOvcWD.js';
@@ -16,7 +16,7 @@ import './Types-CR0Pe5zY.js';
 import './LineType-DkIFzpdp.js';
 import './PathType-9cjB2t-Y.js';
 import './CircleType-D9Xd-yDE.js';
-import './ArcType-DrQBEPB7.js';
+import './Ellipse-Cie3ckUe.js';
 import './IStackImmutable-BNEmWxct.js';
 
 type Bar = {
