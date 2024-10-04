@@ -1,6 +1,7 @@
 import {
   Normalise_exports,
   applyToValues,
+  differenceFromFixed,
   differenceFromLast,
   filter,
   isApprox,
@@ -9,13 +10,12 @@ import {
   numericRange,
   numericRangeRaw,
   proportion,
-  relativeDifference,
   softmax
-} from "./chunk-S5ATO4NG.js";
+} from "./chunk-AUX6RHPJ.js";
 import {
   Bipolar_exports,
   flip
-} from "./chunk-ZZPLTXBK.js";
+} from "./chunk-GNXMKKD5.js";
 import {
   count
 } from "./chunk-UTOEERYG.js";
@@ -37,7 +37,7 @@ import {
   wrap,
   wrapInteger,
   wrapRange
-} from "./chunk-JPZ2VYYG.js";
+} from "./chunk-TIIF2VKF.js";
 import {
   scale,
   scaleClamped,
@@ -45,7 +45,7 @@ import {
   scalePercentages,
   scaler,
   scalerPercent
-} from "./chunk-X4CPBFN6.js";
+} from "./chunk-MXBHIKA7.js";
 import "./chunk-TYALAIXN.js";
 import {
   average,
@@ -103,6 +103,7 @@ export {
   clamp,
   clampIndex,
   count,
+  differenceFromFixed,
   differenceFromLast,
   dotProduct,
   filter,
@@ -131,7 +132,6 @@ export {
   piPi,
   proportion,
   quantiseEvery,
-  relativeDifference,
   round,
   scale,
   scaleClamped,

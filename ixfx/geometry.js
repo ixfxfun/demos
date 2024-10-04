@@ -3,7 +3,6 @@ import {
   Convolve2d_exports,
   CurveSimplification_exports,
   Ellipse_exports,
-  Grid_exports,
   Layout_exports,
   QuadTree_exports,
   Scaler_exports,
@@ -12,13 +11,14 @@ import {
   Waypoint_exports,
   arc_exports,
   circle_exports,
+  grid_exports,
   line_exports,
   path_exports,
   rect_exports,
   shape_exports,
   triangle_exports
-} from "./chunk-7CRPS4WB.js";
-import "./chunk-4454FLU2.js";
+} from "./chunk-M43OQIGJ.js";
+import "./chunk-KILR2KRP.js";
 import "./chunk-RQSMVGEL.js";
 import "./chunk-332QM2S5.js";
 import {
@@ -33,8 +33,8 @@ import {
   radianToDegree,
   radiansFromAxisX,
   radiansSum
-} from "./chunk-JPZ2VYYG.js";
-import "./chunk-X4CPBFN6.js";
+} from "./chunk-TIIF2VKF.js";
+import "./chunk-MXBHIKA7.js";
 import "./chunk-TYALAIXN.js";
 import "./chunk-NGZXMICH.js";
 import "./chunk-XFNQJV53.js";
@@ -71,7 +71,7 @@ export {
   Convolve2d_exports as Convolve2d,
   CurveSimplification_exports as CurveSimplification,
   Ellipse_exports as Ellipses,
-  Grid_exports as Grids,
+  grid_exports as Grids,
   Layout_exports as Layouts,
   line_exports as Lines,
   path_exports as Paths,

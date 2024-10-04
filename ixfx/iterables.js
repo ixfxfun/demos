@@ -15,6 +15,7 @@ import {
   fromFunction,
   fromFunctionAwaited,
   fromIterable,
+  iteratorController,
   map,
   max,
   min,
@@ -26,19 +27,19 @@ import {
   uniqueByValue,
   until,
   zip
-} from "./chunk-XSDXCTUX.js";
+} from "./chunk-Y4GKDTRL.js";
 import {
   chain_exports
-} from "./chunk-NWAALKW6.js";
-import "./chunk-RKPDSTLL.js";
+} from "./chunk-F6RKS4F7.js";
+import "./chunk-EQQ747SO.js";
 import "./chunk-YQTXKH44.js";
 import "./chunk-NAPITDOI.js";
-import "./chunk-QFQZHZB2.js";
+import "./chunk-SHF5276B.js";
 import "./chunk-332QM2S5.js";
 import {
   IterableAsync_exports
-} from "./chunk-JPZ2VYYG.js";
-import "./chunk-X4CPBFN6.js";
+} from "./chunk-TIIF2VKF.js";
+import "./chunk-MXBHIKA7.js";
 import {
   IterableSync_exports
 } from "./chunk-TYALAIXN.js";
@@ -96,6 +97,7 @@ export {
   fromIterable,
   isAsyncIterable,
   isIterable,
+  iteratorController,
   map,
   max,
   min,

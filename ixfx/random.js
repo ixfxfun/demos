@@ -6,6 +6,7 @@ import {
   integer,
   integerSource,
   integerUniqueGen,
+  mersenneTwister,
   minutesMs,
   minutesMsSource,
   secondsMs,
@@ -14,7 +15,7 @@ import {
   weightedInteger,
   weightedIntegerSource,
   weightedSource
-} from "./chunk-L3GW3COY.js";
+} from "./chunk-DI3THAAW.js";
 import {
   shortGuid
 } from "./chunk-B5XDBTUM.js";
@@ -22,10 +23,10 @@ import {
   float,
   floatSource
 } from "./chunk-UTOEERYG.js";
-import "./chunk-JPZ2VYYG.js";
+import "./chunk-TIIF2VKF.js";
 import {
   randomHue
-} from "./chunk-X4CPBFN6.js";
+} from "./chunk-MXBHIKA7.js";
 import "./chunk-TYALAIXN.js";
 import "./chunk-NGZXMICH.js";
 import "./chunk-XFNQJV53.js";
@@ -73,6 +74,7 @@ export {
   integer,
   integerSource,
   integerUniqueGen,
+  mersenneTwister,
   minutesMs,
   minutesMsSource,
   secondsMs,

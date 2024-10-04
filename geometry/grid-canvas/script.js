@@ -43,7 +43,7 @@ const update = () => {
   const pointerCell = Grids.cellAtPoint(grid, pointer);
 
   // Update each cell
-  for (const cell of Grids.cells(grid)) {
+  for (const cell of Grids.By.cells(grid)) {
     updateCell(cell, pointerCell, gridMax, moduleValues);
   }
 
@@ -60,7 +60,7 @@ const use = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ctx.strokeStyle = `white`;
-  for (const cell of Grids.cells(grid)) {
+  for (const cell of Grids.By.cells(grid)) {
     // Get bounds for cell, as well as current mod value
     const rect = Grids.rectangleForCell(grid, cell);
     const cellKey = keyForCell(cell);
