@@ -5,7 +5,7 @@ import { CanvasHelper } from '../../ixfx/dom.js';
 import { Arrays } from '../../ixfx/data.js';
 
 const settings = Object.freeze({
-  canvas: new CanvasHelper(`#canvas`, { fill: `viewport` }),
+  canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both` }),
   rows: 15,
   cols: 15,
   colours: [`bisque`, `cadetblue`, `cornflowerblue`, `coral`],

@@ -13,7 +13,7 @@ import { CanvasHelper } from '../../ixfx/dom.js';
 import { scalePercent } from '../../ixfx/numbers.js';
 
 const settings = Object.freeze({
-  canvas: new CanvasHelper(`#canvas`, { fill: `viewport` }),
+  canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both` }),
   colour: `hotpink`,
   piPi: Math.PI * 2,
   rows: 10,
