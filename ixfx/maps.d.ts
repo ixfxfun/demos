@@ -1,8 +1,7 @@
 import { S as SimpleEventEmitter } from './Events-DJgOvcWD.js';
 import { I as Interval } from './IntervalType-B4PbUkjV.js';
 import { I as IsEqual } from './IsEqual-CTTf-Oj9.js';
-import { E as EitherKey } from './Types-CXzamHqZ.js';
-import { I as ICircularArray } from './CircularArray-CpJrVPp5.js';
+import { E as EitherKey, I as ICircularArray } from './Types-MvI-jAuh.js';
 import { T as ToString } from './ToString-DO94OWoh.js';
 export { I as IMappish, a as IWithEntries } from './IMappish-qfjdy4T9.js';
 
@@ -702,7 +701,7 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
      * @param key
      * @returns
      */
-    valuesFor(key: string): Generator<V, void, undefined>;
+    valuesFor(key: string): Generator<V, void, any>;
     getSource(key: string): M | undefined;
     keys(): IterableIterator<string>;
     entriesFlat(): IterableIterator<[key: string, value: V]>;

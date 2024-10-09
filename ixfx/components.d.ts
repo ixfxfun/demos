@@ -3,11 +3,11 @@ import * as lit from 'lit';
 import { LitElement, PropertyValues } from 'lit';
 import { K as KeyValue } from './PrimitiveTypes-F6miV4Zn.js';
 import { Ref } from 'lit/directives/ref.js';
-import { C as CanvasHelper } from './CanvasHelper-Cb_y0I6i.js';
+import { C as CanvasHelper } from './CanvasHelper-CZAo81Wm.js';
 import { a as RectPositioned, R as Rect } from './RectTypes-BVWwyVKg.js';
-import { C as Colourish } from './Colour-B5L3H-HQ.js';
-import { D as DrawingHelper } from './Drawing-BofY7szZ.js';
-import './Scaler-DTFJSZYG.js';
+import { C as Colourish } from './Colour-YzEXhgtt.js';
+import { D as DrawingHelper } from './Drawing-BA-hHZOn.js';
+import './Scaler-CE9loi0A.js';
 import './ISetMutable-hVNWApH3.js';
 import './Events-DJgOvcWD.js';
 import './IntervalType-B4PbUkjV.js';
@@ -119,6 +119,7 @@ declare class FrequencyHistogramPlot {
  * * render: 'dot' or 'line' (default: 'dot')
  * * hide-legend: If added, legend is not shown
  * * manual-draw: If added, automatic drawning is disabled
+ *
  * Styling variables
  * * --legend-fg: legend foreground text
  */
@@ -137,7 +138,6 @@ declare class PlotElement extends LitElement {
     paused: boolean;
     canvasEl: Ref<HTMLCanvasElement>;
     seriesRanges: Map<string, [min: number, max: number]>;
-    constructor();
     get series(): PlotSeries[];
     get seriesCount(): number;
     /**
@@ -174,8 +174,8 @@ declare class PlotElement extends LitElement {
     colourGenerator(series: string): Colourish;
     draw(): void;
     drawLegend(cl: RectPositioned, d: DrawingHelper): void;
-    drawLineSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string): void;
-    drawDotSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string): void;
+    drawLineSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string): void;
+    drawDotSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string): void;
     computePlot(c: CanvasHelper, plotHeight: number, axisYwidth: number, padding: number): {
         x: number;
         y: number;
@@ -202,7 +202,7 @@ declare class PlotSeries {
     name: string;
     colour: Colourish;
     private plot;
-    data: number[];
+    data: Array<number>;
     minSeen: number;
     maxSeen: number;
     constructor(name: string, colour: Colourish, plot: PlotElement);

@@ -3,63 +3,60 @@ import {
   CartesianCanvasPlot,
   Drawing_exports,
   Palette_exports,
-  Plot2_exports,
-  PlotOld_exports,
   SceneGraph_exports,
-  plot_exports,
-  scaleCanvas
-} from "./chunk-4UKC26OS.js";
+  plot_exports
+} from "./chunk-VBD35SJZ.js";
 import {
   Svg_exports
-} from "./chunk-JKLCXLZ5.js";
+} from "./chunk-U3ORW4RC.js";
 import {
   Video_exports
-} from "./chunk-65WH6KYI.js";
-import "./chunk-GNXMKKD5.js";
-import "./chunk-DI3THAAW.js";
+} from "./chunk-TEGRT2T2.js";
+import "./chunk-57LE6FGF.js";
+import "./chunk-OZLFJQTG.js";
 import "./chunk-B5XDBTUM.js";
-import "./chunk-UTOEERYG.js";
+import "./chunk-4IZI7PBG.js";
 import {
   ImageDataGrid_exports
-} from "./chunk-M43OQIGJ.js";
-import "./chunk-KILR2KRP.js";
-import "./chunk-RQSMVGEL.js";
-import "./chunk-EQQ747SO.js";
-import "./chunk-YQTXKH44.js";
-import "./chunk-NAPITDOI.js";
-import "./chunk-SHF5276B.js";
-import "./chunk-332QM2S5.js";
-import "./chunk-TIIF2VKF.js";
+} from "./chunk-ZRLZLYBK.js";
+import "./chunk-AJPMGGRQ.js";
+import "./chunk-E3FSQL3X.js";
+import "./chunk-2RBU7TP2.js";
+import "./chunk-DCQ242CS.js";
+import "./chunk-MXVPSNIN.js";
+import "./chunk-54EDBTE3.js";
+import "./chunk-HDXW6SB7.js";
+import "./chunk-QDOPKDMZ.js";
 import {
   Colour_exports
-} from "./chunk-MXBHIKA7.js";
-import "./chunk-TYALAIXN.js";
+} from "./chunk-PSUENZJT.js";
+import "./chunk-5WAUCLGX.js";
 import "./chunk-NGZXMICH.js";
 import "./chunk-XFNQJV53.js";
 import "./chunk-IV5E4EHV.js";
-import "./chunk-4GOV2D4X.js";
-import "./chunk-QKQKTBVV.js";
+import "./chunk-KHTAVVRU.js";
+import "./chunk-HLMAS5YI.js";
 import "./chunk-I2PHDNRW.js";
-import "./chunk-67VZAFWN.js";
+import "./chunk-YWJ55NOQ.js";
 import "./chunk-4IJNRUE7.js";
 import "./chunk-N6YIY4CM.js";
-import "./chunk-XGQNP3YG.js";
+import "./chunk-725B7GSU.js";
 import "./chunk-ZNCB3DZ2.js";
-import "./chunk-Q444COJ6.js";
-import "./chunk-BGQOJZFW.js";
+import "./chunk-QOW3V2O7.js";
+import "./chunk-24V3UXMK.js";
 import "./chunk-MZFSDYZE.js";
-import "./chunk-UXBT5HQE.js";
-import "./chunk-7HPQVR47.js";
-import "./chunk-BDIBLBFS.js";
-import "./chunk-GISMJX5E.js";
-import "./chunk-PJHYZUYG.js";
+import "./chunk-DZ7RVDDE.js";
+import "./chunk-GIV6V6A3.js";
+import "./chunk-BDHZM2H2.js";
+import "./chunk-XR4VXEAN.js";
+import "./chunk-JSQM5D7T.js";
 import "./chunk-5VWJ6TUI.js";
-import "./chunk-27HWJFP3.js";
+import "./chunk-MQYLULCF.js";
 import "./chunk-54PXOMGL.js";
-import "./chunk-OTGZJTOP.js";
+import "./chunk-5VSI622V.js";
 import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
-import "./chunk-BLACMGG6.js";
+import "./chunk-HYNPZLXG.js";
 import "./chunk-L5EJU35C.js";
 export {
   BipolarView_exports as BipolarView,
@@ -69,11 +66,8 @@ export {
   ImageDataGrid_exports as ImageDataGrid,
   Palette_exports as Palette,
   plot_exports as Plot,
-  Plot2_exports as Plot2,
-  PlotOld_exports as PlotOld,
   SceneGraph_exports as SceneGraph,
   Svg_exports as Svg,
-  Video_exports as Video,
-  scaleCanvas
+  Video_exports as Video
 };
 //# sourceMappingURL=visual.js.map
