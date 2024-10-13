@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pinch</title>
   <link rel="stylesheet" href="../../base.css">
   <script type="importmap">{ "imports": { "ixfx/": "/ixfx/" } } </script>
@@ -41,18 +41,20 @@
 
     #container {
       position: absolute;
-      top:0;
+      top: 0;
       left: 0;
       height: 100%;
       width: 100%;
       z-index: 1;
-      display:flex;
+      display: flex;
       justify-content: center;
       align-items: center;
     }
+
     section {
       z-index: 100;
     }
+
     #thing {
       background-color: hsl(226, 79%, 52%);
       width: 20vw;
@@ -71,14 +73,14 @@
       <iframe src="../sender/index.html"></iframe>
     </section>
     <script type="module">
-    document.querySelector(`#btnCloseFrame`)?.addEventListener(`click`, event => {
-      document.querySelector(`#sourceSection`)?.remove();
-      const element = event.target;
-      if (element) /** @type {HTMLElement} */(element).remove(); // Remove button too
-    });
-    document.querySelector(`#lnkNewWindow`)?.addEventListener(`click`, event => {
-      document.querySelector(`#sourceSection`)?.remove();
-    });
+      document.querySelector(`#btnCloseFrame`)?.addEventListener(`click`, event => {
+        document.querySelector(`#sourceSection`)?.remove();
+        const element = event.target;
+        if (element) /** @type {HTMLElement} */(element).remove(); // Remove button too
+      });
+      document.querySelector(`#lnkNewWindow`)?.addEventListener(`click`, event => {
+        document.querySelector(`#sourceSection`)?.remove();
+      });
     </script>
     <!-- ----  -->
 

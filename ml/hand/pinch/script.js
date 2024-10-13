@@ -1,19 +1,20 @@
 // @ts-ignore
 import { Remote } from "https://unpkg.com/@clinth/remote@latest/dist/index.mjs";
-import * as Dom from 'ixfx/dom.js';
 import { Points } from 'ixfx/geometry.js';
+import * as Dom from 'ixfx/dom.js';
+import * as Numbers from "ixfx/numbers.js";
 import * as MpVision from '../../lib/client/index.js';
-import { average, Bipolar, clamp, interpolate, scaler } from "ixfx/numbers.js";
+import * as Hands from '../hands.js';
 
 const settings = Object.freeze({
   // How quickly to call update()
   updateRateMs: 100,
 
   // Scale pinch distance
-  pinchScale: scaler(0, 0.5),
+  pinchScale: Numbers.scaler(0, 0.5),
 
   // Interpolation of pinch value
-  pinchInterpolator: interpolate(0.1),
+  pinchInterpolator: Numbers.interpolate(0.1),
 
   remote: new Remote(),
   dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } }),
@@ -28,10 +29,10 @@ const settings = Object.freeze({
  */
 
 /** @type State */
-let state = Object.freeze({
+let state = {
   pinchRaw: 0,
   pinch: 0
-});
+};
 
 /**
  * Runs periodically, computing something
@@ -91,7 +92,7 @@ const updateFromHands = (hands) => {
   let pinch = Points.distance(thumb, pointer);
 
   // Scale & invert
-  pinch = 1 - clamp(pinchScale(pinch));
+  pinch = 1 - Numbers.clamp(pinchScale(pinch));
 
   saveState({ pinchRaw: pinch });
 };
@@ -116,17 +117,6 @@ function setup() {
 };
 setup();
 
-/**
- * Update state
- * @param {Partial<State>} s 
- */
-function saveState(s) {
-  state = Object.freeze({
-    ...state,
-    ...s
-  });
-  return state;
-}
 
 /**
  * Called when we have pose data via Remote.
@@ -149,3 +139,15 @@ function onReceivedPoses(packet) {
 
   updateFromHands(handsData);
 };
+
+/**
+ * Update state
+ * @param {Partial<State>} s 
+ */
+function saveState(s) {
+  state = Object.freeze({
+    ...state,
+    ...s
+  });
+  return state;
+}
