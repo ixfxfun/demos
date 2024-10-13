@@ -1,12 +1,12 @@
 import {
   Svg_exports
-} from "./chunk-QP2YNJRA.js";
+} from "./chunk-R2XC6DT2.js";
 import {
   Video_exports
 } from "./chunk-KZMI6SQ4.js";
 import {
   clamp as clamp2
-} from "./chunk-5YDLV2BM.js";
+} from "./chunk-BL4ZBI5J.js";
 import {
   Empty2,
   EmptyPositioned,
@@ -17,13 +17,13 @@ import {
   corners2,
   isEqualSize,
   rect_exports
-} from "./chunk-NUZRVMLX.js";
+} from "./chunk-OQT4QDLV.js";
 import {
   StackImmutable
-} from "./chunk-SKNF3HI6.js";
+} from "./chunk-B7YMT2OB.js";
 import {
   immutable
-} from "./chunk-5HKSXTOR.js";
+} from "./chunk-D7ASMYBE.js";
 import {
   Empty,
   Ops,
@@ -39,7 +39,7 @@ import {
   quantiseEvery,
   sources_exports,
   subtract
-} from "./chunk-TCAD7SRS.js";
+} from "./chunk-B77CGYDG.js";
 import {
   Colour_exports,
   guard,
@@ -48,7 +48,7 @@ import {
   resolveToString,
   scaler,
   scalerTwoWay
-} from "./chunk-WG3TXLKF.js";
+} from "./chunk-W4IV5LHQ.js";
 import {
   clamp
 } from "./chunk-QAEJS6HO.js";
@@ -1961,11 +1961,13 @@ var ElementSizer = class _ElementSizer {
     return er;
   }
   #byContainer() {
-    const r = resizeObservable(this.#containerEl);
+    const c = this.#containerEl;
+    if (!c) throw new Error(`No container element`);
+    const r = resizeObservable(c);
     r.onValue((v) => {
       this.#onParentResize(v);
     });
-    const current = this.#getStretchSize(this.#containerEl.getBoundingClientRect());
+    const current = this.#getStretchSize(c.getBoundingClientRect());
     this.size = current;
     this.#resizeObservable = r;
   }
@@ -2513,4 +2515,4 @@ export {
   plot_exports,
   visual_exports
 };
-//# sourceMappingURL=chunk-JPM5K4JV.js.map
+//# sourceMappingURL=chunk-EGV5SJVP.js.map

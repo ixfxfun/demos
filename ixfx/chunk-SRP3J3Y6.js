@@ -2,17 +2,17 @@ import {
   Drawing_exports,
   ElementSizer,
   makeHelper
-} from "./chunk-JPM5K4JV.js";
+} from "./chunk-EGV5SJVP.js";
 import {
   ImageDataGrid_exports,
   multiplyScalar,
   rect_exports,
   scaler
-} from "./chunk-NUZRVMLX.js";
+} from "./chunk-OQT4QDLV.js";
 import {
   cloneFromFields,
   guard2 as guard
-} from "./chunk-TCAD7SRS.js";
+} from "./chunk-B77CGYDG.js";
 import {
   SimpleEventEmitter
 } from "./chunk-47H3N64R.js";
@@ -130,6 +130,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
     this.fireEvent(`resize`, { ctx: this.ctx, size: this.#logicalSize, helper: this });
   }
   #init() {
+    console.log(`init`, this.opts);
     const d = this.opts.draw;
     if (d) {
       const sched = () => {
@@ -385,4 +386,4 @@ var CanvasHelper = class extends SimpleEventEmitter {
 export {
   CanvasHelper
 };
-//# sourceMappingURL=chunk-XEDKSREI.js.map
+//# sourceMappingURL=chunk-SRP3J3Y6.js.map

@@ -32,30 +32,21 @@ var average = (data) => {
   return total2 / valid.length;
 };
 var min = (data) => Math.min(...validNumbers(data));
-var maxIndex = (data) => (
-  // eslint-disable-next-line unicorn/no-array-reduce
-  data.reduce(
-    (bestIndex, value, index, array) => value > array[bestIndex] ? index : bestIndex,
-    0
-  )
+var maxIndex = (data) => data.reduce(
+  (bestIndex, value, index, array) => value > array[bestIndex] ? index : bestIndex,
+  0
 );
-var minIndex = (...data) => (
-  // eslint-disable-next-line unicorn/no-array-reduce
-  data.reduce(
-    (bestIndex, value, index, array) => value < array[bestIndex] ? index : bestIndex,
-    0
-  )
+var minIndex = (...data) => data.reduce(
+  (bestIndex, value, index, array) => value < array[bestIndex] ? index : bestIndex,
+  0
 );
 var max = (data) => Math.max(...validNumbers(data));
-var total = (data) => (
-  // eslint-disable-next-line unicorn/no-array-reduce
-  data.reduce((previous, current) => {
-    if (typeof current !== `number`) return previous;
-    if (Number.isNaN(current)) return previous;
-    if (Number.isFinite(current)) return previous;
-    return previous + current;
-  }, 0)
-);
+var total = (data) => data.reduce((previous, current) => {
+  if (typeof current !== `number`) return previous;
+  if (Number.isNaN(current)) return previous;
+  if (!Number.isFinite(current)) return previous;
+  return previous + current;
+}, 0);
 var maxFast = (data) => {
   let m = Number.MIN_SAFE_INTEGER;
   for (const datum of data) {
@@ -92,4 +83,4 @@ export {
   totalFast,
   minFast
 };
-//# sourceMappingURL=chunk-NGZXMICH.js.map
+//# sourceMappingURL=chunk-YG33FJI6.js.map

@@ -4374,7 +4374,7 @@ function guard(p2, name = `Point`) {
   }
   if (p2.z !== void 0) {
     if (typeof p2.z !== `number`) throw new TypeError(`${name}.z must be a number. Got: ${typeof p2.z}`);
-    if (Number.isNaN(p2.z)) throw new Error(`'${name}.z' is NaN`);
+    if (Number.isNaN(p2.z)) throw new Error(`'${name}.z' is NaN. Got: ${JSON.stringify(p2)}`);
   }
   if (p2.x === null) throw new Error(`'${name}.x' is null`);
   if (p2.y === null) throw new Error(`'${name}.y' is null`);
@@ -4446,4 +4446,4 @@ export {
   parseRgbObject,
   Colour_exports
 };
-//# sourceMappingURL=chunk-WG3TXLKF.js.map
+//# sourceMappingURL=chunk-W4IV5LHQ.js.map

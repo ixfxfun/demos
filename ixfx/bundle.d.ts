@@ -11,7 +11,7 @@ export { i as Numbers } from './index-DBBFUCDN.js';
 export { i as Visual } from './index-CSDFnIxC.js';
 export { i as Dom } from './index-CImleTF6.js';
 export { E as Events } from './Events-DJgOvcWD.js';
-export { i as Modulation } from './index-BKlrkm03.js';
+export { i as Modulation } from './index-ZSdciWfB.js';
 export { D as DeepWriteable, b as ReadonlyRemapObjectPropertyType, a as RecursivePartial, R as RecursiveReplace, c as RemapObjectPropertyType, d as RequireOnlyOne, e as Rest, W as Writeable } from './TsUtil-CAOuGbXq.js';
 export { i as Collections } from './index-D7DseyLu.js';
 export { i as Random } from './index-3AbHzXBL.js';

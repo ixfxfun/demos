@@ -1,6 +1,6 @@
 import {
   guard
-} from "./chunk-WG3TXLKF.js";
+} from "./chunk-W4IV5LHQ.js";
 
 // src/geometry/line/FromPoints.ts
 var fromPoints = (a, b) => {
@@ -29,4 +29,4 @@ export {
   fromPoints,
   fromNumbers
 };
-//# sourceMappingURL=chunk-D7PCTOUG.js.map
+//# sourceMappingURL=chunk-RZE4OHS2.js.map

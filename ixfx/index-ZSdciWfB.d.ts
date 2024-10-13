@@ -1550,6 +1550,7 @@ type TimingSources = `elapsed` | `hertz` | `bpm`;
  */
 declare const timingSourceFactory: (source: TimingSources, duration: number, options?: Partial<ModSettableOptions>) => () => ModSettable;
 
+type WaveModulator = (feedback?: Partial<WaveShaperFeedback>) => number;
 type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
 /**
  * Options for the wave function. Defaults to a sine wave of one cycle per-second.
@@ -1669,7 +1670,7 @@ declare function sineBipolarShape(period?: number): Modulate;
  * @param options
  * @returns
  */
-declare function wave(options: Partial<WaveOptions>): (feedback?: Partial<WaveShaperFeedback>) => number;
+declare function wave(options: Partial<WaveOptions>): WaveModulator;
 /**
  * Wave shaper feedback.
  * Feedback allows you to dynamically control tempo for advanced uses.
@@ -1690,7 +1691,7 @@ type WaveShaperFeedback = {
  * @param shaperFn
  * @returns
  */
-declare function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert?: boolean): (feedback?: Partial<WaveShaperFeedback>) => number;
+declare function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert?: boolean): WaveModulator;
 
 /**
  * Weighted average
@@ -1737,6 +1738,7 @@ declare const index_Modulate: typeof Modulate;
 declare const index_ModulatorTimed: typeof ModulatorTimed;
 declare const index_SpringOptions: typeof SpringOptions;
 type index_TimingSources = TimingSources;
+type index_WaveModulator = WaveModulator;
 type index_WaveOptions = WaveOptions;
 type index_WaveShaperFeedback = WaveShaperFeedback;
 type index_Waveforms = Waveforms;
@@ -1768,7 +1770,7 @@ declare const index_wave: typeof wave;
 declare const index_waveFromSource: typeof waveFromSource;
 declare const index_weightedAverage: typeof weightedAverage;
 declare namespace index {
-  export { type index_Drifter as Drifter, index$3 as Easings, index$2 as Envelopes, index_Forces as Forces, type index_JitterOpts as JitterOpts, type index_Jitterer as Jitterer, index_ModSettable as ModSettable, index_ModSettableFeedback as ModSettableFeedback, index_ModSettableOptions as ModSettableOptions, index_ModSource as ModSource, index_Modulate as Modulate, index_ModulatorTimed as ModulatorTimed, Oscillator as Oscillators, index$1 as Sources, index_SpringOptions as SpringOptions, type index_TimingSources as TimingSources, type index_WaveOptions as WaveOptions, type index_WaveShaperFeedback as WaveShaperFeedback, type index_Waveforms as Waveforms, index_arcShape as arcShape, index_crossfade as crossfade, index_cubicBezierShape as cubicBezierShape, index_drift as drift, index_gaussian as gaussian, index_jitter as jitter, index_jitterAbsolute as jitterAbsolute, index_mix as mix, index_mixModulators as mixModulators, index_noop as noop, index_pingPong as pingPong, index_pingPongPercent as pingPongPercent, index_sineBipolarShape as sineBipolarShape, index_sineShape as sineShape, index_spring as spring, index_springShape as springShape, index_springValue as springValue, index_squareShape as squareShape, index_tickModulator as tickModulator, index_ticks as ticks, index_time as time, index_timeModulator as timeModulator, index_timingSourceFactory as timingSourceFactory, index_triangleShape as triangleShape, index_wave as wave, index_waveFromSource as waveFromSource, index_weightedAverage as weightedAverage };
+  export { type index_Drifter as Drifter, index$3 as Easings, index$2 as Envelopes, index_Forces as Forces, type index_JitterOpts as JitterOpts, type index_Jitterer as Jitterer, index_ModSettable as ModSettable, index_ModSettableFeedback as ModSettableFeedback, index_ModSettableOptions as ModSettableOptions, index_ModSource as ModSource, index_Modulate as Modulate, index_ModulatorTimed as ModulatorTimed, Oscillator as Oscillators, index$1 as Sources, index_SpringOptions as SpringOptions, type index_TimingSources as TimingSources, type index_WaveModulator as WaveModulator, type index_WaveOptions as WaveOptions, type index_WaveShaperFeedback as WaveShaperFeedback, type index_Waveforms as Waveforms, index_arcShape as arcShape, index_crossfade as crossfade, index_cubicBezierShape as cubicBezierShape, index_drift as drift, index_gaussian as gaussian, index_jitter as jitter, index_jitterAbsolute as jitterAbsolute, index_mix as mix, index_mixModulators as mixModulators, index_noop as noop, index_pingPong as pingPong, index_pingPongPercent as pingPongPercent, index_sineBipolarShape as sineBipolarShape, index_sineShape as sineShape, index_spring as spring, index_springShape as springShape, index_springValue as springValue, index_squareShape as squareShape, index_tickModulator as tickModulator, index_ticks as ticks, index_time as time, index_timeModulator as timeModulator, index_timingSourceFactory as timingSourceFactory, index_triangleShape as triangleShape, index_wave as wave, index_waveFromSource as waveFromSource, index_weightedAverage as weightedAverage };
 }
 
-export { sineShape as A, arcShape as B, sineBipolarShape as C, type Drifter as D, wave as E, Forces as F, type WaveShaperFeedback as G, waveFromSource as H, weightedAverage as I, type JitterOpts as J, Oscillator as O, type TimingSources as T, type Waveforms as W, index$2 as a, index$1 as b, cubicBezierShape as c, drift as d, type Jitterer as e, jitter as f, gaussian as g, mixModulators as h, index as i, jitterAbsolute as j, crossfade as k, timeModulator as l, mix as m, ticks as n, tickModulator as o, noop as p, pingPongPercent as q, pingPong as r, spring as s, time as t, springValue as u, springShape as v, timingSourceFactory as w, type WaveOptions as x, triangleShape as y, squareShape as z };
+export { squareShape as A, sineShape as B, arcShape as C, type Drifter as D, sineBipolarShape as E, Forces as F, wave as G, type WaveShaperFeedback as H, waveFromSource as I, type JitterOpts as J, weightedAverage as K, Oscillator as O, type TimingSources as T, type WaveModulator as W, index$2 as a, index$1 as b, cubicBezierShape as c, drift as d, type Jitterer as e, jitter as f, gaussian as g, mixModulators as h, index as i, jitterAbsolute as j, crossfade as k, timeModulator as l, mix as m, ticks as n, tickModulator as o, noop as p, pingPongPercent as q, pingPong as r, spring as s, time as t, springValue as u, springShape as v, timingSourceFactory as w, type Waveforms as x, type WaveOptions as y, triangleShape as z };
