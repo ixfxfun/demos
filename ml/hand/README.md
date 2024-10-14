@@ -4,6 +4,12 @@ Uses MediaPipe to generate landmarks of the hand.
 
 See [MediaPipe's documentation](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker#models) for more information on the model.
 
+Most simply, this model gives you the x, y & z position of 21 well-defined _landmarks_ per detected hand.
+
+![Landmarks](hand-pose.avif)
+
+The numerical number of each landmark is fixed, for example #0 always refers to the wrist. The model also give a prediction for whether a hand is left or right, allowing you take different action accordingly.
+
 ## Data
 
 In the sketches, hand pose data comes in to the `updateFromHands` function as the first parameter. It's of type `HandLandmarkerResult`, which looks like:
