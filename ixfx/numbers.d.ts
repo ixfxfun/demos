@@ -1,0 +1,10 @@
+export { B as Bipolar, I as DifferenceKind, M as MovingAverageTimedOptions, N as Normalise, U as ScalerTwoWay, a as applyToValues, u as average, b as averageWeighted, c as clamp, e as clampIndex, d as clamper, f as count, J as differenceFromFixed, K as differenceFromLast, t as dotProduct, g as filter, h as flip, m as isApprox, l as isValid, o as linearSpace, A as max, D as maxFast, y as maxIndex, x as min, F as minFast, z as minIndex, r as movingAverage, p as movingAverageLight, q as movingAverageTimed, s as noiseFilter, k as numericPercent, j as numericRange, n as numericRangeRaw, G as proportion, H as quantiseEvery, L as round, O as scale, Q as scaleClamped, S as scalePercent, R as scalePercentages, P as scaler, T as scalerPercent, V as scalerTwoWay, W as softmax, C as total, E as totalFast, v as validNumbers, w as weight, Y as wrap, X as wrapInteger, Z as wrapRange } from './index-CNc3tyxM.js';
+export { I as InterpolateOptions, i as interpolate, a as interpolateAngle, b as interpolatorInterval, c as interpolatorStepped, p as piPi } from './Interpolate-Doc6ee_I.js';
+export { m as minMaxAvg } from './MinMaxAvg-1MT6_y5i.js';
+export { M as MinMaxAvgOpts, a as MinMaxAvgTotal } from './Types-grp6zrDi.js';
+import './Types-CR0Pe5zY.js';
+import './Types-AjpgZy7P.js';
+import './IntervalType-B4PbUkjV.js';
+import './index-CVS-IuSd.js';
+import './Types-Bw7JwVUD.js';
+import './PointType-BDlA07rn.js';
