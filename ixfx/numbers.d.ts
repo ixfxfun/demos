@@ -1,9 +1,9 @@
-export { B as Bipolar, I as DifferenceKind, M as MovingAverageTimedOptions, N as Normalise, U as ScalerTwoWay, a as applyToValues, u as average, b as averageWeighted, c as clamp, e as clampIndex, d as clamper, f as count, J as differenceFromFixed, K as differenceFromLast, t as dotProduct, g as filter, h as flip, m as isApprox, l as isValid, o as linearSpace, A as max, D as maxFast, y as maxIndex, x as min, F as minFast, z as minIndex, r as movingAverage, p as movingAverageLight, q as movingAverageTimed, s as noiseFilter, k as numericPercent, j as numericRange, n as numericRangeRaw, G as proportion, H as quantiseEvery, L as round, O as scale, Q as scaleClamped, S as scalePercent, R as scalePercentages, P as scaler, T as scalerPercent, V as scalerTwoWay, W as softmax, C as total, E as totalFast, v as validNumbers, w as weight, Y as wrap, X as wrapInteger, Z as wrapRange } from './index-CNc3tyxM.js';
+export { B as Bipolar, K as DifferenceKind, M as MovingAverageTimedOptions, N as Normalise, a as applyToValues, y as average, b as averageWeighted, c as clamp, e as clampIndex, d as clamper, f as count, L as differenceFromFixed, O as differenceFromLast, x as dotProduct, g as filterIterable, h as flip, m as isApprox, l as isValid, o as linearSpace, D as max, F as maxFast, A as maxIndex, z as min, H as minFast, C as minIndex, s as movingAverage, p as movingAverageLight, q as movingAverageTimed, u as noiseFilter, k as numericPercent, j as numericRange, n as numericRangeRaw, I as proportion, J as quantiseEvery, r as rangeInclusive, P as round, Q as scale, T as scaleClamped, V as scalePercent, U as scalePercentages, R as scaler, S as scalerNull, W as scalerPercent, X as scalerTwoWay, Y as softmax, t as thresholdAtLeast, E as total, G as totalFast, v as validNumbers, w as weight, _ as wrap, Z as wrapInteger, $ as wrapRange } from './index-qR44ZYTe.js';
 export { I as InterpolateOptions, i as interpolate, a as interpolateAngle, b as interpolatorInterval, c as interpolatorStepped, p as piPi } from './Interpolate-Doc6ee_I.js';
-export { m as minMaxAvg } from './MinMaxAvg-1MT6_y5i.js';
-export { M as MinMaxAvgOpts, a as MinMaxAvgTotal } from './Types-grp6zrDi.js';
+export { m as minMaxAvg } from './MinMaxAvg-BdRIkRjw.js';
+export { M as MinMaxAvgOpts, a as MinMaxAvgTotal, N as NumberScaler, b as NumberScalerTwoWay } from './Types-D1-qcE-Y.js';
 import './Types-CR0Pe5zY.js';
-import './Types-AjpgZy7P.js';
+import './Types-DaSeYFCm.js';
 import './IntervalType-B4PbUkjV.js';
 import './index-CVS-IuSd.js';
 import './Types-Bw7JwVUD.js';

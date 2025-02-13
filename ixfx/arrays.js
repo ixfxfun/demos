@@ -1,4 +1,5 @@
 import {
+  SortedArray_exports,
   atWrap,
   chunks,
   contains,
@@ -19,7 +20,7 @@ import {
   sortByProperty,
   until,
   zip
-} from "./chunk-IO5QQLGV.js";
+} from "./chunk-6YST6BGJ.js";
 import {
   pairwise,
   pairwiseReduce
@@ -27,7 +28,7 @@ import {
 import {
   containsDuplicateInstances
 } from "./chunk-MZFSDYZE.js";
-import "./chunk-7E62C5MK.js";
+import "./chunk-PPQMFIVD.js";
 import {
   randomElement,
   randomElementWeightedSource,
@@ -43,7 +44,7 @@ import {
   minMaxAvg,
   without,
   withoutUndefined
-} from "./chunk-UCOSSIRP.js";
+} from "./chunk-RDWM2Z63.js";
 import {
   guardArray
 } from "./chunk-GISMJX5E.js";
@@ -57,6 +58,7 @@ import "./chunk-6UZ3OSJO.js";
 import "./chunk-Z5OJDQCF.js";
 import "./chunk-L5EJU35C.js";
 export {
+  SortedArray_exports as Sorted,
   atWrap,
   chunks,
   contains,

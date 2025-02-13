@@ -3,23 +3,23 @@ import * as lit from 'lit';
 import { LitElement, PropertyValues } from 'lit';
 import { K as KeyValue } from './PrimitiveTypes-F6miV4Zn.js';
 import { Ref } from 'lit/directives/ref.js';
-import { C as CanvasHelper } from './CanvasHelper-CbuRSZNf.js';
-import { a as RectPositioned, R as Rect } from './RectTypes-BVWwyVKg.js';
+import { C as CanvasHelper } from './CanvasHelper-uFrit0Cm.js';
+import { a as RectPositioned, R as Rect } from './RectTypes-CjvCxMc4.js';
 import { C as Colourish } from './Colour-jpofjHkm.js';
-import { D as DrawingHelper } from './Drawing-BA-hHZOn.js';
+import { D as DrawingHelper } from './Drawing-CQ43I0rW.js';
 import './Types-CeD-4LiW.js';
 import './ISetMutable-hVNWApH3.js';
 import './Events-DJgOvcWD.js';
 import './IntervalType-B4PbUkjV.js';
-import './Scaler-XwDjxOLc.js';
+import './Scaler-BqD8fmOQ.js';
 import './PointType-BDlA07rn.js';
 import 'colorjs.io';
 import './Types-CR0Pe5zY.js';
 import './Results-ByWkmocN.js';
 import './LineType-DkIFzpdp.js';
-import './PathType-9cjB2t-Y.js';
+import './PathType-m0JxWZvm.js';
 import './CircleType-D9Xd-yDE.js';
-import './Ellipse-Cie3ckUe.js';
+import './Ellipse-Dfv4Jz-W.js';
 import './IStackImmutable-BNEmWxct.js';
 
 type Bar = {
@@ -141,6 +141,17 @@ declare class PlotElement extends LitElement {
     seriesRanges: Map<string, [min: number, max: number]>;
     get series(): PlotSeries[];
     get seriesCount(): number;
+    /**
+     * Returns a `PlotElement` instance based on a query
+     * ```js
+     * PlotElement.fromQuery(`#someplot`); // PlotElement
+     * ```
+     *
+     * Throws an error if query does not match.
+     * @param query
+     * @returns
+     */
+    static fromQuery(query: string): PlotElement;
     /**
      * Delete a series.
      * Returns _true_ if there was a series to delete

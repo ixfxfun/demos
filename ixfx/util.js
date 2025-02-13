@@ -8,7 +8,7 @@ import {
   minMaxAvg2 as minMaxAvg,
   numericComparer,
   runningiOS
-} from "./chunk-UCOSSIRP.js";
+} from "./chunk-RDWM2Z63.js";
 import "./chunk-GISMJX5E.js";
 import "./chunk-NO53N4A2.js";
 import "./chunk-5VWJ6TUI.js";

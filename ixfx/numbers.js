@@ -3,7 +3,7 @@ import {
   applyToValues,
   differenceFromFixed,
   differenceFromLast,
-  filter,
+  filterIterable,
   flip,
   isApprox,
   isValid,
@@ -11,11 +11,13 @@ import {
   numericRange,
   numericRangeRaw,
   proportion,
-  softmax
-} from "./chunk-RJH6U4IO.js";
+  rangeInclusive,
+  softmax,
+  thresholdAtLeast
+} from "./chunk-DKHNTIM3.js";
 import {
   Bipolar_exports
-} from "./chunk-4NJKOXAN.js";
+} from "./chunk-VOD7OQWY.js";
 import {
   count
 } from "./chunk-6MZRE4JN.js";
@@ -37,17 +39,18 @@ import {
   wrap,
   wrapInteger,
   wrapRange
-} from "./chunk-YZTAMYUW.js";
+} from "./chunk-ISBRBAGP.js";
 import {
   scale,
   scaleClamped,
   scalePercent,
   scalePercentages,
   scaler,
+  scalerNull,
   scalerPercent,
   scalerTwoWay
-} from "./chunk-2HWKLE5P.js";
-import "./chunk-OKEIS4I2.js";
+} from "./chunk-TZV2DTER.js";
+import "./chunk-5A4BEECK.js";
 import {
   average,
   dotProduct,
@@ -64,25 +67,25 @@ import {
 } from "./chunk-YG33FJI6.js";
 import "./chunk-XFNQJV53.js";
 import "./chunk-CYC5VE6S.js";
-import "./chunk-DQHPBNC3.js";
-import "./chunk-JQ3H53LX.js";
+import "./chunk-JVQJ6FSV.js";
+import "./chunk-NYIYKEOI.js";
 import {
   clamp,
   clampIndex,
   clamper
 } from "./chunk-QAEJS6HO.js";
-import "./chunk-5T3R27ZX.js";
+import "./chunk-QKVQQVXM.js";
 import "./chunk-N6YIY4CM.js";
-import "./chunk-47H3N64R.js";
+import "./chunk-CM43JQ7N.js";
 import "./chunk-ICXKAKPN.js";
-import "./chunk-IO5QQLGV.js";
+import "./chunk-6YST6BGJ.js";
 import "./chunk-BGQOJZFW.js";
 import "./chunk-MZFSDYZE.js";
-import "./chunk-7E62C5MK.js";
+import "./chunk-PPQMFIVD.js";
 import "./chunk-7HPQVR47.js";
 import {
   minMaxAvg
-} from "./chunk-UCOSSIRP.js";
+} from "./chunk-RDWM2Z63.js";
 import "./chunk-GISMJX5E.js";
 import "./chunk-NO53N4A2.js";
 import "./chunk-5VWJ6TUI.js";
@@ -110,7 +113,7 @@ export {
   differenceFromFixed,
   differenceFromLast,
   dotProduct,
-  filter,
+  filterIterable,
   flip,
   interpolate,
   interpolateAngle,
@@ -136,15 +139,18 @@ export {
   piPi,
   proportion,
   quantiseEvery,
+  rangeInclusive,
   round,
   scale,
   scaleClamped,
   scalePercent,
   scalePercentages,
   scaler,
+  scalerNull,
   scalerPercent,
   scalerTwoWay,
   softmax,
+  thresholdAtLeast,
   total,
   totalFast,
   validNumbers,
