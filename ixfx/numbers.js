@@ -14,16 +14,16 @@ import {
   rangeInclusive,
   softmax,
   thresholdAtLeast
-} from "./chunk-DKHNTIM3.js";
+} from "./chunk-RCRHW5KA.js";
 import {
   Bipolar_exports
-} from "./chunk-VOD7OQWY.js";
+} from "./chunk-3WWW3EH4.js";
 import {
   count
-} from "./chunk-6MZRE4JN.js";
+} from "./chunk-AJPKVRVS.js";
 import {
   linearSpace
-} from "./chunk-4DV6BRLR.js";
+} from "./chunk-ARAXT7VF.js";
 import {
   averageWeighted,
   interpolate2 as interpolate,
@@ -36,11 +36,6 @@ import {
   noiseFilter,
   piPi,
   quantiseEvery,
-  wrap,
-  wrapInteger,
-  wrapRange
-} from "./chunk-ISBRBAGP.js";
-import {
   scale,
   scaleClamped,
   scalePercent,
@@ -48,9 +43,14 @@ import {
   scaler,
   scalerNull,
   scalerPercent,
-  scalerTwoWay
-} from "./chunk-TZV2DTER.js";
-import "./chunk-5A4BEECK.js";
+  scalerTwoWay,
+  wrap,
+  wrapInteger,
+  wrapRange
+} from "./chunk-TSP6MRBQ.js";
+import "./chunk-N7FO4CPW.js";
+import "./chunk-INARIK5E.js";
+import "./chunk-XFNQJV53.js";
 import {
   average,
   dotProduct,
@@ -65,40 +65,35 @@ import {
   validNumbers,
   weight
 } from "./chunk-YG33FJI6.js";
-import "./chunk-XFNQJV53.js";
-import "./chunk-CYC5VE6S.js";
-import "./chunk-JVQJ6FSV.js";
-import "./chunk-NYIYKEOI.js";
+import "./chunk-NK6WZHXG.js";
+import "./chunk-VYCNRTDD.js";
 import {
   clamp,
   clampIndex,
   clamper
-} from "./chunk-QAEJS6HO.js";
-import "./chunk-QKVQQVXM.js";
-import "./chunk-N6YIY4CM.js";
-import "./chunk-CM43JQ7N.js";
+} from "./chunk-4OK6CU6W.js";
+import "./chunk-72EKR3DZ.js";
 import "./chunk-ICXKAKPN.js";
-import "./chunk-6YST6BGJ.js";
-import "./chunk-BGQOJZFW.js";
+import "./chunk-CVHSZDTH.js";
 import "./chunk-MZFSDYZE.js";
-import "./chunk-PPQMFIVD.js";
-import "./chunk-7HPQVR47.js";
+import "./chunk-IXB3RQED.js";
+import "./chunk-YKJ5OEMO.js";
 import {
   minMaxAvg
-} from "./chunk-RDWM2Z63.js";
-import "./chunk-GISMJX5E.js";
-import "./chunk-NO53N4A2.js";
-import "./chunk-5VWJ6TUI.js";
+} from "./chunk-RNGEX66F.js";
+import "./chunk-PSWPSMIG.js";
 import "./chunk-QVTHCRNR.js";
-import "./chunk-4IJNRUE7.js";
-import "./chunk-AKC4PULA.js";
-import "./chunk-54PXOMGL.js";
+import "./chunk-WYMJKVGY.js";
+import "./chunk-Z2SF7PPR.js";
 import {
   round
-} from "./chunk-4LY3IBHN.js";
+} from "./chunk-3UVU2F72.js";
 import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
-import "./chunk-Z5OJDQCF.js";
+import "./chunk-UC4AQMTL.js";
+import "./chunk-CYC5VE6S.js";
+import "./chunk-N6YIY4CM.js";
+import "./chunk-4IJNRUE7.js";
 import "./chunk-L5EJU35C.js";
 export {
   Bipolar_exports as Bipolar,

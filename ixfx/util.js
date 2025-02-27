@@ -4,24 +4,23 @@ import {
   getSorter,
   isEqualTrace,
   isInteger,
+  isPrimitive,
+  isPrimitiveOrObject,
   jsComparer,
   minMaxAvg2 as minMaxAvg,
   numericComparer,
   runningiOS
-} from "./chunk-RDWM2Z63.js";
-import "./chunk-GISMJX5E.js";
-import "./chunk-NO53N4A2.js";
-import "./chunk-5VWJ6TUI.js";
+} from "./chunk-RNGEX66F.js";
+import "./chunk-PSWPSMIG.js";
 import {
   resultErrorToString,
   resultToError,
   resultToValue,
   throwResult
 } from "./chunk-QVTHCRNR.js";
-import "./chunk-4IJNRUE7.js";
 import {
   guards_exports
-} from "./chunk-AKC4PULA.js";
+} from "./chunk-WYMJKVGY.js";
 import {
   mapKeys
 } from "./chunk-HOGLR6UM.js";
@@ -36,7 +35,8 @@ import {
   toStringDefault,
   toStringOrdered
 } from "./chunk-6UZ3OSJO.js";
-import "./chunk-Z5OJDQCF.js";
+import "./chunk-UC4AQMTL.js";
+import "./chunk-4IJNRUE7.js";
 import "./chunk-L5EJU35C.js";
 export {
   guards_exports as Guards,
@@ -51,6 +51,8 @@ export {
   isEqualValuePartial,
   isInteger,
   isMap,
+  isPrimitive,
+  isPrimitiveOrObject,
   isSet,
   jsComparer,
   mapKeys,

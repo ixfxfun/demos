@@ -5,6 +5,7 @@ import {
   annotate,
   annotateWithOp,
   average2 as average,
+  cache,
   chunk,
   cloneFromFields2 as cloneFromFields,
   combineLatestToArray,
@@ -15,6 +16,10 @@ import {
   elapsed,
   field,
   filter2 as filter,
+  initLazyStream,
+  initLazyStreamWithInitial,
+  initStream,
+  initUpstream,
   interpolate3 as interpolate,
   manual,
   max3 as max,
@@ -51,12 +56,11 @@ import {
   withValue,
   wrap2 as wrap,
   writable
-} from "./chunk-ISBRBAGP.js";
-import "./chunk-TZV2DTER.js";
-import "./chunk-5A4BEECK.js";
-import "./chunk-YG33FJI6.js";
+} from "./chunk-TSP6MRBQ.js";
+import "./chunk-N7FO4CPW.js";
+import "./chunk-INARIK5E.js";
 import "./chunk-XFNQJV53.js";
-import "./chunk-CYC5VE6S.js";
+import "./chunk-YG33FJI6.js";
 import {
   hasLast,
   isPingable,
@@ -72,30 +76,27 @@ import {
   messageIsSignal,
   opify,
   resolveTriggerValue
-} from "./chunk-JVQJ6FSV.js";
-import "./chunk-NYIYKEOI.js";
-import "./chunk-QAEJS6HO.js";
-import "./chunk-QKVQQVXM.js";
-import "./chunk-N6YIY4CM.js";
-import "./chunk-CM43JQ7N.js";
+} from "./chunk-NK6WZHXG.js";
+import "./chunk-VYCNRTDD.js";
+import "./chunk-4OK6CU6W.js";
+import "./chunk-72EKR3DZ.js";
 import "./chunk-ICXKAKPN.js";
-import "./chunk-6YST6BGJ.js";
-import "./chunk-BGQOJZFW.js";
+import "./chunk-CVHSZDTH.js";
 import "./chunk-MZFSDYZE.js";
-import "./chunk-PPQMFIVD.js";
-import "./chunk-7HPQVR47.js";
-import "./chunk-RDWM2Z63.js";
-import "./chunk-GISMJX5E.js";
-import "./chunk-NO53N4A2.js";
-import "./chunk-5VWJ6TUI.js";
+import "./chunk-IXB3RQED.js";
+import "./chunk-YKJ5OEMO.js";
+import "./chunk-RNGEX66F.js";
+import "./chunk-PSWPSMIG.js";
 import "./chunk-QVTHCRNR.js";
-import "./chunk-4IJNRUE7.js";
-import "./chunk-AKC4PULA.js";
-import "./chunk-54PXOMGL.js";
-import "./chunk-4LY3IBHN.js";
+import "./chunk-WYMJKVGY.js";
+import "./chunk-Z2SF7PPR.js";
+import "./chunk-3UVU2F72.js";
 import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
-import "./chunk-Z5OJDQCF.js";
+import "./chunk-UC4AQMTL.js";
+import "./chunk-CYC5VE6S.js";
+import "./chunk-N6YIY4CM.js";
+import "./chunk-4IJNRUE7.js";
 import "./chunk-L5EJU35C.js";
 export {
   Dom_exports as Dom,
@@ -105,6 +106,7 @@ export {
   annotate,
   annotateWithOp,
   average,
+  cache,
   chunk,
   cloneFromFields,
   combineLatestToArray,
@@ -116,6 +118,10 @@ export {
   field,
   filter,
   hasLast,
+  initLazyStream,
+  initLazyStreamWithInitial,
+  initStream,
+  initUpstream,
   interpolate,
   isPingable,
   isReactive,

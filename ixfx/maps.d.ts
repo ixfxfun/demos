@@ -3,7 +3,8 @@ import { I as Interval } from './IntervalType-B4PbUkjV.js';
 import { I as IsEqual } from './IsEqual-CTTf-Oj9.js';
 import { E as EitherKey, I as ICircularArray } from './Types-MvI-jAuh.js';
 import { T as ToString } from './ToString-DO94OWoh.js';
-export { I as IMappish, a as IWithEntries } from './IMappish-qfjdy4T9.js';
+import { a as IWithEntries } from './IMappish-qfjdy4T9.js';
+export { I as IMappish } from './IMappish-qfjdy4T9.js';
 
 /**
  * Expiring map options
@@ -914,6 +915,50 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
 }
 
 /**
+ * Finds first entry by iterable value. Expects a map with an iterable as values.
+ *
+ * ```js
+ * const map = new Map();
+ * map.set('hello', ['a', 'b', 'c']);
+ * map.set('there', ['d', 'e', 'f']);
+ *
+ * const entry = firstEntry(map, (value, key) => {
+ *  return (value === 'e');
+ * });
+ * // Entry is: ['there', ['d', 'e', 'f']]
+ * ```
+ *
+ * An alternative is {@link firstEntryByValue} to search by value.
+ * @param map Map to search
+ * @param predicate Filter function returns true when there is a match of value
+ * @returns Entry, or _undefined_ if `filter` function never returns _true_
+ */
+declare const firstEntry: <K, V>(map: IWithEntries<K, Iterable<V>>, predicate: (value: V, key: K) => boolean) => readonly [key: K, value: Iterable<V>] | undefined;
+/**
+ * Returns the size of the largest key, or 0 if empty.
+ */
+declare const lengthMax: <V>(map: IMapOf<V>) => number;
+/**
+ * Finds first entry by iterable value. Expects a map with an iterable as values.
+ *
+ * ```js
+ * const map = new Map();
+ * map.set('hello', ['a', 'b', 'c']);
+ * map.set('there', ['d', 'e', 'f']);
+ *
+ * const entry = firstEntryByValue(map, 'e');
+ * // Entry is: ['there', ['d', 'e', 'f']]
+ * ```
+ *
+ * An alternative is {@link firstEntry} to search by predicate function.
+ * @param map Map to search
+ * @param value Value to seek
+ * @param isEqual Filter function which checks equality. Uses JS comparer by default.
+ * @returns Entry, or _undefined_ if `value` not found.
+ */
+declare const firstEntryByValue: <K, V>(map: IWithEntries<K, Iterable<V>>, value: V, isEqual?: IsEqual<V>) => readonly [key: K, value: Iterable<V>] | undefined;
+
+/**
  * @private
  */
 type MultiValue<V, M> = {
@@ -1046,4 +1091,4 @@ declare class NumberMap<K> extends Map<K, number> {
     subtract(key: K, amount?: number): number;
 }
 
-export { type ExpiringMapEvent, type ExpiringMapEvents, type Opts as ExpiringMapOpts, type IMapImmutable, type IMapMutable, type IMapOf, type IMapOfImmutable, type IMapOfMutable, type IMapOfMutableExtended, type MapArrayEvents, type MapArrayOpts, type MapCircularOpts, type MapMultiOpts, MapOfMutableImpl, MapOfSimple, type MapSetOpts, type MultiValue, NumberMap, create as expiringMap, immutable, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple };
+export { type ExpiringMapEvent, type ExpiringMapEvents, type Opts as ExpiringMapOpts, type IMapImmutable, type IMapMutable, type IMapOf, type IMapOfImmutable, type IMapOfMutable, type IMapOfMutableExtended, IWithEntries, type MapArrayEvents, type MapArrayOpts, type MapCircularOpts, type MapMultiOpts, MapOfMutableImpl, MapOfSimple, type MapSetOpts, type MultiValue, NumberMap, create as expiringMap, firstEntry, firstEntryByValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple };

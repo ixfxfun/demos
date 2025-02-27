@@ -1,64 +1,59 @@
-import "./chunk-DKHNTIM3.js";
+import "./chunk-RCRHW5KA.js";
 import {
   CanvasHelper
-} from "./chunk-YB7NFM56.js";
+} from "./chunk-GREZGSAB.js";
 import {
   Drawing_exports
-} from "./chunk-IS7PPEKX.js";
-import "./chunk-AG4LRD7R.js";
-import "./chunk-G5GFTB4Q.js";
-import "./chunk-VOD7OQWY.js";
-import "./chunk-PSC5STUJ.js";
+} from "./chunk-YPR6SHJS.js";
+import "./chunk-GOOBCKAA.js";
+import "./chunk-3WWW3EH4.js";
+import "./chunk-GDACCM3K.js";
+import "./chunk-AJPKVRVS.js";
+import "./chunk-GEOIJMHU.js";
+import "./chunk-2DGEAALI.js";
+import "./chunk-ARAXT7VF.js";
+import "./chunk-7TRDLPZ6.js";
 import "./chunk-B5XDBTUM.js";
-import "./chunk-6MZRE4JN.js";
-import "./chunk-ELLUBXOK.js";
-import "./chunk-IZZJMZJH.js";
-import "./chunk-4DV6BRLR.js";
-import "./chunk-AO3LGTZU.js";
-import "./chunk-C7R4XKEI.js";
-import "./chunk-MF5NSBG4.js";
-import "./chunk-ALWIOYZM.js";
-import "./chunk-OAST3VYR.js";
+import "./chunk-X224AYBU.js";
+import "./chunk-QJJ6YNP3.js";
+import "./chunk-OG7TSNWN.js";
+import "./chunk-VA4NGFT6.js";
+import "./chunk-BMX5N5CN.js";
 import {
   Pathed_exports,
+  colour_exports,
+  scaler,
   wrap
-} from "./chunk-ISBRBAGP.js";
-import {
-  Colour_exports,
-  scaler
-} from "./chunk-TZV2DTER.js";
-import "./chunk-5A4BEECK.js";
-import "./chunk-YG33FJI6.js";
+} from "./chunk-TSP6MRBQ.js";
+import "./chunk-N7FO4CPW.js";
+import "./chunk-INARIK5E.js";
 import "./chunk-XFNQJV53.js";
-import "./chunk-CYC5VE6S.js";
-import "./chunk-JVQJ6FSV.js";
-import "./chunk-NYIYKEOI.js";
+import "./chunk-YG33FJI6.js";
+import "./chunk-NK6WZHXG.js";
+import "./chunk-VYCNRTDD.js";
 import {
   clamp
-} from "./chunk-QAEJS6HO.js";
-import "./chunk-QKVQQVXM.js";
-import "./chunk-N6YIY4CM.js";
-import "./chunk-CM43JQ7N.js";
+} from "./chunk-4OK6CU6W.js";
+import "./chunk-72EKR3DZ.js";
 import "./chunk-ICXKAKPN.js";
-import "./chunk-6YST6BGJ.js";
-import "./chunk-BGQOJZFW.js";
+import "./chunk-CVHSZDTH.js";
 import "./chunk-MZFSDYZE.js";
-import "./chunk-PPQMFIVD.js";
-import "./chunk-7HPQVR47.js";
+import "./chunk-IXB3RQED.js";
+import "./chunk-YKJ5OEMO.js";
 import {
   getSorter
-} from "./chunk-RDWM2Z63.js";
-import "./chunk-GISMJX5E.js";
-import "./chunk-NO53N4A2.js";
-import "./chunk-5VWJ6TUI.js";
+} from "./chunk-RNGEX66F.js";
+import "./chunk-PSWPSMIG.js";
 import "./chunk-QVTHCRNR.js";
-import "./chunk-4IJNRUE7.js";
-import "./chunk-AKC4PULA.js";
-import "./chunk-54PXOMGL.js";
-import "./chunk-4LY3IBHN.js";
+import "./chunk-WYMJKVGY.js";
+import "./chunk-Z2SF7PPR.js";
+import "./chunk-3UVU2F72.js";
 import "./chunk-HOGLR6UM.js";
 import "./chunk-6UZ3OSJO.js";
-import "./chunk-Z5OJDQCF.js";
+import "./chunk-UC4AQMTL.js";
+import "./chunk-CYC5VE6S.js";
+import "./chunk-N6YIY4CM.js";
+import "./chunk-4IJNRUE7.js";
 import {
   __decorateClass,
   __privateAdd,
@@ -1171,7 +1166,7 @@ var PlotElement = class extends r4 {
     this.updateColours();
   }
   updateColours() {
-    __privateSet(this, _legendColour, Colour_exports.getCssVariable(`legend-fg`, `black`));
+    __privateSet(this, _legendColour, colour_exports.getCssVariable(`legend-fg`, `black`));
   }
   plot(value, seriesName = ``, skipDrawing = false) {
     if (typeof value !== "number") throw new Error(`Can only add numbers. Got: ${typeof value}`);
@@ -1195,7 +1190,7 @@ var PlotElement = class extends r4 {
     this.draw();
   }
   colourGenerator(series) {
-    const c6 = Colour_exports.fromHsl(__privateGet(this, _hue), 0.9, 0.4);
+    const c6 = colour_exports.hslFromRelativeValues(__privateGet(this, _hue), 0.9, 0.4);
     __privateSet(this, _hue, wrap(__privateGet(this, _hue) + 0.1));
     return c6;
   }
@@ -1229,7 +1224,7 @@ var PlotElement = class extends r4 {
     for (const series of __privateGet(this, _series).values()) {
       const seriesScale = this.seriesRanges.get(series.name);
       const data = seriesScale === void 0 ? globalScaler === void 0 ? series.getScaled() : series.getScaledBy(globalScaler) : series.getScaledBy(scaler(seriesScale[0], seriesScale[1]));
-      const colour = Colour_exports.resolveToString(series.colour);
+      const colour = colour_exports.toString(series.colour);
       switch (this.renderStyle) {
         case `line`: {
           this.drawLineSeries(data, cp, d3, colour);
@@ -1250,7 +1245,7 @@ var PlotElement = class extends r4 {
     const swatchSize = 10;
     const ctx = d3.ctx;
     for (const series of __privateGet(this, _series).values()) {
-      ctx.fillStyle = Colour_exports.resolveToString(series.colour);
+      ctx.fillStyle = colour_exports.toString(series.colour);
       ctx.fillRect(x2, y3, swatchSize, swatchSize);
       ctx.fillStyle = textColour;
       x2 += swatchSize + padding;

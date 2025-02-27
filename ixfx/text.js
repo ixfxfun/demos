@@ -1,3 +1,10 @@
+import "./chunk-ZGXDXWPT.js";
+import {
+  stringSegmentsFirstToWhole,
+  stringSegmentsLastToWhole,
+  stringSegmentsWholeToEnd,
+  stringSegmentsWholeToFirst
+} from "./chunk-N7FO4CPW.js";
 import {
   abbreviate,
   afterMatch,
@@ -17,9 +24,8 @@ import {
   toStringAbbreviate,
   unwrap,
   wildcard
-} from "./chunk-NO53N4A2.js";
-import "./chunk-5VWJ6TUI.js";
-import "./chunk-Z5OJDQCF.js";
+} from "./chunk-PSWPSMIG.js";
+import "./chunk-UC4AQMTL.js";
 import "./chunk-L5EJU35C.js";
 export {
   abbreviate,
@@ -37,6 +43,10 @@ export {
   splitByLength,
   splitRanges,
   startsEnds,
+  stringSegmentsFirstToWhole,
+  stringSegmentsLastToWhole,
+  stringSegmentsWholeToEnd,
+  stringSegmentsWholeToFirst,
   toStringAbbreviate,
   unwrap,
   wildcard

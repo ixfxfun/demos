@@ -1,4 +1,4 @@
-export { a as Audio, N as Bluetooth, c as Camera, C as Codec, E as Espruino, F as FrameProcessor, d as FrameProcessorOpts, G as GenericStateTransitions, I as IoDataEvent, f as IoEvents, j as ReconnectingOptions, R as ReconnectingWebsocket, h as ReconnectingWebsocketStates, e as Serial, S as StringReceiveBuffer, b as StringWriteBuffer, O as StringWriteBufferOpts, V as VideoFile, g as genericStateTransitionsInstance, r as reconnectingWebsocket } from './index-BykVmCLB.js';
+export { a as Audio, B as BleDeviceOptions, N as Bluetooth, c as Camera, C as Codec, E as Espruino, F as FrameProcessor, d as FrameProcessorOpts, g as FrameProcessorSources, G as GenericStateTransitions, I as IoDataEvent, f as IoEvents, k as ReconnectingOptions, R as ReconnectingWebsocket, j as ReconnectingWebsocketStates, e as Serial, S as StringReceiveBuffer, b as StringWriteBuffer, O as StringWriteBufferOpts, V as VideoFile, h as genericStateTransitionsInstance, r as reconnectingWebsocket } from './index-D2j3MGiT.js';
 export { a as StateChangeEvent } from './StateMachine-9RqpQXu8.js';
 import './Events-DJgOvcWD.js';
 import './IntervalType-B4PbUkjV.js';

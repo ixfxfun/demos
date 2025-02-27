@@ -12,19 +12,20 @@ import {
   throwFunctionTest,
   throwNullUndef,
   throwStringTest
-} from "./chunk-AKC4PULA.js";
+} from "./chunk-WYMJKVGY.js";
 import {
   ifNaN,
   integerParse,
   integerTest,
   isPowerOfTwo,
+  numberInclusiveRangeTest,
   numberTest,
   percentTest,
   throwFromResult,
   throwIntegerTest,
   throwNumberTest,
   throwPercentTest
-} from "./chunk-Z5OJDQCF.js";
+} from "./chunk-UC4AQMTL.js";
 import "./chunk-L5EJU35C.js";
 export {
   arrayTest,
@@ -39,6 +40,7 @@ export {
   isPowerOfTwo,
   isStringArray,
   nullUndef,
+  numberInclusiveRangeTest,
   numberTest,
   percentTest,
   stringTest,

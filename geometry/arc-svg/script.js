@@ -71,6 +71,7 @@ const updateSvg = (arcElement) => {
     viewportCenter);
 
   // Apply stroke width
+
   Svg.applyStrokeOpts(arcElement, { strokeWidth: width });
 
   // Update existing SVG element with new details
