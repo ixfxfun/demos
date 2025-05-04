@@ -1,4 +1,4 @@
-import { CanvasHelper } from 'ixfx/dom.js';
+import { CanvasHelper } from '@ixfx/visual.js';
 
 /**
  * Draws a circle with optional text

@@ -1,6 +1,7 @@
-import { Points } from 'ixfx/geometry.js';
-import { Bipolar } from 'ixfx/numbers.js';
-import * as Dom from 'ixfx/dom.js';
+import { Points } from '@ixfx/geometry.js';
+import { Bipolar } from '@ixfx/numbers.js';
+import * as Dom from '@ixfx/dom.js';
+import { CanvasHelper } from '@ixfx/visual.js';
 import { Poses, PosesConsumer } from "../util/Poses.js";
 import * as Util from './util.js';
 
@@ -13,7 +14,9 @@ const settings = Object.freeze({
   // Min and max tilt values
   // (empirically figured out)
   tiltRange: [-0.5, 0.5],
-  dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } })
+  dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } }),
+  // Automatically sizes canvas for us
+  canvasHelper: new CanvasHelper(`canvas`, { resizeLogic: `both` }),
 });
 
 /** 
@@ -84,10 +87,11 @@ const update = () => {
  */
 const use = (state) => {
   const { tilt } = state;
+  const { canvasHelper } = settings;
+  const { ctx } = canvasHelper;
+
   // For debug purposes, dump data to a table
   settings.dataDisplay.update(state);
-
-  const ctx = Util.getDrawingContext();
 
   // Fade out canvas
   ctx.fillStyle = `hsl(0,0%,100%,0.01)`;
@@ -111,9 +115,6 @@ const computeShoulderAngle = (pose) => {
 };
 
 function setup() {
-  // Automatically size canvas to viewport
-  Dom.fullSizeCanvas(`#canvas`);
-
   // Draw loop
   window.requestAnimationFrame(update);
 };

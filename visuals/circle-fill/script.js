@@ -1,6 +1,6 @@
-import { CanvasHelper } from 'ixfx/dom.js';
-import { repeatSync } from 'ixfx/flow.js';
-import { Points, Circles, Polar } from 'ixfx/geometry.js';
+import { CanvasHelper } from '@ixfx/visual.js';
+import { repeatSync } from '@ixfx/flow.js';
+import { Points, Circles, Polar } from '@ixfx/geometry.js';
 
 const settings = Object.freeze({
   numberOfPoints: 500,

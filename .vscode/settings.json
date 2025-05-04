@@ -2,6 +2,7 @@
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
+  
   "editor.formatOnPaste": false,
   "editor.formatOnType": false,
   "editor.formatOnSave": true,
@@ -10,7 +11,7 @@
   "js/ts.implicitProjectConfig.checkJs": true,
   "search.exclude": {
     "**/node_modules": true,
-    "**/ixfx": true,
+    "**/_lib": true,
     "ml/**/*":true,
     "**/*.code-search": true
   },
@@ -27,8 +28,10 @@
   "javascript.suggest.enabled": true,
   "javascript.suggest.jsdoc.generateReturns": true,
   "javascript.suggest.paths": true,
-  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "shortest",
   "javascript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifier": "shortest",
   "javascript.inlayHints.enumMemberValues.enabled": false,
   "javascript.inlayHints.functionLikeReturnTypes.enabled": false,
   "javascript.inlayHints.parameterNames.enabled": "all",

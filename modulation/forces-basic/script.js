@@ -1,7 +1,7 @@
-import { CanvasHelper } from 'ixfx/dom.js';
-import { Forces } from 'ixfx/modulation.js';
-import { Points, Rects } from 'ixfx/geometry.js';
-import * as Random from 'ixfx/random.js';
+import { CanvasHelper } from '@ixfx/visual.js';
+import { Forces } from '@ixfx/modulation.js';
+import { Points, Rects } from '@ixfx/geometry.js';
+import * as Random from '@ixfx/random.js';
 
 /**
  * @typedef {Readonly<{ 

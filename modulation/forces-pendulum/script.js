@@ -1,6 +1,6 @@
-import { CanvasHelper } from 'ixfx/dom.js';
-import { Forces } from 'ixfx/modulation.js';
-
+import { CanvasHelper } from '@ixfx/visual.js';
+import { Forces } from '@ixfx/modulation.js';
+import { Points } from '@ixfx/geometry.js';
 const settings = Object.freeze({
   pinnedAt: { x: 0.5, y: 0.2 },
   mass: 0.1,
@@ -13,7 +13,7 @@ const settings = Object.freeze({
 /**
  * @typedef {Readonly<{
  * thing: {
- *  position: import('ixfx/geometry.js').Point
+ *  position: Points.Point
  *  mass: number
  * },
  * pause:boolean

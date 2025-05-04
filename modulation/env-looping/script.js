@@ -1,4 +1,4 @@
-import { Envelopes } from 'ixfx/modulation.js';
+import { Envelopes } from '@ixfx/modulation.js';
 
 const settings = Object.freeze({
   sampleRateMs: 5,
