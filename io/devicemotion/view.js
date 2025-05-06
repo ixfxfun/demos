@@ -1,4 +1,4 @@
-import * as Dom from 'ixfx/dom.js';
+import * as Dom from '@ixfx/dom.js';
 import * as DeviceMotion from './devicemotion.js';
 import { PlotElement } from 'ixfx/components.js';
 

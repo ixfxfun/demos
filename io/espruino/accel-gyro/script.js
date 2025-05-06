@@ -1,5 +1,5 @@
-import { delay } from 'ixfx/flow.js';
-import { Espruino } from 'ixfx/io.js';
+import { delay } from '@ixfx/flow.js';
+import { Espruino } from '@ixfx/io.js'
 import { setCssDisplay, setHtml } from './util.js';
 
 // Two alternative scripts to run on the Puck

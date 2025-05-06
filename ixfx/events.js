@@ -1,3 +1,3 @@
-import { SimpleEventEmitter, eventRace } from "./events-DeVXx5UR.js";
+import { SimpleEventEmitter, eventRace } from "./events-AoZSZyH0.js";
 
 export { SimpleEventEmitter, eventRace };

@@ -1,4 +1,4 @@
-import { Envelopes } from 'ixfx/modulation.js';
+import { Envelopes } from '@ixfx/modulation.js';
 import { Data } from 'ixfx/bundle.js';
 import * as Util from './util.js';
 

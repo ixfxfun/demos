@@ -1,7 +1,7 @@
-import { Points, radianToDegree } from 'ixfx/geometry.js';
-import { Dom, Numbers } from 'ixfx/bundle.js';
-import { Bipolar } from 'ixfx/numbers.js';
-import { Audio } from 'ixfx/io.js';
+import { Points, radianToDegree } from '@ixfx/geometry.js';
+import { Dom, Numbers } from '@ixfx/index.js';
+import { Bipolar } from '@ixfx/numbers.js';
+import { Audio } from '@ixfx/io.js'
 
 import * as Util from './util.js';
 import * as EspruinoSnippets from './espruino.js';

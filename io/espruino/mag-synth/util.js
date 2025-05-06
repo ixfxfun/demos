@@ -1,4 +1,4 @@
-import { Espruino } from 'ixfx/io.js';
+import { Espruino } from '@ixfx/io.js'
 import * as HtmlUtil from './html.js';
 
 /** @type NormaliseData|undefined  */

@@ -1,2 +1,2 @@
-import { LogKind, LogMessage, LogOption, LogSet, MessageLogger, fpsCounter$1 as fpsCounter, getErrorMessage$2 as getErrorMessage, logColours$1 as logColours, logSet$1 as logSet, logger$1 as logger, resolveLogOption$1 as resolveLogOption } from "./debug.d-D5wtLqOE.js";
+import { LogKind, LogMessage, LogOption, LogSet, MessageLogger, fpsCounter$1 as fpsCounter, getErrorMessage$2 as getErrorMessage, logColours$1 as logColours, logSet$1 as logSet, logger$1 as logger, resolveLogOption$1 as resolveLogOption } from "./debug-_UIjiVDf.js";
 export { LogKind, LogMessage, LogOption, LogSet, MessageLogger, fpsCounter, getErrorMessage, logColours, logSet, logger, resolveLogOption };

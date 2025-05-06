@@ -1,7 +1,7 @@
-import { CanvasHelper } from '../../ixfx/dom.js';
-import { repeatSync } from '../../ixfx/flow.js';
-import { jitter } from '../../ixfx/modulation.js';
-import { flip } from '../../ixfx/numbers.js';
+import { CanvasHelper } from '@ixfx/visual.js';
+import { repeatSync } from '@ixfx/flow.js';
+import { jitter } from '@ixfx/modulation.js';
+import { flip } from '@ixfx/numbers.js';
 import { gaussian } from '../../ixfx/random.js';
 import * as Particle from './particle.js';
 

@@ -5,5 +5,8 @@
   "watch": [
     "**/*"
   ],
+  "browser": [
+    "google chrome canary"
+  ],
   "navigate": false
 }

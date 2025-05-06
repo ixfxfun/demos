@@ -1,5 +1,6 @@
-import { Modulation, Numbers, Iterables } from '../../ixfx/bundle.js';
-import { CanvasHelper } from '../../ixfx/dom.js';
+import { Modulation, Iterables } from '@ixfx/index.js';
+import * as Numbers from '@ixfx/numbers.js';
+import { CanvasHelper } from '@ixfx/visual.js';
 
 const settings = Object.freeze({
   canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both`, coordinateScale: `min` }),
