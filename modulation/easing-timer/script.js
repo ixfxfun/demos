@@ -1,4 +1,4 @@
-import * as Easings from '@ixfx/easings.js';
+import { Easings } from '@ixfx/modulation';
 import * as Core from '@ixfx/core.js';
 import * as Util from './util.js';
 

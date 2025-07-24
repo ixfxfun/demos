@@ -1,8 +1,965 @@
-import "./simple-event-emitter-DCUgt8T8.js";
-import "./point-type-aLgOjGpR.js";
-import "./rect-types-Bp6n9fMD.js";
-import { CanvasEvents, CanvasHelper$1 as CanvasHelper, CanvasHelperOptions, Opts, drawing_d_exports, image_data_grid_d_exports, index_d_exports$11 as index_d_exports$1, index_d_exports$12 as index_d_exports, pointerVisualise$1 as pointerVisualise, video_d_exports } from "./visual-TrvKru9L.js";
-import "./types-CPSECnFt.js";
-import "./types-BiW1XnrM.js";
-import "./path-type-2sSqIxFK.js";
-export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Svg, video_d_exports as Video, pointerVisualise };
+import { ElementResizeLogic } from "@ixfx/dom";
+import { SimpleEventEmitter } from "@ixfx/events";
+import * as _ixfx_geometry0 from "@ixfx/geometry";
+import { Angle, Grids, ScaleBy } from "@ixfx/geometry";
+import { RandomSource } from "@ixfx/random";
+import { Rect, RectPositioned } from "@ixfx/geometry/rect";
+import * as _ixfx_geometry_grid0 from "@ixfx/geometry/grid";
+import { Grid } from "@ixfx/geometry/grid";
+
+//#region packages/visual/src/colour/types.d.ts
+type HslBase = {
+  /**
+   * Hue
+   */
+  h: number;
+  /**
+   * Saturation
+   */
+  s: number;
+  /**
+   * Lightness
+   */
+  l: number;
+  /**
+   * Opacity
+   */
+  opacity?: number;
+  space?: `hsl`;
+};
+declare const isHsl: (v: any) => v is Hsl;
+/**
+ * Scalar values use 0..1 for each field
+ */
+type HslScalar = HslBase & {
+  unit: `scalar`;
+};
+/**
+ * Absolute values use hue:0..360, all other fields 0..100
+ */
+type HslAbsolute = HslBase & {
+  unit: `absolute`;
+};
+/**
+ * HSL value.
+ * By default assumes scalar coordinates (0..1) for each field.
+ * Use 'absolute' unit for hue:0...360, all other fields on 0..100 scale.
+ */
+type Hsl = HslScalar | HslAbsolute;
+/**
+ * Rgb.
+ * Units determine how to interperet rgb values.
+ * * 'relative': 0..1 range for RGB & opacity
+ * * '8bit': 0..255 range for RGB & opacity
+ */
+type RgbBase = {
+  r: number;
+  g: number;
+  b: number;
+  opacity?: number;
+  space?: `srgb`;
+};
+type RgbScalar = RgbBase & {
+  unit: `scalar`;
+};
+declare const isRgb: (v: any) => v is Rgb;
+/**
+ * If the input object has r,g&b properties, it will return a fully-
+ * formed Rgb type with `unit` and `space` properties.
+ *
+ * If it lacks these basic three properties or they are out of range,
+ *  _undefined_ is returned.
+ *
+ * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
+ * If RGB values exceed 255, _undefined_ returned.
+ * @param v
+ * @returns
+ */
+declare const tryParseObjectToRgb: (v: any) => Rgb | undefined;
+declare const tryParseObjectToHsl: (v: any) => Hsl | undefined;
+/**
+ * RGB in 0...255 range, including opacity.
+ */
+type Rgb8Bit = RgbBase & {
+  unit: `8bit`;
+};
+type Rgb = RgbScalar | Rgb8Bit;
+type LchBase = {
+  /**
+   * Lightness/perceived brightnes
+   */
+  l: number;
+  /**
+   * Chroma ('amount of colour')
+   */
+  c: number;
+  /**
+   * Hue
+   */
+  h: number;
+  /**
+   * Opacity on 0..1 scale
+   */
+  opacity?: number;
+  space: `lch` | `oklch`;
+};
+declare const isLch: (v: any) => v is OkLch;
+type OkLchBase = LchBase & {
+  space: `oklch`;
+};
+/**
+ * Oklch colour expressed in 0..1 scalar values for LCH & opacity
+ */
+type OkLchScalar = OkLchBase & {
+  unit: `scalar`;
+};
+/**
+ * Oklch colour expressed with:
+ * l: 0..100
+ * c: 0..100
+ * h: 0..360 degrees
+ * opacity: 0..1
+ */
+type OkLchAbsolute = OkLchBase & {
+  unit: `absolute`;
+};
+type OkLch = OkLchAbsolute | OkLchScalar;
+type Colour = {
+  opacity?: number;
+} & (Hsl | OkLch | Rgb);
+/**
+ * A representation of colour. Eg: `blue`, `rgb(255,0,0)`, `hsl(20,100%,50%)`
+ */
+type Colourish = Colour | string;
+declare const isColourish: (v: any) => v is Colourish;
+/**
+ * Options for interpolation
+ */
+type ParsingOptions<T> = Partial<{
+  ensureSafe: boolean;
+  /**
+   * Value to use if input is invalid
+   */
+  fallbackString: string;
+  /**
+   * Fallback colour to use if value cannot be parsed
+   */
+  fallbackColour: T;
+}>;
+//# sourceMappingURL=types.d.ts.map
+//#endregion
+//#region packages/visual/src/canvas-helper.d.ts
+type CanvasEvents = {
+  /**
+   * Fired when canvas is resized
+   */
+  resize: {
+    size: Rect;
+    helper: CanvasHelper;
+    ctx: CanvasRenderingContext2D;
+  };
+  /**
+   * Pointerdown.
+   *
+   * Adds logicalX/Y to get logical pixel coordinate
+   */
+  pointerdown: PointerEvent & {
+    physicalX: number;
+    physicalY: number;
+  };
+  /**
+  * Pointerup.
+  *
+  * Adds logicalX/Y to get logical pixel coordinate
+  */
+  pointerup: PointerEvent & {
+    physicalX: number;
+    physicalY: number;
+  };
+  /**
+  * Pointermove
+  *
+  * Adds logicalX/Y to get logical pixel coordinate
+  */
+  pointermove: PointerEvent & {
+    physicalX: number;
+    physicalY: number;
+  };
+};
+/**
+ * CanvasHelper options
+ */
+type CanvasHelperOptions = Readonly<{
+  /**
+   * Automatic canvas resizing logic.
+   */
+  resizeLogic?: ElementResizeLogic;
+  /**
+   * By default, the helper emits pointer events from the canvas.
+   * Set this to _true_ to disable.
+   */
+  disablePointerEvents: boolean;
+  /**
+   * By default the display DPI is used for scaling.
+   * If this is set, this will override.
+   */
+  pixelZoom: number;
+  /**
+   * If _true_ (default) canvas is cleared when a resize happens
+   */
+  clearOnResize: boolean;
+  /**
+   * If true, it won't add any position CSS
+   */
+  skipCss: boolean;
+  coordinateScale: ScaleBy;
+  /**
+   * Callback when canvas is resized
+   * @param size
+   * @returns
+   */
+  onResize?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void;
+  /**
+   * Logical width of canvas.
+   * This is used for establishing the desired aspect ratio.
+   */
+  width: number;
+  /**
+   * Logical height of canvas.
+   * This is used for establishing the desired aspect ratio.
+   */
+  height: number;
+  /**
+   * If set, the z-index for this canvas.
+   * By default, fullscreen canvas will be given -1
+   */
+  zIndex: number;
+  /**
+   * Colour space to use. Defaults to sRGB.
+   */
+  colourSpace: PredefinedColorSpace;
+  /**
+   * If specified, this function be called in an animation loop.
+   * @param ctx Drawing context
+   * @param size Viewport size
+   * @param helper CanvasHelper instance
+   * @returns
+   */
+  draw?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void;
+}>;
+/**
+ * A wrapper for the CANVAS element that scales the canvas for high-DPI displays
+ * and helps with resizing.
+ *
+ * ```js
+ * const canvas = new CanvasHelper(`#my-canvas`, { resizeLogic: `both` });
+ * const { ctx, width, height } = canvas.ctx; // Get drawing context, width & height
+ * ```
+ *
+ * Draw whenever it is resized using the 'resize' event
+ * ```js
+ * canvas.addEventListener(`resize`, ({ctx, size}) => {
+ *  // Use ctx...
+ * });
+ * ```
+ *
+ * Or provide a function when initialising:
+ * ```js
+ * const onResize = (ctx, size) => {
+ *  // Do drawing
+ * }
+ * const canvas = new CanvasHelper(`#my-canvas`, { resizeLogic: `both`, onResize });
+ * ```
+ *
+ * Automatically draw at animation speeds:
+ * ```js
+ * const draw = () => {
+ * }
+ * const canvas = new CanvasHelper(`#my-canvas`, { resizeLogic: `both`, draw });
+ * ```
+ */
+declare class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
+  #private;
+  readonly el: HTMLCanvasElement;
+  readonly opts: CanvasHelperOptions;
+  constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts?: Partial<CanvasHelperOptions>);
+  getRectangle(): RectPositioned;
+  dispose(reason?: string): void;
+  /**
+   * Gets the drawable area of the canvas.
+   * This accounts for scaling due to high-DPI displays etc.
+   * @returns
+   */
+  getPhysicalSize(): {
+    width: number;
+    height: number;
+  };
+  /**
+   * Creates a drawing helper for the canvas.
+   * If one is already created it is reused.
+   */
+  getDrawHelper(): void;
+  setLogicalSize(logicalSize: Rect): void;
+  /**
+   * Clears the canvas.
+   *
+   * Shortcut for:
+   * `ctx.clearRect(0, 0, this.width, this.height)`
+   */
+  clear(): void;
+  /**
+   * Fills the canvas with a given colour.
+   *
+   * Shortcut for:
+   * ```js
+      * ctx.fillStyle = ``;
+   * ctx.fillRect(0, 0, this.width, this.height);
+   * ```
+   * @param colour Colour
+   */
+  fill(colour?: string): void;
+  /**
+   * Gets the drawing context
+   */
+  get ctx(): CanvasRenderingContext2D;
+  get viewport(): RectPositioned;
+  /**
+   * Gets the logical width of the canvas
+   * See also: {@link height}, {@link size}
+   */
+  get width(): number;
+  /**
+   * Gets the logical height of the canvas
+   * See also: {@link width}, {@link size}
+   */
+  get height(): number;
+  /**
+   * Gets the logical size of the canvas
+   * See also: {@link width}, {@link height}
+   */
+  get size(): Rect;
+  /**
+   * Gets the current scaling ratio being used
+   * to compensate for high-DPI display
+   */
+  get ratio(): number;
+  /**
+   * Returns the width or height, whichever is smallest
+   */
+  get dimensionMin(): number;
+  /**
+   * Returns the width or height, whichever is largest
+   */
+  get dimensionMax(): number;
+  drawBounds(strokeStyle?: string): void;
+  /**
+   * Returns a Scaler that converts from absolute
+   * to relative coordinates.
+   * This is based on the canvas size.
+   *
+   * ```js
+      * // Assuming a canvas of 800x500
+   * toRelative({ x: 800, y: 600 });  // { x: 1,   y: 1 }
+   * toRelative({ x: 0, y: 0 });   // { x: 0,   y: 0 }
+   * toRelative({ x: 400, y: 300 }); // { x: 0.5, y: 0.5 }
+   * ```
+   */
+  get toRelative(): _ixfx_geometry0.Scaler;
+  /**
+   * Returns a scaler for points based on width & height
+   */
+  get toAbsoluteFixed(): _ixfx_geometry0.Scaler;
+  /**
+   * Returns a scaler for points based on width & height
+   */
+  get toRelativeFixed(): _ixfx_geometry0.Scaler;
+  get logicalCenter(): {
+    x: number;
+    y: number;
+  };
+  /**
+  * Returns a Scaler that converts from relative to absolute
+  * coordinates.
+  * This is based on the canvas size.
+  *
+  * ```js
+  * // Assuming a canvas of 800x600
+  * toAbsolute({ x: 1, y: 1 });      // { x: 800, y: 600}
+  * toAbsolute({ x: 0, y: 0 });      // { x: 0, y: 0}
+  * toAbsolute({ x: 0.5, y: 0.5 });  // { x: 400, y: 300}
+  * ```
+  */
+  get toAbsolute(): _ixfx_geometry0.Scaler;
+  /**
+   * Gets the center coordinate of the canvas
+   */
+  get center(): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Gets the image data for the canvas.
+   * Uses the 'physical' canvas size. Eg. A logical size of 400x400 might be
+   * 536x536 with a high-DPI display.
+   * @returns
+   */
+  getImageData(): ImageData;
+  /**
+   * Returns the canvas frame data as a writable grid.
+   * When editing, make as many edits as needed before calling
+   * `flip`, which writes buffer back to the canvas.
+   * ```js
+      * const g = helper.getWritableBuffer();
+   * // Get {r,g,b,opacity} of pixel 10,10
+   * const pixel = g.get({ x: 10, y: 10 });
+   *
+   * // Set a colour to pixel 10,10
+   * g.set({ r: 0.5, g: 1, b: 0, opacity: 0 }, { x: 10, y: 10 });
+   *
+   * // Write buffer to canvas
+   * g.flip();
+   * ```
+   *
+   * Uses 'physical' size of canvas. Eg with a high-DPI screen, this will
+   * mean a higher number of rows and columns compared to the logical size.
+   * @returns
+   */
+  getWritableBuffer(): {
+    grid: Grid;
+    get: _ixfx_geometry_grid0.GridCellAccessor<Rgb8Bit>;
+    set: _ixfx_geometry_grid0.GridCellSetter<Rgb>;
+    flip: () => void;
+  };
+}
+//# sourceMappingURL=canvas-helper.d.ts.map
+//#endregion
+//#region packages/visual/src/pointer-visualise.d.ts
+type Opts = {
+  readonly touchRadius?: number;
+  readonly mouseRadius?: number;
+  readonly trace?: boolean;
+  readonly hue?: number;
+};
+/**
+ * Visualises pointer events within a given element.
+ *
+ * ```js
+ * // Show pointer events for whole document
+ * pointerVis(document);
+ * ```
+ *
+ * Note you may need to set the following CSS properties on the target element:
+ *
+ * ```css
+ * touch-action: none;
+ * user-select: none;
+ * overscroll-behavior: none;
+ * ```
+ *
+ * Options
+ * * touchRadius/mouseRadius: size of circle for these kinds of pointer events
+ * * trace: if true, intermediate events are captured and displayed
+ * @param elOrQuery Element to monitor
+ * @param options Options
+ */
+declare const pointerVisualise: (elOrQuery: HTMLElement | string, options?: Opts) => void;
+//# sourceMappingURL=pointer-visualise.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/conversion.d.ts
+declare const toCssColour: (colour: any) => string;
+declare const convert: (colour: string, destination: "hex" | "hsl" | "oklab" | "oklch" | "srgb" | `rgb`) => string;
+declare const guard$3: (colour: Colour) => void;
+declare const toColour: (colourish: any) => Colour;
+/**
+ * Returns a CSS-ready string
+ * representation.
+ * ```js
+ * element.style.backgroundColor = resolveToString(`red`);
+ * ```
+ *
+ * Tries each parameter in turn, returning the value
+ * for the first that resolves. This can be useful for
+ * having fallback values.
+ *
+ * ```js
+ * // Try a CSS variable, a object property or finally fallback to red.
+ * element.style.backgroundColor = toStringFirst('--some-var', opts.background, `red`);
+ * ```
+ * @param colours Array of colours to resolve
+ * @returns
+ */
+declare const toStringFirst: (...colours: (Colourish | undefined)[]) => string;
+//# sourceMappingURL=conversion.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/css-colours.d.ts
+/**
+ * Converts from some kind of colour that is legal in CSS
+ * into a structured Colour type.
+ *
+ * Handles: hex format, CSS variables, colour names
+ * ```js
+ * fromCssColour(`#ffffff`);
+ * fromCssColour(`blue`);
+ * fromCssColour(`--some-variable`);
+ * fromCssColour(`hsl(50, 50%, 50%)`);
+ * fromCssColour(`rgb(50, 100, 100)`);
+ * ```
+ * @param colour
+ * @returns
+ */
+declare const fromCssColour: (colour: string) => Colour;
+declare const cssDefinedHexColours: {
+  aliceblue: string;
+  antiquewhite: string;
+  aqua: string;
+  aquamarine: string;
+  azure: string;
+  beige: string;
+  bisque: string;
+  black: string;
+  blanchedalmond: string;
+  blue: string;
+  blueviolet: string;
+  brown: string;
+  burlywood: string;
+  cadetblue: string;
+  chartreuse: string;
+  chocolate: string;
+  coral: string;
+  cornflowerblue: string;
+  cornsilk: string;
+  crimson: string;
+  cyan: string;
+  darkblue: string;
+  darkcyan: string;
+  darkgoldenrod: string;
+  darkgray: string;
+  darkgreen: string;
+  darkkhaki: string;
+  darkmagenta: string;
+  darkolivegreen: string;
+  darkorange: string;
+  darkorchid: string;
+  darkred: string;
+  darksalmon: string;
+  darkseagreen: string;
+  darkslateblue: string;
+  darkslategray: string;
+  darkturquoise: string;
+  darkviolet: string;
+  deeppink: string;
+  deepskyblue: string;
+  dimgray: string;
+  dodgerblue: string;
+  firebrick: string;
+  floralwhite: string;
+  forestgreen: string;
+  fuchsia: string;
+  gainsboro: string;
+  ghostwhite: string;
+  gold: string;
+  goldenrod: string;
+  gray: string;
+  green: string;
+  greenyellow: string;
+  honeydew: string;
+  hotpink: string;
+  indianred: string;
+  indigo: string;
+  ivory: string;
+  khaki: string;
+  lavender: string;
+  lavenderblush: string;
+  lawngreen: string;
+  lemonchiffon: string;
+  lightblue: string;
+  lightcoral: string;
+  lightcyan: string;
+  lightgoldenrodyellow: string;
+  lightgray: string;
+  lightgreen: string;
+  lightpink: string;
+  lightsalmon: string;
+  lightseagreen: string;
+  lightskyblue: string;
+  lightslategray: string;
+  lightsteelblue: string;
+  lightyellow: string;
+  lime: string;
+  limegreen: string;
+  linen: string;
+  magenta: string;
+  maroon: string;
+  mediumaquamarine: string;
+  mediumblue: string;
+  mediumorchid: string;
+  mediumpurple: string;
+  mediumseagreen: string;
+  mediumslateblue: string;
+  mediumspringgreen: string;
+  mediumturquoise: string;
+  mediumvioletred: string;
+  midnightblue: string;
+  mintcream: string;
+  mistyrose: string;
+  moccasin: string;
+  navajowhite: string;
+  navy: string;
+  oldlace: string;
+  olive: string;
+  olivedrab: string;
+  orange: string;
+  orangered: string;
+  orchid: string;
+  palegoldenrod: string;
+  palegreen: string;
+  paleturquoise: string;
+  palevioletred: string;
+  papayawhip: string;
+  peachpuff: string;
+  peru: string;
+  pink: string;
+  plum: string;
+  powderblue: string;
+  purple: string;
+  rebeccapurple: string;
+  red: string;
+  rosybrown: string;
+  royalblue: string;
+  saddlebrown: string;
+  salmon: string;
+  sandybrown: string;
+  seagreen: string;
+  seashell: string;
+  sienna: string;
+  silver: string;
+  skyblue: string;
+  slateblue: string;
+  slategray: string;
+  snow: string;
+  springgreen: string;
+  steelblue: string;
+  tan: string;
+  teal: string;
+  thistle: string;
+  tomato: string;
+  turquoise: string;
+  violet: string;
+  wheat: string;
+  white: string;
+  whitesmoke: string;
+  yellow: string;
+  yellowgreen: string;
+  transparent: string;
+};
+//# sourceMappingURL=css-colours.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/generate.d.ts
+/**
+ * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
+ * It's useful for generating perceptually different shades as the index increments.
+ *
+ * ```
+ * el.style.backgroundColor = goldenAgeColour(10);
+ * ```
+ *
+ * Saturation and lightness can be specified, as numeric ranges of 0-1.
+ *
+ * @param saturation Saturation (0-1), defaults to 0.5
+ * @param lightness Lightness (0-1), defaults to 0.75
+ * @param alpha Opacity (0-1), defaults to 1.0
+ * @returns HSL colour string eg `hsl(20,50%,75%)`
+ */
+declare const goldenAngleColour: (index: number, saturation?: number, lightness?: number, alpha?: number) => string;
+/**
+ * Returns a random hue component (0..359)
+ * ```
+ * // Generate hue
+ * const h =randomHue(); // 0-359
+ *
+ * // Generate hue and assign as part of a HSL string
+ * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
+ * ```
+ * @param rand
+ * @returns
+ */
+declare const randomHue: (rand?: RandomSource) => number;
+//# sourceMappingURL=generate.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/math.d.ts
+declare function multiplyOpacity(colourish: string, amount: number): string;
+declare function withOpacity$2(colourish: string, fn: (scalarOpacity: number) => number): string;
+declare function withOpacity$2(colourish: Hsl, fn: (scalarOpacity: number) => number): Hsl;
+declare function withOpacity$2(colourish: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+//# sourceMappingURL=math.d.ts.map
+declare namespace hsl_d_exports {
+  export { fromCssAbsolute$1 as fromCssAbsolute, fromCssScalar$1 as fromCssScalar, fromHexString$2 as fromHexString, generateScalar$1 as generateScalar, guard$2 as guard, toAbsolute$1 as toAbsolute, toCssString$2 as toCssString, toScalar$2 as toScalar, withOpacity$1 as withOpacity };
+}
+/**
+ * Scales the opacity value of an input HSL value
+ * ```js
+ * withOpacity()
+ * ```
+ * @param value
+ * @param fn
+ * @returns
+ */
+declare const withOpacity$1: <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
+declare const fromHexString$2: (hexString: string) => HslAbsolute;
+declare const fromCssAbsolute$1: (value: string, options?: ParsingOptions<HslAbsolute>) => HslAbsolute;
+declare const fromCssScalar$1: (value: string, options?: ParsingOptions<HslAbsolute>) => HslScalar;
+declare const toCssString$2: (hsl: Hsl) => string;
+declare const toAbsolute$1: (hsl: Hsl) => HslAbsolute;
+/**
+ * Generates a {@link HslScalar} value.
+ *
+ * ```js
+ * generateScaler(10); // 10deg, default to full saturation, half lightness and full opacity
+ *
+ * // Generate HSL value from radian angle and 50% saturation
+ * generateScalar(`10rad`, 0.5);
+ *
+ * // Generate from numeric CSS variable
+ * generateScalar(`--hue`);
+ * ```
+ * @param absoluteHslOrVariable Hue angle or CSS variable
+ * @param saturation
+ * @param lightness
+ * @param opacity
+ */
+declare const generateScalar$1: (absoluteHslOrVariable: string | number | Angle, saturation?: number, lightness?: number, opacity?: number) => HslScalar;
+declare const toScalar$2: (hsl: Hsl) => HslScalar;
+declare const guard$2: (hsl: Hsl) => void;
+//# sourceMappingURL=hsl.d.ts.map
+declare namespace oklch_d_exports {
+  export { fromCssAbsolute, fromCssScalar, fromHexString$1 as fromHexString, generateScalar, guard$1 as guard, toAbsolute, toCssString$1 as toCssString, toScalar$1 as toScalar };
+}
+declare const guard$1: (lch: OkLch) => void;
+declare const fromHexString$1: (hexString: string) => OkLchAbsolute;
+declare const fromCssAbsolute: (value: string, options?: ParsingOptions<OkLchAbsolute>) => OkLchAbsolute;
+declare const fromCssScalar: (value: string, options?: ParsingOptions<OkLchAbsolute>) => OkLchScalar;
+declare const toScalar$1: (lch: OkLch) => OkLchScalar;
+declare const toAbsolute: (lch: OkLch) => OkLchAbsolute;
+declare const toCssString$1: (lch: OkLch) => string;
+declare const generateScalar: (absoluteHslOrVariable: string | number | Angle, chroma?: number, lightness?: number, opacity?: number) => OkLchScalar;
+//# sourceMappingURL=oklch.d.ts.map
+declare namespace srgb_d_exports {
+  export { fromCss8bit, fromHexString, guard, to8bit, toCssString, toScalar, withOpacity };
+}
+declare const withOpacity: <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
+declare const fromHexString: (hexString: string) => Rgb8Bit;
+declare const fromCss8bit: (value: string, options?: ParsingOptions<Rgb8Bit>) => Rgb8Bit;
+declare const toCssString: (rgb: Rgb) => string;
+declare const to8bit: (rgb: Rgb) => Rgb8Bit;
+declare const toScalar: (rgb: Rgb) => RgbScalar;
+declare const guard: (rgb: Rgb) => void;
+//# sourceMappingURL=srgb.d.ts.map
+declare namespace index_d_exports {
+  export { Colour, Colourish, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, cssDefinedHexColours, fromCssColour, goldenAngleColour, guard$3 as guard, isColourish, isHsl, isLch, isRgb, multiplyOpacity, randomHue, toColour, toCssColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$2 as withOpacity };
+}
+declare namespace image_data_grid_d_exports {
+  export { accessor, byColumn, byRow, grid, setter, wrap };
+}
+/**
+ * Returns a {@link @ixfx/geometry/Grids.Grid} based on the provided `image`
+ * @param image ImageData
+ * @returns Grid
+ */
+declare const grid: (image: ImageData) => Grids.Grid;
+/**
+ * Returns an object that allows get/set grid semantics on the underlying `image` data.
+ * Uses 8-bit sRGB values, meaning 0..255 range for red, green, blue & opacity.
+ *
+ * ```js
+ * // Get CANVAS element, drawing context and then image data
+ * const canvasEl = document.querySelector(`#my-canvas`);
+ * const ctx = canvasEl.getContext(`2d`);
+ * const imageData = ctx.getImageData();
+ *
+ * // Now that we have image data, we can wrap it:
+ * const asGrid = ImageDataGrid.wrap(imageData);
+ * asGrid.get({ x:10, y: 20 }); // Get pixel at 10,20
+ * asGrid.set(colour, { x:10, y: 20 }); // Set pixel value
+ *
+ * // Display changes back on the canvas
+ * ctx.putImageData(imageData, 0, 0)
+ * ```
+ * @param image
+ * @returns
+ */
+declare const wrap: (image: ImageData) => Grids.GridWritable<Rgb8Bit> & Grids.GridReadable<Rgb8Bit>;
+/**
+ * Returns a function to access pixel values by x,y
+ * @param image
+ * @returns
+ */
+declare const accessor: (image: ImageData) => Grids.GridCellAccessor<Rgb8Bit>;
+/**
+ * Returns a function that sets pixel values
+ * @param image
+ * @returns
+ */
+declare const setter: (image: ImageData) => Grids.GridCellSetter<Rgb>;
+/**
+ * Yields pixels of an image row by row
+ * @param image
+ */
+declare function byRow(image: ImageData): Generator<(Rgb8Bit | undefined)[], void, unknown>;
+/**
+ * Yields pixels of an image column by column
+ * @param image
+ */
+declare function byColumn(image: ImageData): Generator<Rgb8Bit[], void, unknown>;
+//# sourceMappingURL=image-data-grid.d.ts.map
+declare namespace video_d_exports {
+  export { CaptureOpts, Capturer, FramesOpts, ManualCaptureOpts, ManualCapturer, capture, frames, manualCapture };
+}
+type Capturer = {
+  start(): void;
+  cancel(): void;
+  readonly canvasEl: HTMLCanvasElement;
+};
+type ManualCapturer = {
+  capture(): ImageData;
+  readonly canvasEl: HTMLCanvasElement;
+  dispose(): void;
+};
+type CaptureOpts = {
+  /**
+   * Delay between reading frames.
+   * Default: 0, reading as fast as possible
+   */
+  readonly maxIntervalMs?: number;
+  /**
+   * Whether to show the created capture canvas.
+   * Default: false
+   */
+  readonly showCanvas?: boolean;
+  readonly workerScript?: string;
+  readonly onFrame?: (pixels: ImageData) => void;
+};
+type ManualCaptureOpts = {
+  /**
+   * If true, the intermediate canvas is shown
+   * The intermediate canvas is where captures from the source are put in order
+   * to get the ImageData
+   */
+  readonly showCanvas?: boolean;
+  /**
+   * If specified, this function will be called after ImageData is captured
+   * from the intermediate canvs. This allows for drawing on top of the
+   * captured image.
+   */
+  readonly postCaptureDraw?: (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
+  /**
+   * If specified, this is the canvas captured to
+   */
+  readonly canvasEl?: HTMLCanvasElement;
+};
+/**
+ * Options for frames generator
+ */
+type FramesOpts = {
+  /**
+   * Max frame rate (millis per frame), or 0 for animation speed
+   */
+  readonly maxIntervalMs?: number;
+  /**
+   * False by default, created canvas will be hidden
+   */
+  readonly showCanvas?: boolean;
+  /**
+   * If provided, this canvas will be used as the buffer rather than creating one.
+   */
+  readonly canvasEl?: HTMLCanvasElement;
+};
+/**
+ * Generator that yields frames from a video element as [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
+ *
+ * ```js
+ * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ *
+ * const ctx = canvasEl.getContext(`2d`);
+ * for await (const frame of Video.frames(videoEl)) {
+ *   // TODO: Some processing of pixels
+ *
+ *   // Draw image on to the visible canvas
+ *   ctx.putImageData(frame, 0, 0);
+ * }
+ * ```
+ *
+ * Under the hood it creates a hidden canvas where frames are drawn to. This is necessary
+ * to read back pixel data. An existing canvas can be used if it is passed in as an option.
+ *
+ * Options:
+ * * `canvasEl`: CANVAS element to use as a buffer (optional)
+ * * `maxIntervalMs`: Max frame rate (0 by default, ie runs as fast as possible)
+ * * `showCanvas`: Whether buffer canvas will be shown (false by default)
+ * @param sourceVideoEl
+ * @param opts
+ */
+declare function frames(sourceVideoEl: HTMLVideoElement, opts?: FramesOpts): AsyncIterable<ImageData>;
+/**
+ * Captures frames from a video element. It can send pixel data to a function or post to a worker script.
+ *
+ * @example Using a function
+ * ```js
+ * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ *
+ * // Capture from a VIDEO element, handling frame data
+ * // imageData is ImageData type: https://developer.mozilla.org/en-US/docs/Web/API/ImageData
+ * Video.capture(sourceVideoEl, {
+ *  onFrame(imageData => {
+ *    // Do something with pixels...
+ *  });
+ * });
+ * ```
+ *
+ * @example Using a worker
+ * ```js
+ * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ *
+ * Video.capture(sourceVideoEl, {
+ *  workerScript: `./frameProcessor.js`
+ * });
+ * ```
+ *
+ * In frameProcessor.js:
+ * ```
+ * const process = (frame) => {
+ *  // ...process frame
+ *
+ *  // Send image back?
+ *  self.postMessage({frame});
+ * };
+ *
+ * self.addEventListener(`message`, evt => {
+ *   const {pixels, width, height} = evt.data;
+ *   const frame = new ImageData(new Uint8ClampedArray(pixels),
+ *     width, height);
+ *
+ *   // Process it
+ *   process(frame);
+ * });
+ * ```
+ *
+ * Options:
+ * * `canvasEl`: CANVAS element to use as a buffer (optional)
+ * * `maxIntervalMs`: Max frame rate (0 by default, ie runs as fast as possible)
+ * * `showCanvas`: Whether buffer canvas will be shown (false by default)
+ * * `workerScript`: If this specified, this URL will be loaded as a Worker, and frame data will be automatically posted to it
+ *
+ * Implementation: frames are captured using a animation-speed loop to a hidden canvas. From there
+ * the pixel data is extracted and sent to either destination. In future the intermediate drawing to a
+ * canvas could be skipped if it becomes possible to get pixel data from an ImageBitmap.
+ * @param sourceVideoEl Source VIDEO element
+ * @param opts
+ * @returns
+ */
+declare const capture: (sourceVideoEl: HTMLVideoElement, opts?: CaptureOpts) => Capturer;
+declare const manualCapture: (sourceVideoEl: HTMLVideoElement, opts?: ManualCaptureOpts) => ManualCapturer;
+//# sourceMappingURL=video.d.ts.map
+
+//#endregion
+export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, image_data_grid_d_exports as ImageDataGrid, Opts, video_d_exports as Video, pointerVisualise };
+//# sourceMappingURL=visual.d.ts.map
