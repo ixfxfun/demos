@@ -1,6 +1,6 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultThrow } from "./src-BhN8B7uk.js";
-import { interpolate, scale, scaler, zip } from "./src-Cyp-w-xE.js";
+import { integerTest, numberTest, resultThrow } from "./src-C3Fpyyz5.js";
+import { interpolate, scale, scaler, zip } from "./src-BVzuGCxJ.js";
 
 //#region packages/numbers/src/apply-to-values.ts
 /**
@@ -122,7 +122,6 @@ const average = (data) => {
 * Undefined and non-numbers are silently ignored.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
 * Numbers.min([10, 20, 0]); // Yields 0
 * ```
 * @param data
@@ -132,7 +131,6 @@ const min = (data) => Math.min(...validNumbers(data));
 /**
 * Returns the index of the largest value.
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
 * const v = [ 10, 40, 5 ];
 * Numbers.maxIndex(v); // Yields 1
 * ```
@@ -144,7 +142,6 @@ const maxIndex = (data) => data.reduce((bestIndex, value, index, array$1) => val
 * Returns the index of the smallest value.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
 * const v = [ 10, 40, 5 ];
 * Numbers.minIndex(v); // Yields 2
 * ```
@@ -157,7 +154,6 @@ const minIndex = (...data) => data.reduce((bestIndex, value, index, array$1) => 
 * Undefined and non-numbers are silently ignored.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
 * Numbers.max(100, 200, 50); // 200
 * ```
 * @param data List of numbers
@@ -169,7 +165,6 @@ const max = (data) => Math.max(...validNumbers(data));
 * Undefined and non-numbers are silently ignored.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
 * Numbers.total([1, 2, 3]); // 6
 * ```
 * @param data Array of numbers
@@ -187,7 +182,6 @@ const total = (data) => data.reduce((previous, current) => {
 * For most uses, {@link max} should suffice.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
 * Numbers.maxFast([ 10, 0, 4 ]); // 10
 * ```
 * @param data
@@ -204,7 +198,6 @@ const maxFast = (data) => {
 * For most uses, {@link total} should suffice.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
 * Numbers.totalFast([ 10, 0, 4 ]); // 14
 * ```
 * @param data
@@ -221,7 +214,6 @@ const totalFast = (data) => {
 * For most uses, {@link max} should suffice.
 *
 * ```js
-* import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
 * Numbers.minFast([ 10, 0, 100 ]); // 0
 * ```
 * @param data
@@ -359,6 +351,28 @@ const clampIndex = (v, arrayOrLength) => {
 	if (v < 0) return 0;
 	if (v >= length) return length - 1;
 	return v;
+};
+/**
+* Returns the largest value, ignoring the sign of numbers
+* 
+* ```js
+* maxAbs(1, 5);    // 5
+* maxAbs(-10, 5);  // -10 (since sign is ignored)
+* ```
+* @param values 
+* @returns 
+*/
+const maxAbs = (...values) => {
+	let index = -1;
+	let maxA = Number.MIN_SAFE_INTEGER;
+	for (let index_ = 0; index_ < values.length; index_++) {
+		const vA = Math.abs(values[index_]);
+		if (vA > maxA) {
+			maxA = vA;
+			index = index_;
+		}
+	}
+	return values[index];
 };
 
 //#endregion
@@ -530,11 +544,9 @@ const isValid = (possibleNumber) => {
 * those that are valid numbers
 *
 * ```js
-* import * as Numbers from 'https://unpkg.com/ixfx/dist/numbers.js';
-*
 * const data = [true, 10, '5', { x: 5 }];
 * for (const n of Numbers.filterIterable(data)) {
-*  // 5
+*  // 10
 * }
 * ```
 * @param it
@@ -701,6 +713,40 @@ const numericPercent = function(interval = .01, repeating = false, start = 0, en
 	resultThrow(numberTest(interval, `percentage`, `interval`), numberTest(start, `percentage`, `start`), numberTest(end, `percentage`, `end`));
 	return numericRange(interval, start, end, repeating);
 };
+
+//#endregion
+//#region packages/numbers/src/round.ts
+/**
+* Rounds a number.
+*
+* If one parameter is given, it's the decimal places,
+* and a rounding function is returned:
+* ```js
+* const r = round(2);
+* r(10.12355); // 10.12
+* ```
+*
+* If two parameters are given, the first is decimal places,
+* the second the value to round.
+* ```js
+* round(2, 10.12355); // 10.12
+* ```
+* @param decimalPlaces
+* @returns
+*/
+function round(a, b, roundUp) {
+	resultThrow(integerTest(a, `positive`, `decimalPlaces`));
+	const up = typeof b === `boolean` ? b : roundUp ?? false;
+	let rounder;
+	if (a === 0) rounder = Math.round;
+	else {
+		const p = Math.pow(10, a);
+		if (up) rounder = (v) => Math.ceil(v * p) / p;
+		else rounder = (v) => Math.floor(v * p) / p;
+	}
+	if (typeof b === `number`) return rounder(b);
+	return rounder;
+}
 
 //#endregion
 //#region packages/numbers/src/is-approx.ts
@@ -875,7 +921,6 @@ const toScalar = (bipolarValue, max$1 = 1, min$1 = 0) => {
 * That is, input range is 0..1, output range is -1...1
 *
 * ```js
-* import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
 * Bipolar.fromScalar(1);   // 1
 * Bipolar.fromScalar(0);   // -1
 * Bipolar.fromScalar(0.5); // 0
@@ -928,7 +973,6 @@ const scaleUnclamped = (inputValue, inMin, inMax) => {
 /**
 * Clamp a bipolar value
 * ```js
-* import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
 * Bipolar.clamp(-1);   // -1
 * Bipolar.clamp(-1.1); // -1
 * ```
@@ -949,7 +993,6 @@ const clamp$1 = (bipolarValue) => {
 * Return value is clamped on bipolar range of -1..1
 * 
 * ```js
-* import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
 * Bipolar.towardZero(-1, 0.1); // -0.9
 * Bipolar.towardZero( 1, 0.1); //  0.9
 * Bipolar.towardZero( 0, 0.1); //  0.0
@@ -1238,7 +1281,6 @@ const interpolatorStepped = (incrementAmount, a = 0, b = 1, startInterpolationAt
 * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
 *
 * ```js
-* import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
 * interpolateAngle(0.5, Math.PI, Math.PI/2);
 * ```
 * @param amount
@@ -1250,41 +1292,6 @@ const interpolateAngle = (amount, aRadians, bRadians, options) => {
 	const t = wrap(bRadians - aRadians, 0, piPi);
 	return interpolate$1(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t), options);
 };
-
-//#endregion
-//#region packages/numbers/src/round.ts
-/**
-* Rounds a number.
-*
-* If one parameter is given, it's the decimal places,
-* and a rounding function is returned:
-* ```js
-* import { round } from 'https://unpkg.com/ixfx/dist/numbers.js';
-* const r = round(2);
-* r(10.12355); // 10.12
-* ```
-*
-* If two parameters are given, the first is decimal places,
-* the second the value to round.
-* ```js
-* round(2, 10.12355); // 10.12
-* ```
-* @param decimalPlaces
-* @returns
-*/
-function round(a, b, roundUp) {
-	resultThrow(integerTest(a, `positive`, `decimalPlaces`));
-	const up = typeof b === `boolean` ? b : roundUp ?? false;
-	let rounder;
-	if (a === 0) rounder = Math.round;
-	else {
-		const p = Math.pow(10, a);
-		if (up) rounder = (v) => Math.ceil(v * p) / p;
-		else rounder = (v) => Math.floor(v * p) / p;
-	}
-	if (typeof b === `number`) return rounder(b);
-	return rounder;
-}
 
 //#endregion
 //#region packages/numbers/src/linear-space.ts
@@ -1400,8 +1407,8 @@ const movingAverageLight = (scaling = 3) => {
 * It uses `Arrays.averageWeighted` under the hood.
 *
 * ```js
-* import { movingAverage } from 'https://unpkg.com/ixfx/dist/data.js';
-* import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
+* import { movingAverage } from '@ixfx/numbers.js';
+* import { gaussian } from '@ixfx/modulation.js';
 * 
 * // Give more weight to data in middle of sampling window
 * const ma = movingAverage(100, gaussian());
@@ -1469,7 +1476,6 @@ const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1) => 
 * For example, if a sensor's useful range is 100-500, scale it to a percentage:
 *
 * ```js
-* import { scale } from 'https://unpkg.com/ixfx/dist/data.js';
 *
 * scale(sensorReading, 100, 500, 0, 1);
 * ```
@@ -1555,8 +1561,6 @@ const scaleClamped = (v, inMin, inMax, outMin, outMax, easing) => {
 * _output_ percentage of `outMin`-`outMax`.
 *
 * ```js
-* import { scalePercentages } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * // Scales 50% to a range of 0-10%
 * scalePercentages(0.5, 0, 0.10); // 0.05 - 5%
 * ```
@@ -1567,8 +1571,6 @@ const scaleClamped = (v, inMin, inMax, outMin, outMax, easing) => {
 *
 * If you want to scale some input range to percentage output range, just use `scale`:
 * ```js
-* import { scale } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * // Yields 0.5
 * scale(2.5, 0, 5);
 * ```
@@ -1585,7 +1587,6 @@ const scalePercentages = (percentage, outMin, outMax = 1) => {
 * Scales an input percentage value to an output range
 * If you have an input percentage (0-1), `scalePercent` maps it to an output range of `outMin`-`outMax`.
 * ```js
-* import { scalePercent } from 'https://unpkg.com/ixfx/dist/data.js';
 * scalePercent(0.5, 10, 20); // 15
 * ```
 *
@@ -1684,6 +1685,11 @@ const numberArrayCompute = (data, opts = {}) => {
 
 //#endregion
 //#region packages/numbers/src/normalise.ts
+var normalise_exports = {};
+__export(normalise_exports, {
+	array: () => array,
+	stream: () => stream
+});
 /**
 * Normalises numbers, adjusting min/max as new values are processed.
 * Normalised return values will be in the range of 0-1 (inclusive).
@@ -1692,7 +1698,6 @@ const numberArrayCompute = (data, opts = {}) => {
 *
 * @example
 * ```js
-* import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
 * const s = Normalise.stream();
 * s(2);    // 1 (because 2 is highest seen)
 * s(1);    // 0 (because 1 is the lowest so far)
@@ -1736,7 +1741,6 @@ const stream = (minDefault, maxDefault) => {
 * as the normalisation range. [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
 *
 * ```js
-* import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
 * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
 * Normalise.array([5,1,0,9,10]);
 * ```
@@ -1767,8 +1771,12 @@ const array = (values, minForced, maxForced) => {
 //#region packages/numbers/src/proportion.ts
 /**
 * Scales a percentage-scale number, ie: `v * t`.
+* 
 * The utility of this function is that it sanity-checks that
-*  both parameters are in the 0..1 scale.
+* both parameters are in the 0..1 scale.
+* 
+* Parameters can also be a function that takes no parameters
+* and returns a number. It will be invoked when `proportion` is called.
 * @param v Value
 * @param t Scale amount
 * @returns Scaled value
@@ -1838,5 +1846,5 @@ const softmax = (logits) => {
 };
 
 //#endregion
-export { bipolar_exports as Bipolar, applyToValues, array, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeInclusive, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, stream, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
+export { bipolar_exports as Bipolar, normalise_exports as Normalise, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeInclusive, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
 //# sourceMappingURL=numbers.js.map

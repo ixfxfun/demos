@@ -1,8 +1,10 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-BhN8B7uk.js";
-import { containsDuplicateInstances, without } from "./src-Cyp-w-xE.js";
-import { defaultKeyer, intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, isPrimitive, toStringDefault } from "./src-Cjy4Jx5o.js";
-import { SimpleEventEmitter, addValue, filterValues, findValue, hasAnyValue, last as last$1, last$1 as last, map, max, min, sortByValueProperty, toArray, toStringAbbreviate } from "./maps-CyRBIIF3.js";
+import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-C3Fpyyz5.js";
+import { containsDuplicateInstances, without } from "./src-BVzuGCxJ.js";
+import { intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-CEZs43zj.js";
+import { addValue, filterValues, findValue, hasAnyValue, sortByValueProperty, toArray } from "./maps-C72wxMfj.js";
+import { SimpleEventEmitter, defaultKeyer, last as last$1, last$1 as last, map, max, min, toStringAbbreviate } from "./src-BGGRKLH-.js";
+import { isPrimitive } from "./is-primitive-B-tAS1Xm.js";
 
 //#region packages/collections/src/circular-array.ts
 /**
@@ -506,12 +508,14 @@ __export(tree_mutable_exports, {
 	breadthFirst: () => breadthFirst$1,
 	children: () => children$1,
 	childrenLength: () => childrenLength$1,
+	childrenValues: () => childrenValues,
 	compare: () => compare$1,
 	computeMaxDepth: () => computeMaxDepth,
 	createNode: () => createNode,
 	depthFirst: () => depthFirst$2,
 	findAnyChildByValue: () => findAnyChildByValue$1,
 	findChildByValue: () => findChildByValue$1,
+	findParentsValue: () => findParentsValue,
 	followValue: () => followValue$1,
 	fromPlainObject: () => fromPlainObject,
 	getRoot: () => getRoot,
@@ -521,7 +525,9 @@ __export(tree_mutable_exports, {
 	hasParent: () => hasParent$1,
 	nodeDepth: () => nodeDepth,
 	parents: () => parents$1,
+	parentsValues: () => parentsValues,
 	queryByValue: () => queryByValue,
+	queryParentsValue: () => queryParentsValue,
 	remove: () => remove,
 	root: () => root,
 	rootWrapped: () => rootWrapped,
@@ -580,6 +586,16 @@ const wrap = (n) => {
 		getIdentity: () => n,
 		*queryValue(value$1) {
 			for (const v of queryByValue(value$1, unwrapped(n))) yield wrap(v);
+		},
+		*queryParentsValue(child, value$1, eq) {
+			for (const v of queryParentsValue(unwrapped(child), value$1, eq)) yield wrap(v);
+		},
+		*parentsValues(child) {
+			yield* parentsValues(unwrapped(child));
+		},
+		findParentsValue(child, value$1, eq) {
+			const n$1 = findParentsValue(child, value$1, eq);
+			if (n$1 !== void 0) return wrap(n$1);
 		},
 		getParent: () => n.parent === void 0 ? void 0 : wrap(n.parent),
 		hasParent: (parent) => {
@@ -708,11 +724,20 @@ function throwTreeTest(root$1) {
 	throw new Error(`${v[1]} Node: ${toStringAbbreviate(v[2].value, 30)}`, { cause: v[2] });
 }
 /**
-* Iterate over direct children of `root`
+* Iterate over direct children of `root`, yielding {@link TreeNode} instances.
+* Use {@link childrenValues} to iterate over child values
 * @param root 
 */
 function* children$1(root$1) {
 	for (const c of root$1.childrenStore) yield c;
+}
+/**
+* Iterate over the value ofdirect children of `root`.
+* Use {@link children} if you want to iterate over {@link TreeNode} instances instead.
+* @param root 
+*/
+function* childrenValues(root$1) {
+	for (const c of root$1.childrenStore) if (typeof c.value !== `undefined`) yield c.value;
 }
 /**
 * Iterate over all parents of `root`. First result is the immediate parent.
@@ -738,9 +763,26 @@ const hasChild$1 = (child, parent) => {
 	for (const c of parent.childrenStore) if (c === child) return true;
 	return false;
 };
+/**
+* Returns the first immediate child of `parent` that matches `value`.
+* 
+* Use {@link queryByValue} if you want all matching children.
+* @param value 
+* @param parent 
+* @param eq 
+* @returns 
+*/
 const findChildByValue$1 = (value$1, parent, eq = isEqualDefault) => {
 	for (const c of parent.childrenStore) if (eq(value$1, c.value)) return c;
 };
+/**
+* Yield all immediate children of `parent` that match `value`.
+* 
+* Use {@link findChildByValue} if you only want the first matching child.
+* @param value 
+* @param parent 
+* @param eq 
+*/
 function* queryByValue(value$1, parent, eq = isEqualDefault) {
 	for (const c of parent.childrenStore) if (eq(value$1, c.value)) yield c;
 }
@@ -777,6 +819,44 @@ const hasAnyParent$1 = (child, prospectiveParent) => {
 	for (const p of parents$1(child)) if (p === prospectiveParent) return true;
 	return false;
 };
+/**
+* Yields the node value of each parent of `child`.
+* _undefined_ values are not returned.
+* 
+* Use {@link queryParentsValue} to search for a particular value
+* @param child 
+* @param value 
+* @param eq 
+* @returns 
+*/
+function* parentsValues(child) {
+	for (const p of parents$1(child)) if (typeof p.value !== `undefined`) yield p.value;
+	return false;
+}
+/**
+* Yields all parents of `child` that have a given value.
+* Use {@link findParentsValue} to find the first match only.
+* @param child 
+* @param value 
+* @param eq 
+* @returns 
+*/
+function* queryParentsValue(child, value$1, eq = isEqualDefault) {
+	for (const p of parents$1(child)) if (typeof p.value !== `undefined`) {
+		if (eq(p.value, value$1)) yield p;
+	}
+	return false;
+}
+/**
+* Returns the first parent that has a given value.
+* @param child 
+* @param value 
+* @param eq 
+* @returns 
+*/
+function findParentsValue(child, value$1, eq = isEqualDefault) {
+	for (const p of queryParentsValue(child, value$1, eq)) return p;
+}
 /**
 * Returns _true_ if `prospectiveParent` is the immediate
 * parent of `child`.
@@ -854,6 +934,13 @@ const fromPlainObject = (value$1, label = ``, parent, seen = []) => {
 const rootWrapped = (value$1) => {
 	return wrap(createNode(value$1));
 };
+/**
+* Creates a `TreeNode` instance with a given value and parent.
+* Parent node, if specified, has its `childrenStore` property changed to include new child.
+* @param value 
+* @param parent 
+* @returns 
+*/
 const createNode = (value$1, parent) => {
 	const n = {
 		childrenStore: [],
@@ -938,7 +1025,7 @@ __export(traverse_object_exports, {
 	traceByPath: () => traceByPath
 });
 /**
-* Helper function to get a 'friendly' string representation of an array of {@link Entry}.
+* Helper function to get a 'friendly' string representation of an array of {@link TraverseObjectEntry}.
 * @param entries 
 * @returns 
 */
@@ -947,7 +1034,7 @@ function prettyPrintEntries(entries) {
 	let t = ``;
 	for (const [index, entry] of entries.entries()) {
 		t += `  `.repeat(index);
-		t += entry.name + ` = ` + JSON.stringify(entry.nodeValue) + `\n`;
+		t += entry.name + ` = ` + JSON.stringify(entry.leafValue) + `\n`;
 	}
 	return t;
 }
@@ -965,9 +1052,9 @@ const prettyPrint = (node, indent = 0, options = {}) => {
 	resultThrow(nullUndefTest(node, `node`));
 	const defaultName = options.name ?? `node`;
 	const entry = getNamedEntry(node, defaultName);
-	const t = `${`  `.repeat(indent)} + name: ${entry.name} value: ${JSON.stringify(entry.nodeValue)}`;
+	const t = `${`  `.repeat(indent)} + name: ${entry.name} value: ${JSON.stringify(entry.leafValue)}`;
 	const childrenAsArray = [...children(node, options)];
-	return childrenAsArray.length > 0 ? t + `\n` + childrenAsArray.map((d) => prettyPrint(d.nodeValue, indent + 1, {
+	return childrenAsArray.length > 0 ? t + `\n` + childrenAsArray.map((d) => prettyPrint(d.leafValue, indent + 1, {
 		...options,
 		name: d.name
 	})).join(`\n`) : t;
@@ -981,12 +1068,12 @@ const prettyPrint = (node, indent = 0, options = {}) => {
 const toStringDeep$1 = (node, indent = 0) => {
 	let t = ` `.repeat(indent) + ` ${node.value?.name}`;
 	if (node.value !== void 0) {
-		if (`sourceValue` in node.value && `nodeValue` in node.value) {
+		if (`sourceValue` in node.value && `leafValue` in node.value) {
 			let sourceValue = toStringAbbreviate(node.value.sourceValue, 20);
-			const nodeValue = toStringAbbreviate(node.value.nodeValue, 20);
-			sourceValue = sourceValue === nodeValue ? `` : `source: ` + sourceValue;
-			t += ` = ${nodeValue} ${sourceValue}`;
-		} else if (`value` in node.value && node.value.value !== void 0) t += ` = ${node.value.value}`;
+			const leafValue = toStringAbbreviate(node.value.leafValue, 20);
+			sourceValue = sourceValue === leafValue ? `` : `source: ` + sourceValue;
+			t += ` = ${leafValue} ${sourceValue}`;
+		} else if (`sourceValue` in node.value && node.value.sourceValue !== void 0) t += ` = ${node.value.sourceValue}`;
 		if (`ancestors` in node.value) t += ` (ancestors: ${node.value.ancestors.join(`, `)})`;
 	}
 	t += `\n`;
@@ -994,27 +1081,43 @@ const toStringDeep$1 = (node, indent = 0) => {
 	return t;
 };
 /**
-* Returns the direct children of a tree-like object as a pairing
-* of node name and value. Supports basic objects, Maps and arrays. 
+* Yields the direct (ie. non-recursive) children of a tree-like object as a pairing
+* of node name and value. Supports basic objects, Maps and arrays.
 * 
-* Sub-children are included as an object blob.
+* To iterate recursively, consider {@link depthFirst}
 * 
-* @example Simple object
-* ```js
-* const o = {
-*  colour: {
-*    r: 0.5, g: 0.5, b: 0.5
-*  }
-* };
-* 
-* const children = [ ...Trees.children(o) ];
-* // Children:
-* // [
-* //  { name: "colour", value: { b: 0.5, g: 0.5, r: 0.5 } }
-* // ]
-* const subChildren = [ ...Trees.children(o.colour) ];
-* // [ { name: "r", value: 0.5 }, { name: "g", value: 0.5 }, { name: "b", value: 0.5 } ]
+* Each child is returned in an {@link TraverseObjectEntry} structure:
+* ```typescript
+* type Entry = Readonly<{
+*  // Property name
+*  name: string, 
+*  // Value of property, as if you called `object[propertyName]`
+*  sourceValue: any,
+*  // Branch nodes will have _undefined_, leaf nodes will contain the value
+*  leafValue: any 
+* }>;
 * ```
+* 
+* For example, iterating over a flat object:
+* ```js
+* const verySimpleObject = { field: `hello`, flag: true }
+* const kids = [ ...children(verySimpleObject) ];
+* // Yields:
+* // [ { name: "field", sourceValue: `hello`, leafValue: `hello` },
+* //  { name: "flag", sourceValue: true, leafValue: true } ]
+* ```
+* 
+* For objects containing objects:
+* ```js
+* const lessSimpleObject = { field: `hello`, flag: true, colour: { `red`, opacity: 0.5 } }
+* const kids = [ ...children(verySimpleObject) ];
+* // Yields as before, plus:
+* //  { name: "colour", sourceValue: { name: 'red', opacity: 0.5 }, leafValue: undefined }
+* ```
+* 
+* Note that 'sourceValue' always contains the property value, as if you 
+* access it via `object[propName]`. 'leafValue' only contains the value if it's a leaf
+* node.
 * 
 * Arrays are assigned a name based on index.
 * @example Arrays
@@ -1035,29 +1138,31 @@ const toStringDeep$1 = (node, indent = 0) => {
 */
 function* children(node, options = {}) {
 	resultThrow(nullUndefTest(node, `node`));
-	const filter = options.filter ?? `none`;
+	const filteringOption = options.filter ?? `none`;
 	const filterByValue = (v) => {
-		if (filter === `none`) return [true, isPrimitive(v)];
-		else if (filter === `leaves` && isPrimitive(v)) return [true, true];
-		else if (filter === `branches` && !isPrimitive(v)) return [true, false];
+		if (filteringOption === `none`) return [true, isPrimitive(v)];
+		else if (filteringOption === `leaves` && isPrimitive(v)) return [true, true];
+		else if (filteringOption === `branches` && !isPrimitive(v)) return [true, false];
 		return [false, isPrimitive(v)];
 	};
 	if (Array.isArray(node)) for (const [index, element] of node.entries()) {
 		const f = filterByValue(element);
 		if (f[0]) yield {
 			name: index.toString(),
+			_kind: `entry`,
 			sourceValue: element,
-			nodeValue: f[1] ? element : void 0
+			leafValue: f[1] ? element : void 0
 		};
 	}
 	else if (typeof node === `object`) {
 		const entriesIter = `entries` in node ? node.entries() : Object.entries(node);
 		for (const [name, value$1] of entriesIter) {
-			const f = filterByValue(value$1);
-			if (f[0]) yield {
+			const [filter, isPrimitive$1] = filterByValue(value$1);
+			if (filter) yield {
 				name,
+				_kind: `entry`,
 				sourceValue: value$1,
-				nodeValue: f[1] ? value$1 : void 0
+				leafValue: isPrimitive$1 ? value$1 : void 0
 			};
 		}
 	}
@@ -1066,7 +1171,8 @@ function* depthFirst$1(node, options = {}, ancestors = []) {
 	for (const c of children(node, options)) {
 		yield {
 			...c,
-			ancestors: [...ancestors]
+			ancestors: [...ancestors],
+			_kind: `entry-ancestors`
 		};
 		yield* depthFirst$1(c.sourceValue, options, [...ancestors, c.name]);
 	}
@@ -1154,15 +1260,17 @@ function* traceByPath(path, node, options = {}) {
 			yield {
 				name: p,
 				sourceValue: void 0,
-				nodeValue: void 0,
-				ancestors
+				leafValue: void 0,
+				ancestors,
+				_kind: `entry-ancestors`
 			};
 			return;
 		}
 		node = entry.sourceValue;
 		yield {
 			...entry,
-			ancestors: [...ancestors]
+			ancestors: [...ancestors],
+			_kind: `entry-ancestors`
 		};
 		ancestors.push(p);
 	}
@@ -1170,6 +1278,15 @@ function* traceByPath(path, node, options = {}) {
 /**
 * Returns a projection of `node` as a dynamic traversable.
 * This means that the tree structure is dynamically created as last-minute as possible.
+* 
+* The type when calling `getValue()` is {@link TraverseObjectEntryStatic}:
+* ```typescript
+* type EntryStatic = Readonly<{ 
+*  name: string,
+*  value: any
+*  ancestors: string[] 
+* }>
+* ```
 * 
 * Note that the object identity of TraversableTree return results is not stable.
 * This is because they are created on-the-fly by reading fields of `node`.
@@ -1180,6 +1297,7 @@ function* traceByPath(path, node, options = {}) {
 * 
 * // Object identity is not the same
 * c1[ 0 ] === c1[ 0 ]; // false
+* 
 * // ...even though its referring to the same value
 * c1[ 0 ].getValue() === c1[ 0 ].getValue(); // true
 * ```
@@ -1187,6 +1305,19 @@ function* traceByPath(path, node, options = {}) {
 * Instead .getIdentity() to get a stable identity:
 * ```js
 * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
+* ```
+* 
+* @example
+* ```js
+* import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+* const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+* const root = Trees.FromObject.asDynamicTraversable(myObj);
+* for (const v of Trees.Traverse.breadthFirst(root)) {
+* // v.getValue() yields:
+* // { name: 'name', sourceValue: 'Pedro' ...}, 
+* // { name: 'size', sourceValue: 45 ... }
+* // ...
+* }
 * ```
 * @param node Object to read
 * @param options Options when creating traversable
@@ -1198,9 +1329,9 @@ const asDynamicTraversable = (node, options = {}, ancestors = [], parent) => {
 	const name = options.name ?? `object`;
 	const t = {
 		*children() {
-			for (const c of children(node, options)) yield asDynamicTraversable(c.sourceValue, {
+			for (const { name: childName, sourceValue, leafValue } of children(node, options)) yield asDynamicTraversable(sourceValue, {
 				...options,
-				name: c.name
+				name: childName
 			}, [...ancestors, name], t);
 		},
 		getParent() {
@@ -1209,8 +1340,9 @@ const asDynamicTraversable = (node, options = {}, ancestors = [], parent) => {
 		getValue() {
 			return {
 				name,
-				value: node,
-				ancestors
+				sourceValue: node,
+				ancestors,
+				_kind: `entry-static`
 			};
 		},
 		getIdentity() {
@@ -1234,6 +1366,18 @@ const createWrapped = (node, options) => {
 * remain the same.
 * 
 * Alternatively, consider {@link asDynamicTraversable} which reads the object dynamically.
+* @example
+* ```js
+* import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+* const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+* const root = Trees.FromObject.create(myObj);
+* for (const v of Trees.Traverse.breadthFirst(root)) {
+* // v.getValue() yields:
+* // { name: 'name', sourceValue: 'Pedro' ...}, 
+* // { name: 'size', sourceValue: 45 ... }
+* // ...
+* }
+* ```
 * @param node 
 * @param options 
 * @returns 
@@ -1245,16 +1389,17 @@ const create$2 = (node, options = {}) => {
 	} : (v) => v;
 	return createImpl(node, valueFor(node), options, []);
 };
-const createImpl = (sourceValue, nodeValue, options = {}, ancestors) => {
+const createImpl = (sourceValue, leafValue, options = {}, ancestors) => {
 	const defaultName = options.name ?? `object_ci`;
 	const r = root({
 		name: defaultName,
-		value: nodeValue,
-		ancestors: [...ancestors]
+		sourceValue: leafValue,
+		ancestors: [...ancestors],
+		_kind: `entry-static`
 	});
 	ancestors = [...ancestors, defaultName];
 	for (const c of children(sourceValue, options)) {
-		const v = options.valuesAtLeaves ? c.nodeValue : c.sourceValue;
+		const v = options.valuesAtLeaves ? c.leafValue : c.sourceValue;
 		add$1(createImpl(c.sourceValue, v, {
 			...options,
 			name: c.name
@@ -1279,16 +1424,23 @@ const createSimplified = (node, options = {}) => {
 * @returns
 */
 function getNamedEntry(node, defaultName = ``) {
-	if (`name` in node && `nodeValue` in node && `sourceValue` in node) return node;
+	if (`name` in node && `leafValue` in node && `sourceValue` in node) return {
+		name: node.name,
+		_kind: `entry`,
+		leafValue: node.leafValue,
+		sourceValue: node.sourceValue
+	};
 	if (`name` in node) return {
 		name: node.name,
-		nodeValue: node,
-		sourceValue: node
+		leafValue: node,
+		sourceValue: node,
+		_kind: `entry`
 	};
 	return {
 		name: defaultName,
-		nodeValue: node,
-		sourceValue: node
+		leafValue: node,
+		sourceValue: node,
+		_kind: `entry`
 	};
 }
 
@@ -1567,6 +1719,7 @@ const hasAnyParent = (child, possibleParent, eq) => {
 	return hasParent(child, possibleParent, eq, Number.MAX_SAFE_INTEGER);
 };
 const hasAnyParentValue = (child, possibleParentValue, eq) => {
+	if (typeof child === `undefined`) throw new TypeError(`Param 'child' is undefined`);
 	return hasParentValue(child, possibleParentValue, eq, Number.MAX_SAFE_INTEGER);
 };
 const findAnyParentByValue = (child, possibleParentValue, eq) => {
@@ -1593,7 +1746,19 @@ const hasParent = (child, possibleParent, eq = isEqualDefault, maxDepth = 0) => 
 	if (eq(pId, ppId)) return true;
 	return hasParent(p, possibleParent, eq, maxDepth - 1);
 };
+/**
+* Checks if a child node has a parent with a certain value
+* Note: by default only checks immediate parent. Set maxDepth to a large value to recurse
+* 
+* Uses `getValue()` on the parent if that function exists.
+* @param child Node to start looking from
+* @param possibleParentValue Value to seek
+* @param eq Equality checker
+* @param maxDepth Defaults to 0, so it only checks immediate parent
+* @returns 
+*/
 const hasParentValue = (child, possibleParentValue, eq = isEqualDefault, maxDepth = 0) => {
+	if (child === void 0) throw new Error(`Param 'child' is undefined`);
 	if (maxDepth < 0) return false;
 	const p = `getParent` in child ? child.getParent() : child.parent;
 	if (p === void 0) return false;
@@ -1674,7 +1839,10 @@ const hasChild = (parent, possibleChild, eq = isEqualDefault, maxDepth = 0) => {
 const hasChildValue = (parent, possibleValue, eq = isEqualDefault, maxDepth = 0) => {
 	if (maxDepth < 0) return false;
 	if (eq(parent.getValue(), possibleValue)) return true;
-	for (const c of breadthFirst(parent, maxDepth)) if (eq(c.getValue(), possibleValue)) return true;
+	for (const c of breadthFirst(parent, maxDepth)) {
+		const v = c.getValue();
+		if (eq(v, possibleValue)) return true;
+	}
 	return false;
 };
 /**
@@ -1784,6 +1952,19 @@ function* depthFirst(root$1) {
 * * {@link depthFirst}: Children, depth-first
 * * {@link parents}: Chain of parents, starting with immediate parent
 * * {@link siblings}: Nodes with same parent
+* 
+* @example Traversing over a simple object
+* ```js
+* import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+* const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+* const root = Trees.FromObject.asDynamicTraversable(myObj);
+* for (const v of Trees.Traverse.breadthFirst(root)) {
+* // v.getValue() yields:
+* // { name: 'name', sourceValue: 'Pedro' ...}, 
+* // { name: 'size', sourceValue: 45 ... }
+* // ...
+* }
+* ```
 * @param root Root node
 * @param depth How many levels to traverse 
 * @returns 
@@ -1846,7 +2027,7 @@ function findByValue(root$1, predicate, order = `breadth`) {
 * 
 * If it can't find a child, it stops.
 * 
-* This is different to 'find' functions, which exhausively search all possible child nodes, regardless of position in tree.
+* This is different to 'find' functions, which exhaustively search all possible child nodes, regardless of position in tree.
 * 
 * ```js
 * const path = 'a.aa.aaa'.split('.');
@@ -1916,18 +2097,38 @@ __export(tree_exports, {
 	isTreeNode: () => isTreeNode,
 	toTraversable: () => toTraversable
 });
+/**
+* Makes a 'traversable' to move around a {@link TreeNode}, an existing {@link TraversableTree} or a plain object.
+* 
+* @param node 
+* @returns 
+*/
 const toTraversable = (node) => {
 	if (isTraversable(node)) return node;
 	if (isTreeNode(node)) return asDynamicTraversable$1(node);
 	if (typeof node === `object`) return asDynamicTraversable(node);
 	throw new Error(`Parameter 'node' not convertible`);
 };
+/**
+* Checks whether `node` is of type {@link TreeNode}.
+* 
+* Checks for: parent, childrenStore and value defined on `node`.
+* @param node 
+* @returns 
+*/
 const isTreeNode = (node) => {
 	if (`parent` in node && `childrenStore` in node && `value` in node) {
 		if (Array.isArray(node.childrenStore)) return true;
 	}
 	return false;
 };
+/**
+* Checks if `node` is of type {@link TraversableTree}.
+* 
+* Checks by looking for: children, getParent, getValue and getIdentity defined on `node`.
+* @param node 
+* @returns 
+*/
 const isTraversable = (node) => {
 	return `children` in node && `getParent` in node && `getValue` in node && `getIdentity` in node;
 };
@@ -2426,7 +2627,6 @@ var QueueImmutable = class QueueImmutable {
 * _dequeing_ removes items from the front (ie. the oldest).
 *
 * ```js
-* import { Queues } from "https://unpkg.com/ixfx/dist/collections.js"
 * let q = Queues.immutable();           // Create
 * q = q.enqueue(`a`, `b`);   // Add two strings
 * const front = q.peek();    // `a` is at the front of queue (oldest)
@@ -3019,11 +3219,11 @@ var MapOfMutableImpl = class extends SimpleEventEmitter {
 	addKeyedValues(key, ...values) {
 		const set$1 = this.#map.get(key);
 		if (set$1 === void 0) {
-			this.#map.set(key, this.type.add(void 0, values));
+			this.#map.set(key, this.type.addKeyedValues(void 0, values));
 			super.fireEvent(`addedKey`, { key });
 			super.fireEvent(`addedValues`, { values });
 		} else {
-			this.#map.set(key, this.type.add(set$1, values));
+			this.#map.set(key, this.type.addKeyedValues(set$1, values));
 			super.fireEvent(`addedValues`, { values });
 		}
 	}
@@ -3051,7 +3251,7 @@ var MapOfMutableImpl = class extends SimpleEventEmitter {
 		const preCount = this.type.count(map$1);
 		const filtered = this.type.without(map$1, value$1);
 		const postCount = filtered.length;
-		this.#map.set(key, this.type.add(void 0, filtered));
+		this.#map.set(key, this.type.addKeyedValues(void 0, filtered));
 		return preCount > postCount;
 	}
 	deleteByValue(value$1) {
@@ -3180,7 +3380,7 @@ const ofSetMutable = (options) => {
 			return `set`;
 		},
 		iterable: (source) => source.values(),
-		add: (dest, values) => addValue(dest, hash, `skip`, ...values),
+		addKeyedValues: (dest, values) => addValue(dest, hash, `skip`, ...values),
 		count: (source) => source.size,
 		find: (source, predicate) => findValue(source, predicate),
 		filter: (source, predicate) => filterValues(source, predicate),
@@ -3219,10 +3419,10 @@ const ofCircularMutable = (options) => {
 		get name() {
 			return `circular`;
 		},
-		add: (destination, values) => {
-			destination ??= new CircularArray(options.capacity);
-			for (const v of values) destination = destination.add(v);
-			return destination;
+		addKeyedValues: (destination, values) => {
+			let ca = destination ?? new CircularArray(options.capacity);
+			for (const v of values) ca = ca.add(v);
+			return ca;
 		},
 		count: (source) => source.length,
 		find: (source, predicate) => source.find(predicate),
@@ -3349,7 +3549,7 @@ const ofArrayMutable = (options = {}) => {
 		get name() {
 			return `array`;
 		},
-		add: (destination, values) => {
+		addKeyedValues: (destination, values) => {
 			if (destination === void 0) return [...values];
 			return [...destination, ...values];
 		},

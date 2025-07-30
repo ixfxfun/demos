@@ -1,12 +1,16 @@
 import { __export, __toESM } from "./chunk-51aI8Tpl.js";
-import { resultToError } from "./src-BhN8B7uk.js";
-import { clamp, round } from "./src-Cyp-w-xE.js";
-import { getErrorMessage, uniqueInstances } from "./src-Cjy4Jx5o.js";
-import "./src-Ct16kpGA.js";
-import { afterMatch } from "./maps-CyRBIIF3.js";
-import { Empty as Empty$1, Empty$1 as Empty, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-CHmQoYVM.js";
-import { shortGuid } from "./bezier-BdPT6F7P.js";
-import { require_dist } from "./dist-B0diH7Mh.js";
+import { resultToError } from "./src-C3Fpyyz5.js";
+import { clamp, round } from "./src-BVzuGCxJ.js";
+import "./interval-type-CEZs43zj.js";
+import "./maps-C72wxMfj.js";
+import "./src-Bip7wA20.js";
+import { afterMatch } from "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import "./key-value-CfwtfZWC.js";
+import { require_dist, uniqueInstances } from "./dist-27gr6RC3.js";
+import { getErrorMessage } from "./resolve-core-CDPnQKIe.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-DB-SLoee.js";
+import { shortGuid } from "./bezier-DZRwSDvJ.js";
 
 //#region packages/dom/src/resolve-el.ts
 /**
@@ -175,9 +179,9 @@ const setFromCssVariables = (context, ...options) => {
 		if (els === null) continue;
 		if (els === void 0) continue;
 		if (opt.attribute) for (const el$1 of els) if (isHtmlElement(el$1)) el$1.setAttribute(opt.attribute, v);
-		else throw new Error(`Trying to set an attribute on something not a HTML element`, el$1);
+		else throw new Error(`Trying to set an attribute on something not a HTML element`, { cause: el$1 });
 		else if (opt.field) for (const el$1 of els) if (typeof el$1 === `object`) el$1[opt.field] = v;
-		else throw new Error(`Trying to set field on something that is not an object (${typeof el$1})`, el$1);
+		else throw new Error(`Trying to set field on something that is not an object (${typeof el$1})`, { cause: el$1 });
 		else throw new Error(`Neither 'attribute' or 'field' to set is defined in option (${JSON.stringify(opt)})`);
 	}
 };

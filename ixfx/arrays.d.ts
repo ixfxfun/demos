@@ -235,8 +235,6 @@ declare const filterAB: <V>(data: readonly V[], filter: (a: V) => boolean) => [a
  * of slicing the array before using `filter`.
  *
  * ```js
- * import { filterBetween } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * // Return 'registered' people between and including array indexes 5-10
  * const filtered = [...filterBetween(people, person => person.registered, 5, 10)];
  * ```
@@ -293,8 +291,6 @@ declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy
  *
  * @example
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const data = [
  *  { age: 39, city: `London` },
  *  { age: 14, city: `Copenhagen` },
@@ -380,7 +376,18 @@ declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonl
 //#region packages/arrays/src/insert-at.d.ts
 /**
  * Inserts `values` at position `index`, shuffling remaining
- * items further down.
+ * items further down and returning changed result.
+ *
+ * Does not modify the input array.
+ *
+ * ```js
+ * const data = [ 1, 2, 3 ]
+ *
+ * // Inserts 20,30,40 at index 1
+ * Arrays.insertAt(data, 1, 20, 30, 40);
+ *
+ * // Yields: 1, 20, 30, 40, 2, 3
+ * ```
  * @param data
  * @param index
  * @param values
@@ -388,15 +395,12 @@ declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonl
  */
 declare const insertAt: <V>(data: readonly V[] | V[], index: number, ...values: V[]) => V[];
 //# sourceMappingURL=insert-at.d.ts.map
-
 //#endregion
 //#region packages/arrays/src/interleave.d.ts
 /**
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const a = [`a`, `b`, `c`];
  * const b = [`1`, `2`, `3`];
  * const c = Arrays.interleave(a, b);
@@ -584,8 +588,6 @@ declare const randomIndex: <V>(array: ArrayLike<V>, rand?: () => number) => numb
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const v = [ 100, 20, 50 ];
  * const vv = Arrays.remove(2);
  *
@@ -616,8 +618,6 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
  * @example
  * By percentage - get half of the items
  * ```
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = Arrays.sample(list, 0.5);
  * // Yields: [2, 4, 6, 8, 10]
@@ -626,8 +626,6 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
  * @example
  * By steps - every third value
  * ```
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = Arrays.sample(list, 3);
  * // Yields:
@@ -769,8 +767,6 @@ declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], c
  * Zip combines the elements of two or more arrays based on their index.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const a = [1,2,3];
  * const b = [`red`, `blue`, `green`];
  *

@@ -56,33 +56,39 @@ type GenerateRandomOptions = RandomNumberOptions & Readonly<{
  */
 declare const randomIndex: <V>(array: ArrayLike<V>, rand?: RandomSource) => number;
 /**
- * Removes a random item from an array, returning both the item and the new array as a result.
- * Does not modify the original array unless `mutate` parameter is true.
+ * Returns a random value from `array`,
+ * and removes it from the array.
  *
- * @example Without changing source
  * ```js
- * const data = [100, 20, 40];
- * const {value, array} = randomPluck(data);
- * // value: 20, array: [100, 40], data: [100, 20, 40];
+ * const data = [100,20,50];
+ * const v = randomPluck(data, { mutate: true });
+ * // eg: v: 20, data is now [100,50]
  * ```
- *
- * @example Mutating source
- * ```js
- * const data = [100, 20, 40];
- * const {value} = randomPluck(data, true);
- * // value: 20, data: [100, 40];
- * ```
- *
- * @typeParam V - Type of items in array
- * @param array Array to pluck item from
- * @param mutate If _true_, changes input array. _False_ by default.
- * @param rand Random generatr. `Math.random` by default.
- * @return Returns an object `{value:V|undefined, array:V[]}`
- *
+ * @param array
+ * @param options
  */
-declare const randomPluck: <V>(array: readonly V[] | V[], mutate?: boolean, rand?: RandomSource) => {
-  readonly value: V | undefined;
-  readonly array: V[];
+declare function randomPluck<V>(array: readonly V[] | V[], options: {
+  mutate: true;
+  source?: RandomSource;
+}): V | undefined;
+/**
+ * Returns a random element from an array
+ * along with the remaining elements. Does not
+ * modify the original array.
+ * ```js
+ * const data = [100,20,50];
+ * const {value,remainder} = randomPluck(data);
+ * // eg: value: 20, remainder: [100,50], data remains [100,20,50]
+ * ```
+ * @param array
+ * @param options
+ */
+declare function randomPluck<V>(array: readonly V[] | V[], options?: {
+  mutate: false;
+  source?: RandomSource;
+}): {
+  value: V;
+  remainder: V[];
 };
 /**
  * Returns random element.
@@ -287,7 +293,7 @@ declare const gaussianSource: (skew?: number) => RandomSource;
 //#endregion
 //#region packages/random/src/guid.d.ts
 /**
- * Generates a short roughly unique id
+ * Generates a six-digit roughly unique id
  * ```js
  * const id = shortGuid();
  * ```
@@ -583,7 +589,6 @@ declare const weightedIndex: (weightings: Array<number>, rand?: RandomSource) =>
  *
  * @example 0..99
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * const r = Random.weightedIntegerFn(100);
  * r(); // Produce value
  * ```
@@ -611,7 +616,6 @@ declare const weightedIntegerSource: (options: WeightedOptions) => RandomSource;
  *
  * @example 0..99
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * Random.weightedInteger(100);
  * ```
  *

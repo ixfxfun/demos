@@ -1,11 +1,14 @@
 import { ElementResizeLogic } from "@ixfx/dom";
 import { SimpleEventEmitter } from "@ixfx/events";
 import * as _ixfx_geometry0 from "@ixfx/geometry";
-import { Angle, Grids, ScaleBy } from "@ixfx/geometry";
+import { Angle, Arcs, Beziers, Circles, Ellipses, Grids, Lines, Paths, Points, Rects, ScaleBy, Triangles } from "@ixfx/geometry";
 import { RandomSource } from "@ixfx/random";
 import { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import * as _ixfx_geometry_grid0 from "@ixfx/geometry/grid";
 import { Grid } from "@ixfx/geometry/grid";
+import * as C from "colorizr";
+import Colorizr from "colorizr";
+import { IStackImmutable } from "@ixfx/collections/stack";
 
 //#region packages/visual/src/colour/types.d.ts
 type HslBase = {
@@ -27,7 +30,7 @@ type HslBase = {
   opacity?: number;
   space?: `hsl`;
 };
-declare const isHsl: (v: any) => v is Hsl;
+type ColourSpaces = `srgb` | `hsl` | `oklch`;
 /**
  * Scalar values use 0..1 for each field
  */
@@ -49,7 +52,7 @@ type Hsl = HslScalar | HslAbsolute;
 /**
  * Rgb.
  * Units determine how to interperet rgb values.
- * * 'relative': 0..1 range for RGB & opacity
+ * * 'scalar': 0..1 range for RGB & opacity
  * * '8bit': 0..255 range for RGB & opacity
  */
 type RgbBase = {
@@ -62,27 +65,18 @@ type RgbBase = {
 type RgbScalar = RgbBase & {
   unit: `scalar`;
 };
-declare const isRgb: (v: any) => v is Rgb;
-/**
- * If the input object has r,g&b properties, it will return a fully-
- * formed Rgb type with `unit` and `space` properties.
- *
- * If it lacks these basic three properties or they are out of range,
- *  _undefined_ is returned.
- *
- * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
- * If RGB values exceed 255, _undefined_ returned.
- * @param v
- * @returns
- */
-declare const tryParseObjectToRgb: (v: any) => Rgb | undefined;
-declare const tryParseObjectToHsl: (v: any) => Hsl | undefined;
 /**
  * RGB in 0...255 range, including opacity.
  */
 type Rgb8Bit = RgbBase & {
   unit: `8bit`;
 };
+/**
+ * Rgb.
+ * Units determine how to interperet rgb values.
+ * * 'scalar': 0..1 range for RGB & opacity
+ * * '8bit': 0..255 range for RGB & opacity
+ */
 type Rgb = RgbScalar | Rgb8Bit;
 type LchBase = {
   /**
@@ -103,7 +97,7 @@ type LchBase = {
   opacity?: number;
   space: `lch` | `oklch`;
 };
-declare const isLch: (v: any) => v is OkLch;
+type ColourInterpolator<T extends Colour> = (amount: number) => T;
 type OkLchBase = LchBase & {
   space: `oklch`;
 };
@@ -115,8 +109,8 @@ type OkLchScalar = OkLchBase & {
 };
 /**
  * Oklch colour expressed with:
- * l: 0..100
- * c: 0..100
+ * l: 0..1
+ * c: 0..4
  * h: 0..360 degrees
  * opacity: 0..1
  */
@@ -131,11 +125,27 @@ type Colour = {
  * A representation of colour. Eg: `blue`, `rgb(255,0,0)`, `hsl(20,100%,50%)`
  */
 type Colourish = Colour | string;
-declare const isColourish: (v: any) => v is Colourish;
 /**
  * Options for interpolation
  */
+type ColourInterpolationOpts = {
+  direction: `longer` | `shorter`;
+  space: ColourSpaces;
+};
+type ColourStepOpts = ColourInterpolationOpts & {
+  /**
+   * If set, determines total number of steps, including colour stops.
+   * Use this _or_ `stepsBetween`.
+   */
+  stepsTotal?: number;
+  /**
+   * If set, determines number of steps between colour stops.
+   * Use this _or_ `stepsTotal`.
+   */
+  stepsBetween?: number;
+};
 type ParsingOptions<T> = Partial<{
+  scalar: boolean;
   ensureSafe: boolean;
   /**
    * Value to use if input is invalid
@@ -466,8 +476,18 @@ declare const pointerVisualise: (elOrQuery: HTMLElement | string, options?: Opts
 //# sourceMappingURL=pointer-visualise.d.ts.map
 //#endregion
 //#region packages/visual/src/colour/conversion.d.ts
-declare const toCssColour: (colour: any) => string;
-declare const convert: (colour: string, destination: "hex" | "hsl" | "oklab" | "oklch" | "srgb" | `rgb`) => string;
+type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
+declare function convert<T extends ConvertDestinations>(colour: Colourish, destination: T): T extends "oklch-absolute" ? OkLchAbsolute : T extends "oklch-scalar" ? OkLchScalar : T extends "srgb-8bit" ? Rgb8Bit : T extends "srgb-scalar" ? RgbScalar : T extends "hsl-scalar" ? HslScalar : T extends "hsl-absolute" ? HslAbsolute : never;
+/**
+ * Like {@link convert}, but result is a CSS colour string
+ * @param colour
+ * @param destination
+ * @returns
+ */
+declare function convertToString(colour: Colourish, destination: ConvertDestinations): string;
+declare function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T): T extends "oklch" ? OkLchScalar : T extends "hsl" ? HslScalar : T extends "srgb" ? RgbScalar : never;
+declare const toCssColour: (colour: Colourish | object) => string;
+declare const toLibraryColour: (colour: Colourish) => Colorizr;
 declare const guard$3: (colour: Colour) => void;
 declare const toColour: (colourish: any) => Colour;
 /**
@@ -489,6 +509,8 @@ declare const toColour: (colourish: any) => Colour;
  * @returns
  */
 declare const toStringFirst: (...colours: (Colourish | undefined)[]) => string;
+declare function rgbToHsl(rgb: Rgb, scalarResult: true): HslScalar;
+declare function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute;
 //# sourceMappingURL=conversion.d.ts.map
 //#endregion
 //#region packages/visual/src/colour/css-colours.d.ts
@@ -687,13 +709,98 @@ declare const randomHue: (rand?: RandomSource) => number;
 //# sourceMappingURL=generate.d.ts.map
 //#endregion
 //#region packages/visual/src/colour/math.d.ts
+/**
+ * Multiplies the opacity of a colour by `amount`, returning a computed CSS colour.
+ *
+ * ```js
+ * multiplyOpacity(`red`, 0.5); // Returns a colour string
+ * ```
+ *
+ * For example, to half the opacity, use `amount: 0.5`.
+ * Clamps the result to ensure it's between 0..1
+ * @param colourish
+ * @param amount
+ * @returns
+ */
 declare function multiplyOpacity(colourish: string, amount: number): string;
-declare function withOpacity$2(colourish: string, fn: (scalarOpacity: number) => number): string;
-declare function withOpacity$2(colourish: Hsl, fn: (scalarOpacity: number) => number): Hsl;
-declare function withOpacity$2(colourish: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+/**
+ * Does a computation with the opacity of a colour, returning colour string
+ * @param colourish Colour
+ * @param fn Function that takes original opacity as input and returns output opacity
+ */
+declare function withOpacity$3(colourish: string, fn: (scalarOpacity: number) => number): string;
+/**
+ * Does a computation with the opacity of a colour in a HSL structure
+ * @param hsl Colour
+ * @param fn Function that takes original opacity as input and returns output opacity
+ */
+declare function withOpacity$3(hsl: Hsl, fn: (scalarOpacity: number) => number): Hsl;
+/**
+ * Does a computation with the opacity of a colour in a RGB structure
+ * @param colourish Colour
+ * @param fn Function that takes original opacity as input and returns output opacity
+ */
+declare function withOpacity$3(rgb: Rgb, fn: (scalarOpacity: number) => number): Rgb;
 //# sourceMappingURL=math.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/interpolate.d.ts
+/**
+ * Returns a CSS `linear-gradient` with stops corresponding to the given list of `colours`.
+ * ```js
+ * element.style.background = Colour.cssLinearGradient(['red','green','blue']);
+ * ```
+ * @param colours
+ * @returns
+ */
+declare const cssLinearGradient: (colours: Colourish[]) => string;
+/**
+ * Returns a function that interpolates between two colours. Returns string colour values.
+ * ```js
+ * const i = interpolator(`blue`, `red`);
+ * i(0.5); // Get the colour at 50%, as a string.
+ * ```
+ *
+ * To work with structured colour values, use one of the space's `interpolate` functions.
+ * @param colourA
+ * @param colourB
+ * @param options
+ * @returns
+ */
+declare const interpolator$3: (colourA: Colourish, colourB: Colourish, options?: Partial<ColourInterpolationOpts>) => (amount: number) => string;
+/**
+ * Produces a stepped scale of colours.
+ *
+ * ```js
+ * // A scale of from red to green, with three colours in-between
+ * const steps = Colour.scale([ `red`, `green` ], { stepsBetween: 3 });
+ * for (const step of steps) {
+ *  // A CSS colour string
+ * }
+ * ```
+ *
+ * {@link cssLinearGradient} can produce a smooth gradient in CSS on the basis
+ * of the stepped colours.
+ * @param colours
+ * @param opts
+ * @returns
+ */
+declare const scale: (colours: Colourish[], opts?: Partial<ColourStepOpts>) => string[];
+type CreateStepsOptions = Partial<{
+  space: ColourSpaces;
+  steps: number;
+  direction: `longer` | `shorter`;
+  exclusive: boolean;
+}>;
+declare function createSteps<T extends CreateStepsOptions>(a: Colourish | string, b: Colourish, options: T): T extends {
+  space: `oklch`;
+} ? OkLchScalar[] : T extends {
+  space: `srgb`;
+} ? RgbScalar[] : T extends {
+  space: `hsl`;
+} ? HslScalar[] : OkLchScalar[];
+//# sourceMappingURL=interpolate.d.ts.map
 declare namespace hsl_d_exports {
-  export { fromCssAbsolute$1 as fromCssAbsolute, fromCssScalar$1 as fromCssScalar, fromHexString$2 as fromHexString, generateScalar$1 as generateScalar, guard$2 as guard, toAbsolute$1 as toAbsolute, toCssString$2 as toCssString, toScalar$2 as toScalar, withOpacity$1 as withOpacity };
+  export { absolute$1 as absolute, changeLightness$1 as changeLightness, fromCss$2 as fromCss, fromHexString$2 as fromHexString, generateScalar$1 as generateScalar, guard$2 as guard, interpolator$2 as interpolator, parseCssHslFunction, scalar$2 as scalar, toAbsolute$1 as toAbsolute, toCssString$2 as toCssString, toLibraryRgb, toScalar$2 as toScalar, withOpacity$2 as withOpacity };
 }
 /**
  * Scales the opacity value of an input HSL value
@@ -704,12 +811,42 @@ declare namespace hsl_d_exports {
  * @param fn
  * @returns
  */
-declare const withOpacity$1: <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
-declare const fromHexString$2: (hexString: string) => HslAbsolute;
-declare const fromCssAbsolute$1: (value: string, options?: ParsingOptions<HslAbsolute>) => HslAbsolute;
-declare const fromCssScalar$1: (value: string, options?: ParsingOptions<HslAbsolute>) => HslScalar;
+declare const withOpacity$2: <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
+/**
+ * Increases or decreases lightness by this percentage, returning new colour
+ *
+ * Amount to change:
+ * * 'fixed': a fixed amount
+ * * 'delta': increase/decrease by this amount
+ * * 'pdelta': proportion of current value to change by ('percentage delta')
+ *
+ * ```
+ * const colour = { h: 0.5, s: 0.5, l: 0.5, space: `hsl`, unit: `scalar` };
+ * changeLightness(colour, { pdelta: 0.1 }); // l: 0.55
+ * changeLightness(colour, { delta: 0.1 });  // l: 0.6
+ * changeLightness(colour, { fixed: 0.5 });  // l: 0.5
+ * ```
+ *
+ * Keep in mind the numerical value will depend on the unit of `value`. If it's scalar,
+ * lightness is 0..1 scale, otherwise 0..100 scale.
+ *
+ * Use negative values to decrease (does not apply to 'fixed')
+ * @param value
+ * @param amount
+ */
+declare const changeLightness$1: (value: Hsl, amount: Partial<{
+  pdelta: number;
+  delta: number;
+  fixed: number;
+}>) => Hsl;
+declare function fromHexString$2<T extends ParsingOptions<Hsl>>(hexString: string, scalar: T): T extends {
+  scalar: true;
+} ? HslScalar : HslAbsolute;
+declare function fromCss$2<T extends ParsingOptions<Hsl>>(value: string, options: T): T extends {
+  scalar: true;
+} ? HslScalar : HslAbsolute;
 declare const toCssString$2: (hsl: Hsl) => string;
-declare const toAbsolute$1: (hsl: Hsl) => HslAbsolute;
+declare const toAbsolute$1: (hslOrString: Hsl | Rgb | string) => HslAbsolute;
 /**
  * Generates a {@link HslScalar} value.
  *
@@ -728,35 +865,458 @@ declare const toAbsolute$1: (hsl: Hsl) => HslAbsolute;
  * @param opacity
  */
 declare const generateScalar$1: (absoluteHslOrVariable: string | number | Angle, saturation?: number, lightness?: number, opacity?: number) => HslScalar;
-declare const toScalar$2: (hsl: Hsl) => HslScalar;
+/**
+ * Converts a {@link Hsl} value to scalar units, or parses a colour string
+ * and converts it.
+ *
+ * ```js
+ * toScalar({ h: 100, s: 50, l: 100, unit: `absolute` });
+ * toScalar(`red`);
+ * ```
+ * @param hslOrString
+ * @returns
+ */
+declare const toScalar$2: (hslOrString: Rgb | Hsl | string) => HslScalar;
 declare const guard$2: (hsl: Hsl) => void;
+declare const interpolator$2: (a: Hsl | string, b: Hsl | string, direction?: `longer` | `shorter`) => (amount: number) => HslScalar;
+/**
+ * Creates a HslScalar value from scalar (0..1) values
+ * @param hue
+ * @param sat
+ * @param lightness
+ * @param opacity
+ * @returns
+ */
+declare function scalar$2(hue?: number, sat?: number, lightness?: number, opacity?: number): HslScalar;
+declare function absolute$1(hue?: number, sat?: number, lightness?: number, opacity?: number): HslAbsolute;
+/**
+ * It seems Colorizr can't handle 'deg' units
+ * @param value
+ */
+declare function parseCssHslFunction(value: string): Hsl;
+/**
+ * Converts a Hsl structure (or CSS string) to Colorizr's RGB format
+ * @param rgb
+ * @returns
+ */
+declare function toLibraryRgb(hsl: Hsl | string): C.RGB;
 //# sourceMappingURL=hsl.d.ts.map
 declare namespace oklch_d_exports {
-  export { fromCssAbsolute, fromCssScalar, fromHexString$1 as fromHexString, generateScalar, guard$1 as guard, toAbsolute, toCssString$1 as toCssString, toScalar$1 as toScalar };
+  export { OKLCH_CHROMA_MAX, absolute, fromCss$1 as fromCss, fromHexString$1 as fromHexString, fromLibrary, generateScalar, guard$1 as guard, interpolator$1 as interpolator, scalar$1 as scalar, toAbsolute, toCssString$1 as toCssString, toScalar$1 as toScalar, withOpacity$1 as withOpacity };
 }
+declare const OKLCH_CHROMA_MAX = 0.4;
 declare const guard$1: (lch: OkLch) => void;
-declare const fromHexString$1: (hexString: string) => OkLchAbsolute;
-declare const fromCssAbsolute: (value: string, options?: ParsingOptions<OkLchAbsolute>) => OkLchAbsolute;
-declare const fromCssScalar: (value: string, options?: ParsingOptions<OkLchAbsolute>) => OkLchScalar;
-declare const toScalar$1: (lch: OkLch) => OkLchScalar;
-declare const toAbsolute: (lch: OkLch) => OkLchAbsolute;
-declare const toCssString$1: (lch: OkLch) => string;
+declare function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options: T): T extends {
+  scalar: true;
+} ? OkLchScalar : OkLchAbsolute;
+declare const fromHexString$1: (hexString: string, options?: ParsingOptions<OkLch>) => OkLch;
+declare function fromCss$1<T extends ParsingOptions<OkLch>>(value: string, options: T): T extends {
+  scalar: true;
+} ? OkLchScalar : OkLchAbsolute;
+/**
+ * Returns a string or {@link OkLch} value to absolute form.
+ *
+ * This means ranges are:
+ * * lightness: 0..1
+ * * chroma: 0...CHROMA_MAX (0.4)
+ * * hue: 0..360
+ * @param lchOrString
+ * @returns
+ */
+declare const toAbsolute: (lchOrString: OkLch | string) => OkLchAbsolute;
+declare const toScalar$1: (lchOrString: OkLch | string) => OkLchScalar;
+/**
+ * Returns the colour as a CSS colour string: `oklch(l c h / opacity)`.
+ *
+ * @param lch Colour
+ * @param precision Set precision of numbers, defaults to 3
+ * @returns CSS colour string
+ */
+declare const toCssString$1: (lch: OkLch, precision?: number) => string;
 declare const generateScalar: (absoluteHslOrVariable: string | number | Angle, chroma?: number, lightness?: number, opacity?: number) => OkLchScalar;
+/**
+ * Scales the opacity value of an input Oklch value
+ * ```js
+ * withOpacity()
+ * ```
+ * @param value
+ * @param fn
+ * @returns
+ */
+declare const withOpacity$1: <T extends OkLch>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
+declare const interpolator$1: (a: OkLch | string, b: OkLch | string, direction?: `longer` | `shorter`) => (amount: number) => OkLchScalar;
+declare function scalar$1(lightness?: number, chroma?: number, hue?: number, opacity?: number): OkLchScalar;
+/**
+ * Create an LCH colour using absolute hue
+ * @param l Lightness 0..1
+ * @param c Chroma 0..4
+ * @param h Hue 0..360
+ * @param opacity
+ * @returns
+ */
+declare const absolute: (l: number, c: number, h: number, opacity?: number) => OkLchAbsolute;
 //# sourceMappingURL=oklch.d.ts.map
 declare namespace srgb_d_exports {
-  export { fromCss8bit, fromHexString, guard, to8bit, toCssString, toScalar, withOpacity };
+  export { changeLightness, eightBit, fromCss, fromHexString, guard, interpolator, lightness, parseCssRgbFunction, scalar, to8bit, toCssString, toLibraryHsl, toScalar, withOpacity };
 }
 declare const withOpacity: <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
-declare const fromHexString: (hexString: string) => Rgb8Bit;
-declare const fromCss8bit: (value: string, options?: ParsingOptions<Rgb8Bit>) => Rgb8Bit;
+declare function fromHexString<T extends boolean>(hexString: string, scalar: T): T extends true ? RgbScalar : Rgb8Bit;
+declare function fromCss<T extends ParsingOptions<Rgb>>(value: string, options: T): T extends {
+  scalar: true;
+} ? RgbScalar : Rgb8Bit;
 declare const toCssString: (rgb: Rgb) => string;
-declare const to8bit: (rgb: Rgb) => Rgb8Bit;
-declare const toScalar: (rgb: Rgb) => RgbScalar;
+declare const to8bit: (rgbOrString: Rgb | string) => Rgb8Bit;
+declare const toScalar: (rgbOrString: Rgb | Hsl | string) => RgbScalar;
 declare const guard: (rgb: Rgb) => void;
+/**
+ * Sets the lightness value.
+ *
+ * Amount to change:
+ * * 'fixed': a fixed amount
+ * * 'delta': increase/decrease by this amount
+ * * 'pdelta': proportion of current value to change by ('percentage delta')
+ *
+ * Use negative values to decrease
+ * @param value
+ * @param amount
+ */
+declare const changeLightness: (rgb: Rgb, amount: Partial<{
+  pdelta: number;
+  delta: number;
+  fixed: number;
+}>) => Rgb;
+/**
+ * Returns a lightness value (0..1) for an RGB input
+ *
+ * Calculates lightness by converting to Oklab and using the 'L' value
+ * @param rgb
+ * @returns
+ */
+declare function lightness(rgb: Rgb): number;
+/**
+ * Creates a Rgb8Bit value from 8bit (0..255) values
+ * @param red
+ * @param green
+ * @param blue
+ * @param opacity
+ * @returns
+ */
+declare function eightBit(red?: number, green?: number, blue?: number, opacity?: number): Rgb8Bit;
+/**
+ * Creates a RgbScalar value from scalar (0..1) values
+ * @param red
+ * @param green
+ * @param blue
+ * @param opacity
+ * @returns
+ */
+declare function scalar(red?: number, green?: number, blue?: number, opacity?: number): RgbScalar;
+/**
+ * It seems Colorizr can't handle % values properly :'(
+ * @param value
+ */
+declare function parseCssRgbFunction(value: string): Rgb;
+/**
+ * Interpolates colours in Srgb space. Probably
+ * really ugly, use OkLch space isntead.
+ *
+ * ```js
+ * const i = interpolator(`red`, `blue`);
+ * i(0.5); // Get 50% between these colours
+ * ```
+ * @param colourA
+ * @param colourB
+ * @returns
+ */
+declare const interpolator: (colourA: Rgb | string, colourB: Rgb | string) => (amount: number) => RgbScalar;
+/**
+ * Converts a Rgb structure (or CSS string) to Colorizr's HSL format
+ * @param rgb
+ * @returns
+ */
+declare function toLibraryHsl(rgb: Rgb | string): C.HSL;
 //# sourceMappingURL=srgb.d.ts.map
 declare namespace index_d_exports {
-  export { Colour, Colourish, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, cssDefinedHexColours, fromCssColour, goldenAngleColour, guard$3 as guard, isColourish, isHsl, isLch, isRgb, multiplyOpacity, randomHue, toColour, toCssColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$2 as withOpacity };
+  export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, multiplyOpacity, randomHue, rgbToHsl, scale, toColour, toCssColour, toLibraryColour, toStringFirst, withOpacity$3 as withOpacity };
 }
+declare namespace drawing_d_exports {
+  export { CanvasContextQuery, ConnectedPointsOptions, DotOpts, DrawingHelper, DrawingOpts, DrawingStack, HorizAlign, LineOpts, RectOpts, StackOp, VertAlign, arc, bezier, circle, connectedPoints, copyToImg, dot, drawingStack, ellipse, getContext, line, lineThroughPoints, makeHelper, paths, pointLabels, rect, textBlock, textBlockAligned, textHeight, textRect, textWidth, translatePoint, triangle };
+}
+type CanvasContextQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+/**
+ * Gets a 2d drawing context from canvas element or query, or throws an error
+ * @param canvasElementContextOrQuery Canvas element reference or DOM query
+ * @returns Drawing context.
+ */
+declare const getContext: (canvasElementContextOrQuery: CanvasContextQuery) => CanvasRenderingContext2D;
+type DrawingHelper = ReturnType<typeof makeHelper>;
+/**
+ * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
+ * @param ctxOrCanvasEl Drawing context or canvs element reference
+ * @param canvasBounds Bounds of drawing (optional). Used for limiting `textBlock`
+ * @returns
+ */
+declare const makeHelper: (ctxOrCanvasEl: CanvasContextQuery, canvasBounds?: Rects.Rect) => {
+  ctx: CanvasRenderingContext2D;
+  paths(pathsToDraw: Paths.Path[] | readonly Paths.Path[], opts?: DrawingOpts): void;
+  line(lineToDraw: Lines.Line | Lines.Line[], opts?: DrawingOpts): void;
+  rect(rectsToDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: RectOpts): void;
+  bezier(bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier, opts?: DrawingOpts): void;
+  connectedPoints(pointsToDraw: Points.Point[], opts?: DrawingOpts & Partial<ConnectedPointsOptions>): void;
+  pointLabels(pointsToDraw: Points.Point[], opts?: DrawingOpts): void;
+  dot(dotPosition: Points.Point | Points.Point[], opts?: DotOpts): void;
+  circle(circlesToDraw: Circles.CirclePositioned | Circles.CirclePositioned[], opts: DrawingOpts): void;
+  arc(arcsToDraw: Arcs.ArcPositioned | Arcs.ArcPositioned[], opts: DrawingOpts): void;
+  textBlock(lines: string[], opts: DrawingOpts & {
+    anchor: Points.Point;
+    anchorPadding?: number;
+    bounds?: Rects.RectPositioned;
+  }): void;
+};
+/**
+ * Drawing options
+ */
+type DrawingOpts = {
+  /**
+   * Stroke style
+   */
+  readonly strokeStyle?: string;
+  /**
+   * Fill style
+   */
+  readonly fillStyle?: string;
+  /**
+   * If true, diagnostic helpers will be drawn
+   */
+  readonly debug?: boolean;
+};
+type LineOpts = {
+  readonly lineWidth?: number;
+  readonly lineCap?: CanvasLineCap;
+  readonly lineJoin?: CanvasLineJoin;
+};
+/**
+ * Draws one or more arcs.
+ * @param ctx
+ * @param arcs
+ * @param opts
+ */
+declare const arc: (ctx: CanvasRenderingContext2D, arcs: Arcs.ArcPositioned | readonly Arcs.ArcPositioned[], opts?: DrawingOpts) => void;
+/**
+ * A drawing stack operation
+ */
+type StackOp = (ctx: CanvasRenderingContext2D) => void;
+/**
+ * A drawing stack (immutable)
+ */
+type DrawingStack = {
+  /**
+   * Push a new drawing op
+   * @param ops Operation to add
+   * @returns stack with added op
+   */
+  push(...ops: readonly StackOp[]): DrawingStack;
+  /**
+   * Pops an operatiomn
+   * @returns Drawing stack with item popped
+   */
+  pop(): DrawingStack;
+  /**
+   * Applies drawing stack
+   */
+  apply(): DrawingStack;
+};
+/**
+ * Creates and returns an immutable drawing stack for a context
+ * @param ctx Context
+ * @param stk Initial stack operations
+ * @returns
+ */
+declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: IStackImmutable<StackOp>) => DrawingStack;
+/**
+ * Draws a curved line through a set of points
+ * @param ctx
+ * @param points
+ * @param opts
+ */
+declare const lineThroughPoints: (ctx: CanvasRenderingContext2D, points: readonly Points.Point[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more circles. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
+ *
+ * ```js
+ * // Draw a circle with radius of 10 at 0,0
+ * circle(ctx, {radius:10});
+ *
+ * // Draw a circle of radius 10 at 100,100
+ * circle(ctx, {radius: 10, x: 100, y: 100});
+ *
+ * // Draw two blue outlined circles
+ * circle(ctx, [ {radius: 5}, {radius: 10} ], {strokeStyle:`blue`});
+ * ```
+ * @param ctx Drawing context
+ * @param circlesToDraw Circle(s) to draw
+ * @param opts Drawing options
+ */
+declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: Circles.CirclePositioned | readonly Circles.CirclePositioned[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more ellipses. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
+ * @param ctx
+ * @param ellipsesToDraw
+ * @param opts
+ */
+declare const ellipse: (ctx: CanvasRenderingContext2D, ellipsesToDraw: Ellipses.EllipsePositioned | readonly Ellipses.EllipsePositioned[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more paths.
+ * supported paths are quadratic beziers and lines.
+ * @param ctx
+ * @param pathsToDraw
+ * @param opts
+ */
+declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths.Path[] | Paths.Path, opts?: {
+  readonly strokeStyle?: string;
+  readonly debug?: boolean;
+}) => void;
+type ConnectedPointsOptions = {
+  readonly lineWidth: number;
+  readonly loop: boolean;
+  readonly fillStyle: string;
+  readonly strokeStyle: string;
+};
+/**
+ * Draws a line between all the given points.
+ * If a fillStyle is specified, it will be filled.
+ *
+ * See also:
+ * * {@link line}: Draw one or more lines
+ *
+ * @param ctx
+ * @param pts
+ */
+declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts?: Partial<ConnectedPointsOptions>) => void;
+/**
+ * Draws labels for a set of points
+ * @param ctx
+ * @param pts Points to draw
+ * @param opts
+ * @param labels Labels for points
+ */
+declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts?: {
+  readonly fillStyle?: string;
+}, labels?: readonly string[]) => void;
+/**
+ * Returns `point` with the canvas's translation matrix applied
+ * @param ctx
+ * @param point
+ * @returns
+ */
+declare const translatePoint: (ctx: CanvasRenderingContext2D, point: Points.Point) => Points.Point;
+/**
+ * Creates a new HTML IMG element with a snapshot of the
+ * canvas. Element will need to be inserted into the document.
+ *
+ * ```
+ * const myCanvas = document.getElementById('someCanvas');
+ * const el = copyToImg(myCanvas);
+ * document.getElementById('images').appendChild(el);
+ * ```
+ * @param canvasEl
+ * @returns
+ */
+declare const copyToImg: (canvasEl: HTMLCanvasElement) => HTMLImageElement;
+type DotOpts = DrawingOpts & {
+  readonly radius?: number;
+  readonly stroke?: boolean;
+  readonly filled?: boolean;
+  readonly strokeWidth?: number;
+};
+/**
+ * Draws filled circle(s) at provided point(s)
+ * @param ctx
+ * @param pos
+ * @param opts
+ */
+declare const dot: (ctx: CanvasRenderingContext2D, pos: Points.Point | (Points.Point | Circles.CirclePositioned)[] | Circles.CirclePositioned, opts?: DotOpts) => void;
+/**
+ * Draws a cubic or quadratic bezier
+ * @param ctx
+ * @param bezierToDraw
+ * @param opts
+ */
+declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier, opts?: DrawingOpts) => void;
+/**
+ * Draws one or more lines.
+ *
+ * Each line is drawn independently, ie it's not assumed lines are connected.
+ *
+ * See also:
+ * * {@link connectedPoints}: Draw a series of connected points
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const line: (ctx: CanvasRenderingContext2D, toDraw: Lines.Line | readonly Lines.Line[], opts?: LineOpts & DrawingOpts) => void;
+/**
+ * Draws one or more triangles
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const triangle: (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triangle | readonly Triangles.Triangle[], opts?: DrawingOpts & {
+  readonly filled?: boolean;
+}) => void;
+type RectOpts = DrawingOpts & Readonly<Partial<{
+  stroke: boolean;
+  filled: boolean;
+  strokeWidth: number;
+  /**
+   * If true, diagonals are drawn
+   */
+  crossed: boolean;
+}>>;
+/**
+ * Draws one or more rectangles.
+ *
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const rect: (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: RectOpts) => void;
+/**
+ * Returns the width of `text`. Rounds number up to nearest multiple if provided. If
+ * text is empty or undefined, 0 is returned.
+ * @param ctx
+ * @param text
+ * @param widthMultiple
+ * @returns
+ */
+declare const textWidth: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => number;
+declare const textRect: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => Rects.Rect;
+declare const textHeight: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number) => number;
+/**
+ * Draws a block of text. Each array item is considered a line.
+ * @param ctx
+ * @param lines
+ * @param opts
+ */
+declare const textBlock: (ctx: CanvasRenderingContext2D, lines: readonly string[], opts: DrawingOpts & {
+  readonly anchor: Points.Point;
+  readonly align?: `top` | `center`;
+  readonly anchorPadding?: number;
+  readonly bounds?: Rects.RectPositioned;
+}) => void;
+type HorizAlign = `left` | `right` | `center`;
+type VertAlign = `top` | `center` | `bottom`;
+/**
+ * Draws an aligned text block
+ */
+declare const textBlockAligned: (ctx: CanvasRenderingContext2D, text: readonly string[] | string, opts: DrawingOpts & {
+  readonly bounds: Rects.RectPositioned;
+  readonly horiz?: HorizAlign;
+  readonly vert?: VertAlign;
+}) => void;
+//# sourceMappingURL=drawing.d.ts.map
 declare namespace image_data_grid_d_exports {
   export { accessor, byColumn, byRow, grid, setter, wrap };
 }
@@ -877,7 +1437,7 @@ type FramesOpts = {
  * Generator that yields frames from a video element as [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
  *
  * ```js
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Video } from '@ixfx/visual.js'
  *
  * const ctx = canvasEl.getContext(`2d`);
  * for await (const frame of Video.frames(videoEl)) {
@@ -904,8 +1464,6 @@ declare function frames(sourceVideoEl: HTMLVideoElement, opts?: FramesOpts): Asy
  *
  * @example Using a function
  * ```js
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
- *
  * // Capture from a VIDEO element, handling frame data
  * // imageData is ImageData type: https://developer.mozilla.org/en-US/docs/Web/API/ImageData
  * Video.capture(sourceVideoEl, {
@@ -917,8 +1475,6 @@ declare function frames(sourceVideoEl: HTMLVideoElement, opts?: FramesOpts): Asy
  *
  * @example Using a worker
  * ```js
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
- *
  * Video.capture(sourceVideoEl, {
  *  workerScript: `./frameProcessor.js`
  * });
@@ -961,5 +1517,5 @@ declare const manualCapture: (sourceVideoEl: HTMLVideoElement, opts?: ManualCapt
 //# sourceMappingURL=video.d.ts.map
 
 //#endregion
-export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, image_data_grid_d_exports as ImageDataGrid, Opts, video_d_exports as Video, pointerVisualise };
+export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, image_data_grid_d_exports as ImageDataGrid, Opts, video_d_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.d.ts.map

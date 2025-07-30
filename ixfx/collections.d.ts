@@ -1,4 +1,4 @@
-import { IWithEntries, Interval, IsEqual, ToString } from "./index-ZOxM3wdD.js";
+import { IWithEntries, Interval, IsEqual, ToString } from "@ixfx/core";
 import { SimpleEventEmitter } from "@ixfx/events";
 
 //#region packages/collections/src/circular-array.d.ts
@@ -83,7 +83,9 @@ type LabelledValues<TValue> = {
   values: TValue[];
 };
 /**
- * Array-backed tree node
+ * Array-backed tree node.
+ *
+ * Create using {@link root}
  */
 type TreeNode<TValue> = {
   /**
@@ -134,6 +136,118 @@ type TraversableTree<TValue> = {
    */
   getIdentity(): any;
 };
+type TraverseObjectEntry = Readonly<{
+  name: string;
+  sourceValue: any;
+  leafValue: any;
+  _kind: `entry`;
+}>;
+type TraverseObjectEntryWithAncestors = Readonly<{
+  name: string;
+  sourceValue: any;
+  leafValue: any;
+  ancestors: string[];
+  _kind: `entry-ancestors`;
+}>;
+type TraverseObjectEntryStatic = Readonly<{
+  name: string;
+  sourceValue: any;
+  ancestors: string[];
+  _kind: `entry-static`;
+}>;
+/**
+ * Options for parsing a path
+ */
+type TraverseObjectPathOpts = {
+  /**
+   * Separator for path, eg '.'
+   */
+  readonly separator?: string;
+};
+/**
+ * Wraps a {@link TreeNode} for a more object-oriented means of access.
+ */
+type WrappedNode<T> = TraversableTree<T> & {
+  /**
+   * Underlying Node
+   */
+  wraps: TreeNode<T>;
+  /**
+   * Gets value of node, if defined
+   * @returns Value of Node
+   */
+  getValue: () => T | undefined;
+  /**
+   * Remove node and its children from tree
+   * @returns
+   */
+  remove: () => void;
+  /**
+   * Adds a child node
+   * @param child
+   * @returns
+   */
+  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>;
+  /**
+   * Adds a new child node, with `value` as its value
+   * @param value
+   * @returns
+   */
+  addValue: (value: T) => WrappedNode<T>;
+  /**
+   * Returns _true_ if `child` is an immediate child of this node
+   * @param child
+   * @returns
+   */
+  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
+  queryValue: (value: T) => IterableIterator<WrappedNode<T>>;
+  /**
+  * Yields all parents of `child` that have a given value.
+  * Use {@link findParentsValue} to find the first match only.
+  * @param child
+  * @param value
+  * @param eq
+  * @returns
+  */
+  queryParentsValue<T>(child: TreeNode<T>, value: T, eq?: IsEqual<T>): IterableIterator<WrappedNode<T>>;
+  /**
+  * Returns the first parent that has a given value.
+  * @param child
+  * @param value
+  * @param eq
+  * @returns
+  */
+  findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>): WrappedNode<T> | undefined;
+  /**
+   * Yields the node value of each parent of `child`.
+   * _undefined_ values are not returned.
+   *
+   * Use {@link queryParentsValue} to search for a particular value
+   * @param child
+   * @param value
+   * @param eq
+   * @returns
+   */
+  parentsValues<T>(child: TreeNode<T>): IterableIterator<T>;
+  /**
+   * Returns _true_ if `child` is contained any any descendant
+   * @param child
+   * @returns
+   */
+  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
+  /**
+   * Returns _true_ if `parent` is the immediate parent for this node
+   * @param parent
+   * @returns
+   */
+  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
+  /**
+   * Returns _true_ if `parent` is the immediate or ancestor parent for this node
+   * @param parent
+   * @returns
+   */
+  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
+};
 //# sourceMappingURL=types.d.ts.map
 //#endregion
 //#region packages/collections/src/tree/compare.d.ts
@@ -169,7 +283,7 @@ type DiffNode<T> = TreeNode<DiffAnnotation<T>> & {
 declare const compare$1: <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq?: IsEqual<T>, parent?: DiffNode<T>) => DiffNode<T>;
 //# sourceMappingURL=compare.d.ts.map
 declare namespace tree_mutable_d_exports {
-  export { WrappedNode, add, addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, queryByValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
+  export { add, addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, childrenValues, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, findParentsValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, parentsValues, queryByValue, queryParentsValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
 }
 /**
  * Compares two nodes.
@@ -192,62 +306,6 @@ declare const compare: <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>) => D
  * @returns
  */
 declare const stripParentage: <T>(node: TreeNode<T>) => SimplifiedNode<T>;
-/**
- * Wraps a {@link TreeNode} for a more object-oriented means of access.
- */
-type WrappedNode<T> = TraversableTree<T> & {
-  /**
-   * Underlying Node
-   */
-  wraps: TreeNode<T>;
-  /**
-   * Gets value, if defined
-   * @returns Value of Node
-   */
-  getValue: () => T | undefined;
-  /**
-   * Remove node and its children from tree
-   * @returns
-   */
-  remove: () => void;
-  /**
-   * Adds a child node
-   * @param child
-   * @returns
-   */
-  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>;
-  /**
-   * Adds a new child node, with `value` as its value
-   * @param value
-   * @returns
-   */
-  addValue: (value: T) => WrappedNode<T>;
-  /**
-   * Returns _true_ if `child` is an immediate child of this node
-   * @param child
-   * @returns
-   */
-  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
-  queryValue: (value: T) => IterableIterator<WrappedNode<T>>;
-  /**
-   * Returns _true_ if `child` is contained any any descendant
-   * @param child
-   * @returns
-   */
-  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
-  /**
-   * Returns _true_ if `parent` is the immediate parent for this node
-   * @param parent
-   * @returns
-   */
-  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
-  /**
-   * Returns _true_ if `parent` is the immediate or ancestor parent for this node
-   * @param parent
-   * @returns
-   */
-  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
-};
 /**
  * Wraps node `n` for a more object-oriented means of access.
  * It will wrap child nodes on demand. For this reason, WrappedNode object
@@ -289,10 +347,17 @@ declare function treeTest<T>(root: TreeNode<T>, seen?: TreeNode<T>[]): [ok: bool
  */
 declare function throwTreeTest<T>(root: TreeNode<T>): void;
 /**
- * Iterate over direct children of `root`
+ * Iterate over direct children of `root`, yielding {@link TreeNode} instances.
+ * Use {@link childrenValues} to iterate over child values
  * @param root
  */
 declare function children$1<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>>;
+/**
+ * Iterate over the value ofdirect children of `root`.
+ * Use {@link children} if you want to iterate over {@link TreeNode} instances instead.
+ * @param root
+ */
+declare function childrenValues<T>(root: TreeNode<T>): IterableIterator<T>;
 /**
  * Iterate over all parents of `root`. First result is the immediate parent.
  * @param root
@@ -305,7 +370,24 @@ declare function parents$1<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>>;
  */
 declare function nodeDepth(node: TreeNode<any>): number;
 declare const hasChild$1: <T>(child: TreeNode<T>, parent: TreeNode<T>) => boolean;
+/**
+ * Returns the first immediate child of `parent` that matches `value`.
+ *
+ * Use {@link queryByValue} if you want all matching children.
+ * @param value
+ * @param parent
+ * @param eq
+ * @returns
+ */
 declare const findChildByValue$1: <T>(value: T, parent: TreeNode<T>, eq?: IsEqual<T>) => TreeNode<T> | undefined;
+/**
+ * Yield all immediate children of `parent` that match `value`.
+ *
+ * Use {@link findChildByValue} if you only want the first matching child.
+ * @param value
+ * @param parent
+ * @param eq
+ */
 declare function queryByValue<T>(value: T, parent: TreeNode<T>, eq?: IsEqual<T>): IterableIterator<TreeNode<T>>;
 /**
  * Returns _true_ if `prospectiveChild` is some child node of `parent`,
@@ -329,6 +411,34 @@ declare const getRoot: <T>(node: TreeNode<T>) => TreeNode<T>;
  * @returns
  */
 declare const hasAnyParent$1: <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => boolean;
+/**
+ * Yields the node value of each parent of `child`.
+ * _undefined_ values are not returned.
+ *
+ * Use {@link queryParentsValue} to search for a particular value
+ * @param child
+ * @param value
+ * @param eq
+ * @returns
+ */
+declare function parentsValues<T>(child: TreeNode<T>): Generator<T & ({} | null), boolean, unknown>;
+/**
+ * Yields all parents of `child` that have a given value.
+ * Use {@link findParentsValue} to find the first match only.
+ * @param child
+ * @param value
+ * @param eq
+ * @returns
+ */
+declare function queryParentsValue<T>(child: TreeNode<T>, value: T, eq?: IsEqual<T>): Generator<TreeNode<T>, boolean, unknown>;
+/**
+ * Returns the first parent that has a given value.
+ * @param child
+ * @param value
+ * @param eq
+ * @returns
+ */
+declare function findParentsValue<T>(child: TreeNode<T>, value: T, eq?: IsEqual<T>): TreeNode<T> | undefined;
 /**
  * Returns _true_ if `prospectiveParent` is the immediate
  * parent of `child`.
@@ -368,6 +478,13 @@ declare const fromPlainObject: (value: Record<string, any>, label?: string, pare
  * @returns
  */
 declare const rootWrapped: <T>(value: T | undefined) => WrappedNode<T>;
+/**
+ * Creates a `TreeNode` instance with a given value and parent.
+ * Parent node, if specified, has its `childrenStore` property changed to include new child.
+ * @param value
+ * @param parent
+ * @returns
+ */
 declare const createNode: <T>(value: T | undefined, parent?: TreeNode<T>) => TreeNode<T>;
 declare const childrenLength$1: <T>(node: TreeNode<T>) => number;
 declare const value: <T>(node: TreeNode<T>) => T | undefined;
@@ -384,12 +501,12 @@ declare const toStringDeep$2: <T>(node: TreeNode<T>, indent?: number) => string;
 declare function followValue$1<T>(root: TreeNode<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth?: number): IterableIterator<T | undefined>;
 //# sourceMappingURL=tree-mutable.d.ts.map
 declare namespace pathed_d_exports {
-  export { PathOpts$1 as PathOpts, addValueByPath, childrenLengthByPath, clearValuesByPath, create$2 as create, removeByPath, valueByPath, valuesByPath };
+  export { PathOpts, addValueByPath, childrenLengthByPath, clearValuesByPath, create$2 as create, removeByPath, valueByPath, valuesByPath };
 }
 /**
  * Options for parsing a path
  */
-type PathOpts$1 = Readonly<{
+type PathOpts = Readonly<{
   /**
    * Separator for path, eg '.'
    */
@@ -433,7 +550,7 @@ type PathOpts$1 = Readonly<{
  * @param pathOpts
  * @returns
  */
-declare const create$2: <T>(pathOpts?: Partial<PathOpts$1>) => {
+declare const create$2: <T>(pathOpts?: Partial<PathOpts>) => {
   getRoot: () => TreeNode<LabelledValue<T>> | undefined;
   add: (value: T, path: string) => void;
   prettyPrint: () => string;
@@ -466,47 +583,22 @@ declare const create$2: <T>(pathOpts?: Partial<PathOpts$1>) => {
  * @param path
  * @param pathOpts
  */
-declare const addValueByPath: <T>(value: T, path: string, node?: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => LabelledNode<T>;
-declare const removeByPath: <T>(path: string, root: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => boolean;
-declare const clearValuesByPath: <T>(path: string, root: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => boolean;
-declare const childrenLengthByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => number;
-declare const valueByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => T | undefined;
-declare const valuesByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts$1>) => T[];
+declare const addValueByPath: <T>(value: T, path: string, node?: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => LabelledNode<T>;
+declare const removeByPath: <T>(path: string, root: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => boolean;
+declare const clearValuesByPath: <T>(path: string, root: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => boolean;
+declare const childrenLengthByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => number;
+declare const valueByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => T | undefined;
+declare const valuesByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => T[];
 //# sourceMappingURL=pathed.d.ts.map
 declare namespace traverse_object_d_exports {
-  export { ChildrenOptions, CreateOptions, Entry, EntryStatic, EntryWithAncestors, PathOpts, asDynamicTraversable, children, create$1 as create, createSimplified, createWrapped, depthFirst$1 as depthFirst, getByPath, prettyPrint, prettyPrintEntries, toStringDeep$1 as toStringDeep, traceByPath };
+  export { ChildrenOptions, CreateOptions, asDynamicTraversable, children, create$1 as create, createSimplified, createWrapped, depthFirst$1 as depthFirst, getByPath, prettyPrint, prettyPrintEntries, toStringDeep$1 as toStringDeep, traceByPath };
 }
-type Entry = Readonly<{
-  name: string;
-  sourceValue: any;
-  nodeValue: any;
-}>;
-type EntryWithAncestors = Readonly<{
-  name: string;
-  sourceValue: any;
-  nodeValue: any;
-  ancestors: string[];
-}>;
-type EntryStatic = Readonly<{
-  name: string;
-  value: any;
-  ancestors: string[];
-}>;
 /**
- * Options for parsing a path
- */
-type PathOpts = {
-  /**
-   * Separator for path, eg '.'
-   */
-  readonly separator?: string;
-};
-/**
- * Helper function to get a 'friendly' string representation of an array of {@link Entry}.
+ * Helper function to get a 'friendly' string representation of an array of {@link TraverseObjectEntry}.
  * @param entries
  * @returns
  */
-declare function prettyPrintEntries(entries: readonly Entry[]): string;
+declare function prettyPrintEntries(entries: readonly TraverseObjectEntry[]): string;
 /**
  * Returns a human-friendly debug string for a tree-like structure
  * ```js
@@ -524,7 +616,7 @@ declare const prettyPrint: (node: object, indent?: number, options?: Partial<Chi
  * @param indent
  * @returns
  */
-declare const toStringDeep$1: (node: TreeNode<Entry | EntryStatic>, indent?: number) => string;
+declare const toStringDeep$1: (node: TreeNode<TraverseObjectEntry | TraverseObjectEntryStatic>, indent?: number) => string;
 type ChildrenOptions = Readonly<{
   /**
    * If set, only uses leaves or branches. 'none' means there is no filter.
@@ -536,27 +628,43 @@ type ChildrenOptions = Readonly<{
   name: string;
 }>;
 /**
- * Returns the direct children of a tree-like object as a pairing
+ * Yields the direct (ie. non-recursive) children of a tree-like object as a pairing
  * of node name and value. Supports basic objects, Maps and arrays.
  *
- * Sub-children are included as an object blob.
+ * To iterate recursively, consider {@link depthFirst}
  *
- * @example Simple object
- * ```js
- * const o = {
- *  colour: {
- *    r: 0.5, g: 0.5, b: 0.5
- *  }
- * };
- *
- * const children = [ ...Trees.children(o) ];
- * // Children:
- * // [
- * //  { name: "colour", value: { b: 0.5, g: 0.5, r: 0.5 } }
- * // ]
- * const subChildren = [ ...Trees.children(o.colour) ];
- * // [ { name: "r", value: 0.5 }, { name: "g", value: 0.5 }, { name: "b", value: 0.5 } ]
+ * Each child is returned in an {@link TraverseObjectEntry} structure:
+ * ```typescript
+ * type Entry = Readonly<{
+ *  // Property name
+ *  name: string,
+ *  // Value of property, as if you called `object[propertyName]`
+ *  sourceValue: any,
+ *  // Branch nodes will have _undefined_, leaf nodes will contain the value
+ *  leafValue: any
+ * }>;
  * ```
+ *
+ * For example, iterating over a flat object:
+ * ```js
+ * const verySimpleObject = { field: `hello`, flag: true }
+ * const kids = [ ...children(verySimpleObject) ];
+ * // Yields:
+ * // [ { name: "field", sourceValue: `hello`, leafValue: `hello` },
+ * //  { name: "flag", sourceValue: true, leafValue: true } ]
+ * ```
+ *
+ * For objects containing objects:
+ * ```js
+ * const lessSimpleObject = { field: `hello`, flag: true, colour: { `red`, opacity: 0.5 } }
+ * const kids = [ ...children(verySimpleObject) ];
+ * // Yields as before, plus:
+ * //  { name: "colour", sourceValue: { name: 'red', opacity: 0.5 }, leafValue: undefined }
+ * ```
+ *
+ * Note that 'sourceValue' always contains the property value, as if you
+ * access it via `object[propName]`. 'leafValue' only contains the value if it's a leaf
+ * node.
  *
  * Arrays are assigned a name based on index.
  * @example Arrays
@@ -575,8 +683,8 @@ type ChildrenOptions = Readonly<{
  * @param node
  * @param options
  */
-declare function children<T extends object>(node: T, options?: Partial<ChildrenOptions>): IterableIterator<Entry>;
-declare function depthFirst$1<T extends object>(node: T, options?: Partial<ChildrenOptions>, ancestors?: string[]): IterableIterator<EntryWithAncestors>;
+declare function children(node: object, options?: Partial<ChildrenOptions>): IterableIterator<TraverseObjectEntry>;
+declare function depthFirst$1(node: object, options?: Partial<ChildrenOptions>, ancestors?: string[]): IterableIterator<TraverseObjectEntryWithAncestors>;
 /**
  * Returns the closest matching entry, tracing `path` in an array, Map or simple object.
  * Returns an entry with _undefined_ value at the point where tracing stopped.
@@ -603,7 +711,7 @@ declare function depthFirst$1<T extends object>(node: T, options?: Partial<Child
  * @param options Options for parsing path. By default '.' is used as a separator
  * @returns
  */
-declare function getByPath<T extends object>(path: string, node: T, options?: PathOpts): Entry;
+declare function getByPath(path: string, node: object, options?: TraverseObjectPathOpts): TraverseObjectEntryWithAncestors;
 /**
  * Enumerates over children of `node` towards the node named in `path`.
  * This is useful if you want to get the interim steps to the target node.
@@ -636,10 +744,19 @@ declare function getByPath<T extends object>(path: string, node: T, options?: Pa
  * @param options Options for path traversal logic
  * @returns
  */
-declare function traceByPath<T extends object>(path: string, node: T, options?: PathOpts): Iterable<EntryWithAncestors>;
+declare function traceByPath(path: string, node: object, options?: TraverseObjectPathOpts): Iterable<TraverseObjectEntryWithAncestors>;
 /**
  * Returns a projection of `node` as a dynamic traversable.
  * This means that the tree structure is dynamically created as last-minute as possible.
+ *
+ * The type when calling `getValue()` is {@link TraverseObjectEntryStatic}:
+ * ```typescript
+ * type EntryStatic = Readonly<{
+ *  name: string,
+ *  value: any
+ *  ancestors: string[]
+ * }>
+ * ```
  *
  * Note that the object identity of TraversableTree return results is not stable.
  * This is because they are created on-the-fly by reading fields of `node`.
@@ -650,6 +767,7 @@ declare function traceByPath<T extends object>(path: string, node: T, options?: 
  *
  * // Object identity is not the same
  * c1[ 0 ] === c1[ 0 ]; // false
+ *
  * // ...even though its referring to the same value
  * c1[ 0 ].getValue() === c1[ 0 ].getValue(); // true
  * ```
@@ -658,20 +776,33 @@ declare function traceByPath<T extends object>(path: string, node: T, options?: 
  * ```js
  * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
  * ```
+ *
+ * @example
+ * ```js
+ * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+ * const root = Trees.FromObject.asDynamicTraversable(myObj);
+ * for (const v of Trees.Traverse.breadthFirst(root)) {
+ * // v.getValue() yields:
+ * // { name: 'name', sourceValue: 'Pedro' ...},
+ * // { name: 'size', sourceValue: 45 ... }
+ * // ...
+ * }
+ * ```
  * @param node Object to read
  * @param options Options when creating traversable
  * @param ancestors Do not use
  * @param parent Do not use
  * @returns
  */
-declare const asDynamicTraversable: <T extends object>(node: T, options?: Partial<ChildrenOptions>, ancestors?: string[], parent?: TraversableTree<EntryStatic>) => TraversableTree<EntryStatic>;
+declare const asDynamicTraversable: (node: object, options?: Partial<ChildrenOptions>, ancestors?: string[], parent?: TraversableTree<TraverseObjectEntryStatic>) => TraversableTree<TraverseObjectEntryStatic>;
 /**
  * Reads all fields and sub-fields of `node`, returning as a 'wrapped' tree structure.
  * @param node
  * @param options
  * @returns
  */
-declare const createWrapped: <T extends object>(node: T, options: Partial<CreateOptions>) => WrappedNode<any>;
+declare const createWrapped: (node: object, options: Partial<CreateOptions>) => WrappedNode<any>;
 type CreateOptions = {
   name: string;
   /**
@@ -704,18 +835,30 @@ type CreateOptions = {
  * remain the same.
  *
  * Alternatively, consider {@link asDynamicTraversable} which reads the object dynamically.
+ * @example
+ * ```js
+ * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+ * const root = Trees.FromObject.create(myObj);
+ * for (const v of Trees.Traverse.breadthFirst(root)) {
+ * // v.getValue() yields:
+ * // { name: 'name', sourceValue: 'Pedro' ...},
+ * // { name: 'size', sourceValue: 45 ... }
+ * // ...
+ * }
+ * ```
  * @param node
  * @param options
  * @returns
  */
-declare const create$1: <T extends object>(node: T, options?: Partial<CreateOptions>) => TreeNode<EntryStatic>;
+declare const create$1: (node: object, options?: Partial<CreateOptions>) => TreeNode<TraverseObjectEntryStatic>;
 /**
  * Returns a copy of `node` with its (and all its children's) parent information removed.
  * @param node
  * @param options
  * @returns
  */
-declare const createSimplified: <T extends object>(node: T, options?: Partial<CreateOptions>) => SimplifiedNode<EntryStatic>;
+declare const createSimplified: (node: object, options?: Partial<CreateOptions>) => SimplifiedNode<TraverseObjectEntryStatic>;
 //# sourceMappingURL=traverse-object.d.ts.map
 declare namespace traversable_tree_d_exports {
   export { breadthFirst, childrenLength, couldAddChild, depthFirst, find, findAnyChildByValue, findAnyParentByValue, findByValue, findChildByValue, findParentByValue, followValue, hasAnyChild, hasAnyChildValue, hasAnyParent, hasAnyParentValue, hasChild, hasChildValue, hasParent, hasParentValue, parents, siblings, toString, toStringDeep };
@@ -741,6 +884,17 @@ declare const findAnyParentByValue: <TValue>(child: TraversableTree<TValue>, pos
  * @returns
  */
 declare const hasParent: <T extends TraversableTree<TV> | TreeNode<TV>, TV>(child: T, possibleParent: T, eq?: IsEqual<T>, maxDepth?: number) => boolean;
+/**
+ * Checks if a child node has a parent with a certain value
+ * Note: by default only checks immediate parent. Set maxDepth to a large value to recurse
+ *
+ * Uses `getValue()` on the parent if that function exists.
+ * @param child Node to start looking from
+ * @param possibleParentValue Value to seek
+ * @param eq Equality checker
+ * @param maxDepth Defaults to 0, so it only checks immediate parent
+ * @returns
+ */
 declare const hasParentValue: <T extends TraversableTree<TV> | TreeNode<TV>, TV>(child: T, possibleParentValue: TV, eq?: IsEqual<TV>, maxDepth?: number) => boolean;
 declare const findParentByValue: <T extends TraversableTree<TV> | TreeNode<TV>, TV>(child: T, possibleParentValue: TV, eq?: IsEqual<TV>, maxDepth?: number) => T | undefined;
 /**
@@ -849,6 +1003,19 @@ declare function depthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(ro
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
+ *
+ * @example Traversing over a simple object
+ * ```js
+ * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+ * const root = Trees.FromObject.asDynamicTraversable(myObj);
+ * for (const v of Trees.Traverse.breadthFirst(root)) {
+ * // v.getValue() yields:
+ * // { name: 'name', sourceValue: 'Pedro' ...},
+ * // { name: 'size', sourceValue: 45 ... }
+ * // ...
+ * }
+ * ```
  * @param root Root node
  * @param depth How many levels to traverse
  * @returns
@@ -886,7 +1053,7 @@ declare function findByValue<T>(root: TraversableTree<T>, predicate: (nodeValue:
  *
  * If it can't find a child, it stops.
  *
- * This is different to 'find' functions, which exhausively search all possible child nodes, regardless of position in tree.
+ * This is different to 'find' functions, which exhaustively search all possible child nodes, regardless of position in tree.
  *
  * ```js
  * const path = 'a.aa.aaa'.split('.');
@@ -918,10 +1085,30 @@ declare function toStringDeep<T>(node: TraversableTree<T>, depth?: number): stri
 declare function toString(...nodes: TraversableTree<any>[]): string;
 //# sourceMappingURL=traversable-tree.d.ts.map
 declare namespace index_d_exports$5 {
-  export { DiffAnnotation, DiffNode, traverse_object_d_exports as FromObject, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, tree_mutable_d_exports as Mutable, pathed_d_exports as Pathed, SimplifiedNode, TraversableTree, traversable_tree_d_exports as Traverse, TreeNode, compare$1 as compare, isTraversable, isTreeNode, toTraversable };
+  export { DiffAnnotation, DiffNode, traverse_object_d_exports as FromObject, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, tree_mutable_d_exports as Mutable, pathed_d_exports as Pathed, SimplifiedNode, TraversableTree, traversable_tree_d_exports as Traverse, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts, TreeNode, WrappedNode, compare$1 as compare, isTraversable, isTreeNode, toTraversable };
 }
+/**
+ * Makes a 'traversable' to move around a {@link TreeNode}, an existing {@link TraversableTree} or a plain object.
+ *
+ * @param node
+ * @returns
+ */
 declare const toTraversable: <T>(node: TreeNode<T> | TraversableTree<T> | object) => TraversableTree<any>;
+/**
+ * Checks whether `node` is of type {@link TreeNode}.
+ *
+ * Checks for: parent, childrenStore and value defined on `node`.
+ * @param node
+ * @returns
+ */
 declare const isTreeNode: (node: any) => node is TreeNode<any>;
+/**
+ * Checks if `node` is of type {@link TraversableTree}.
+ *
+ * Checks by looking for: children, getParent, getValue and getIdentity defined on `node`.
+ * @param node
+ * @returns
+ */
 declare const isTraversable: (node: any) => node is TraversableTree<any>;
 //# sourceMappingURL=index.d.ts.map
 //#endregion
@@ -1049,7 +1236,7 @@ interface IStackMutable<V> extends IStack<V> {
    * @param toAdd Items to add.
    * @returns How many items were added
    */
-  push(...toAdd: ReadonlyArray<V>): number;
+  push(...toAdd: readonly V[]): number;
   /**
    * Remove and return item from the top of the stack, or _undefined_ if empty.
    * If you just want to find out what's at the top, use {@link peek}.
@@ -1060,7 +1247,7 @@ interface IStackMutable<V> extends IStack<V> {
 //#endregion
 //#region packages/collections/src/stack/IStackImmutable.d.ts
 interface IStackImmutable<V> extends IStack<V> {
-  push(...toAdd: ReadonlyArray<V>): IStackImmutable<V>;
+  push(...toAdd: readonly V[]): IStackImmutable<V>;
   pop(): IStackImmutable<V>;
 }
 //# sourceMappingURL=IStackImmutable.d.ts.map
@@ -1137,15 +1324,15 @@ declare const immutable$3: <V>(options?: StackOpts, ...startingItems: ReadonlyAr
  */
 declare class StackMutable<V> implements IStackMutable<V> {
   readonly opts: StackOpts;
-  data: ReadonlyArray<V>;
-  constructor(opts?: StackOpts, data?: ReadonlyArray<V>);
+  data: readonly V[];
+  constructor(opts?: StackOpts, data?: readonly V[]);
   /**
    * Push data onto the stack.
    * If `toAdd` is empty, nothing happens
    * @param toAdd Data to add
    * @returns Length of stack
    */
-  push(...toAdd: ReadonlyArray<V>): number;
+  push(...toAdd: readonly V[]): number;
   forEach(fn: (v: V) => void): void;
   forEachFromTop(fn: (v: V) => void): void;
   pop(): V | undefined;
@@ -1174,7 +1361,7 @@ declare class StackMutable<V> implements IStackMutable<V> {
  * s.peek;  // 3
  * ```
  */
-declare const mutable$3: <V>(opts?: StackOpts, ...startingItems: ReadonlyArray<V>) => IStackMutable<V>;
+declare const mutable$3: <V>(opts?: StackOpts, ...startingItems: readonly V[]) => IStackMutable<V>;
 //# sourceMappingURL=StackMutable.d.ts.map
 //#endregion
 //#region packages/collections/src/stack/StackFns.d.ts
@@ -1432,7 +1619,7 @@ interface ISet<V> {
  * @typeParam V - Type of data stored
  */
 interface ISetImmutable<V> extends ISet<V> {
-  add(...values: ReadonlyArray<V>): ISetImmutable<V>;
+  add(...values: readonly V[]): ISetImmutable<V>;
   delete(v: V): ISetImmutable<V>;
 }
 //# sourceMappingURL=ISetImmutable.d.ts.map
@@ -1896,10 +2083,10 @@ declare class QueueImmutable<V> implements IQueueImmutable<V> {
    * @param {QueueOpts} opts Options foor queue
    * @param {V[]} data Initial data. Index 0 is front of queue
    */
-  constructor(opts?: QueueOpts<V>, data?: ReadonlyArray<V>);
+  constructor(opts?: QueueOpts<V>, data?: readonly V[]);
   forEach(fn: (v: V) => void): void;
   forEachFromFront(fn: (v: V) => void): void;
-  enqueue(...toAdd: ReadonlyArray<V> | Array<V>): QueueImmutable<V>;
+  enqueue(...toAdd: readonly V[] | V[]): QueueImmutable<V>;
   dequeue(): QueueImmutable<V>;
   get isEmpty(): boolean;
   get isFull(): boolean;
@@ -1913,7 +2100,6 @@ declare class QueueImmutable<V> implements IQueueImmutable<V> {
  * _dequeing_ removes items from the front (ie. the oldest).
  *
  * ```js
- * import { Queues } from "https://unpkg.com/ixfx/dist/collections.js"
  * let q = Queues.immutable();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
  * const front = q.peek();    // `a` is at the front of queue (oldest)
@@ -1929,7 +2115,7 @@ declare class QueueImmutable<V> implements IQueueImmutable<V> {
  * @param startingItems Index 0 is the front of the queue
  * @returns A new queue
  */
-declare const immutable$1: <V>(options?: QueueOpts<V>, ...startingItems: ReadonlyArray<V>) => IQueueImmutable<V>;
+declare const immutable$1: <V>(options?: QueueOpts<V>, ...startingItems: readonly V[]) => IQueueImmutable<V>;
 //# sourceMappingURL=queue-immutable.d.ts.map
 //#endregion
 //#region packages/collections/src/queue/queue-fns.d.ts
@@ -2432,13 +2618,13 @@ interface IMapOfMutable<V> extends IMapOf<V> {
    * @param key
    * @param values
    */
-  addKeyedValues(key: string, ...values: ReadonlyArray<V>): void;
+  addKeyedValues(key: string, ...values: readonly V[]): void;
   /**
    * Adds a value, automatically extracting a key via the
    * `groupBy` function assigned in the constructor options.
    * @param values Adds several values
    */
-  addValue(...values: ReadonlyArray<V>): void;
+  addValue(...values: readonly V[]): void;
   /**
    * Clears the map
    */
@@ -3012,7 +3198,7 @@ declare const firstEntryByValue: <K, V>(map: IWithEntries<K, Iterable<V>>, value
 type MultiValue<V, M> = {
   get name(): string;
   has(source: M, value: V, eq: IsEqual<V>): boolean;
-  add(destination: M | undefined, values: Iterable<V>): M;
+  addKeyedValues(destination: M | undefined, values: Iterable<V>): M;
   toArray(source: M): readonly V[];
   iterable(source: M): IterableIterator<V>;
   find(source: M, predicate: (v: V) => boolean): V | undefined;
@@ -3786,5 +3972,5 @@ declare namespace index_d_exports {
   export { directed_graph_d_exports as Directed, undirected_graph_d_exports as Undirected };
 }
 //#endregion
-export { ArrayKeys, CircularArray, EitherKey, ExpiringMap, index_d_exports as Graphs, ICircularArray, type ISetImmutable, type ISetMutable, type IStackImmutable, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, MapOfSimpleMutable, index_d_exports$1 as Maps, ObjectKeys, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueOpts, index_d_exports$2 as Queues, SetStringImmutable, SetStringMutable, index_d_exports$3 as Sets, SimplifiedNode, StackImmutable, StackMutable, index_d_exports$4 as Stacks, Table, TableRow, TableValue, TraversableTree, TreeNode, index_d_exports$5 as Trees, ValueSetEventMap };
+export { ArrayKeys, CircularArray, EitherKey, ExpiringMap, index_d_exports as Graphs, ICircularArray, type ISetImmutable, type ISetMutable, type IStackImmutable, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, MapOfSimpleMutable, index_d_exports$1 as Maps, ObjectKeys, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueOpts, index_d_exports$2 as Queues, SetStringImmutable, SetStringMutable, index_d_exports$3 as Sets, SimplifiedNode, StackImmutable, StackMutable, index_d_exports$4 as Stacks, Table, TableRow, TableValue, TraversableTree, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts, TreeNode, index_d_exports$5 as Trees, ValueSetEventMap, WrappedNode };
 //# sourceMappingURL=collections.d.ts.map

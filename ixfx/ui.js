@@ -1,18 +1,22 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import "./src-BhN8B7uk.js";
-import "./src-Cyp-w-xE.js";
-import { getPathsAndData } from "./src-Cjy4Jx5o.js";
-import { QueueMutable } from "./src-Ct16kpGA.js";
-import { afterMatch, beforeMatch, findBySomeKey, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "./maps-CyRBIIF3.js";
-import "./src-CHmQoYVM.js";
-import "./bezier-BdPT6F7P.js";
-import { resolveEl } from "./src-BcsRx2nU.js";
-import "./dist-B0diH7Mh.js";
-import "./with-events-VBGv2Bbw.js";
-import "./elapsed-DeRxnr7s.js";
-import { fromCss8bit, fromCssScalar, toColour, toCssColour, toCssString } from "./src-COIiQ9nR.js";
-import "./src-xHr0qBxY.js";
-import { debounce, event, eventTrigger, hasLast, initStream, messageHasValue, messageIsSignal, object, observable, transform } from "./src-Dq_-RA9k.js";
+import "./src-C3Fpyyz5.js";
+import "./src-BVzuGCxJ.js";
+import "./interval-type-CEZs43zj.js";
+import { findBySomeKey } from "./maps-C72wxMfj.js";
+import { QueueMutable } from "./src-Bip7wA20.js";
+import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "./src-BGGRKLH-.js";
+import "./is-integer-BPLQCDA2.js";
+import "./is-primitive-B-tAS1Xm.js";
+import "./key-value-CfwtfZWC.js";
+import "./dist-27gr6RC3.js";
+import "./resolve-core-CDPnQKIe.js";
+import "./records-D95EU4q-.js";
+import { getPathsAndData } from "./src-BYvifgKg.js";
+import { resolveEl } from "./src-CkUASbck.js";
+import "./src-DB-SLoee.js";
+import "./bezier-DZRwSDvJ.js";
+import { fromCss as fromCss$1, fromCss$1 as fromCss, toColour, toCssColour, toCssString } from "./src-AXYqc09L.js";
+import { debounce, event, eventTrigger, hasLast, initStream, messageHasValue, messageIsSignal, object, observable, transform } from "./src-DR7bGmIS.js";
 
 //#region packages/ui/src/rx/browser-resize.ts
 /**
@@ -147,12 +151,18 @@ function domHslInputValue(targetOrQuery, options = {}) {
 		}
 	});
 	const rx = transform(input, (v) => {
-		return fromCssScalar(v, { ensureSafe: true });
+		return fromCss(v, {
+			scalar: true,
+			ensureSafe: true
+		});
 	});
 	return {
 		...rx,
 		last() {
-			return fromCssScalar(input.last(), { ensureSafe: true });
+			return fromCss(input.last(), {
+				scalar: true,
+				ensureSafe: true
+			});
 		},
 		set(value) {
 			input.set(toCssString(value));
@@ -315,7 +325,7 @@ function domForm(formElOrQuery, options = {}) {
 				entries.push([k, vBool]);
 			} else if (typeHint === `colour`) {
 				const vRgb = toCssColour(vString);
-				entries.push([k, fromCss8bit(vRgb)]);
+				entries.push([k, fromCss$1(vRgb, { scalar: false })]);
 			} else entries.push([k, v.toString()]);
 		}
 		for (const el of formEl.querySelectorAll(`input[type="checkbox"]`)) if (!el.checked && el.value === `true`) entries.push([el.name, false]);

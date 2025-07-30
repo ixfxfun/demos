@@ -1,14 +1,808 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-BhN8B7uk.js";
-import { clamp, interpolate, interpolateAngle, scale, wrap } from "./src-Cyp-w-xE.js";
-import { intervalToMs, resolveWithFallbackSync } from "./src-Cjy4Jx5o.js";
-import { elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-Ct16kpGA.js";
-import { SimpleEventEmitter } from "./maps-CyRBIIF3.js";
-import { Empty$1 as Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar$1 as multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-CHmQoYVM.js";
-import { float, floatSource } from "./bezier-BdPT6F7P.js";
-import { StateMachineWithEvents } from "./with-events-VBGv2Bbw.js";
-import "./elapsed-DeRxnr7s.js";
+import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-C3Fpyyz5.js";
+import { clamp, interpolate, interpolateAngle, scale, wrap } from "./src-BVzuGCxJ.js";
+import { intervalToMs } from "./interval-type-CEZs43zj.js";
+import "./maps-C72wxMfj.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-Bip7wA20.js";
+import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import "./key-value-CfwtfZWC.js";
+import { resolveWithFallbackSync } from "./resolve-core-CDPnQKIe.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-DB-SLoee.js";
+import { float, floatSource } from "./bezier-DZRwSDvJ.js";
 
+//#region packages/modulation/src/source/ticks.ts
+/**
+* Returns a function which cycles between 0..1 (inclusive of 0 and 1).
+* `totalTicks` is how many ticks it takes to get to 1. Since we want an inclusive 0 & 1,
+* the total ticks is actually +1.
+*
+* Ie. if totalTicks = 10, we get: 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
+* 
+* Use 'exclusiveStart' and 'exclusiveEnd' flags to shift range. Eg, with `totalTicks` of 10: 
+* * 'exclusiveStart:true': first value is 0.1, last value is 1.0 (10 values total)
+* * 'exclusiveEnd:true': first value is 0, last value is 0.9 (10 values total)
+* * If both are true, first value is 0.1, last value is 0.9 (9 values total)
+* * If both are false (or not set), we get the case described earlier, first value is 0, last value is 1 (11 values total)
+* 
+* Other examples:
+* * totalTicks: 20, value goes up by 0.05
+* * totalTicks: 1, value goes up by 1
+* @param totalTicks Positive, integer value. How many ticks to complete a cycle
+* @param options
+* @returns 
+*/
+function ticks$2(totalTicks, options = {}) {
+	resultThrow(integerTest(totalTicks, `aboveZero`, `totalTicks`));
+	const exclusiveStart = options.exclusiveStart ?? false;
+	const exclusiveEnd = options.exclusiveEnd ?? false;
+	const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
+	const startPoint = exclusiveStart ? 1 : 0;
+	const endPoint = exclusiveEnd ? totalTicks - 1 : totalTicks;
+	let cycleCount = 0;
+	let v = options.startAt ?? startPoint;
+	if (options.startAtRelative) {
+		let totalTicksForReal = totalTicks;
+		if (exclusiveStart) totalTicksForReal--;
+		if (exclusiveEnd) totalTicksForReal--;
+		v = Math.round(options.startAtRelative * totalTicksForReal);
+	}
+	return (feedback) => {
+		if (feedback) {
+			if (feedback.resetAt !== void 0) v = feedback.resetAt;
+			if (feedback.resetAtRelative !== void 0) v = Math.floor(feedback.resetAtRelative * totalTicks);
+		}
+		if (cycleCount >= cycleLimit) return 1;
+		const current = v / totalTicks;
+		v++;
+		if (v > endPoint) {
+			cycleCount++;
+			v = startPoint;
+		}
+		return current;
+	};
+}
+
+//#endregion
+//#region packages/modulation/src/source/time.ts
+/**
+* Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
+* using different units for time.
+* 
+* By default, it continues forever, cycling from 0..1 repeatedly for each interval. Use
+* `cycleLimit` to restrict this. A value of 1 means it won't loop. 
+* 
+* The starting 'position' is `performance.now()`. If `startAt` option is provided, this will be used instead.
+* It probably should be an offset of `performance.now()`, eg: `{ startAt: performance.now() - 500 }` to shift
+* the cycle by 500ms.
+* 
+* When using `startAtRelative`, the starting position will be set backward by the relative amount. A value
+* of 0.5, for example, will set the timer back 50% of the interval, meaning the cycle will start half way through.
+* 
+* @param interval 
+* @param options 
+* @returns
+*/
+function elapsed(interval, options = {}) {
+	const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
+	const limitValue = 1;
+	let start = options.startAt ?? performance.now();
+	let cycleCount = 0;
+	const intervalMs = intervalToMs(interval, 1e3);
+	if (options.startAtRelative) {
+		resultThrow(numberTest(options.startAtRelative, `percentage`, `startAtRelative`));
+		start = performance.now() - intervalMs * options.startAtRelative;
+	}
+	return (feedback) => {
+		if (feedback) {
+			if (feedback.resetAt !== void 0) {
+				start = feedback.resetAt;
+				if (start === 0) start = performance.now();
+			}
+			if (feedback.resetAtRelative !== void 0) {
+				resultThrow(numberTest(feedback.resetAtRelative, `percentage`, `resetAtRelative`));
+				start = performance.now() - intervalMs * feedback.resetAtRelative;
+			}
+		}
+		if (cycleCount >= cycleLimit) return limitValue;
+		const now = performance.now();
+		const elapsedCycle = now - start;
+		if (elapsedCycle >= intervalMs) {
+			cycleCount += Math.floor(elapsedCycle / intervalMs);
+			start = now;
+			if (cycleCount >= cycleLimit) return limitValue;
+		}
+		return elapsedCycle % intervalMs / intervalMs;
+	};
+}
+/**
+* Counts beats based on a BPM.
+* Uses {@link elapsed} internally.
+* @param bpm 
+* @param options 
+* @returns 
+*/
+function bpm(bpm$1, options = {}) {
+	const interval = 60 * 1e3 / bpm$1;
+	return elapsed(interval, options);
+}
+/**
+* Counts based on hertz (oscillations per second).
+* Uses {@link elapsed} internally.
+* @param hz 
+* @param options 
+* @returns 
+*/
+function hertz(hz, options = {}) {
+	const interval = 1e3 / hz;
+	return elapsed(interval, options);
+}
+
+//#endregion
+//#region packages/modulation/src/source/per-second.ts
+/**
+* Returns a proportion of `amount` depending on elapsed time.
+* Cumulatively, `amount` is yielded every second.
+* 
+* ```js
+* // Calculate a proportion of 0.1 every second
+* const x = perSecond(0.1);
+* x();
+* ```
+* 
+* The faster `x()` is called, the smaller the chunks of `amount` are returned.
+* Values accumulate. For example, `x()` isn't called for two seconds, 2*amount is returned.
+* 
+* @example Usage
+* ```js
+* const settings = {
+*  ageMod: perSecond(0.1);
+* };
+* 
+* let state = {
+*  age: 1
+* };
+* 
+* // Update
+* setInterval(() => {
+*  let { age } = state;
+*  // Add 0.1 per second, regardless of 
+*  // loop speed
+*  age += settings.ageMod(); 
+*  state = {
+*    ...state,
+*    age: clamp(age)
+*  }
+* });
+* ```
+* 
+* Use the `clamp` option so the returned value never exceeds `amount`.
+* Alternatively, `min`/`max` options allow you to set arbitrary limits.
+* @param amount
+* @returns 
+*/
+const perSecond = (amount, options = {}) => {
+	const perMilli = amount / 1e3;
+	let min = options.min ?? Number.MIN_SAFE_INTEGER;
+	let max = options.max ?? Number.MAX_SAFE_INTEGER;
+	const clamp$1 = options.clamp ?? false;
+	if (clamp$1 && options.max) throw new Error(`Use either 'max' or 'clamp', not both.`);
+	if (clamp$1) max = amount;
+	let called = performance.now();
+	return () => {
+		const now = performance.now();
+		const elapsed$1 = now - called;
+		called = now;
+		const x = perMilli * elapsed$1;
+		if (x > max) return max;
+		if (x < min) return min;
+		return x;
+	};
+};
+/**
+* As {@link perSecond}, but per minute.
+* @param amount 
+* @param options 
+* @returns 
+*/
+const perMinute = (amount, options = {}) => {
+	return perSecond(amount / 60, options);
+};
+
+//#endregion
+//#region packages/modulation/src/source/index.ts
+var source_exports = {};
+__export(source_exports, {
+	bpm: () => bpm,
+	elapsed: () => elapsed,
+	hertz: () => hertz,
+	perMinute: () => perMinute,
+	perSecond: () => perSecond,
+	ticks: () => ticks$2
+});
+
+//#endregion
+//#region packages/modulation/src/oscillator.ts
+var oscillator_exports = {};
+__export(oscillator_exports, {
+	saw: () => saw,
+	sine: () => sine,
+	sineBipolar: () => sineBipolar,
+	square: () => square,
+	triangle: () => triangle
+});
+const piPi$1 = Math.PI * 2;
+/**
+* Sine oscillator.
+*
+* ```js
+* import { Oscillators } from "@ixfx/modulation.js"
+* import { frequencyTimer } from "@ixfx/flow.js";
+* // Setup
+* const osc = Oscillators.sine(frequencyTimer(10));
+* const osc = Oscillators.sine(0.1);
+*
+* // Call whenever a value is needed
+* const v = osc.next().value;
+* ```
+*
+* @example Saw/tri pinch
+* ```js
+* const v = Math.pow(osc.value, 2);
+* ```
+*
+* @example Saw/tri bulge
+* ```js
+* const v = Math.pow(osc.value, 0.5);
+* ```
+*
+*/
+function* sine(timerOrFreq) {
+	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
+	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
+	while (true) yield (Math.sin(timerOrFreq.elapsed * piPi$1) + 1) / 2;
+}
+/**
+* Bipolar sine (-1 to 1)
+* @param timerOrFreq
+*/
+function* sineBipolar(timerOrFreq) {
+	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
+	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
+	while (true) yield Math.sin(timerOrFreq.elapsed * piPi$1);
+}
+/**
+* Triangle oscillator
+*
+* ```js
+* // Setup
+* const osc = triangle(Timers.frequencyTimer(0.1));
+* const osc = triangle(0.1);
+*
+* // Call whenver a value is needed
+* const v = osc.next().value;
+* ```
+*/
+function* triangle(timerOrFreq) {
+	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
+	while (true) {
+		let v = timerOrFreq.elapsed;
+		if (v < .5) v *= 2;
+		else v = 2 - v * 2;
+		yield v;
+	}
+}
+/**
+* Saw oscillator
+*
+* ```js
+* import { Oscillators } from "@ixfx/modulation.js"
+* import { frequencyTimer } from "@ixfx/flow.js";
+* // Setup
+* const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
+*
+* // Or
+* const osc = Oscillators.saw(0.1);
+*
+* // Call whenever a value is needed
+* const v = osc.next().value;
+* ```
+*/
+function* saw(timerOrFreq) {
+	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
+	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
+	while (true) yield timerOrFreq.elapsed;
+}
+/**
+* Square oscillator
+*
+* ```js
+* import { Oscillators } from "@ixfx/modulation.js"
+*
+* // Setup
+* const osc = Oscillators.square(Timers.frequencyTimer(0.1));
+* const osc = Oscillators.square(0.1);
+*
+* // Call whenever a value is needed
+* osc.next().value;
+* ```
+*/
+function* square(timerOrFreq) {
+	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
+	while (true) yield timerOrFreq.elapsed < .5 ? 0 : 1;
+}
+
+//#endregion
+//#region packages/modulation/src/gaussian.ts
+const pow$1 = Math.pow;
+const gaussianA = 1 / Math.sqrt(2 * Math.PI);
+/**
+* Returns a roughly gaussian easing function
+* ```js
+* const fn = Easings.gaussian();
+* ```
+*
+* Try different positive and negative values for `stdDev` to pinch
+* or flatten the bell shape.
+* @param standardDeviation
+* @returns
+*/
+const gaussian = (standardDeviation = .4) => {
+	const mean = .5;
+	return (t) => {
+		const f = gaussianA / standardDeviation;
+		let p = -2.5;
+		let c = (t - mean) / standardDeviation;
+		c *= c;
+		p *= c;
+		const v = f * pow$1(Math.E, p);
+		if (v > 1) return 1;
+		if (v < 0) return 0;
+		return v;
+	};
+};
+
+//#endregion
+//#region packages/modulation/src/easing/easings-named.ts
+var easings_named_exports = {};
+__export(easings_named_exports, {
+	arch: () => arch,
+	backIn: () => backIn,
+	backInOut: () => backInOut,
+	backOut: () => backOut,
+	bell: () => bell,
+	bounceIn: () => bounceIn,
+	bounceInOut: () => bounceInOut,
+	bounceOut: () => bounceOut,
+	circIn: () => circIn,
+	circInOut: () => circInOut,
+	circOut: () => circOut,
+	cubicIn: () => cubicIn,
+	cubicOut: () => cubicOut,
+	elasticIn: () => elasticIn,
+	elasticInOut: () => elasticInOut,
+	elasticOut: () => elasticOut,
+	expoIn: () => expoIn,
+	expoInOut: () => expoInOut,
+	expoOut: () => expoOut,
+	quadIn: () => quadIn,
+	quadInOut: () => quadInOut,
+	quadOut: () => quadOut,
+	quartIn: () => quartIn,
+	quartOut: () => quartOut,
+	quintIn: () => quintIn,
+	quintInOut: () => quintInOut,
+	quintOut: () => quintOut,
+	sineIn: () => sineIn,
+	sineInOut: () => sineInOut,
+	sineOut: () => sineOut,
+	smootherstep: () => smootherstep,
+	smoothstep: () => smoothstep
+});
+const sqrt = Math.sqrt;
+const pow = Math.pow;
+const cos = Math.cos;
+const pi = Math.PI;
+const sin = Math.sin;
+const bounceOut = (x) => {
+	const n1 = 7.5625;
+	const d1 = 2.75;
+	if (x < 1 / d1) return n1 * x * x;
+	else if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + .75;
+	else if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + .9375;
+	else return n1 * (x -= 2.625 / d1) * x + .984375;
+};
+const quintIn = (x) => x * x * x * x * x;
+const quintOut = (x) => 1 - pow(1 - x, 5);
+const arch = (x) => x * (1 - x) * 4;
+const smoothstep = (x) => x * x * (3 - 2 * x);
+const smootherstep = (x) => (x * (x * 6 - 15) + 10) * x * x * x;
+const sineIn = (x) => 1 - cos(x * pi / 2);
+const sineOut = (x) => sin(x * pi / 2);
+const quadIn = (x) => x * x;
+const quadOut = (x) => 1 - (1 - x) * (1 - x);
+const sineInOut = (x) => -(cos(pi * x) - 1) / 2;
+const quadInOut = (x) => x < .5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2;
+const cubicIn = (x) => x * x * x;
+const cubicOut = (x) => 1 - pow(1 - x, 3);
+const quartIn = (x) => x * x * x * x;
+const quartOut = (x) => 1 - pow(1 - x, 4);
+const expoIn = (x) => x === 0 ? 0 : pow(2, 10 * x - 10);
+const expoOut = (x) => x === 1 ? 1 : 1 - pow(2, -10 * x);
+const quintInOut = (x) => x < .5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2;
+const expoInOut = (x) => x === 0 ? 0 : x === 1 ? 1 : x < .5 ? pow(2, 20 * x - 10) / 2 : (2 - pow(2, -20 * x + 10)) / 2;
+const circIn = (x) => 1 - sqrt(1 - pow(x, 2));
+const circOut = (x) => sqrt(1 - pow(x - 1, 2));
+const backIn = (x) => {
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
+	return c3 * x * x * x - c1 * x * x;
+};
+const backOut = (x) => {
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
+	return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
+};
+const circInOut = (x) => x < .5 ? (1 - sqrt(1 - pow(2 * x, 2))) / 2 : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
+const backInOut = (x) => {
+	const c1 = 1.70158;
+	const c2 = c1 * 1.525;
+	return x < .5 ? pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2) / 2 : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+};
+const elasticIn = (x) => {
+	const c4 = 2 * pi / 3;
+	return x === 0 ? 0 : x === 1 ? 1 : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
+};
+const elasticOut = (x) => {
+	const c4 = 2 * pi / 3;
+	return x === 0 ? 0 : x === 1 ? 1 : pow(2, -10 * x) * sin((x * 10 - .75) * c4) + 1;
+};
+const bounceIn = (x) => 1 - bounceOut(1 - x);
+const bell = gaussian();
+const elasticInOut = (x) => {
+	const c5 = 2 * pi / 4.5;
+	return x === 0 ? 0 : x === 1 ? 1 : x < .5 ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2 : pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5) / 2 + 1;
+};
+const bounceInOut = (x) => x < .5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;
+
+//#endregion
+//#region packages/modulation/src/easing/line.ts
+/**
+* Interpolates points along a line.
+* By default it's a straight line, so use `bend` to make a non-linear curve.
+* @param bend -1...1. -1 will pull line up, 1 will push it down.
+* @returns 
+*/
+const line = (bend = 0, warp = 0) => {
+	const max = 1;
+	const cubicB = {
+		x: scale(bend, -1, 1, 0, max),
+		y: scale(bend, -1, 1, max, 0)
+	};
+	let cubicA = interpolate$1(Math.abs(bend), Empty, cubicB);
+	if (bend !== 0 && warp > 0) if (bend > 0) cubicA = interpolate$1(warp, cubicA, {
+		x: 0,
+		y: cubicB.x * 2
+	});
+	else cubicA = interpolate$1(warp, cubicA, {
+		x: cubicB.y * 2,
+		y: 0
+	});
+	const bzr = cubic(Empty, Unit, cubicA, cubicB);
+	const inter = interpolator(bzr);
+	return (value) => inter(value);
+};
+
+//#endregion
+//#region packages/modulation/src/modulator-timed.ts
+/**
+* Produce values over time. When the modulate function is complete, the final
+* value continues to return. Timer starts when return function is first invoked.
+* 
+* ```js
+* const fn = (t) => {
+*  // 't' will be values 0..1 where 1 represents end of time period.
+*  // Return some computed value based on 't'
+*  return t*Math.random();
+* }
+* const e = Modulate.time(fn, 1000);
+* 
+* // Keep calling e() to get the current value
+* e();
+* ```
+* @param fn Modulate function
+* @param duration Duration
+* @returns 
+*/
+const time = (fn, duration) => {
+	resultThrow(functionTest(fn, `fn`));
+	let relative$1;
+	return () => {
+		if (typeof relative$1 === `undefined`) relative$1 = ofTotal(duration, { clampValue: true });
+		return fn(relative$1());
+	};
+};
+/**
+* Creates an modulator based on clock time. Time
+* starts being counted when modulate function is created.
+* 
+* `timeModulator` allows you to reset and check for completion.
+* Alternatively, use {@link time} which is a simple function that just returns a value.
+*
+* @example Time based easing
+* ```
+* import { timeModulator } from "@ixfx/modulation.js";
+* const fn = (t) => {
+*  // 't' will be a value 0..1 representing time elapsed. 1 being end of period.
+*  return t*Math.random();
+* }
+* const t = timeModulator(fn, 5*1000); // Will take 5 seconds to complete
+* ...
+* t.compute(); // Get current value of modulator
+* t.reset();   // Reset to 0
+* t.isDone;    // _True_ if finished
+* ```
+* @param fn Modulator
+* @param duration Duration
+* @returns ModulatorTimed
+*/
+const timeModulator = (fn, duration) => {
+	resultThrow(functionTest(fn, `fn`));
+	const timer = elapsedMillisecondsAbsolute();
+	const durationMs = intervalToMs(duration);
+	if (durationMs === void 0) throw new Error(`Param 'duration' not provided`);
+	const relativeTimer = relative(durationMs, {
+		timer,
+		clampValue: true
+	});
+	return timerWithFunction(fn, relativeTimer);
+};
+/**
+* Produce modulate values with each invocation. When the time is complete, the final
+* value continues to return. Timer starts when return function is first invoked.
+* 
+* If you need to check if a modulator is done or reset it, consider {@link tickModulator}.
+* 
+* ```js
+* const fn = (t) => {
+*  // 't' will be values 0..1 representing elapsed ticks toward totwal
+* }
+* const e = ticks(fn, 100);
+* 
+* // Keep calling e() to get the current value
+* e();
+* ```
+* @param fn Function that produces 0..1 scale
+* @param totalTicks Total length of ticks
+* @returns 
+*/
+const ticks = (fn, totalTicks) => {
+	resultThrow(functionTest(fn, `fn`));
+	let relative$1;
+	return () => {
+		if (typeof relative$1 === `undefined`) relative$1 = ofTotalTicks(totalTicks, { clampValue: true });
+		return fn(relative$1());
+	};
+};
+/**
+* Creates an modulator based on ticks. 
+* 
+* `tickModulator` allows you to reset and check for completion.
+* Alternatively, use {@link ticks} which is a simple function that just returns a value.
+*
+* @example Tick-based modulator
+* ```
+* import { tickModulator } from "@ixfx/modulation.js";
+* const fn = (t) => {
+*  // 't' will be values 0..1 based on completion
+*  return Math.random() * t;
+* }
+* const t = tickModulator(fn, 1000);   // Will take 1000 ticks to complete
+* t.compute(); // Each call to `compute` progresses the tick count
+* t.reset();   // Reset to 0
+* t.isDone;    // _True_ if finished
+* ```
+* @param fn Modulate function that returns 0..1
+* @param durationTicks Duration in ticks
+* @returns ModulatorTimed
+*/
+const tickModulator = (fn, durationTicks) => {
+	resultThrow(functionTest(fn, `fn`));
+	const timer = elapsedTicksAbsolute();
+	const relativeTimer = relative(durationTicks, {
+		timer,
+		clampValue: true
+	});
+	return timerWithFunction(fn, relativeTimer);
+};
+
+//#endregion
+//#region packages/modulation/src/easing/index.ts
+var easing_exports = {};
+__export(easing_exports, {
+	Named: () => easings_named_exports,
+	create: () => create,
+	get: () => get,
+	getEasingNames: () => getEasingNames,
+	line: () => line,
+	tickEasing: () => tickEasing,
+	ticks: () => ticks$1,
+	time: () => time$1,
+	timeEasing: () => timeEasing
+});
+/**
+* Creates an easing function
+* ```js
+* const e = Easings.create({ duration: 1000, name: `quadIn` });
+* const e = Easings.create({ ticks: 100, name: `sineOut` });
+* const e = Easings.create({ 
+*  duration: 1000, 
+*  fn: (v) => {
+*    // v will be 0..1 based on time
+*    return Math.random() * v
+*  }
+* });
+* ```
+* @param options 
+* @returns 
+*/
+const create = (options) => {
+	const name = resolveEasingName(options.name ?? `quintIn`);
+	const fn = name ?? options.fn;
+	if (typeof fn === `undefined`) throw new Error(`Either 'name' or 'fn' must be set`);
+	if (`duration` in options) return time$1(fn, options.duration);
+	else if (`ticks` in options) return ticks$1(fn, options.ticks);
+	else throw new Error(`Expected 'duration' or 'ticks' in options`);
+};
+/**
+* Creates an easing based on clock time. Time
+* starts being counted when easing function is created.
+* 
+* `timeEasing` allows you to reset and check for completion.
+* Alternatively, use {@link time} which is a simple function that just returns a value.
+*
+* 
+* @example Time based easing
+* ```
+* const t = Easings.timeEasing(`quintIn`, 5*1000); // Will take 5 seconds to complete
+* ...
+* t.compute(); // Get current value of easing
+* t.reset();   // Reset to 0
+* t.isDone;    // _True_ if finished
+* ```
+* 
+* Thisi function is just a wrapper around Modulator.timedModulator.
+* @param nameOrFunction Name of easing, or an easing function
+* @param duration Duration
+* @returns Easing
+*/
+const timeEasing = (nameOrFunction, duration) => {
+	const fn = resolveEasingName(nameOrFunction);
+	return timeModulator(fn, duration);
+};
+/**
+* Produce easing values over time. When the easing is complete, the final
+* value continues to return. Timer starts when return function is first invoked.
+* 
+* If you need to check if an easing is done or reset it, consider {@link timeEasing}.
+* 
+* ```js
+* // Quad-in easing over one second
+* const e = Easings.time(`quadIn`, 1000);
+* 
+* // Keep calling e() to get the current value
+* e();
+* ```
+* 
+* This function is just a wrapper around Modulate.time
+* @param nameOrFunction Easing name or a function that produces 0..1 scale
+* @param duration Duration
+* @returns 
+*/
+const time$1 = (nameOrFunction, duration) => {
+	const fn = resolveEasingName(nameOrFunction);
+	return time(fn, duration);
+};
+/**
+* Produce easing values with each invocation. When the easing is complete, the final
+* value continues to return. Timer starts when return function is first invoked.
+* 
+* If you need to check if an easing is done or reset it, consider {@link tickEasing}.
+* 
+* ```js
+* // Quad-in easing over 100 ticks
+* const e = Easings.ticks(`quadIn`, 100);
+* 
+* // Keep calling e() to get the current value
+* e();
+* ```
+* 
+* This is just a wrapper around Modulator.ticks
+* @param nameOrFunction Easing name or a function that produces 0..1 scale
+* @param totalTicks Total length of ticks
+* @returns 
+*/
+const ticks$1 = (nameOrFunction, totalTicks) => {
+	const fn = resolveEasingName(nameOrFunction);
+	return ticks(fn, totalTicks);
+};
+/**
+* Creates an easing based on ticks. 
+* 
+* `tickEasing` allows you to reset and check for completion.
+* Alternatively, use {@link ticks} which is a simple function that just returns a value.
+*
+* @example Tick-based easing
+* ```
+* const t = Easings.tickEasing(`sineIn`, 1000);   // Will take 1000 ticks to complete
+* t.compute(); // Each call to `compute` progresses the tick count
+* t.reset();   // Reset to 0
+* t.isDone;    // _True_ if finished
+* ```
+* @param nameOrFunction Name of easing, or an easing function
+* @param durationTicks Duration in ticks
+* @returns Easing
+*/
+const tickEasing = (nameOrFunction, durationTicks) => {
+	const fn = resolveEasingName(nameOrFunction);
+	return tickModulator(fn, durationTicks);
+};
+const resolveEasingName = (nameOrFunction) => {
+	const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
+	if (typeof fn === `undefined`) {
+		const error = typeof nameOrFunction === `string` ? /* @__PURE__ */ new Error(`Easing function not found: '${nameOrFunction}'`) : /* @__PURE__ */ new Error(`Easing function not found`);
+		throw error;
+	}
+	return fn;
+};
+/**
+* Creates a new easing by name
+*
+* ```js
+* const e = Easings.create(`circInOut`, 1000, elapsedMillisecondsAbsolute);
+* ```
+* @param nameOrFunction Name of easing, or an easing function
+* @param duration Duration (meaning depends on timer source)
+* @param timerSource Timer source
+* @returns
+*/
+let easingsMap;
+/**
+* Returns an easing function by name. Throws an error if
+* easing is not found.
+*
+* ```js
+* const fn = Easings.get(`sineIn`);
+* // Returns 'eased' transformation of 0.5
+* fn(0.5);
+* ```
+* @param easingName eg `sineIn`
+* @returns Easing function
+*/
+const get = function(easingName) {
+	resultThrow(stringTest(easingName, `non-empty`, `easingName`));
+	const found = cacheEasings().get(easingName.toLowerCase());
+	if (found === void 0) throw new Error(`Easing not found: '${easingName}'`);
+	return found;
+};
+function cacheEasings() {
+	if (easingsMap === void 0) {
+		easingsMap = /* @__PURE__ */ new Map();
+		for (const [k, v] of Object.entries(easings_named_exports)) easingsMap.set(k.toLowerCase(), v);
+		return easingsMap;
+	} else return easingsMap;
+}
+/**
+* Iterate over available easings.
+* @private
+* @returns Returns list of available easing names
+*/
+function* getEasingNames() {
+	const map = cacheEasings();
+	yield* map.keys();
+}
+
+//#endregion
 //#region packages/modulation/src/envelope/Types.ts
 const adsrStateTransitions = Object.freeze({
 	attack: [`decay`, `release`],
@@ -250,7 +1044,6 @@ var AdsrIterator = class {
 *
 * @example Setup
 * ```js
-* import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js'
 * const env = new Envelopes.Adsr({
 *  attackDuration: 1000,
 *  decayDuration: 200,
@@ -493,8 +1286,8 @@ const adsr = (opts = {}) => {
 *
 * @example Init
 * ```js
-* import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js';
-* import { IterableAsync } from  'https://unpkg.com/ixfx/dist/util.js';
+* import { Envelopes } from '@ixfx/modulation.js';
+* import { IterableAsync } from  '@ixfx/iterable.js';
 *
 * const opts = {
 *  attackDuration: 1000,
@@ -531,757 +1324,6 @@ async function* adsrIterable(opts) {
 		signal: opts.signal
 	});
 	for await (const v of r) yield v;
-}
-
-//#endregion
-//#region packages/modulation/src/source/ticks.ts
-/**
-* Returns a function which cycles between 0..1 (inclusive of 0 and 1).
-* `totalTicks` is how many ticks it takes to get to 1. Since we want an inclusive 0 & 1,
-* the total ticks is actually +1.
-*
-* Ie. if totalTicks = 10, we get: 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
-* 
-* Use 'exclusiveStart' and 'exclusiveEnd' flags to shift range. Eg, with `totalTicks` of 10: 
-* * 'exclusiveStart:true': first value is 0.1, last value is 1.0 (10 values total)
-* * 'exclusiveEnd:true': first value is 0, last value is 0.9 (10 values total)
-* * If both are true, first value is 0.1, last value is 0.9 (9 values total)
-* * If both are false (or not set), we get the case described earlier, first value is 0, last value is 1 (11 values total)
-* 
-* Other examples:
-* * totalTicks: 20, value goes up by 0.05
-* * totalTicks: 1, value goes up by 1
-* @param totalTicks Positive, integer value. How many ticks to complete a cycle
-* @param options
-* @returns 
-*/
-function ticks$2(totalTicks, options = {}) {
-	resultThrow(integerTest(totalTicks, `aboveZero`, `totalTicks`));
-	const exclusiveStart = options.exclusiveStart ?? false;
-	const exclusiveEnd = options.exclusiveEnd ?? false;
-	const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
-	const startPoint = exclusiveStart ? 1 : 0;
-	const endPoint = exclusiveEnd ? totalTicks - 1 : totalTicks;
-	let cycleCount = 0;
-	let v = options.startAt ?? startPoint;
-	if (options.startAtRelative) {
-		let totalTicksForReal = totalTicks;
-		if (exclusiveStart) totalTicksForReal--;
-		if (exclusiveEnd) totalTicksForReal--;
-		v = Math.round(options.startAtRelative * totalTicksForReal);
-	}
-	return (feedback) => {
-		if (feedback) {
-			if (feedback.resetAt !== void 0) v = feedback.resetAt;
-			if (feedback.resetAtRelative !== void 0) v = Math.floor(feedback.resetAtRelative * totalTicks);
-		}
-		if (cycleCount >= cycleLimit) return 1;
-		const current = v / totalTicks;
-		v++;
-		if (v > endPoint) {
-			cycleCount++;
-			v = startPoint;
-		}
-		return current;
-	};
-}
-
-//#endregion
-//#region packages/modulation/src/source/time.ts
-/**
-* Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
-* using different units for time.
-* 
-* By default, it continues forever, cycling from 0..1 repeatedly for each interval. Use
-* `cycleLimit` to restrict this. A value of 1 means it won't loop. 
-* 
-* The starting 'position' is `performance.now()`. If `startAt` option is provided, this will be used instead.
-* It probably should be an offset of `performance.now()`, eg: `{ startAt: performance.now() - 500 }` to shift
-* the cycle by 500ms.
-* 
-* When using `startAtRelative`, the starting position will be set backward by the relative amount. A value
-* of 0.5, for example, will set the timer back 50% of the interval, meaning the cycle will start half way through.
-* 
-* @param interval 
-* @param options 
-* @returns
-*/
-function elapsed(interval, options = {}) {
-	const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
-	const limitValue = 1;
-	let start = options.startAt ?? performance.now();
-	let cycleCount = 0;
-	const intervalMs = intervalToMs(interval, 1e3);
-	if (options.startAtRelative) {
-		resultThrow(numberTest(options.startAtRelative, `percentage`, `startAtRelative`));
-		start = performance.now() - intervalMs * options.startAtRelative;
-	}
-	return (feedback) => {
-		if (feedback) {
-			if (feedback.resetAt !== void 0) {
-				start = feedback.resetAt;
-				if (start === 0) start = performance.now();
-			}
-			if (feedback.resetAtRelative !== void 0) {
-				resultThrow(numberTest(feedback.resetAtRelative, `percentage`, `resetAtRelative`));
-				start = performance.now() - intervalMs * feedback.resetAtRelative;
-			}
-		}
-		if (cycleCount >= cycleLimit) return limitValue;
-		const now = performance.now();
-		const elapsedCycle = now - start;
-		if (elapsedCycle >= intervalMs) {
-			cycleCount += Math.floor(elapsedCycle / intervalMs);
-			start = now;
-			if (cycleCount >= cycleLimit) return limitValue;
-		}
-		return elapsedCycle % intervalMs / intervalMs;
-	};
-}
-/**
-* Counts beats based on a BPM.
-* Uses {@link elapsed} internally.
-* @param bpm 
-* @param options 
-* @returns 
-*/
-function bpm(bpm$1, options = {}) {
-	const interval = 60 * 1e3 / bpm$1;
-	return elapsed(interval, options);
-}
-/**
-* Counts based on hertz (oscillations per second).
-* Uses {@link elapsed} internally.
-* @param hz 
-* @param options 
-* @returns 
-*/
-function hertz(hz, options = {}) {
-	const interval = 1e3 / hz;
-	return elapsed(interval, options);
-}
-
-//#endregion
-//#region packages/modulation/src/source/per-second.ts
-/**
-* Returns a proportion of `amount` depending on elapsed time.
-* Cumulatively, `amount` is yielded every second.
-* 
-* ```js
-* // Calculate a proportion of 0.1 every second
-* const x = perSecond(0.1);
-* x();
-* ```
-* 
-* The faster `x()` is called, the smaller the chunks of `amount` are returned.
-* Values accumulate. For example, `x()` isn't called for two seconds, 2*amount is returned.
-* 
-* @example Usage
-* ```js
-* const settings = {
-*  ageMod: perSecond(0.1);
-* };
-* 
-* let state = {
-*  age: 1
-* };
-* 
-* // Update
-* setInterval(() => {
-*  let { age } = state;
-*  // Add 0.1 per second, regardless of 
-*  // loop speed
-*  age += settings.ageMod(); 
-*  state = {
-*    ...state,
-*    age: clamp(age)
-*  }
-* });
-* ```
-* 
-* Use the `clamp` option so the returned value never exceeds `amount`.
-* Alternatively, `min`/`max` options allow you to set arbitrary limits.
-* @param amount
-* @returns 
-*/
-const perSecond = (amount, options = {}) => {
-	const perMilli = amount / 1e3;
-	let min = options.min ?? Number.MIN_SAFE_INTEGER;
-	let max = options.max ?? Number.MAX_SAFE_INTEGER;
-	const clamp$1 = options.clamp ?? false;
-	if (clamp$1 && options.max) throw new Error(`Use either 'max' or 'clamp', not both.`);
-	if (clamp$1) max = amount;
-	let called = performance.now();
-	return () => {
-		const now = performance.now();
-		const elapsed$1 = now - called;
-		called = now;
-		const x = perMilli * elapsed$1;
-		if (x > max) return max;
-		if (x < min) return min;
-		return x;
-	};
-};
-/**
-* As {@link perSecond}, but per minute.
-* @param amount 
-* @param options 
-* @returns 
-*/
-const perMinute = (amount, options = {}) => {
-	return perSecond(amount / 60, options);
-};
-
-//#endregion
-//#region packages/modulation/src/source/index.ts
-var source_exports = {};
-__export(source_exports, {
-	bpm: () => bpm,
-	elapsed: () => elapsed,
-	hertz: () => hertz,
-	perMinute: () => perMinute,
-	perSecond: () => perSecond,
-	ticks: () => ticks$2
-});
-
-//#endregion
-//#region packages/modulation/src/cubic-bezier.ts
-/**
-* Creates an easing function using a simple cubic bezier defined by two points.
-*
-* Eg: https://cubic-bezier.com/#0,1.33,1,-1.25
-*  a:0, b: 1.33, c: 1, d: -1.25
-*
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* // Time-based easing using bezier
-* const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
-* e.compute();
-* ```
-* @param b
-* @param d
-* @returns Value
-*/
-const cubicBezierShape = (b, d) => (t) => {
-	const s = 1 - t;
-	const s2 = s * s;
-	const t2 = t * t;
-	const t3 = t2 * t;
-	return 3 * b * s2 * t + 3 * d * s * t2 + t3;
-};
-
-//#endregion
-//#region packages/modulation/src/drift.ts
-/**
-* WIP
-* Returns a {@link Drifter} that moves a value over time.
-*
-* It keeps track of how much time has elapsed, accumulating `driftAmtPerMs`.
-* The accumulated drift is wrapped on a 0..1 scale.
-* ```js
-* // Set up the drifer
-* const d = drif(0.001);
-*
-* d.update(1.0);
-* // Returns 1.0 + accumulated drift
-* ```
-* @param driftAmtPerMs
-* @returns
-*/
-const drift = (driftAmtPerMs) => {
-	let lastChange = performance.now();
-	const update = (v = 1) => {
-		const elapsed$1 = performance.now() - lastChange;
-		const amt = driftAmtPerMs * elapsed$1 % 1;
-		lastChange = performance.now();
-		const calc = (v + amt) % 1;
-		return calc;
-	};
-	const reset = () => {
-		lastChange = performance.now();
-	};
-	return {
-		update,
-		reset
-	};
-};
-
-//#endregion
-//#region packages/modulation/src/gaussian.ts
-const pow$1 = Math.pow;
-const gaussianA = 1 / Math.sqrt(2 * Math.PI);
-/**
-* Returns a roughly gaussian easing function
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const fn = Easings.gaussian();
-* ```
-*
-* Try different positive and negative values for `stdDev` to pinch
-* or flatten the bell shape.
-* @param standardDeviation
-* @returns
-*/
-const gaussian = (standardDeviation = .4) => {
-	const mean = .5;
-	return (t) => {
-		const f = gaussianA / standardDeviation;
-		let p = -2.5;
-		let c = (t - mean) / standardDeviation;
-		c *= c;
-		p *= c;
-		const v = f * pow$1(Math.E, p);
-		if (v > 1) return 1;
-		if (v < 0) return 0;
-		return v;
-	};
-};
-
-//#endregion
-//#region packages/modulation/src/easing/easings-named.ts
-var easings_named_exports = {};
-__export(easings_named_exports, {
-	arch: () => arch,
-	backIn: () => backIn,
-	backInOut: () => backInOut,
-	backOut: () => backOut,
-	bell: () => bell,
-	bounceIn: () => bounceIn,
-	bounceInOut: () => bounceInOut,
-	bounceOut: () => bounceOut,
-	circIn: () => circIn,
-	circInOut: () => circInOut,
-	circOut: () => circOut,
-	cubicIn: () => cubicIn,
-	cubicOut: () => cubicOut,
-	elasticIn: () => elasticIn,
-	elasticInOut: () => elasticInOut,
-	elasticOut: () => elasticOut,
-	expoIn: () => expoIn,
-	expoInOut: () => expoInOut,
-	expoOut: () => expoOut,
-	quadIn: () => quadIn,
-	quadInOut: () => quadInOut,
-	quadOut: () => quadOut,
-	quartIn: () => quartIn,
-	quartOut: () => quartOut,
-	quintIn: () => quintIn,
-	quintInOut: () => quintInOut,
-	quintOut: () => quintOut,
-	sineIn: () => sineIn,
-	sineInOut: () => sineInOut,
-	sineOut: () => sineOut,
-	smootherstep: () => smootherstep,
-	smoothstep: () => smoothstep
-});
-const sqrt = Math.sqrt;
-const pow = Math.pow;
-const cos = Math.cos;
-const pi = Math.PI;
-const sin = Math.sin;
-const bounceOut = (x) => {
-	const n1 = 7.5625;
-	const d1 = 2.75;
-	if (x < 1 / d1) return n1 * x * x;
-	else if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + .75;
-	else if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + .9375;
-	else return n1 * (x -= 2.625 / d1) * x + .984375;
-};
-const quintIn = (x) => x * x * x * x * x;
-const quintOut = (x) => 1 - pow(1 - x, 5);
-const arch = (x) => x * (1 - x) * 4;
-const smoothstep = (x) => x * x * (3 - 2 * x);
-const smootherstep = (x) => (x * (x * 6 - 15) + 10) * x * x * x;
-const sineIn = (x) => 1 - cos(x * pi / 2);
-const sineOut = (x) => sin(x * pi / 2);
-const quadIn = (x) => x * x;
-const quadOut = (x) => 1 - (1 - x) * (1 - x);
-const sineInOut = (x) => -(cos(pi * x) - 1) / 2;
-const quadInOut = (x) => x < .5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2;
-const cubicIn = (x) => x * x * x;
-const cubicOut = (x) => 1 - pow(1 - x, 3);
-const quartIn = (x) => x * x * x * x;
-const quartOut = (x) => 1 - pow(1 - x, 4);
-const expoIn = (x) => x === 0 ? 0 : pow(2, 10 * x - 10);
-const expoOut = (x) => x === 1 ? 1 : 1 - pow(2, -10 * x);
-const quintInOut = (x) => x < .5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2;
-const expoInOut = (x) => x === 0 ? 0 : x === 1 ? 1 : x < .5 ? pow(2, 20 * x - 10) / 2 : (2 - pow(2, -20 * x + 10)) / 2;
-const circIn = (x) => 1 - sqrt(1 - pow(x, 2));
-const circOut = (x) => sqrt(1 - pow(x - 1, 2));
-const backIn = (x) => {
-	const c1 = 1.70158;
-	const c3 = c1 + 1;
-	return c3 * x * x * x - c1 * x * x;
-};
-const backOut = (x) => {
-	const c1 = 1.70158;
-	const c3 = c1 + 1;
-	return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
-};
-const circInOut = (x) => x < .5 ? (1 - sqrt(1 - pow(2 * x, 2))) / 2 : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
-const backInOut = (x) => {
-	const c1 = 1.70158;
-	const c2 = c1 * 1.525;
-	return x < .5 ? pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2) / 2 : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
-};
-const elasticIn = (x) => {
-	const c4 = 2 * pi / 3;
-	return x === 0 ? 0 : x === 1 ? 1 : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
-};
-const elasticOut = (x) => {
-	const c4 = 2 * pi / 3;
-	return x === 0 ? 0 : x === 1 ? 1 : pow(2, -10 * x) * sin((x * 10 - .75) * c4) + 1;
-};
-const bounceIn = (x) => 1 - bounceOut(1 - x);
-const bell = gaussian();
-const elasticInOut = (x) => {
-	const c5 = 2 * pi / 4.5;
-	return x === 0 ? 0 : x === 1 ? 1 : x < .5 ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2 : pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5) / 2 + 1;
-};
-const bounceInOut = (x) => x < .5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;
-
-//#endregion
-//#region packages/modulation/src/easing/line.ts
-/**
-* Interpolates points along a line.
-* By default it's a straight line, so use `bend` to make a non-linear curve.
-* @param bend -1...1. -1 will pull line up, 1 will push it down.
-* @returns 
-*/
-const line = (bend = 0, warp = 0) => {
-	const max = 1;
-	const cubicB = {
-		x: scale(bend, -1, 1, 0, max),
-		y: scale(bend, -1, 1, max, 0)
-	};
-	let cubicA = interpolate$1(Math.abs(bend), Empty, cubicB);
-	if (bend !== 0 && warp > 0) if (bend > 0) cubicA = interpolate$1(warp, cubicA, {
-		x: 0,
-		y: cubicB.x * 2
-	});
-	else cubicA = interpolate$1(warp, cubicA, {
-		x: cubicB.y * 2,
-		y: 0
-	});
-	const bzr = cubic(Empty, Unit, cubicA, cubicB);
-	const inter = interpolator(bzr);
-	return (value) => inter(value);
-};
-
-//#endregion
-//#region packages/modulation/src/modulator-timed.ts
-/**
-* Produce values over time. When the modulate function is complete, the final
-* value continues to return. Timer starts when return function is first invoked.
-* 
-* ```js
-* const fn = (t) => {
-*  // 't' will be values 0..1 where 1 represents end of time period.
-*  // Return some computed value based on 't'
-*  return t*Math.random();
-* }
-* const e = Modulate.time(fn, 1000);
-* 
-* // Keep calling e() to get the current value
-* e();
-* ```
-* @param fn Modulate function
-* @param duration Duration
-* @returns 
-*/
-const time = (fn, duration) => {
-	resultThrow(functionTest(fn, `fn`));
-	let relative$1;
-	return () => {
-		if (typeof relative$1 === `undefined`) relative$1 = ofTotal(duration, { clampValue: true });
-		return fn(relative$1());
-	};
-};
-/**
-* Creates an modulator based on clock time. Time
-* starts being counted when modulate function is created.
-* 
-* `timeModulator` allows you to reset and check for completion.
-* Alternatively, use {@link time} which is a simple function that just returns a value.
-*
-* @example Time based easing
-* ```
-* import { timeModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const fn = (t) => {
-*  // 't' will be a value 0..1 representing time elapsed. 1 being end of period.
-*  return t*Math.random();
-* }
-* const t = timeModulator(fn, 5*1000); // Will take 5 seconds to complete
-* ...
-* t.compute(); // Get current value of modulator
-* t.reset();   // Reset to 0
-* t.isDone;    // _True_ if finished
-* ```
-* @param fn Modulator
-* @param duration Duration
-* @returns ModulatorTimed
-*/
-const timeModulator = (fn, duration) => {
-	resultThrow(functionTest(fn, `fn`));
-	const timer = elapsedMillisecondsAbsolute();
-	const durationMs = intervalToMs(duration);
-	if (durationMs === void 0) throw new Error(`Param 'duration' not provided`);
-	const relativeTimer = relative(durationMs, {
-		timer,
-		clampValue: true
-	});
-	return timerWithFunction(fn, relativeTimer);
-};
-/**
-* Produce modulate values with each invocation. When the time is complete, the final
-* value continues to return. Timer starts when return function is first invoked.
-* 
-* If you need to check if a modulator is done or reset it, consider {@link tickModulator}.
-* 
-* ```js
-* const fn = (t) => {
-*  // 't' will be values 0..1 representing elapsed ticks toward totwal
-* }
-* const e = ticks(fn, 100);
-* 
-* // Keep calling e() to get the current value
-* e();
-* ```
-* @param fn Function that produces 0..1 scale
-* @param totalTicks Total length of ticks
-* @returns 
-*/
-const ticks = (fn, totalTicks) => {
-	resultThrow(functionTest(fn, `fn`));
-	let relative$1;
-	return () => {
-		if (typeof relative$1 === `undefined`) relative$1 = ofTotalTicks(totalTicks, { clampValue: true });
-		return fn(relative$1());
-	};
-};
-/**
-* Creates an modulator based on ticks. 
-* 
-* `tickModulator` allows you to reset and check for completion.
-* Alternatively, use {@link ticks} which is a simple function that just returns a value.
-*
-* @example Tick-based modulator
-* ```
-* import { tickModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const fn = (t) => {
-*  // 't' will be values 0..1 based on completion
-*  return Math.random() * t;
-* }
-* const t = tickModulator(fn, 1000);   // Will take 1000 ticks to complete
-* t.compute(); // Each call to `compute` progresses the tick count
-* t.reset();   // Reset to 0
-* t.isDone;    // _True_ if finished
-* ```
-* @param fn Modulate function that returns 0..1
-* @param durationTicks Duration in ticks
-* @returns ModulatorTimed
-*/
-const tickModulator = (fn, durationTicks) => {
-	resultThrow(functionTest(fn, `fn`));
-	const timer = elapsedTicksAbsolute();
-	const relativeTimer = relative(durationTicks, {
-		timer,
-		clampValue: true
-	});
-	return timerWithFunction(fn, relativeTimer);
-};
-
-//#endregion
-//#region packages/modulation/src/easing/index.ts
-var easing_exports = {};
-__export(easing_exports, {
-	Named: () => easings_named_exports,
-	create: () => create,
-	get: () => get,
-	getEasingNames: () => getEasingNames,
-	line: () => line,
-	tickEasing: () => tickEasing,
-	ticks: () => ticks$1,
-	time: () => time$1,
-	timeEasing: () => timeEasing
-});
-/**
-* Creates an easing function
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const e = Easings.create({ duration: 1000, name: `quadIn` });
-* const e = Easings.create({ ticks: 100, name: `sineOut` });
-* const e = Easings.create({ 
-*  duration: 1000, 
-*  fn: (v) => {
-*    // v will be 0..1 based on time
-*    return Math.random() * v
-*  }
-* });
-* ```
-* @param options 
-* @returns 
-*/
-const create = (options) => {
-	const name = resolveEasingName(options.name ?? `quintIn`);
-	const fn = name ?? options.fn;
-	if (typeof fn === `undefined`) throw new Error(`Either 'name' or 'fn' must be set`);
-	if (`duration` in options) return time$1(fn, options.duration);
-	else if (`ticks` in options) return ticks$1(fn, options.ticks);
-	else throw new Error(`Expected 'duration' or 'ticks' in options`);
-};
-/**
-* Creates an easing based on clock time. Time
-* starts being counted when easing function is created.
-* 
-* `timeEasing` allows you to reset and check for completion.
-* Alternatively, use {@link time} which is a simple function that just returns a value.
-*
-* 
-* @example Time based easing
-* ```
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const t = Easings.timeEasing(`quintIn`, 5*1000); // Will take 5 seconds to complete
-* ...
-* t.compute(); // Get current value of easing
-* t.reset();   // Reset to 0
-* t.isDone;    // _True_ if finished
-* ```
-* 
-* Thisi function is just a wrapper around Modulator.timedModulator.
-* @param nameOrFunction Name of easing, or an easing function
-* @param duration Duration
-* @returns Easing
-*/
-const timeEasing = (nameOrFunction, duration) => {
-	const fn = resolveEasingName(nameOrFunction);
-	return timeModulator(fn, duration);
-};
-/**
-* Produce easing values over time. When the easing is complete, the final
-* value continues to return. Timer starts when return function is first invoked.
-* 
-* If you need to check if an easing is done or reset it, consider {@link timeEasing}.
-* 
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* // Quad-in easing over one second
-* const e = Easings.time(`quadIn`, 1000);
-* 
-* // Keep calling e() to get the current value
-* e();
-* ```
-* 
-* This function is just a wrapper around Modulate.time
-* @param nameOrFunction Easing name or a function that produces 0..1 scale
-* @param duration Duration
-* @returns 
-*/
-const time$1 = (nameOrFunction, duration) => {
-	const fn = resolveEasingName(nameOrFunction);
-	return time(fn, duration);
-};
-/**
-* Produce easing values with each invocation. When the easing is complete, the final
-* value continues to return. Timer starts when return function is first invoked.
-* 
-* If you need to check if an easing is done or reset it, consider {@link tickEasing}.
-* 
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* // Quad-in easing over 100 ticks
-* const e = Easings.ticks(`quadIn`, 100);
-* 
-* // Keep calling e() to get the current value
-* e();
-* ```
-* 
-* This is just a wrapper around Modulator.ticks
-* @param nameOrFunction Easing name or a function that produces 0..1 scale
-* @param totalTicks Total length of ticks
-* @returns 
-*/
-const ticks$1 = (nameOrFunction, totalTicks) => {
-	const fn = resolveEasingName(nameOrFunction);
-	return ticks(fn, totalTicks);
-};
-/**
-* Creates an easing based on ticks. 
-* 
-* `tickEasing` allows you to reset and check for completion.
-* Alternatively, use {@link ticks} which is a simple function that just returns a value.
-*
-* @example Tick-based easing
-* ```
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const t = Easings.tickEasing(`sineIn`, 1000);   // Will take 1000 ticks to complete
-* t.compute(); // Each call to `compute` progresses the tick count
-* t.reset();   // Reset to 0
-* t.isDone;    // _True_ if finished
-* ```
-* @param nameOrFunction Name of easing, or an easing function
-* @param durationTicks Duration in ticks
-* @returns Easing
-*/
-const tickEasing = (nameOrFunction, durationTicks) => {
-	const fn = resolveEasingName(nameOrFunction);
-	return tickModulator(fn, durationTicks);
-};
-const resolveEasingName = (nameOrFunction) => {
-	const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
-	if (typeof fn === `undefined`) {
-		const error = typeof nameOrFunction === `string` ? /* @__PURE__ */ new Error(`Easing function not found: '${nameOrFunction}'`) : /* @__PURE__ */ new Error(`Easing function not found`);
-		throw error;
-	}
-	return fn;
-};
-/**
-* Creates a new easing by name
-*
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const e = Easings.create(`circInOut`, 1000, elapsedMillisecondsAbsolute);
-* ```
-* @param nameOrFunction Name of easing, or an easing function
-* @param duration Duration (meaning depends on timer source)
-* @param timerSource Timer source
-* @returns
-*/
-let easingsMap;
-/**
-* Returns an easing function by name. Throws an error if
-* easing is not found.
-*
-* ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
-* const fn = Easings.get(`sineIn`);
-* // Returns 'eased' transformation of 0.5
-* fn(0.5);
-* ```
-* @param easingName eg `sineIn`
-* @returns Easing function
-*/
-const get = function(easingName) {
-	resultThrow(stringTest(easingName, `non-empty`, `easingName`));
-	const found = cacheEasings().get(easingName.toLowerCase());
-	if (found === void 0) throw new Error(`Easing not found: '${easingName}'`);
-	return found;
-};
-function cacheEasings() {
-	if (easingsMap === void 0) {
-		easingsMap = /* @__PURE__ */ new Map();
-		for (const [k, v] of Object.entries(easings_named_exports)) easingsMap.set(k.toLowerCase(), v);
-		return easingsMap;
-	} else return easingsMap;
-}
-/**
-* Iterate over available easings.
-* @private
-* @returns Returns list of available easing names
-*/
-function* getEasingNames() {
-	const map = cacheEasings();
-	yield* map.keys();
 }
 
 //#endregion
@@ -1553,7 +1595,7 @@ const apply = (t, ...accelForces) => {
 * It returns a function which can later be applied to a thing.
 *
 * ```js
-* import { Forces } from "https://unpkg.com/ixfx/dist/modulation.js"
+* import { Forces } from "@ixfx/dist/modulation.js"
 * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
 * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
 *
@@ -1887,8 +1929,70 @@ const orientationForce = (interpolationAmt = .5) => {
 };
 
 //#endregion
+//#region packages/modulation/src/cubic-bezier.ts
+/**
+* Creates an easing function using a simple cubic bezier defined by two points.
+*
+* Eg: https://cubic-bezier.com/#0,1.33,1,-1.25
+*  a:0, b: 1.33, c: 1, d: -1.25
+*
+* ```js
+* import { Easings } from "@ixfx/modulation.js";
+* // Time-based easing using bezier
+* const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
+* e.compute();
+* ```
+* @param b
+* @param d
+* @returns Value
+*/
+const cubicBezierShape = (b, d) => (t) => {
+	const s = 1 - t;
+	const s2 = s * s;
+	const t2 = t * t;
+	const t3 = t2 * t;
+	return 3 * b * s2 * t + 3 * d * s * t2 + t3;
+};
+
+//#endregion
+//#region packages/modulation/src/drift.ts
+/**
+* WIP
+* Returns a {@link Drifter} that moves a value over time.
+*
+* It keeps track of how much time has elapsed, accumulating `driftAmtPerMs`.
+* The accumulated drift is wrapped on a 0..1 scale.
+* ```js
+* // Set up the drifer
+* const d = drif(0.001);
+*
+* d.update(1.0);
+* // Returns 1.0 + accumulated drift
+* ```
+* @param driftAmtPerMs
+* @returns
+*/
+const drift = (driftAmtPerMs) => {
+	let lastChange = performance.now();
+	const update = (v = 1) => {
+		const elapsed$1 = performance.now() - lastChange;
+		const amt = driftAmtPerMs * elapsed$1 % 1;
+		lastChange = performance.now();
+		const calc = (v + amt) % 1;
+		return calc;
+	};
+	const reset = () => {
+		lastChange = performance.now();
+	};
+	return {
+		update,
+		reset
+	};
+};
+
+//#endregion
 //#region packages/modulation/src/util/pi-pi.ts
-const piPi$1 = Math.PI * 2;
+const piPi = Math.PI * 2;
 
 //#endregion
 //#region packages/modulation/src/interpolate.ts
@@ -1899,7 +2003,7 @@ const piPi$1 = Math.PI * 2;
 *
 * @example Get the halfway point between 30 and 60
 * ```js
-* import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+* import { interpolate } from '@ixfx/numbers.js';
 * interpolate(0.5, 30, 60);
 * ```
 *
@@ -2023,7 +2127,7 @@ const interpolatorStepped = (incrementAmount, a = 0, b = 1, startInterpolationAt
 * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
 *
 * ```js
-* import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
+* import { interpolateAngle } from '@ixfx/data.js';
 * interpolateAngle(0.5, Math.PI, Math.PI/2);
 * ```
 * @param amount
@@ -2032,8 +2136,8 @@ const interpolatorStepped = (incrementAmount, a = 0, b = 1, startInterpolationAt
 * @returns
 */
 const interpolateAngle$1 = (amount, aRadians, bRadians, options) => {
-	const t = wrap(bRadians - aRadians, 0, piPi$1);
-	return interpolate$2(amount, aRadians, aRadians + (t > Math.PI ? t - piPi$1 : t), options);
+	const t = wrap(bRadians - aRadians, 0, piPi);
+	return interpolate$2(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t), options);
 };
 /**
 * Interpolates between A->B over `duration`.
@@ -2139,7 +2243,6 @@ const jitterAbsolute = (options) => {
 * `jitter` returns a function that calculates jitter. If you only need a one-off
 * jitter, you can immediately execute the returned function:
 * ```js
-* import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
 * // Compute 10% jitter of input 0.5
 * const value = jitter({ relative: 0.1 })(0.5);
 * ```
@@ -2147,7 +2250,6 @@ const jitterAbsolute = (options) => {
 * However, if the returned jitter function is to be used again,
 * assign it to a variable:
 * ```js
-* import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
 * const myJitter = jitter({ absolute: 0.5 });
 *
 * // Jitter an input value 1.0
@@ -2158,7 +2260,7 @@ const jitterAbsolute = (options) => {
 * random number generator:
 *
 * ```js
-* import { weighted } from 'https://unpkg.com/ixfx/dist/random.js';
+* import { weighted } from '@ixfx/random.js';
 * jitter({ relative: 0.1, source: weighted });
 * ```
 *
@@ -2209,7 +2311,6 @@ const jitter = (options = {}) => {
 * to slowly ramp up to the fully modulated value.
 * 
 * ```js
-* import { mix } from 'https://unpkg.com/ixfx/dist/modulation.js'
 * // When 'amt' is 0, modulation doesn't affect value at all,
 * // original is returned
 * mix(0, 0.5, 0.9); // 0.5
@@ -2233,7 +2334,7 @@ const mix = (amount, original, modulation) => {
 * Both modulators are given the same input value.
 *
 * ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+* import { Easings } from "@ixfx/modulation.js";
 * // Get a 50/50 mix of two easing functions
 * const mix = Easings.mix(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
 *
@@ -2259,7 +2360,7 @@ const mixModulators = (balance, a, b) => (amt) => interpolate(balance, a(amt), b
 * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower values.
 *
 * ```js
-* import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+* import { Easings } from "@ixfx/modulation.js";
 * Easings.crossFade(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
 * ```
 * @param a Easing A
@@ -2284,117 +2385,6 @@ const crossfade = (a, b) => {
 const noop = (v) => v;
 
 //#endregion
-//#region packages/modulation/src/oscillator.ts
-var oscillator_exports = {};
-__export(oscillator_exports, {
-	saw: () => saw,
-	sine: () => sine,
-	sineBipolar: () => sineBipolar,
-	square: () => square,
-	triangle: () => triangle
-});
-const piPi = Math.PI * 2;
-/**
-* Sine oscillator.
-*
-* ```js
-* import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
-* import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
-* // Setup
-* const osc = Oscillators.sine(frequencyTimer(10));
-* const osc = Oscillators.sine(0.1);
-*
-* // Call whenever a value is needed
-* const v = osc.next().value;
-* ```
-*
-* @example Saw/tri pinch
-* ```js
-* const v = Math.pow(osc.value, 2);
-* ```
-*
-* @example Saw/tri bulge
-* ```js
-* const v = Math.pow(osc.value, 0.5);
-* ```
-*
-*/
-function* sine(timerOrFreq) {
-	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
-	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
-	while (true) yield (Math.sin(timerOrFreq.elapsed * piPi) + 1) / 2;
-}
-/**
-* Bipolar sine (-1 to 1)
-* @param timerOrFreq
-*/
-function* sineBipolar(timerOrFreq) {
-	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
-	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
-	while (true) yield Math.sin(timerOrFreq.elapsed * piPi);
-}
-/**
-* Triangle oscillator
-*
-* ```js
-* // Setup
-* const osc = triangle(Timers.frequencyTimer(0.1));
-* const osc = triangle(0.1);
-*
-* // Call whenver a value is needed
-* const v = osc.next().value;
-* ```
-*/
-function* triangle(timerOrFreq) {
-	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
-	while (true) {
-		let v = timerOrFreq.elapsed;
-		if (v < .5) v *= 2;
-		else v = 2 - v * 2;
-		yield v;
-	}
-}
-/**
-* Saw oscillator
-*
-* ```js
-* import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
-* import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
-* // Setup
-* const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
-*
-* // Or
-* const osc = Oscillators.saw(0.1);
-*
-* // Call whenever a value is needed
-* const v = osc.next().value;
-* ```
-*/
-function* saw(timerOrFreq) {
-	if (timerOrFreq === void 0) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
-	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
-	while (true) yield timerOrFreq.elapsed;
-}
-/**
-* Square oscillator
-*
-* ```js
-* import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
-*
-* // Setup
-* const osc = Oscillators.square(Timers.frequencyTimer(0.1));
-* const osc = Oscillators.square(0.1);
-*
-* // Call whenever a value is needed
-* osc.next().value;
-* ```
-*/
-function* square(timerOrFreq) {
-	if (typeof timerOrFreq === `number`) timerOrFreq = frequencyTimer(timerOrFreq);
-	while (true) yield timerOrFreq.elapsed < .5 ? 0 : 1;
-}
-
-//#endregion
 //#region packages/modulation/src/ping-pong.ts
 /**
 * Continually loops up and down between 0 and 1 by a specified interval.
@@ -2402,7 +2392,6 @@ function* square(timerOrFreq) {
 *
 * @example Usage
 * ```js
-* import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js';
 * for (const v of percentPingPong(0.1)) {
 *  // v will go up and down. Make sure you have a break somewhere because it is infinite
 * }
@@ -2503,8 +2492,8 @@ const pingPong = function* (interval, lower, upper, start, rounding) {
 /**
 * Produces values according to rough spring physics.
 * ```js
-* import { continuously } from "https://unpkg.com/ixfx/dist/flow.js"
-* import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+* import { continuously } from "@ixfx/flow.js"
+* import { spring } from "@ixfx/modulation.js"
 * 
 * const s = spring();
 *
@@ -2518,7 +2507,7 @@ const pingPong = function* (interval, lower, upper, start, rounding) {
 *
 * Parameters to the spring can be provided.
 * ```js
-* import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+* import { spring } from "@ixfx/modulation.js"
 * const s = spring({
 *  mass: 5,
 *  damping: 10
@@ -2551,14 +2540,14 @@ function* spring(opts = {}, timerOrFreq) {
 * a value. When the spring is done, 1 is returned instead of undefined.
 * 
 * ```js
-* import { springValue } from "https://unpkg.com/ixfx/dist/modulation.js"
+* import { springValue } from "@ixfx/modulation.js"
 * const s = springValue();
 * s(); // 0..1 (roughly - exceeding 1 is possible)
 * ```
 * 
 * Options can be provided:
 * ```js
-* import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+* import { spring } from "@ixfx/modulation.js"
 * const s = springValue({
 *  stiffness: 100,
 *  damping: 10
@@ -2566,7 +2555,7 @@ function* spring(opts = {}, timerOrFreq) {
 * ```
 * @example Applied
 * ```js
-* import { Modulation, Data } from  "https://unpkg.com/ixfx/dist/bundle.js"
+* import { Modulation, Data } from  "@ixfx/bundle.js"
 * let state = {
 *  spring: Modulation.springValue()
 * }
@@ -2746,7 +2735,7 @@ function sineBipolarShape(period = 1) {
 /**
 * Creates a wave modulator. Defaults to 5-second sine wave. 
 * ```js
-* import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
+* import { wave } from '@ixfx/modulation.js';
 * // Triangle wave that has a single cycle over two seconds
 * const m = wave({ secs: 2, shape: `triangle`});
 * 
@@ -2757,8 +2746,8 @@ function sineBipolarShape(period = 1) {
 * 
 * @example
 * ```js
-* import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
-* import { resolveFields } from 'https://unpkg.com/ixfx/dist/data.js';
+* import { wave } from '@ixfx/modulation.js';
+* import { resolveFields } from '@ixfx/data.js';
 * 
 * const state = {
 *  intensity: wave({secs: 2, shape: `sine` }),
@@ -2855,7 +2844,6 @@ const weightedAverage = (currentValue, targetValue, slowDownFactor) => {
 * Use {@link weightedSource} to return a function instead.
 *
 * ```js
-* import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
 * Random.weighted();          // quadIn easing by default, which skews toward low values
 * Random.weighted(`quadOut`); // quadOut favours high values
 * ```
@@ -2870,7 +2858,6 @@ const weighted = (easingNameOrOptions = `quadIn`) => weightedSource(easingNameOr
 * Use {@link weighted} to get a value directly.
 *
 * ```js
-* import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
 * const r1 = Random.weightedSource();          // quadIn easing by default, which skews toward low values
 * r1(); // Produce a value
 *
@@ -2895,5 +2882,5 @@ const weightedSource = (easingNameOrOptions = `quadIn`) => {
 };
 
 //#endregion
-export { easing_exports as Easings, forces_exports as Forces, envelope_exports as Modulation, oscillator_exports as Oscillators, source_exports as Sources, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate$2 as interpolate, interpolateAngle$1 as interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
+export { easing_exports as Easings, envelope_exports as Envelopes, forces_exports as Forces, oscillator_exports as Oscillators, source_exports as Sources, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate$2 as interpolate, interpolateAngle$1 as interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
 //# sourceMappingURL=modulation.js.map

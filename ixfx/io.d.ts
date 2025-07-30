@@ -1,4 +1,4 @@
-import { Continuously, Interval } from "./index-ZOxM3wdD.js";
+import { Continuously, Interval } from "@ixfx/core";
 import { ISimpleEventEmitter, SimpleEventEmitter } from "@ixfx/events";
 import { Video } from "@ixfx/visual";
 import { Rect } from "@ixfx/geometry/rect";
@@ -661,7 +661,7 @@ type SerialOpts = JsonDeviceOpts & {
  * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
  *
  * ```
- * import { Serial } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Serial } from '@ixfx/io.js'
  * const s = new Serial.Device();
  * s.addEventListener(`change`, evt => {
  *  console.log(`State change ${evt.priorState} -> ${evt.newState}`);
@@ -827,7 +827,7 @@ type EspruinoBleOpts = {
  * If `opts.name` is specified, this will the the Bluetooth device sought.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruino.puck({ name:`Puck.js a123` });
  * ```
  *
@@ -836,7 +836,7 @@ type EspruinoBleOpts = {
  * To get more control over filtering, pass in `opts.filter`. `opts.name` is not used as a filter in this scenario.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const filters = [
  *  { namePrefix: `Puck.js` },
  *  { namePrefix: `Pixl.js` },
@@ -853,14 +853,14 @@ declare const bangle: (opts?: EspruinoBleOpts) => Promise<EspruinoBleDevice>;
  * Create a serial-connected Espruino device.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruio.serial();
  * e.connect();
  * ```
  *
  * Options:
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruino.serial({ debug: true, evalTimeoutMs: 1000, name: `My Pico` });
  * e.connect();
  * ```
@@ -911,7 +911,7 @@ declare const serial: (opts?: {
  * `opts.filters` overrides and sets arbitary filters.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const filters = [
  *  { namePrefix: `Puck.js` },
  *  { namePrefix: `Pixl.js` },
@@ -1025,7 +1025,6 @@ declare namespace camera_d_exports {
  * Print available media devices to console
  *
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
  * camera.dumpDevices(); // Will print results to console
  * ```
  * @param filterKind Defaults `videoinput`
@@ -1081,9 +1080,8 @@ type StartResult$1 = {
  *
  *
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
- *
+ * import { Camera } from '@ixfx/io.js'
+ * import { Video } from '@ixfx/visual.js'
  * try {
  *  const { videoEl, dispose } = await Camera.start();
  *  for await (const frame of Video.frames(videoEl)) {
@@ -1099,8 +1097,8 @@ type StartResult$1 = {
  *
  * _Constraints_ can be specified to select a camera and resolution:
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Camera } from '@ixfx/io.js'
+ * import { Video } from '@ixfx/visual.js'
  *
  * try {
  *  const { videoEl, dispose } = await Camera.start({
@@ -1325,7 +1323,7 @@ type ReconnectingOptions = {
  *
  * The essential usage is:
  * ```js
- * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { reconnectingWebsocket } from '@ixfx/io.js'
  * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
  *  onMessage: (msg) => {
  *    // Do something with received message...
@@ -1341,7 +1339,7 @@ type ReconnectingOptions = {
  *
  * More options can be provided to monitor state
  * ```js
- * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { reconnectingWebsocket } from '@ixfx/io.js'
  * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
  *  onError: (err) => {
  *    console.error(err)

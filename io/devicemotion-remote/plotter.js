@@ -1,5 +1,5 @@
 import { Remote } from "https://unpkg.com/@clinth/remote@latest/dist/index.mjs";
-import { PlotElement } from 'ixfx/components.js';
+import { PlotElement } from '@ixfx/ui.js';
 
 const settings = Object.freeze({
   accelPlot: PlotElement.fromQuery(`#accelPlot`),

@@ -1,5 +1,5 @@
-import { Result } from "@ixfx/guards";
 import { Points, Rects } from "@ixfx/geometry";
+import { Result } from "@ixfx/guards";
 import { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import { Point } from "@ixfx/geometry/point";
 import { GridCardinalDirection } from "@ixfx/geometry/grid";

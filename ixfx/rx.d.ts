@@ -1,8 +1,8 @@
-import { Interval, IsEqual, IsEqualContext, Primitive, RankFunction, RankOptions, RecursivePartial } from "./index-ZOxM3wdD.js";
+import { Interval, IsEqual, IsEqualContext, Pathed, Primitive, RankFunction, RankOptions, RecursivePartial } from "@ixfx/core";
 import { InterpolateOptions } from "@ixfx/modulation";
 import { Processors } from "@ixfx/process";
 import { IQueueMutableWithEvents } from "@ixfx/collections/queue";
-import { ChangeRecord, PathDataChange } from "@ixfx/core/records";
+import { ChangeRecord } from "@ixfx/core/records";
 
 //#region packages/rx/src/ops/types.d.ts
 type SyncOptions = {
@@ -853,7 +853,7 @@ type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * Use the returned function to unsubscribe.
    * @param changes
    */
-  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
+  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
   /**
    * Updates the reactive with some partial key-value pairs.
    * Keys omitted are left the same as the current value.

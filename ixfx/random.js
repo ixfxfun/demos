@@ -1,4 +1,4 @@
-import { arrayTest, integerTest, numberTest, resultThrow } from "./src-BhN8B7uk.js";
+import { arrayTest, integerTest, numberTest, resultThrow } from "./src-C3Fpyyz5.js";
 
 //#region packages/random/src/weighted-index.ts
 /**
@@ -45,51 +45,52 @@ const weightedIndex = (weightings, rand = Math.random) => {
 */
 const randomIndex = (array, rand = Math.random) => Math.floor(rand() * array.length);
 /**
-* Removes a random item from an array, returning both the item and the new array as a result.
-* Does not modify the original array unless `mutate` parameter is true.
-*
-* @example Without changing source
+* Plucks a random value from an array, optionally mutating
+* the original array.
+* 
+* @example Get a random element without modifying array
 * ```js
-* const data = [100, 20, 40];
-* const {value, array} = randomPluck(data);
-* // value: 20, array: [100, 40], data: [100, 20, 40];
+* const { value, remainder } = randomPluck(inputArray);
 * ```
-*
-* @example Mutating source
+* 
+* @example Get a random element, removing it from original array
 * ```js
-* const data = [100, 20, 40];
-* const {value} = randomPluck(data, true);
-* // value: 20, data: [100, 40];
+* const value = randomPluck(inputArray, { mutate: true });
 * ```
-*
+* 
+* If the input array is empty, _undefined_ is returned as the value.
 * @typeParam V - Type of items in array
 * @param array Array to pluck item from
-* @param mutate If _true_, changes input array. _False_ by default.
-* @param rand Random generatr. `Math.random` by default.
-* @return Returns an object `{value:V|undefined, array:V[]}`
+* @param options Options. By default { mutate: false, source: Math.random }
+* @param rand Random generator. `Math.random` by default.
 *
 */
-const randomPluck = (array, mutate = false, rand = Math.random) => {
+function randomPluck(array, options = {}) {
 	if (typeof array === `undefined`) throw new Error(`Param 'array' is undefined`);
 	if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array`);
-	if (array.length === 0) return {
-		value: void 0,
-		array: []
-	};
-	const index = randomIndex(array, rand);
-	if (mutate) return {
-		value: array[index],
-		array: array.splice(index, 1)
-	};
-	else {
-		const t = [...array];
-		t.splice(index, 1);
+	const mutate = options.mutate ?? false;
+	const rand = options.source ?? Math.random;
+	if (array.length === 0) {
+		if (mutate) return void 0;
 		return {
-			value: array[index],
-			array: t
+			value: void 0,
+			remainder: []
 		};
 	}
-};
+	const index = randomIndex(array, rand);
+	if (mutate) {
+		const v = array[index];
+		array.splice(index, 1);
+		return v;
+	} else {
+		const inputCopy = [...array];
+		inputCopy.splice(index, 1);
+		return {
+			value: array[index],
+			remainder: inputCopy
+		};
+	}
+}
 /**
 * Returns random element.
 *
@@ -369,7 +370,7 @@ const gaussianSource = (skew = 1) => {
 //#endregion
 //#region packages/random/src/guid.ts
 /**
-* Generates a short roughly unique id
+* Generates a six-digit roughly unique id
 * ```js
 * const id = shortGuid();
 * ```
@@ -410,8 +411,8 @@ const shortGuid = (options = {}) => {
 *
 * @example Run some code every 100ms, 10 times:
 * ```js
-* import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
-* import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
+* import { interval } from '@ixfx/flow.js'
+* import { count } from '@ixfx/numbers.js'
 * const counter = count(10);
 * for await (const v of interval(counter, { fixedIntervalMs: 100 })) {
 *  // Do something
@@ -647,7 +648,10 @@ function mersenneTwister(seed) {
 const string = (lengthOrOptions = 5) => {
 	const options = typeof lengthOrOptions === `number` ? { length: lengthOrOptions } : lengthOrOptions;
 	const calculate = options.source ?? Math.random;
-	return calculate().toString(36).slice(2, length + 2);
+	const length = options.length ?? 5;
+	let returnValue = ``;
+	while (returnValue.length < length) returnValue += calculate().toString(36).slice(2);
+	return returnValue.substring(0, length);
 };
 
 //#endregion
@@ -791,7 +795,6 @@ function clamp(v, min = 0, max = 1) {
 *
 * @example 0..99
 * ```js
-* import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
 * const r = Random.weightedIntegerFn(100);
 * r(); // Produce value
 * ```
@@ -831,7 +834,6 @@ const weightedIntegerSource = (options) => {
 * 
 * @example 0..99
 * ```js
-* import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
 * Random.weightedInteger(100);
 * ```
 *

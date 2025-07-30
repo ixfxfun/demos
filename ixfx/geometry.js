@@ -1,10 +1,14 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./src-BhN8B7uk.js";
-import { clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-Cyp-w-xE.js";
-import "./src-Cjy4Jx5o.js";
-import { mutable } from "./src-Ct16kpGA.js";
-import { zipKeyValue } from "./maps-CyRBIIF3.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-BdPT6F7P.js";
+import { integerTest, numberTest, percentTest, resultThrow } from "./src-C3Fpyyz5.js";
+import { clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-BVzuGCxJ.js";
+import "./interval-type-CEZs43zj.js";
+import { zipKeyValue } from "./maps-C72wxMfj.js";
+import { mutable } from "./src-Bip7wA20.js";
+import "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import "./key-value-CfwtfZWC.js";
+import "./resolve-core-CDPnQKIe.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DZRwSDvJ.js";
 
 //#region packages/geometry/src/point/guard.ts
 /**
@@ -121,7 +125,6 @@ const isPlaceholder = (p) => {
 * Returns a line from two points
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * // Line from 0,1 to 10,15
 * const line = Lines.fromPoints( { x:0, y:1 }, { x:10, y:15 });
 * // line is: { a: { x: 0, y: 1}, b: { x: 10, y: 15 } };
@@ -149,7 +152,6 @@ const fromPoints$1 = (a, b) => {
 * Eg, if points a,b,c are provided, two lines are provided: a->b and b->c.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const lines = Lines.joinPointsToLines(ptA, ptB, ptC);
 * // lines is an array of, well, lines
 * ```
@@ -171,7 +173,6 @@ const joinPointsToLines = (...points) => {
 /**
 * Returns true if `p` is a valid line, containing `a` and `b` Points.
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * Lines.isLine(l);
 * ```
 * @param p Value to check
@@ -349,7 +350,6 @@ const directionVectorNormalised = (line) => {
 * Returns a parallel line to `line` at `distance`.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const l = Lines.parallel(line, 10);
 * ```
 * @param line
@@ -374,7 +374,6 @@ const parallel = (line, distance$2) => {
 * Returns a point perpendicular to `line` at a specified `distance`. Use negative
 * distances for the other side of line.
 * ```
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * // Project a point 100 units away from line, at its midpoint.
 * const pt = Lines.perpendicularPoint(line, 100, 0.5);
 * ```
@@ -397,7 +396,6 @@ const perpendicularPoint = (line, distance$2, amount = 0) => {
 * Returns the mid-point of a line (same as `interpolate` with an amount of 0.5)
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * Lines.midpoint(line); // Returns {x, y}
 * ```
 * @param aOrLine 
@@ -688,7 +686,6 @@ function distance(a, xOrB, y, z) {
 * Returns the nearest point on `line` closest to `point`.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const pt = Lines.nearest(line, {x:10,y:10});
 * ```
 * 
@@ -730,7 +727,6 @@ const nearest$1 = (line, point$1) => {
 * Returns the distance of `point` to the nearest point on `line`
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const distance = Lines.distanceSingleLine(line, pt);
 * ```
 * @param line Line
@@ -862,7 +858,6 @@ const bbox3d = (...points) => {
 * Returns a rectangle that encompasses dimension of line
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';
 * const rect = Lines.bbox(line);
 * ```
 */
@@ -947,8 +942,6 @@ function divider(a, b, c) {
 /**
 * Divides both start and end points by given x,y
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
-* 
 * // Line 1,1 -> 10,10
 * const l = Lines.fromNumbers(1,1,10,10);
 * const ll = Lines.divide(l, {x:2, y:4});
@@ -972,7 +965,6 @@ const divide$1 = (line, point$1) => Object.freeze({
 * Returns a line from a basis of coordinates (x1, y1, x2, y2)
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * // Line from 0,1 -> 10,15
 * Lines.fromNumbers(0, 1, 10, 15);
 * ```
@@ -1006,7 +998,6 @@ const fromNumbers$2 = (x1, y1, x2, y2) => {
 * See {@link toFlatArray} to create an array from a line.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const line = Lines.fromFlatArray(...[0, 0, 100, 100]);
 * // line is {a: { x:0, y:0 }, b: { x: 100, y: 100 } }
 * ```
@@ -1528,7 +1519,6 @@ const Unit3d = {
 * Converts to Cartesian coordinate from polar.
 *
 * ```js
-* import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
 *
 * const origin = { x: 50, y: 50}; // Polar origin
 * // Yields: { x, y }
@@ -1549,7 +1539,7 @@ const Unit3d = {
 */
 const toCartesian = (a, b, c) => {
 	if (isPolarCoord(a)) {
-		if (b === void 0) b = Empty$1;
+		if (typeof b === `undefined`) b = Empty$1;
 		if (isPoint(b)) return polarToCartesian(a.distance, a.angleRadian, b);
 		throw new Error(`Expecting (Coord, Point). Second parameter is not a point`);
 	} else if (typeof a === `object`) throw new TypeError(`First param is an object, but not a Coord: ${JSON.stringify(a)}`);
@@ -1563,7 +1553,6 @@ const toCartesian = (a, b, c) => {
 * Converts a Cartesian coordinate to polar
 *
 * ```js
-* import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
 *
 * // Yields: { angleRadian, distance }
 * const polar = Polar.fromCartesian({x: 50, y: 50}, origin);
@@ -1690,6 +1679,28 @@ const divide$4 = (v, amt) => {
 		distance: v.distance / amt
 	});
 };
+
+//#endregion
+//#region packages/geometry/src/point/point-type.ts
+/**
+* Placeholder point: `{ x: NaN, y: NaN }`
+* Use `isPlaceholder` to check if a point is a placeholder.
+* Use `Placeholder3d` get a point with `z` property.
+*/
+const Placeholder$3 = Object.freeze({
+	x: NaN,
+	y: NaN
+});
+/**
+* Placeholder point: `{x: NaN, y:NaN, z:NaN }`
+* Use `isPlaceholder` to check if a point is a placeholder.
+* Use `Placeholder` to get a point without `z` property.
+*/
+const Placeholder3d = Object.freeze({
+	x: NaN,
+	y: NaN,
+	z: NaN
+});
 
 //#endregion
 //#region packages/geometry/src/point/angle.ts
@@ -1973,7 +1984,6 @@ const fromPivot = (origin = {
 * Returns a {@link LinePath} from two points
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const path = Lines.fromPointsToPath(ptA, ptB);
 * ```
 * @param a 
@@ -2015,7 +2025,6 @@ const isEqual$2 = (...p) => {
 * true.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
 * const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
 * a === b; // false, because they are different objects
@@ -2335,8 +2344,6 @@ const isNaN = (a) => {
 * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
-* 
 * const circleA = { radius: 5 };
 * Circles.isPositioned(circle); // false
 * 
@@ -2356,7 +2363,6 @@ const isCirclePositioned = (p) => isCircle(p) && isPositioned$2(p);
 * Returns the distance between two circle centers.
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
 * const circleA = { radius: 5, x: 5, y: 5 }
 * const circleB = { radius: 10, x: 20, y: 20 }
 * const distance = Circles.distanceCenter(circleA, circleB);
@@ -2379,7 +2385,6 @@ const distanceCenter$1 = (a, b) => {
 * If `b` overlaps or is enclosed by `a`, distance is 0.
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
 * const circleA = { radius: 5, x: 5, y: 5 }
 * const circleB = { radius: 10, x: 20, y: 20 }
 * const distance = Circles.distanceCenter(circleA, circleB);
@@ -2459,7 +2464,6 @@ function sum$1(a1, ab2, ab3, ab4, ab5, ab6) {
 * Returns the point(s) of intersection between a circle and line.
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
 * const circle = { radius: 5, x: 5, y: 5 };
 * const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
 * const pts = Circles.intersectionLine(circle, line);
@@ -2538,7 +2542,6 @@ const circleCircle = (a, b) => intersections(a, b).length === 2;
 * Returns true if point is within or on boundary of `rect`.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * Rects.intersectsPoint(rect, { x: 100, y: 100});
 * Rects.intersectsPoint(rect, 100, 100);
 * ```
@@ -2587,8 +2590,6 @@ const isIntersecting$1 = (a, b) => {
 *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-*
 * const p = Rects.center({x:10, y:20, width:100, height:50});
 * const p2 = Rects.center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
 * ```
@@ -2619,7 +2620,6 @@ const center$1 = (rect, origin) => {
 * If `rect` does not have an x,y it's assumed to be 0,0
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 0, y: 0 };
 * Rects.distanceFromExterior(rect, { x: 20, y: 20 });
 * ```
@@ -2639,7 +2639,6 @@ const distanceFromExterior = (rect, pt) => {
 * Return the distance of `pt` to the center of `rect`.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 0, y: 0 };
 * Rects.distanceFromCenter(rect, { x: 20, y: 20 });
 * ```
@@ -3342,28 +3341,6 @@ const relation = (a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/point-type.ts
-/**
-* Placeholder point: `{ x: NaN, y: NaN }`
-* Use `isPlaceholder` to check if a point is a placeholder.
-* Use `Placeholder3d` get a point with `z` property.
-*/
-const Placeholder$3 = Object.freeze({
-	x: NaN,
-	y: NaN
-});
-/**
-* Placeholder point: `{x: NaN, y:NaN, z:NaN }`
-* Use `isPlaceholder` to check if a point is a placeholder.
-* Use `Placeholder` to get a point without `z` property.
-*/
-const Placeholder3d = Object.freeze({
-	x: NaN,
-	y: NaN,
-	z: NaN
-});
-
-//#endregion
 //#region packages/geometry/src/point/point-tracker.ts
 /**
 * A tracked point. Mutable. Useful for monitoring how
@@ -3705,21 +3682,21 @@ function quantiseEvery$1(pt, snap, middleRoundsUp = true) {
 /**
 * Returns a random 2D point on a 0..1 scale.
 * ```js
-* import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
+* import { Points } from "@ixfx/geometry.js";
 * const pt = Points.random(); // eg {x: 0.2549012, y:0.859301}
 * ```
 *
 * A custom source of randomness can be provided:
 * ```js
-* import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
-* import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+* import { Points } from "@ixfx/geometry.js";
+* import { weightedSource } from "@ixfx/random.js"
 * const pt = Points.random(weightedSource(`quadIn`));
 * ```
 * @param rando
 * @returns
 */
 const random$2 = (rando) => {
-	if (rando === void 0) rando = Math.random;
+	if (typeof rando === `undefined`) rando = Math.random;
 	return Object.freeze({
 		x: rando(),
 		y: rando()
@@ -3728,21 +3705,21 @@ const random$2 = (rando) => {
 /**
 * Returns a random 3D point on a 0..1 scale.
 * ```js
-* import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
+* import { Points } from "@ixfx/geometry";
 * const pt = Points.random(); // eg {x: 0.2549012, y:0.859301}
 * ```
 *
 * A custom source of randomness can be provided:
 * ```js
-* import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
-* import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+* import { Points } from "@ixfx/geometry";
+* import { weightedSource } from "@ixfx/random.js"
 * const pt = Points.random(weightedSource(`quadIn`));
 * ```
 * @param rando
 * @returns
 */
 const random3d = (rando) => {
-	if (rando === void 0) rando = Math.random;
+	if (typeof rando === `undefined`) rando = Math.random;
 	return Object.freeze({
 		x: rando(),
 		y: rando(),
@@ -3986,7 +3963,6 @@ __export(point_exports, {
 * Multiplies start and end of line by point.x, point.y.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * 
 * // Line 1,1 -> 10,10
 * const l = Lines.fromNumbers(1, 1, 10, 10);
@@ -4025,8 +4001,6 @@ const relativePosition$1 = (line, pt) => {
 * If `origin` is a number, it's presumed to be a 0..1 percentage of the line.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
-* 
 * // Rotates line by 0.1 radians around point 10,10
 * const r = Lines.rotate(line, 0.1, {x:10,y:10});
 * 
@@ -4045,8 +4019,8 @@ const relativePosition$1 = (line, pt) => {
 * @returns 
 */
 const rotate$2 = (line, amountRadian, origin) => {
-	if (amountRadian === void 0 || amountRadian === 0) return line;
-	if (origin === void 0) origin = .5;
+	if (typeof amountRadian === `undefined` || amountRadian === 0) return line;
+	if (typeof origin === `undefined`) origin = .5;
 	if (typeof origin === `number`) origin = interpolate$1(origin, line.a, line.b);
 	return Object.freeze({
 		...line,
@@ -4060,8 +4034,6 @@ const rotate$2 = (line, amountRadian, origin) => {
 /**
 * Subtracts both start and end points by given x,y
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
-* 
 * // Line 1,1 -> 10,10
 * const l = Lines.fromNumbers(1,1,10,10);
 * const ll = Lines.subtract(l, {x:2, y:4});
@@ -4082,7 +4054,7 @@ const subtract$1 = (line, point$1) => Object.freeze({
 /**
 * Adds both start and end points by given x,y
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+* 
 * // Line 1,1 -> 10,10
 * const l = Lines.fromNumbers(1,1,10,10);
 * const ll = Lines.sum(l, {x:2, y:4});
@@ -4198,7 +4170,6 @@ const isPlaceholder$2 = (l) => isPlaceholder(l.a) && isPlaceholder(l.b);
 * Applies `fn` to both start and end points.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * // Line 10,10 -> 20,20
 * const line = Lines.fromNumbers(10,10, 20,20);
 * 
@@ -4223,7 +4194,6 @@ const apply$1 = (line, fn) => Object.freeze({
 /**
 * Returns the angle in radians of a line, or two points
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * Lines.angleRadian(line);
 * Lines.angleRadian(ptA, ptB);
 * ```
@@ -4247,7 +4217,6 @@ const angleRadian$1 = (lineOrPoint, b) => {
 * for converting an absolutely-defined line to a relative one.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * 
 * // Line 1,1 -> 10,10
 * const l = Lines.fromNumbers(1,1,10,10);
@@ -4268,7 +4237,6 @@ const normaliseByRect$1 = (line, width, height$3) => Object.freeze({
 * Returns true if `point` is within `maxRange` of `line`.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const line = Lines.fromNumbers(0,20,20,20);
 * Lines.withinRange(line, {x:0,y:21}, 1); // True
 * ```
@@ -4286,7 +4254,6 @@ const withinRange = (line, point$1, maxRange) => {
 * 
 * @example
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * Lines.slope(line);
 * Lines.slope(ptA, ptB)
 * ```
@@ -4311,7 +4278,6 @@ const slope = (lineOrPoint, b) => {
 * 
 * @example Shorten by 50%, anchored at the midpoint
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const l = {
 *  a: {x:50, y:50}, b: {x: 100, y: 90}
 * }
@@ -4344,7 +4310,6 @@ const pointAtX = (line, x) => {
 * Returns a line extended from its `a` point by a specified distance
 *
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
 * const extended = Lines.extendFromA(line, 2);
 * ```
@@ -4368,7 +4333,6 @@ const extendFromA = (line, distance$2) => {
 * 
 * @example Basic usage
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const l = { a: {x: 0, y: 0}, b: {x: 100, y: 100} };
 * for (const p of Lines.pointsOf(l)) {
 *  // Do something with point `p`...
@@ -4414,7 +4378,6 @@ function* pointsOf(line) {
 * nearest point on `line`.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const d = Lines.distance(line, {x:10,y:10});
 * ```
 * 
@@ -4435,7 +4398,6 @@ const distance$1 = (line, point$1) => {
 * See {@link fromFlatArray} to create a line _from_ this representation.
 *
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * Lines.toFlatArray(line);
 * Lines.toFlatArray(pointA, pointB);
 * ```
@@ -4478,7 +4440,6 @@ function* asPoints(lines) {
 /**
 * Returns an SVG description of line
 * ```
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';
 * Lines.toSvgString(ptA, ptB);
 * ```
 * @param a 
@@ -4498,7 +4459,6 @@ const toSvgString$1 = (a, b) => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
 * wrapping the result of `sum`.
 * 
 * ```js
-* import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * // Create a path
 * const l = Lines.toPath(fromNumbers(0,0,10,10));
 * 
@@ -4656,7 +4616,6 @@ const equilateralFromVertex = (origin, length$4 = 10, angleRadian$2 = Math.PI / 
 * Returns the four corners of a rectangle as an array of Points.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 0, y: 0};
 * const pts = Rects.corners(rect);
 * ```
@@ -4695,8 +4654,6 @@ const corners$1 = (rect, origin) => {
 * Creates a rectangle from its top-left coordinate, a width and height.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-*
 * // Rectangle at 50,50 with width of 100, height of 200.
 * const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
 * ```
@@ -4832,21 +4789,20 @@ const randomPoint$1 = (within, opts = {}) => {
 /**
 * Returns a random positioned Rect on a 0..1 scale.
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
 * ```
 *
 * A custom source of randomness can be provided:
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-* import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+* import { Rects } from "@ixfx/geometry.js";
+* import { weightedSource } from "@ixfx/random.js"
 * const r = Rects.random(weightedSource(`quadIn`));
 * ```
 * @param rando
 * @returns
 */
 const random$1 = (rando) => {
-	if (rando === void 0) rando = Math.random;
+	rando ??= Math.random;
 	return Object.freeze({
 		x: rando(),
 		y: rando(),
@@ -4890,7 +4846,6 @@ const randomPoint$2 = (within, options = {}) => {
 * If not, `radius` is used as the x and y.
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
 * const circle = { radius: 5, x: 10, y: 10};
 * 
 * // Yields: { x: 5, y: 10 }
@@ -5201,8 +5156,6 @@ const area$5 = (circle) => {
 * Initialises a rectangle based on its center, a width and height
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-*
 * // Rectangle with center at 50,50, width 100 height 200
 * Rects.fromCenter({x: 50, y:50}, 100, 200);
 * ```
@@ -5338,7 +5291,6 @@ const piPi$3 = Math.PI * 2;
 * Returns the nearest point on `circle`'s perimeter closest to `point`.
 * 
 * ```js
-* import { Circles } from 'https://unpkg.com/ixfx/dist/geometry.js'
 * const pt = Circles.nearest(circle, {x:10,y:10});
 * ```
 * 
@@ -5367,8 +5319,6 @@ const nearest = (circle, point$1) => {
 * Returns a point on a circle's perimeter at a specified angle in radians
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
-* 
 * // Circle without position
 * const circleA = { radius: 5 };
 * 
@@ -5417,7 +5367,6 @@ const piPi$2 = Math.PI * 2;
 * Computes relative position along circle perimeter
 * 
 * ```js
-* import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
 * const circle = { radius: 100, x: 100, y: 100 };
 * 
 * // Get a point halfway around circle
@@ -5572,7 +5521,6 @@ __export(circle_exports, {
 * Returns the area of `rect`
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 100, y: 100 };
 * Rects.area(rect);
 * ```
@@ -5786,7 +5734,6 @@ function divideDim(rect, amount) {
 * Lines are given in order: top, right, bottom, left
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 100, y: 100 };
 * // Yields: array of length four
 * const lines = Rects.lines(rect);
@@ -5803,8 +5750,6 @@ const edges$1 = (rect, origin) => {
 /**
 * Returns a point on the edge of rectangle
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-*
 * const r1 = {x: 10, y: 10, width: 100, height: 50};
 * Rects.getEdgeX(r1, `right`);  // Yields: 110
 * Rects.getEdgeX(r1, `bottom`); // Yields: 10
@@ -5830,8 +5775,6 @@ const getEdgeX = (rect, edge) => {
 * Returns a point on the edge of rectangle
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
-*
 * const r1 = {x: 10, y: 10, width: 100, height: 50};
 * Rects.getEdgeY(r1, `right`);  // Yields: 10
 * Rects.getEdgeY(r1, `bottom`); // Yields: 60
@@ -5900,7 +5843,6 @@ const encompass = (rect, ...points) => {
 * Initialise a rectangle based on the width and height of a HTML element.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js"
 * Rects.fromElement(document.querySelector(`body`));
 * ```
 * @param el
@@ -5917,7 +5859,6 @@ const fromElement = (el) => ({
 * Returns a rectangle from a series of numbers: x, y, width, height OR width, height
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const r1 = Rects.fromNumbers(100, 200);
 * // {width: 100, height: 200}
 *
@@ -6027,7 +5968,6 @@ function getRectPositionedParameter(a, b, c, d) {
 * Returns _true_ if the width & height of the two rectangles is the same.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rectA = { width: 10, height: 10, x: 10, y: 10 };
 * const rectB = { width: 10, height: 10, x: 20, y: 20 };
 *
@@ -6051,7 +5991,6 @@ const isEqualSize = (a, b) => {
 * Both rectangles must be positioned or not.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rectA = { width: 10, height: 10, x: 10, y: 10 };
 * const rectB = { width: 10, height: 10, x: 20, y: 20 };
 *
@@ -6079,7 +6018,6 @@ const isEqual$3 = (a, b) => {
 * Returns the length of each side of the rectangle (top, right, bottom, left)
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 100, y: 100 };
 * // Yields: array of length four
 * const lengths = Rects.lengths(rect);
@@ -6178,7 +6116,6 @@ const PlaceholderPositioned = Object.freeze({
 /**
 * Returns the perimeter of `rect` (ie. sum of all edges)
 *  * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rect = { width: 100, height: 100, x: 100, y: 100 };
 * Rects.perimeter(rect);
 * ```
@@ -6228,7 +6165,6 @@ const subtractOp = (a, b) => a - b;
 * Subtracts width/height from `a`.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rectA = { width: 100, height: 100 };
 * const rectB = { width: 200, height: 200 };
 *
@@ -6298,7 +6234,6 @@ const sumOp = (a, b) => a + b;
 * Sums width/height of `b` with `a` (ie: a + b), returning result.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const rectA = { width: 100, height: 100 };
 * const rectB = { width: 200, height: 200 };
 *
@@ -6353,7 +6288,6 @@ function sumOffset(a, b) {
 * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
 *
 * ```js
-* import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
 * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
 * // [10, 20, 100, 200]
 * const r2 = Rects.toArray({ width: 100, height: 200 });

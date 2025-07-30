@@ -1,16 +1,19 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./src-BhN8B7uk.js";
-import { max, maxFast, numberArrayCompute } from "./src-Cyp-w-xE.js";
-import { continuously, getErrorMessage, intervalToMs } from "./src-Cjy4Jx5o.js";
-import { QueueMutable, eventRace, retryFunction, retryTask, waitFor } from "./src-Ct16kpGA.js";
-import { SimpleEventEmitter, indexOfCharCode, omitChars, splitByLength } from "./maps-CyRBIIF3.js";
-import "./src-CHmQoYVM.js";
-import { number, shortGuid, string } from "./bezier-BdPT6F7P.js";
-import { resolveEl } from "./src-BcsRx2nU.js";
-import "./dist-B0diH7Mh.js";
-import { StateMachineWithEvents, init, to } from "./with-events-VBGv2Bbw.js";
-import "./elapsed-DeRxnr7s.js";
-import { manualCapture } from "./src-COIiQ9nR.js";
+import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./src-C3Fpyyz5.js";
+import { max, maxFast, numberArrayCompute } from "./src-BVzuGCxJ.js";
+import { intervalToMs } from "./interval-type-CEZs43zj.js";
+import "./maps-C72wxMfj.js";
+import { QueueMutable, StateMachineWithEvents, continuously, eventRace, init, retryFunction, retryTask, to, waitFor } from "./src-Bip7wA20.js";
+import { SimpleEventEmitter, indexOfCharCode, omitChars, splitByLength } from "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import "./key-value-CfwtfZWC.js";
+import "./dist-27gr6RC3.js";
+import { getErrorMessage } from "./resolve-core-CDPnQKIe.js";
+import "./records-D95EU4q-.js";
+import { resolveEl } from "./src-CkUASbck.js";
+import "./src-DB-SLoee.js";
+import { number, shortGuid, string } from "./bezier-DZRwSDvJ.js";
+import { manualCapture } from "./src-AXYqc09L.js";
 
 //#region packages/io/src/codec.ts
 /**
@@ -1149,7 +1152,7 @@ __export(serial_exports, { Device: () => Device });
 * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
 *
 * ```
-* import { Serial } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Serial } from '@ixfx/io.js'
 * const s = new Serial.Device();
 * s.addEventListener(`change`, evt => {
 *  console.log(`State change ${evt.priorState} -> ${evt.newState}`);
@@ -1340,7 +1343,7 @@ __export(espruino_exports, {
 * If `opts.name` is specified, this will the the Bluetooth device sought.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruino.puck({ name:`Puck.js a123` });
 * ```
 *
@@ -1349,7 +1352,7 @@ __export(espruino_exports, {
 * To get more control over filtering, pass in `opts.filter`. `opts.name` is not used as a filter in this scenario.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const filters = [
 *  { namePrefix: `Puck.js` },
 *  { namePrefix: `Pixl.js` },
@@ -1394,14 +1397,14 @@ const bangle = async (opts = {}) => {
 * Create a serial-connected Espruino device.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruio.serial();
 * e.connect();
 * ```
 *
 * Options:
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruino.serial({ debug: true, evalTimeoutMs: 1000, name: `My Pico` });
 * e.connect();
 * ```
@@ -1467,7 +1470,7 @@ const getFilters = (opts, defaultNamePrefix) => {
 * `opts.filters` overrides and sets arbitary filters.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const filters = [
 *  { namePrefix: `Puck.js` },
 *  { namePrefix: `Pixl.js` },
@@ -1564,7 +1567,6 @@ const startTimeoutMs = 1e4;
 * Print available media devices to console
 * 
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
 * camera.dumpDevices(); // Will print results to console
 * ```
 * @param filterKind Defaults `videoinput`
@@ -1584,9 +1586,8 @@ const dumpDevices = async (filterKind = `videoinput`) => {
 *
 *
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
-* import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
-* 
+* import { Camera } from '@ixfx/io.js'
+* import { Video } from '@ixfx/visual.js'
 * try {
 *  const { videoEl, dispose } = await Camera.start();
 *  for await (const frame of Video.frames(videoEl)) {
@@ -1602,8 +1603,8 @@ const dumpDevices = async (filterKind = `videoinput`) => {
 *
 * _Constraints_ can be specified to select a camera and resolution:
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
-* import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+* import { Camera } from '@ixfx/io.js'
+* import { Video } from '@ixfx/visual.js'
 * 
 * try {
 *  const { videoEl, dispose } = await Camera.start({
@@ -2021,7 +2022,7 @@ var FrameProcessor = class {
 * 
 * The essential usage is:
 * ```js
-* import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { reconnectingWebsocket } from '@ixfx/io.js'
 * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
 *  onMessage: (msg) => {
 *    // Do something with received message...
@@ -2037,7 +2038,7 @@ var FrameProcessor = class {
 * 
 * More options can be provided to monitor state
 * ```js
-* import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { reconnectingWebsocket } from '@ixfx/io.js'
 * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
 *  onError: (err) => {
 *    console.error(err)

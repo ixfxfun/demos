@@ -13,10 +13,12 @@ type NumberGuardRange =
 type ResultOk<TValue> = {
   success: true;
   value: TValue;
+  info?: string;
 };
 type ResultError<TError> = {
   success: false;
   error: TError;
+  info?: string;
 };
 type ResultOrFunction = Result<any, any> | (() => undefined | Result<any, any>);
 type Result<TValue, TError> = ResultOk<TValue> | ResultError<TError>;
@@ -112,7 +114,7 @@ declare const integerParse: (value: string | number | null, range?: NumberGuardR
  * @param range Range to enforce
  * @returns
  */
-declare const numberTest: (value?: unknown, range?: NumberGuardRange, parameterName?: string) => Result<number, string>;
+declare const numberTest: (value?: unknown, range?: NumberGuardRange, parameterName?: string, info?: string) => Result<number, string>;
 /**
  * Checks if `t` is not a number or within specified range.
  * Throws if invalid. Use {@link numberTest} to test without throwing.
@@ -154,7 +156,7 @@ declare const numberDecimalTest: (a: number, b: number, decimals?: number) => Re
  * @param parameterName Param name for customising exception message
  * @returns
  */
-declare const percentTest: (value: number, parameterName?: string) => Result<number, string>;
+declare const percentTest: (value: number, parameterName?: string, info?: string) => Result<number, string>;
 /**
  * Checks if `value` an integer and meets additional criteria.
  * See {@link numberTest} for guard details, or use that if integer checking is not required.

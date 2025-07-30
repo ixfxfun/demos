@@ -1,4 +1,4 @@
-import { Interval, KeyValue, KeyValueSortSyles, ToString } from "./index-ZOxM3wdD.js";
+import { Interval, KeyValue, KeyValueSortSyles, ToString } from "@ixfx/core";
 import { SimpleEventEmitter } from "@ixfx/events";
 import * as _ixfx_numbers0 from "@ixfx/numbers";
 import { GetOrGenerate } from "@ixfx/core/maps";
@@ -294,7 +294,7 @@ declare class NumberTracker extends PrimitiveTracker<number, NumberTrackerResult
  * Usage:
  *
  * ```js
- * import { number } from 'https://unpkg.com/ixfx/dist/trackers.js';
+ * import { number } from '@ixfx/trackers.js';
  *
  * const t = number();
  * t.seen(10);
@@ -352,7 +352,7 @@ declare class IntervalTracker extends NumberTracker {
  * records the interval between each call to `mark`.
  *
  * ```js
- * import { interval } from 'https://unpkg.com/ixfx/dist/trackers.js';
+ * import { interval } from '@ixfx/trackers.js';
  *
  * const t = interval();
  *

@@ -2,7 +2,6 @@ import * as Mod from '@ixfx/modulation.js';
 import * as Numbers from '@ixfx/numbers.js';
 import { CanvasHelper } from '@ixfx/visual.js';
 
-
 // Define settings
 const settings = Object.freeze({
   arc: {

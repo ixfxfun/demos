@@ -1,8 +1,12 @@
-import "./src-BhN8B7uk.js";
-import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-Cyp-w-xE.js";
-import { keyValueSorter } from "./src-Cjy4Jx5o.js";
-import { timeout } from "./src-Ct16kpGA.js";
-import { SimpleEventEmitter, getOrGenerate } from "./maps-CyRBIIF3.js";
+import "./src-C3Fpyyz5.js";
+import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-BVzuGCxJ.js";
+import "./interval-type-CEZs43zj.js";
+import { getOrGenerate } from "./maps-C72wxMfj.js";
+import { timeout } from "./src-Bip7wA20.js";
+import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import { keyValueSorter } from "./key-value-CfwtfZWC.js";
+import "./resolve-core-CDPnQKIe.js";
 
 //#region packages/trackers/src/frequency-mutable.ts
 /**
@@ -376,7 +380,7 @@ var NumberTracker = class extends PrimitiveTracker {
 * Usage:
 *
 * ```js
-* import { number } from 'https://unpkg.com/ixfx/dist/trackers.js';
+* import { number } from '@ixfx/trackers.js';
 *
 * const t = number();
 * t.seen(10);
@@ -437,7 +441,7 @@ var IntervalTracker = class extends NumberTracker {
 * records the interval between each call to `mark`.
 *
 * ```js
-* import { interval } from 'https://unpkg.com/ixfx/dist/trackers.js';
+* import { interval } from '@ixfx/trackers.js';
 *
 * const t = interval();
 *

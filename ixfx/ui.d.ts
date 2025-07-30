@@ -1,8 +1,8 @@
-import { Interval, RecursivePartial } from "./index-ZOxM3wdD.js";
+import * as _ixfx_core0 from "@ixfx/core";
+import { Interval, Pathed } from "@ixfx/core";
 import * as _ixfx_rx0 from "@ixfx/rx";
 import { Reactive, ReactiveInitial, ReactiveNonInitial, ReactiveWritable } from "@ixfx/rx";
 import { Colour } from "@ixfx/visual";
-import { PathDataChange } from "@ixfx/core/records";
 import { HslScalar } from "@ixfx/visual/colour";
 import { EventSourceOptions } from "@ixfx/rx/from";
 
@@ -285,8 +285,8 @@ declare function fromDomQuery(query: string): _ixfx_rx0.Reactive<HTMLElement[]> 
   set(value: HTMLElement[]): void;
 } & {
   onField(fieldName: string, handler: (result: _ixfx_rx0.ObjectFieldHandler) => void): () => void;
-  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
-  update(changedPart: (RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
+  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
+  update(changedPart: (_ixfx_core0.RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
   updateField(field: string, value: any): void;
 } & {
   last(): HTMLElement[];
@@ -491,7 +491,7 @@ declare const bindUpdate: <V>(source: _ixfx_rx0.Reactive<V>, elOrQuery: string |
  * @param opts
  * @returns
  */
-declare const bindDiffUpdate: <V>(source: _ixfx_rx0.ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
+declare const bindDiffUpdate: <V>(source: _ixfx_rx0.ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: Pathed.PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
   refresh: () => void;
 };
 /**

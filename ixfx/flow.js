@@ -1,10 +1,12 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-BhN8B7uk.js";
-import { clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-Cyp-w-xE.js";
-import { continuously, defaultComparer, elapsedSince, elapsedToHumanString, getErrorMessage, intervalToMs, logSet, resolve, resolveLogOption, resolveSync, sleep } from "./src-Cjy4Jx5o.js";
-import { continuously as continuously$1, mutable$1 as mutable, rateMinimum } from "./src-Ct16kpGA.js";
-import { SimpleEventEmitter } from "./maps-CyRBIIF3.js";
-import { elapsedInfinity, elapsedSince as elapsedSince$1 } from "./elapsed-DeRxnr7s.js";
+import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-C3Fpyyz5.js";
+import { clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-BVzuGCxJ.js";
+import { elapsedToHumanString, intervalToMs } from "./interval-type-CEZs43zj.js";
+import { defaultComparer, elapsedInfinity, elapsedSince, sleep } from "./maps-C72wxMfj.js";
+import { continuously, mutable$1 as mutable, rateMinimum } from "./src-Bip7wA20.js";
+import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
+import "./is-primitive-B-tAS1Xm.js";
+import { getErrorMessage, logSet, resolve, resolveLogOption, resolveSync } from "./resolve-core-CDPnQKIe.js";
 
 //#region packages/flow/src/behaviour-tree.ts
 const getName = (t, defaultValue = ``) => {
@@ -1386,8 +1388,8 @@ const rateMinimum$1 = (options) => {
 * @example
 * Return values from a generator every 500ms
 * ```js
-* import { repeat } from 'https://unpkg.com/ixfx/dist/flow.js'
-* import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
+* import { repeat } from '@ixfx/flow.js'
+* import { count } from '@ixfx/numbers.js'
 * for await (const v of repeat(count(10), { fixed: 1000 })) {
 *  // Do something with `v`
 * }
@@ -2182,13 +2184,11 @@ var SyncWait = class {
 * so you don't create it directly. Rather, use:
 * 
 * ```js
-* import { TaskQueueMutable } from "https://unpkg.com/ixfx/dist/flow.js"
 * const queue = TaskQueueMutable.shared;
 * ```
 *
 * @example Usage
 * ```js
-* import { TaskQueueMutable, sleep } from "https://unpkg.com/ixfx/dist/flow.js"
 * const queue = TaskQueueMutable.shared;
 * q.enqueue(async () => {
 *  // Takes one second to run
@@ -2322,7 +2322,6 @@ const throttle = (callback, intervalMinMs) => {
 * A function that returns _true_ when an interval has elapsed
 *
 * ```js
-* import { hasElapsed } from "https://unpkg.com/ixfx/dist/flow.js"
 * const oneSecond = hasElapsed(1000);
 * 
 * // Keep calling to check if time has elapsed.
@@ -2345,7 +2344,6 @@ function hasElapsed(elapsed) {
 * Starts when return function is first invoked.
 *
 * ```js
-* import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
 * const timer = Flow.ofTotal(1000);
 * 
 * // Call timer() to find out the completion
@@ -2386,7 +2384,6 @@ function ofTotal(duration, opts = {}) {
 * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
 *
 * ```js
-* import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
 * const timer = Flow.ofTotalTicks(1000);
 * timer(); // Returns 0..1
 * ```
@@ -2523,7 +2520,6 @@ const relative = (total, options = {}) => {
 *
 * @example Prints around 0/0.5 each second, as timer is half a cycle per second
 * ```js
-* import { frequencyTimer } from "https://unpkg.com/ixfx/dist/flow.js"
 * const t = frequencyTimer(0.5);
 * setInterval(() => {
 *  console.log(t.elapsed);
@@ -3338,7 +3334,7 @@ var StateMachineWithEvents = class extends SimpleEventEmitter {
 	reset() {
 		this.#setIsDone(false);
 		this.#sm = cloneState(this.#smInitial);
-		this.#changedAt = elapsedSince$1();
+		this.#changedAt = elapsedSince();
 	}
 	/**
 	* Throws if it's not valid to transition to `newState`
@@ -3368,7 +3364,7 @@ var StateMachineWithEvents = class extends SimpleEventEmitter {
 		if (newState === this.#sm.value) return;
 		this.#sm = to(this.#sm, newState);
 		if (this.#debug) console.log(`StateMachine: ${priorState} -> ${newState}`);
-		this.#changedAt = elapsedSince$1();
+		this.#changedAt = elapsedSince();
 		setTimeout(() => {
 			this.fireEvent(`change`, {
 				newState,
@@ -3419,5 +3415,5 @@ __export(state_machine_exports, {
 });
 
 //#endregion
-export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously$1 as continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum$1 as rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum$1 as rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
 //# sourceMappingURL=flow.js.map

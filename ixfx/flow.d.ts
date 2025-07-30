@@ -1,7 +1,7 @@
-import { BasicType, Comparer, HasCompletion, Interval, ResolveToValue, ResolveToValueSync, sleep } from "./index-ZOxM3wdD.js";
-import { Result } from "@ixfx/guards";
+import { BasicType, Comparer, HasCompletion, Interval, ResolveToValue, ResolveToValueSync, sleep } from "@ixfx/core";
 import { LogOption } from "@ixfx/debug";
 import { SimpleEventEmitter } from "@ixfx/events";
+import { Result } from "@ixfx/guards";
 export * from "@ixfx/core/continuously";
 
 //#region packages/flow/src/behaviour-tree.d.ts
@@ -1003,8 +1003,8 @@ type RepeatOpts = Partial<Readonly<{
  * @example
  * Return values from a generator every 500ms
  * ```js
- * import { repeat } from 'https://unpkg.com/ixfx/dist/flow.js'
- * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
+ * import { repeat } from '@ixfx/flow.js'
+ * import { count } from '@ixfx/numbers.js'
  * for await (const v of repeat(count(10), { fixed: 1000 })) {
  *  // Do something with `v`
  * }
@@ -1574,13 +1574,11 @@ type TaskQueueEvents = {
  * so you don't create it directly. Rather, use:
  *
  * ```js
- * import { TaskQueueMutable } from "https://unpkg.com/ixfx/dist/flow.js"
  * const queue = TaskQueueMutable.shared;
  * ```
  *
  * @example Usage
  * ```js
- * import { TaskQueueMutable, sleep } from "https://unpkg.com/ixfx/dist/flow.js"
  * const queue = TaskQueueMutable.shared;
  * q.enqueue(async () => {
  *  // Takes one second to run
@@ -1712,7 +1710,6 @@ type RelativeTimerOpts = TimerOpts & {
  * A function that returns _true_ when an interval has elapsed
  *
  * ```js
- * import { hasElapsed } from "https://unpkg.com/ixfx/dist/flow.js"
  * const oneSecond = hasElapsed(1000);
  *
  * // Keep calling to check if time has elapsed.
@@ -1729,7 +1726,6 @@ declare function hasElapsed(elapsed: Interval): () => boolean;
  * Starts when return function is first invoked.
  *
  * ```js
- * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
  * const timer = Flow.ofTotal(1000);
  *
  * // Call timer() to find out the completion
@@ -1761,7 +1757,6 @@ declare function ofTotal(duration: Interval, opts?: {
  * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
  *
  * ```js
- * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
  * const timer = Flow.ofTotalTicks(1000);
  * timer(); // Returns 0..1
  * ```
@@ -1851,7 +1846,6 @@ declare const relative: (total: number, options?: Partial<RelativeTimerOpts>) =>
  *
  * @example Prints around 0/0.5 each second, as timer is half a cycle per second
  * ```js
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist/flow.js"
  * const t = frequencyTimer(0.5);
  * setInterval(() => {
  *  console.log(t.elapsed);

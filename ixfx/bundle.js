@@ -1,19 +1,278 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, isPowerOfTwo, numberTest, resultThrow, src_exports } from "./src-BhN8B7uk.js";
-import { max, maxFast, numberArrayCompute, src_exports as src_exports$1, src_exports$1 as src_exports$2 } from "./src-Cyp-w-xE.js";
-import { align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, getErrorMessage, getPathsAndData, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, records_exports, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, src_exports as src_exports$3, toStringDefault, toStringOrdered, unique, uniqueInstances } from "./src-Cjy4Jx5o.js";
-import { QueueMutable, eventRace, retryFunction, retryTask, src_exports as src_exports$4, src_exports$1 as src_exports$5, waitFor } from "./src-Ct16kpGA.js";
-import { SimpleEventEmitter, afterMatch, beforeMatch, findBySomeKey, indexOfCharCode, omitChars, splitByLength, src_exports as src_exports$6, src_exports$1 as src_exports$7, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "./maps-CyRBIIF3.js";
-import { src_exports as src_exports$8 } from "./src-CHmQoYVM.js";
-import { number, shortGuid, src_exports as src_exports$10, src_exports$1 as src_exports$9, string } from "./bezier-BdPT6F7P.js";
-import { resolveEl, src_exports as src_exports$11 } from "./src-BcsRx2nU.js";
-import "./dist-B0diH7Mh.js";
-import { StateMachineWithEvents, init, to } from "./with-events-VBGv2Bbw.js";
-import "./elapsed-DeRxnr7s.js";
-import { fromCss8bit, fromCssScalar, manualCapture, src_exports as src_exports$12, toColour, toCssColour, toCssString } from "./src-COIiQ9nR.js";
-import { src_exports as src_exports$13, src_exports$1 as src_exports$14 } from "./src-xHr0qBxY.js";
-import { debounce, event, eventTrigger, hasLast as hasLast$1, initStream, messageHasValue, messageIsSignal, object, observable, src_exports as src_exports$15, transform } from "./src-Dq_-RA9k.js";
+import { integerTest, isPowerOfTwo, numberTest, resultThrow, src_exports } from "./src-C3Fpyyz5.js";
+import { max, maxFast, numberArrayCompute, src_exports as src_exports$1, src_exports$1 as src_exports$2 } from "./src-BVzuGCxJ.js";
+import { compareIterableValuesShallow, defaultToString, elapsedToHumanString, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInterval, isMap, isSet, toStringDefault, toStringOrdered } from "./interval-type-CEZs43zj.js";
+import { comparerInverse, defaultComparer, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, findBySomeKey, jsComparer, numericComparer, promiseFromEvent, sleep, sleepWhile } from "./maps-C72wxMfj.js";
+import { QueueMutable, StateMachineWithEvents, continuously, eventRace, init, retryFunction, retryTask, src_exports as src_exports$3, src_exports$1 as src_exports$4, to, waitFor } from "./src-Bip7wA20.js";
+import { SimpleEventEmitter, afterMatch, beforeMatch, defaultKeyer, indexOfCharCode, omitChars, splitByLength, src_exports as src_exports$5, src_exports$1 as src_exports$6, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst, toStringAbbreviate } from "./src-BGGRKLH-.js";
+import { isInteger } from "./is-integer-BPLQCDA2.js";
+import { isPrimitive, isPrimitiveOrObject } from "./is-primitive-B-tAS1Xm.js";
+import { keyValueSorter } from "./key-value-CfwtfZWC.js";
+import { unique, uniqueInstances } from "./dist-27gr6RC3.js";
+import { getErrorMessage, hasLast, isReactive, resolve, resolveSync, resolveWithFallback, resolveWithFallbackSync, src_exports as src_exports$7 } from "./resolve-core-CDPnQKIe.js";
+import { records_exports } from "./records-D95EU4q-.js";
+import { getPathsAndData, pathed_exports, src_exports as src_exports$8, src_exports$1 as src_exports$9 } from "./src-BYvifgKg.js";
+import { resolveEl, src_exports as src_exports$10 } from "./src-CkUASbck.js";
+import { src_exports as src_exports$11 } from "./src-DB-SLoee.js";
+import { number, shortGuid, src_exports as src_exports$12, src_exports$1 as src_exports$13, string } from "./bezier-DZRwSDvJ.js";
+import { fromCss as fromCss$1, fromCss$1 as fromCss, manualCapture, src_exports as src_exports$14, toColour, toCssColour, toCssString } from "./src-AXYqc09L.js";
+import { debounce, event, eventTrigger, hasLast as hasLast$1, initStream, messageHasValue, messageIsSignal, object, observable, src_exports as src_exports$15, transform } from "./src-DR7bGmIS.js";
 
+//#region packages/core/dist/src/correlate.js
+const orderScore = (a, b) => {
+	if (a.score > b.score) return -1;
+	else if (a.score < b.score) return 1;
+	return 0;
+};
+/**
+* Attempts to align prior data with new data, based on a provided similarity function.
+*
+* See also `alignById` for a version which encloses parameters.
+*
+* ```js
+* // Compare data based on x,y distance
+* const fn = (a, b) => {
+*  return 1-Points.distance(a, b);
+* }
+* const lastData = [
+*  { id:`1`, x:100, y:200 }
+*  ...
+* ]
+* const newData = [
+*  { id:`2`, x:101, y:200 }
+* ]
+* const aligned = Correlate.align(fn, lastdata, newData, opts);
+*
+* // Result:
+* [
+*  { id:`1`, x:101, y:200 }
+* ]
+* ```
+* @param similarityFunction Function to compute similarity
+* @param lastData Old data
+* @param newData New data
+* @param options Options
+* @returns
+*/
+const align = (similarityFunction, lastData, newData, options = {}) => {
+	const matchThreshold = options.matchThreshold ?? 0;
+	const debug = options.debug ?? false;
+	const results = /* @__PURE__ */ new Map();
+	const newThings = [];
+	const lastMap = /* @__PURE__ */ new Map();
+	lastData?.forEach((d, index) => {
+		if (typeof d === `undefined`) throw new Error(`'lastData' contains undefined (index: ${index.toString()})`);
+		lastMap.set(d.id, d);
+	});
+	for (const newD of newData) {
+		if (!lastData || lastData.length === 0) {
+			if (debug) console.debug(`Correlate.align() new id: ${newD.id}`);
+			newThings.push(newD);
+			continue;
+		}
+		const scoredLastValues = Array.from(lastMap.values()).map((last) => ({
+			id: last.id,
+			score: last === null ? -1 : similarityFunction(last, newD),
+			last
+		}));
+		if (scoredLastValues.length === 0) {
+			if (debug) console.debug(`Correlate.align() no valid last values id: ${newD.id}`);
+			newThings.push(newD);
+			continue;
+		}
+		scoredLastValues.sort(orderScore);
+		const top = scoredLastValues[0];
+		if (top.score < matchThreshold) {
+			if (debug) console.debug(`Correlate.align() new item does not reach threshold. Top score: ${top.score.toString()} id: ${newD.id}`);
+			newThings.push(newD);
+			continue;
+		}
+		if (debug && top.id !== newD.id) console.log(`Correlate.align() Remapped ${newD.id} -> ${top.id} (score: ${top.score.toString()})`);
+		results.set(top.id, {
+			...newD,
+			id: top.id
+		});
+		lastMap.delete(top.id);
+	}
+	newThings.forEach((t) => results.set(t.id, t));
+	return Array.from(results.values());
+};
+/**
+* Returns a function that attempts to align a series of data by its id.
+* See also {@link align} for a version with no internal storage.
+*
+* ```js
+* // Compare data based on x,y distance
+* const fn = (a, b) => {
+*  return 1-Points.distance(a, b);
+* }
+* const aligner = Correlate.alignById(fn, opts);
+*
+* const lastData = [
+*  { id:`1`, x:100, y:200 }
+*  ...
+* ]
+* const aligned = aligner(lastData);
+*
+* ```
+* @param fn Function to compute similarity
+* @param options Options
+* @returns
+*/
+const alignById = (fn, options = {}) => {
+	let lastData = [];
+	const compute = (newData) => {
+		lastData = align(fn, lastData, newData, options);
+		return [...lastData];
+	};
+	return compute;
+};
+
+//#endregion
+//#region packages/core/dist/src/filters.js
+/**
+* Returns `v` if `predicate` returns _true_,
+* alternatively returning `skipValue`.
+*
+* ```js
+* // Return true if value is less than 10
+* const p = v => v < 10;
+*
+* filterValue(5, p, 0);   // 5
+* filterValue(20, p, 0);  // 0
+* ```
+* @param v Value to test
+* @param predicate Predicate
+* @param skipValue Value to return if predicate returns false
+* @returns Input value if predicate is _true_, or `skipValue` if not.
+*/
+const filterValue = (v, predicate, skipValue) => {
+	if (predicate(v)) return v;
+	return skipValue;
+};
+
+//#endregion
+//#region packages/core/dist/src/is-equal-test.js
+/**
+* Wraps the `eq` function, tracing the input data result
+* ```js
+* // Init trace
+* const traceEq = isEqualTrace(isEqualValueDefault);
+* // Use it in some function that takes IsEqual<T>
+* compare(a, b, eq);
+* ```
+* @param eq
+* @returns
+*/
+const isEqualTrace = (eq) => {
+	return (a, b) => {
+		const result = eq(a, b);
+		console.log(`isEqualTrace eq: ${result} a: ${toStringAbbreviate(a)} b: ${toStringAbbreviate(b)}`);
+		return result;
+	};
+};
+
+//#endregion
+//#region packages/core/dist/src/platform.js
+/**
+* Returns _true_ if it seems like the code is running on iOS (iPad/iPhone)
+* @returns
+*/
+const runningiOS = () => [
+	`iPad Simulator`,
+	`iPhone Simulator`,
+	`iPod Simulator`,
+	`iPad`,
+	`iPhone`,
+	`iPod`
+].includes(navigator.platform) || navigator.userAgent.includes(`Mac`) && `ontouchend` in document;
+
+//#endregion
+//#region packages/core/dist/src/util/zip.js
+const zip = (...arrays) => {
+	if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
+	const lengths = arrays.map((a) => a.length);
+	const returnValue = [];
+	const length = lengths[0];
+	for (let index = 0; index < length; index++) returnValue.push(arrays.map((a) => a[index]));
+	return returnValue;
+};
+
+//#endregion
+//#region packages/core/dist/src/resolve-fields.js
+/**
+* Returns a copy of `object`, with the same properties. For each property
+* that has a basic value (string, number, boolean, object), the value is set
+* for the return object. If the property is a function or generator, its value
+* is used instead. Async functions and generators are also usable.
+*
+* Use {@link resolveFieldsSync} for a synchronous version.
+*
+* Not recursive.
+*
+* In the below example, the function for the property `random` is invoked.
+* ```js
+* const state = {
+*  length: 10,
+*  random: () => Math.random();
+* }
+* const x = resolveFields(state);
+* // { length: 10, random: 0.1235 }
+* ```
+*
+* It also works with generators. Probably best with those that are infinite.
+*
+* ```js
+* import { count } from './numbers.js';
+*
+* const state = {
+*  length: 10,
+*  index: count(2) // Generator that yields: 0, 1 and then ends
+* }
+* resolveFields(state); // { length: 10, index: 0 }
+* resolveFields(state); // { length: 10, index: 1 }
+* // Generator finishes after counting twice:
+* resolveFields(state); // { length: 10, index: undefined }
+* ```
+* @param object
+* @returns
+*/
+async function resolveFields(object$1) {
+	const resolvers = [];
+	const keys = [];
+	for (const entry of Object.entries(object$1)) {
+		const resolvable = entry[1];
+		resolvers.push(resolve(resolvable));
+		keys.push(entry[0]);
+	}
+	const results = await Promise.all(resolvers);
+	const entries = zip(keys, results);
+	return Object.fromEntries(entries);
+}
+/**
+* 'Resolves' all the fields of `object` in a synchronous manner.
+* Uses {@link resolveSync} under-the-hood
+* @param object
+* @returns
+*/
+function resolveFieldsSync(object$1) {
+	const entries = [];
+	for (const entry of Object.entries(object$1)) {
+		const resolvable = entry[1];
+		const value = resolveSync(resolvable);
+		entries.push([entry[0], value]);
+	}
+	return Object.fromEntries(entries);
+}
+/**
+* Returns a function that resolves `object`.
+*
+* Use {@link resolveFields} to resolve an object directly.
+* @param object
+* @returns
+*/
+
+//#endregion
 //#region packages/io/dist/src/codec.js
 /**
 * Handles utf-8 text encoding/decoding
@@ -1156,7 +1415,7 @@ __export(serial_exports, { Device: () => Device });
 * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
 *
 * ```
-* import { Serial } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Serial } from '@ixfx/io.js'
 * const s = new Serial.Device();
 * s.addEventListener(`change`, evt => {
 *  console.log(`State change ${evt.priorState} -> ${evt.newState}`);
@@ -1348,7 +1607,7 @@ __export(espruino_exports, {
 * If `opts.name` is specified, this will the the Bluetooth device sought.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruino.puck({ name:`Puck.js a123` });
 * ```
 *
@@ -1357,7 +1616,7 @@ __export(espruino_exports, {
 * To get more control over filtering, pass in `opts.filter`. `opts.name` is not used as a filter in this scenario.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const filters = [
 *  { namePrefix: `Puck.js` },
 *  { namePrefix: `Pixl.js` },
@@ -1402,14 +1661,14 @@ const bangle = async (opts = {}) => {
 * Create a serial-connected Espruino device.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruio.serial();
 * e.connect();
 * ```
 *
 * Options:
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const e = await Espruino.serial({ debug: true, evalTimeoutMs: 1000, name: `My Pico` });
 * e.connect();
 * ```
@@ -1475,7 +1734,7 @@ const getFilters = (opts, defaultNamePrefix) => {
 * `opts.filters` overrides and sets arbitary filters.
 *
 * ```js
-* import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { Espruino } from '@ixfx/io.js'
 * const filters = [
 *  { namePrefix: `Puck.js` },
 *  { namePrefix: `Pixl.js` },
@@ -1572,7 +1831,6 @@ const startTimeoutMs = 1e4;
 * Print available media devices to console
 *
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
 * camera.dumpDevices(); // Will print results to console
 * ```
 * @param filterKind Defaults `videoinput`
@@ -1592,9 +1850,8 @@ const dumpDevices = async (filterKind = `videoinput`) => {
 *
 *
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
-* import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
-*
+* import { Camera } from '@ixfx/io.js'
+* import { Video } from '@ixfx/visual.js'
 * try {
 *  const { videoEl, dispose } = await Camera.start();
 *  for await (const frame of Video.frames(videoEl)) {
@@ -1610,8 +1867,8 @@ const dumpDevices = async (filterKind = `videoinput`) => {
 *
 * _Constraints_ can be specified to select a camera and resolution:
 * ```js
-* import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
-* import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+* import { Camera } from '@ixfx/io.js'
+* import { Video } from '@ixfx/visual.js'
 *
 * try {
 *  const { videoEl, dispose } = await Camera.start({
@@ -2029,7 +2286,7 @@ var FrameProcessor = class {
 *
 * The essential usage is:
 * ```js
-* import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { reconnectingWebsocket } from '@ixfx/io.js'
 * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
 *  onMessage: (msg) => {
 *    // Do something with received message...
@@ -2045,7 +2302,7 @@ var FrameProcessor = class {
 *
 * More options can be provided to monitor state
 * ```js
-* import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+* import { reconnectingWebsocket } from '@ixfx/io.js'
 * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
 *  onError: (err) => {
 *    console.error(err)
@@ -2334,12 +2591,18 @@ function domHslInputValue(targetOrQuery, options = {}) {
 		}
 	});
 	const rx = transform(input, (v) => {
-		return fromCssScalar(v, { ensureSafe: true });
+		return fromCss(v, {
+			scalar: true,
+			ensureSafe: true
+		});
 	});
 	return {
 		...rx,
 		last() {
-			return fromCssScalar(input.last(), { ensureSafe: true });
+			return fromCss(input.last(), {
+				scalar: true,
+				ensureSafe: true
+			});
 		},
 		set(value) {
 			input.set(toCssString(value));
@@ -2502,7 +2765,7 @@ function domForm(formElOrQuery, options = {}) {
 				entries.push([k, vBool]);
 			} else if (typeHint === `colour`) {
 				const vRgb = toCssColour(vString);
-				entries.push([k, fromCss8bit(vRgb)]);
+				entries.push([k, fromCss$1(vRgb, { scalar: false })]);
 			} else entries.push([k, v.toString()]);
 		}
 		for (const el of formEl.querySelectorAll(`input[type="checkbox"]`)) if (!el.checked && el.value === `true`) entries.push([el.name, false]);
@@ -3147,5 +3410,5 @@ var src_exports$17 = {};
 __export(src_exports$17, { Rx: () => rx_exports });
 
 //#endregion
-export { src_exports$2 as Arrays, src_exports$5 as Collections, src_exports$3 as Debug, src_exports$11 as Dom, src_exports$7 as Events, src_exports$4 as Flow, src_exports$8 as Geometry, src_exports as Guards, src_exports$16 as Io, src_exports$6 as Iterables, src_exports$14 as Modulation, src_exports$1 as Numbers, src_exports$13 as Process, src_exports$10 as Random, records_exports as Records, src_exports$15 as Rx, src_exports$9 as Trackers, src_exports$17 as Ui, src_exports$12 as Visual, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
+export { src_exports$2 as Arrays, src_exports$4 as Collections, src_exports$7 as Debug, src_exports$10 as Dom, src_exports$6 as Events, src_exports$3 as Flow, src_exports$11 as Geometry, src_exports as Guards, src_exports$16 as Io, src_exports$5 as Iterables, src_exports$9 as Modulation, src_exports$1 as Numbers, pathed_exports as Pathed, src_exports$8 as Process, src_exports$13 as Random, records_exports as Records, src_exports$15 as Rx, src_exports$12 as Trackers, src_exports$17 as Ui, src_exports$14 as Visual, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=bundle.js.map

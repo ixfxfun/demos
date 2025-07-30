@@ -70,9 +70,9 @@ function resultIsOk(result) {
 * @returns 
 */
 function resultToError(result) {
-	if (typeof result.error === `string`) throw new Error(result.error);
+	if (typeof result.error === `string`) throw new Error(result.error, { cause: result.info });
 	if (result.error instanceof Error) throw result.error;
-	return new Error(JSON.stringify(result.error));
+	return new Error(JSON.stringify(result.error), { cause: result.info });
 }
 /**
 * Unwraps the result, returning its value if OK.
@@ -191,84 +191,97 @@ const integerParse = (value, range = ``, defaultValue = NaN) => {
 * @param range Range to enforce
 * @returns
 */
-const numberTest = (value, range = ``, parameterName = `?`) => {
+const numberTest = (value, range = ``, parameterName = `?`, info) => {
 	if (value === null) return {
 		success: false,
-		error: `Parameter '${parameterName}' is null`
+		error: `Parameter '${parameterName}' is null`,
+		info
 	};
 	if (typeof value === `undefined`) return {
 		success: false,
-		error: `Parameter '${parameterName}' is undefined`
+		error: `Parameter '${parameterName}' is undefined`,
+		info
 	};
 	if (Number.isNaN(value)) return {
 		success: false,
-		error: `Parameter '${parameterName}' is NaN`
+		error: `Parameter '${parameterName}' is NaN`,
+		info
 	};
 	if (typeof value !== `number`) return {
 		success: false,
-		error: `Parameter '${parameterName}' is not a number (${JSON.stringify(value)})`
+		error: `Parameter '${parameterName}' is not a number (${JSON.stringify(value)})`,
+		info
 	};
 	switch (range) {
 		case `finite`: {
 			if (!Number.isFinite(value)) return {
 				success: false,
-				error: `Parameter '${parameterName} must be finite (Got: ${value})`
+				error: `Parameter '${parameterName} must be finite (Got: ${value})`,
+				info
 			};
 			break;
 		}
 		case `positive`: {
 			if (value < 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be at least zero (${value})`
+				error: `Parameter '${parameterName}' must be at least zero (${value})`,
+				info
 			};
 			break;
 		}
 		case `negative`: {
 			if (value > 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be zero or lower (${value})`
+				error: `Parameter '${parameterName}' must be zero or lower (${value})`,
+				info
 			};
 			break;
 		}
 		case `aboveZero`: {
 			if (value <= 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be above zero (${value})`
+				error: `Parameter '${parameterName}' must be above zero (${value})`,
+				info
 			};
 			break;
 		}
 		case `belowZero`: {
 			if (value >= 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be below zero (${value})`
+				error: `Parameter '${parameterName}' must be below zero (${value})`,
+				info
 			};
 			break;
 		}
 		case `percentage`: {
 			if (value > 1 || value < 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be in percentage range (0 to 1). (${value})`
+				error: `Parameter '${parameterName}' must be in percentage range (0 to 1). (${value})`,
+				info
 			};
 			break;
 		}
 		case `nonZero`: {
 			if (value === 0) return {
 				success: false,
-				error: `Parameter '${parameterName}' must non-zero. (${value})`
+				error: `Parameter '${parameterName}' must non-zero. (${value})`,
+				info
 			};
 			break;
 		}
 		case `bipolar`: {
 			if (value > 1 || value < -1) return {
 				success: false,
-				error: `Parameter '${parameterName}' must be in bipolar percentage range (-1 to 1). (${value})`
+				error: `Parameter '${parameterName}' must be in bipolar percentage range (-1 to 1). (${value})`,
+				info
 			};
 			break;
 		}
 	}
 	return {
 		success: true,
-		value
+		value,
+		info
 	};
 };
 /**
@@ -336,7 +349,7 @@ const numberDecimalTest = (a, b, decimals = 3) => {
 * @param parameterName Param name for customising exception message
 * @returns
 */
-const percentTest = (value, parameterName = `?`) => numberTest(value, `percentage`, parameterName);
+const percentTest = (value, parameterName = `?`, info) => numberTest(value, `percentage`, parameterName, info);
 /**
 * Checks if `value` an integer and meets additional criteria.
 * See {@link numberTest} for guard details, or use that if integer checking is not required.

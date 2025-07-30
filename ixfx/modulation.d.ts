@@ -1,369 +1,10 @@
-import { HasCompletion, Interval } from "./index-ZOxM3wdD.js";
+import { HasCompletion, Interval } from "@ixfx/core";
 import { SimpleEventEmitter } from "@ixfx/events";
 import * as Flow from "@ixfx/flow";
 import { Paths, Points, Rects } from "@ixfx/geometry";
 import { BasicInterpolateOptions } from "@ixfx/numbers";
 import { RandomSource } from "@ixfx/random";
 
-//#region packages/modulation/src/envelope/Types.d.ts
-type EnvelopeOpts = AdsrOpts & AdsrTimingOpts;
-/**
- * Options for the ADSR envelope.
- */
-type AdsrOpts = Partial<{
-  /**
-   * Attack bezier 'bend'. Bend from -1 to 1. 0 for a straight line
-   */
-  readonly attackBend: number;
-  /**
-   * Decay bezier 'bend'. Bend from -1 to 1. 0 for a straight line
-   */
-  readonly decayBend: number;
-  /**
-   * Release bezier 'bend'. Bend from -1 to 1. 0 for a straight line
-   */
-  readonly releaseBend: number;
-  /**
-   * Peak level (maximum of attack stage)
-   */
-  readonly peakLevel: number;
-  /**
-   * Starting level (usually 0)
-   */
-  readonly initialLevel: number;
-  /**
-   * Sustain level. Only valid if trigger and hold happens
-   */
-  readonly sustainLevel: number;
-  /**
-   * Release level, when envelope is done (usually 0)
-   */
-  readonly releaseLevel: number;
-  /**
-   * When _false_, envelope starts from it's current level when being triggered.
-   * _True_ by default.
-   */
-  readonly retrigger: boolean;
-}>;
-type AdsrTimingOpts = Partial<{
-  /**
-   * If true, envelope indefinately returns to attack stage after release
-   *
-   * @type {boolean}
-   */
-  readonly shouldLoop: boolean;
-  /**
-   * Duration for attack stage
-   * Unit depends on timer source
-   * @type {number}
-   */
-  readonly attackDuration: number;
-  /**
-   * Duration for decay stage
-   * Unit depends on timer source
-   * @type {number}
-   */
-  readonly decayDuration: number;
-  /**
-   * Duration for release stage
-   * Unit depends on timer source
-   * @type {number}
-   */
-  readonly releaseDuration: number;
-}>;
-type AdsrIterableOpts = {
-  readonly signal?: AbortSignal;
-  readonly sampleRateMs?: number;
-  readonly env: EnvelopeOpts;
-};
-/**
- * State change event
- */
-interface StateChangeEvent {
-  readonly newState: string;
-  readonly priorState: string;
-}
-interface CompleteEvent {}
-type AdsrEvents = {
-  readonly change: StateChangeEvent;
-  readonly complete: CompleteEvent;
-};
-declare const adsrStateTransitions: Readonly<{
-  attack: string[];
-  decay: string[];
-  sustain: string[];
-  release: string[];
-  complete: null;
-}>;
-type AdsrStateTransitions = Readonly<typeof adsrStateTransitions>;
-//# sourceMappingURL=Types.d.ts.map
-//#endregion
-//#region packages/modulation/src/envelope/AdsrBase.d.ts
-declare const defaultAdsrTimingOpts: Readonly<{
-  attackDuration: 600;
-  decayDuration: 200;
-  releaseDuration: 800;
-  shouldLoop: false;
-}>;
-/**
- * Base class for an ADSR envelope.
- *
- * It outputs values on a scale of 0..1 corresponding to each phase.
- */
-declare class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
-  #private;
-  protected attackDuration: number;
-  protected decayDuration: number;
-  protected releaseDuration: number;
-  protected decayDurationTotal: number;
-  /**
-   * If _true_ envelope will loop
-   */
-  shouldLoop: boolean;
-  constructor(opts?: AdsrTimingOpts);
-  dispose(): void;
-  get isDisposed(): boolean;
-  /**
-   * Changes state based on timer status
-   * @returns _True_ if state was changed
-   */
-  protected switchStateIfNeeded(allowLooping: boolean): boolean;
-  /**
-   * Computes a stage's progress from 0-1
-   * @param allowStateChange
-   * @returns
-   */
-  protected computeRaw(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, amount: number, prevStage: string];
-  /**
-   * Returns _true_ if envelope has finished
-   */
-  get isDone(): boolean;
-  protected onTrigger(): void;
-  /**
-   * Triggers envelope, optionally _holding_ it.
-   *
-   * If `hold` is _false_ (default), envelope will run through all stages,
-   * but sustain stage won't have an affect.
-   *
-   * If `hold` is _true_, it will run to, and stay at the sustain stage.
-   * Use {@link release} to later release the envelope.
-   *
-   * If event is already trigged it will be _retriggered_.
-   * Initial value depends on `opts.retrigger`
-   * * _false_ (default): envelope continues at current value.
-   * * _true_: envelope value resets to `opts.initialValue`.
-   *
-   * @param hold If _true_ envelope will hold at sustain stage
-   */
-  trigger(hold?: boolean): void;
-  get hasTriggered(): boolean;
-  compute(): void;
-  /**
-   * Release if 'trigger(true)' was previouslly called.
-   * Has no effect if not triggered or held.
-   * @returns
-   */
-  release(): void;
-}
-//# sourceMappingURL=AdsrBase.d.ts.map
-//#endregion
-//#region packages/modulation/src/envelope/Adsr.d.ts
-declare const defaultAdsrOpts: Readonly<{
-  attackBend: -1;
-  decayBend: -0.3;
-  releaseBend: -0.3;
-  peakLevel: 1;
-  initialLevel: 0;
-  sustainLevel: 0.6;
-  releaseLevel: 0;
-  retrigger: false;
-}>;
-declare class AdsrIterator implements Iterator<number> {
-  private adsr;
-  constructor(adsr: Adsr);
-  next(...args: [] | [undefined]): IteratorResult<number>;
-  get [Symbol.toStringTag](): string;
-}
-/**
- * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
- * usually in response to an intial trigger.
- *
- * [See the ixfx Guide on Envelopes](https://ixfx.fun/modulation/envelopes/introduction/).
- *
- * @example Setup
- * ```js
- * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js'
- * const env = new Envelopes.Adsr({
- *  attackDuration: 1000,
- *  decayDuration: 200,
- *  sustainDuration: 100
- * });
- * ```
- *
- * Options for envelope are as follows:
- *
- * ```js
- * initialLevel?: number
- * attackBend: number
- * attackDuration: number
- * decayBend: number
- * decayDuration:number
- * sustainLevel: number
- * releaseBend: number
- * releaseDuration: number
- * releaseLevel?: number
- * peakLevel: number
- * retrigger?: boolean
- * shouldLoop: boolean
- * ```
- *
- * If `retrigger` is _false_ (default), a re-triggered envelope continues at current value
- * rather than resetting to `initialLevel`.
- *
- * If `shouldLoop` is true, envelope loops until `release()` is called.
- *
- * @example Using
- * ```js
- * env.trigger(); // Start envelope
- * ...
- * // Get current value of envelope
- * const [state, scaled, raw] = env.compute();
- * ```
- *
- * * `state` is a string, one of the following: 'attack', 'decay', 'sustain', 'release', 'complete'
- * * `scaled` is a value scaled according to the stage's _levels_
- * * `raw` is the progress from 0 to 1 within a stage. ie. 0.5 means we're halfway through a stage.
- *
- * Instead of `compute()`, most usage of the envelope is just fetching the `value` property, which returns the same scaled value of `compute()`:
- *
- * ```js
- * const value = env.value; // Get scaled number
- * ```
- *
- * @example Hold & release
- * ```js
- * env.trigger(true);   // Pass in true to hold
- * ...envelope will stop at sustain stage...
- * env.release();      // Release into decay
- * ```
- *
- * Check if it's done:
- *
- * ```js
- * env.isDone; // True if envelope is completed
- * ```
- *
- * Envelope has events to track activity: 'change' and 'complete':
- *
- * ```
- * env.addEventListener(`change`, ev => {
- *  console.log(`Old: ${evt.oldState} new: ${ev.newState}`);
- * })
- * ```
- *
- * It's also possible to iterate over the values of the envelope:
- * ```js
- * const env = new Envelopes.Adsr();
- * for await (const v of env) {
- *  // v is the numeric value
- *  await Flow.sleep(100); // Want to pause a little to give envelope time to run
- * }
- * // Envelope has finished
- * ```
- */
-declare class Adsr extends AdsrBase implements Iterable<number> {
-  readonly attackPath: Paths.Path;
-  readonly decayPath: Paths.Path;
-  readonly releasePath: Paths.Path;
-  readonly initialLevel: any;
-  readonly peakLevel: any;
-  readonly releaseLevel: any;
-  readonly sustainLevel: any;
-  readonly attackBend: any;
-  readonly decayBend: any;
-  readonly releaseBend: any;
-  protected initialLevelOverride: number | undefined;
-  readonly retrigger: boolean;
-  private releasedAt;
-  constructor(opts?: EnvelopeOpts);
-  protected onTrigger(): void;
-  [Symbol.iterator](): Iterator<number>;
-  /**
-   * Returns the scaled value
-   * Same as .compute()[1]
-   */
-  get value(): number;
-  /**
-   * Compute value of envelope at this point in time.
-   *
-   * Returns an array of [stage, scaled, raw]. Most likely you want to use {@link value} to just get the scaled value.
-   * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
-   */
-  compute(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, scaled: number, raw: number];
-}
-//# sourceMappingURL=Adsr.d.ts.map
-declare namespace index_d_exports$1 {
-  export { Adsr, AdsrBase, AdsrEvents, AdsrIterableOpts, AdsrIterator, AdsrOpts, AdsrStateTransitions, AdsrTimingOpts, CompleteEvent, EnvelopeOpts, StateChangeEvent, adsr, adsrIterable, adsrStateTransitions, defaultAdsrOpts, defaultAdsrTimingOpts };
-}
-/**
- * Returns a function that iterates over an envelope
- * ```js
- * const e = Envelopes.adsr();
- *
- * e(); // Yields current value
- * ```
- *
- * Starts the envelope the first time the return function is called.
- * When the envelope finishes, it continues to return the `releaseLevel` of the envelope.
- *
- * Options can be provided to set the shape of the envelope as usual, eg:
- * ```js
- * const e = Envelopes.adsr({
- *  attackDuration: 1000,
- *  releaseDuration: 500
- * });
- * ```
- * @param opts
- * @returns
- */
-declare const adsr: (opts?: EnvelopeOpts) => () => any;
-/**
- * Creates and runs an envelope, sampling its values at `sampleRateMs`.
- * Note that if the envelope loops, iterator never returns.
- *
- * @example Init
- * ```js
- * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js';
- * import { IterableAsync } from  'https://unpkg.com/ixfx/dist/util.js';
- *
- * const opts = {
- *  attackDuration: 1000,
- *  releaseDuration: 1000,
- *  sustainLevel: 1,
- *  attackBend: 1,
- *  decayBend: -1
- * };
- * ```
- *
- * ```js
- * //  Add data to array
- * // Sample an envelope every 20ms into an array
- * const data = await IterableAsync.toArray(Envelopes.adsrIterable(opts, 20));
- * ```
- *
- * ```js
- * // Iterate with `for await`
- * // Work with values as sampled
- * for await (const v of Envelopes.adsrIterable(opts, 5)) {
- *  // Work with envelope value `v`...
- * }
- * ```
- * @param opts Envelope options
- * @returns
- */
-declare function adsrIterable(opts: AdsrIterableOpts): AsyncGenerator<number>;
-//# sourceMappingURL=index.d.ts.map
-//#endregion
 //#region packages/modulation/src/types.d.ts
 type ModSettableOptions = {
   /**
@@ -591,50 +232,86 @@ declare const perMinute: (amount: number, options?: Partial<{
 declare namespace index_d_exports$2 {
   export { TicksModSettableOptions, bpm, elapsed, hertz, perMinute, perSecond, ticks$2 as ticks };
 }
-//#endregion
-//#region packages/modulation/src/cubic-bezier.d.ts
+declare namespace oscillator_d_exports {
+  export { saw, sine, sineBipolar, square, triangle };
+}
 /**
- * Creates an easing function using a simple cubic bezier defined by two points.
- *
- * Eg: https://cubic-bezier.com/#0,1.33,1,-1.25
- *  a:0, b: 1.33, c: 1, d: -1.25
+ * Sine oscillator.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
- * // Time-based easing using bezier
- * const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
- * e.compute();
- * ```
- * @param b
- * @param d
- * @returns Value
- */
-declare const cubicBezierShape: (b: number, d: number) => ModFunction;
-//# sourceMappingURL=cubic-bezier.d.ts.map
-//#endregion
-//#region packages/modulation/src/drift.d.ts
-type Drifter = {
-  update(v: number): number;
-  reset(): void;
-};
-/**
- * WIP
- * Returns a {@link Drifter} that moves a value over time.
+ * import { Oscillators } from "@ixfx/modulation.js"
+ * import { frequencyTimer } from "@ixfx/flow.js";
+ * // Setup
+ * const osc = Oscillators.sine(frequencyTimer(10));
+ * const osc = Oscillators.sine(0.1);
  *
- * It keeps track of how much time has elapsed, accumulating `driftAmtPerMs`.
- * The accumulated drift is wrapped on a 0..1 scale.
+ * // Call whenever a value is needed
+ * const v = osc.next().value;
+ * ```
+ *
+ * @example Saw/tri pinch
  * ```js
- * // Set up the drifer
- * const d = drif(0.001);
- *
- * d.update(1.0);
- * // Returns 1.0 + accumulated drift
+ * const v = Math.pow(osc.value, 2);
  * ```
- * @param driftAmtPerMs
- * @returns
+ *
+ * @example Saw/tri bulge
+ * ```js
+ * const v = Math.pow(osc.value, 0.5);
+ * ```
+ *
  */
-declare const drift: (driftAmtPerMs: number) => Drifter;
-//# sourceMappingURL=drift.d.ts.map
+declare function sine(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+/**
+ * Bipolar sine (-1 to 1)
+ * @param timerOrFreq
+ */
+declare function sineBipolar(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+/**
+ * Triangle oscillator
+ *
+ * ```js
+ * // Setup
+ * const osc = triangle(Timers.frequencyTimer(0.1));
+ * const osc = triangle(0.1);
+ *
+ * // Call whenver a value is needed
+ * const v = osc.next().value;
+ * ```
+ */
+declare function triangle(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+/**
+ * Saw oscillator
+ *
+ * ```js
+ * import { Oscillators } from "@ixfx/modulation.js"
+ * import { frequencyTimer } from "@ixfx/flow.js";
+ * // Setup
+ * const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
+ *
+ * // Or
+ * const osc = Oscillators.saw(0.1);
+ *
+ * // Call whenever a value is needed
+ * const v = osc.next().value;
+ * ```
+ */
+declare function saw(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+/**
+ * Square oscillator
+ *
+ * ```js
+ * import { Oscillators } from "@ixfx/modulation.js"
+ *
+ * // Setup
+ * const osc = Oscillators.square(Timers.frequencyTimer(0.1));
+ * const osc = Oscillators.square(0.1);
+ *
+ * // Call whenever a value is needed
+ * osc.next().value;
+ * ```
+ */
+declare function square(timerOrFreq: Flow.Timer | number): Generator<0 | 1, void, unknown>;
+//# sourceMappingURL=oscillator.d.ts.map
 declare namespace easings_named_d_exports {
   export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };
 }
@@ -704,7 +381,6 @@ declare namespace index_d_exports {
 /**
  * Creates an easing function
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const e = Easings.create({ duration: 1000, name: `quadIn` });
  * const e = Easings.create({ ticks: 100, name: `sineOut` });
  * const e = Easings.create({
@@ -729,7 +405,6 @@ declare const create: (options: EasingOptions) => () => number;
  *
  * @example Time based easing
  * ```
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const t = Easings.timeEasing(`quintIn`, 5*1000); // Will take 5 seconds to complete
  * ...
  * t.compute(); // Get current value of easing
@@ -750,7 +425,6 @@ declare const timeEasing: (nameOrFunction: EasingName | ((v: number) => number),
  * If you need to check if an easing is done or reset it, consider {@link timeEasing}.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over one second
  * const e = Easings.time(`quadIn`, 1000);
  *
@@ -771,7 +445,6 @@ declare const time$1: (nameOrFunction: EasingName | ((v: number) => number), dur
  * If you need to check if an easing is done or reset it, consider {@link tickEasing}.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over 100 ticks
  * const e = Easings.ticks(`quadIn`, 100);
  *
@@ -793,7 +466,6 @@ declare const ticks$1: (nameOrFunction: EasingName | ((v: number) => number), to
  *
  * @example Tick-based easing
  * ```
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const t = Easings.tickEasing(`sineIn`, 1000);   // Will take 1000 ticks to complete
  * t.compute(); // Each call to `compute` progresses the tick count
  * t.reset();   // Reset to 0
@@ -809,7 +481,6 @@ declare const tickEasing: (nameOrFunction: EasingName | ((v: number) => number),
  * easing is not found.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const fn = Easings.get(`sineIn`);
  * // Returns 'eased' transformation of 0.5
  * fn(0.5);
@@ -824,6 +495,364 @@ declare const get: (easingName: EasingName) => ModFunction;
  * @returns Returns list of available easing names
  */
 declare function getEasingNames(): Iterable<string>;
+//# sourceMappingURL=index.d.ts.map
+//#endregion
+//#region packages/modulation/src/envelope/Types.d.ts
+type EnvelopeOpts = AdsrOpts & AdsrTimingOpts;
+/**
+ * Options for the ADSR envelope.
+ */
+type AdsrOpts = Partial<{
+  /**
+   * Attack bezier 'bend'. Bend from -1 to 1. 0 for a straight line
+   */
+  readonly attackBend: number;
+  /**
+   * Decay bezier 'bend'. Bend from -1 to 1. 0 for a straight line
+   */
+  readonly decayBend: number;
+  /**
+   * Release bezier 'bend'. Bend from -1 to 1. 0 for a straight line
+   */
+  readonly releaseBend: number;
+  /**
+   * Peak level (maximum of attack stage)
+   */
+  readonly peakLevel: number;
+  /**
+   * Starting level (usually 0)
+   */
+  readonly initialLevel: number;
+  /**
+   * Sustain level. Only valid if trigger and hold happens
+   */
+  readonly sustainLevel: number;
+  /**
+   * Release level, when envelope is done (usually 0)
+   */
+  readonly releaseLevel: number;
+  /**
+   * When _false_, envelope starts from it's current level when being triggered.
+   * _True_ by default.
+   */
+  readonly retrigger: boolean;
+}>;
+type AdsrTimingOpts = Partial<{
+  /**
+   * If true, envelope indefinately returns to attack stage after release
+   *
+   * @type {boolean}
+   */
+  readonly shouldLoop: boolean;
+  /**
+   * Duration for attack stage
+   * Unit depends on timer source
+   * @type {number}
+   */
+  readonly attackDuration: number;
+  /**
+   * Duration for decay stage
+   * Unit depends on timer source
+   * @type {number}
+   */
+  readonly decayDuration: number;
+  /**
+   * Duration for release stage
+   * Unit depends on timer source
+   * @type {number}
+   */
+  readonly releaseDuration: number;
+}>;
+type AdsrIterableOpts = {
+  readonly signal?: AbortSignal;
+  readonly sampleRateMs?: number;
+  readonly env: EnvelopeOpts;
+};
+/**
+ * State change event
+ */
+interface StateChangeEvent {
+  readonly newState: string;
+  readonly priorState: string;
+}
+interface CompleteEvent {}
+type AdsrEvents = {
+  readonly change: StateChangeEvent;
+  readonly complete: CompleteEvent;
+};
+declare const adsrStateTransitions: Readonly<{
+  attack: string[];
+  decay: string[];
+  sustain: string[];
+  release: string[];
+  complete: null;
+}>;
+type AdsrStateTransitions = Readonly<typeof adsrStateTransitions>;
+//# sourceMappingURL=Types.d.ts.map
+//#endregion
+//#region packages/modulation/src/envelope/AdsrBase.d.ts
+declare const defaultAdsrTimingOpts: Readonly<{
+  attackDuration: 600;
+  decayDuration: 200;
+  releaseDuration: 800;
+  shouldLoop: false;
+}>;
+/**
+ * Base class for an ADSR envelope.
+ *
+ * It outputs values on a scale of 0..1 corresponding to each phase.
+ */
+declare class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
+  #private;
+  protected attackDuration: number;
+  protected decayDuration: number;
+  protected releaseDuration: number;
+  protected decayDurationTotal: number;
+  /**
+   * If _true_ envelope will loop
+   */
+  shouldLoop: boolean;
+  constructor(opts?: AdsrTimingOpts);
+  dispose(): void;
+  get isDisposed(): boolean;
+  /**
+   * Changes state based on timer status
+   * @returns _True_ if state was changed
+   */
+  protected switchStateIfNeeded(allowLooping: boolean): boolean;
+  /**
+   * Computes a stage's progress from 0-1
+   * @param allowStateChange
+   * @returns
+   */
+  protected computeRaw(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, amount: number, prevStage: string];
+  /**
+   * Returns _true_ if envelope has finished
+   */
+  get isDone(): boolean;
+  protected onTrigger(): void;
+  /**
+   * Triggers envelope, optionally _holding_ it.
+   *
+   * If `hold` is _false_ (default), envelope will run through all stages,
+   * but sustain stage won't have an affect.
+   *
+   * If `hold` is _true_, it will run to, and stay at the sustain stage.
+   * Use {@link release} to later release the envelope.
+   *
+   * If event is already trigged it will be _retriggered_.
+   * Initial value depends on `opts.retrigger`
+   * * _false_ (default): envelope continues at current value.
+   * * _true_: envelope value resets to `opts.initialValue`.
+   *
+   * @param hold If _true_ envelope will hold at sustain stage
+   */
+  trigger(hold?: boolean): void;
+  get hasTriggered(): boolean;
+  compute(): void;
+  /**
+   * Release if 'trigger(true)' was previouslly called.
+   * Has no effect if not triggered or held.
+   * @returns
+   */
+  release(): void;
+}
+//# sourceMappingURL=AdsrBase.d.ts.map
+//#endregion
+//#region packages/modulation/src/envelope/Adsr.d.ts
+declare const defaultAdsrOpts: Readonly<{
+  attackBend: -1;
+  decayBend: -0.3;
+  releaseBend: -0.3;
+  peakLevel: 1;
+  initialLevel: 0;
+  sustainLevel: 0.6;
+  releaseLevel: 0;
+  retrigger: false;
+}>;
+declare class AdsrIterator implements Iterator<number> {
+  private adsr;
+  constructor(adsr: Adsr);
+  next(...args: [] | [undefined]): IteratorResult<number>;
+  get [Symbol.toStringTag](): string;
+}
+/**
+ * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
+ * usually in response to an intial trigger.
+ *
+ * [See the ixfx Guide on Envelopes](https://ixfx.fun/modulation/envelopes/introduction/).
+ *
+ * @example Setup
+ * ```js
+ * const env = new Envelopes.Adsr({
+ *  attackDuration: 1000,
+ *  decayDuration: 200,
+ *  sustainDuration: 100
+ * });
+ * ```
+ *
+ * Options for envelope are as follows:
+ *
+ * ```js
+ * initialLevel?: number
+ * attackBend: number
+ * attackDuration: number
+ * decayBend: number
+ * decayDuration:number
+ * sustainLevel: number
+ * releaseBend: number
+ * releaseDuration: number
+ * releaseLevel?: number
+ * peakLevel: number
+ * retrigger?: boolean
+ * shouldLoop: boolean
+ * ```
+ *
+ * If `retrigger` is _false_ (default), a re-triggered envelope continues at current value
+ * rather than resetting to `initialLevel`.
+ *
+ * If `shouldLoop` is true, envelope loops until `release()` is called.
+ *
+ * @example Using
+ * ```js
+ * env.trigger(); // Start envelope
+ * ...
+ * // Get current value of envelope
+ * const [state, scaled, raw] = env.compute();
+ * ```
+ *
+ * * `state` is a string, one of the following: 'attack', 'decay', 'sustain', 'release', 'complete'
+ * * `scaled` is a value scaled according to the stage's _levels_
+ * * `raw` is the progress from 0 to 1 within a stage. ie. 0.5 means we're halfway through a stage.
+ *
+ * Instead of `compute()`, most usage of the envelope is just fetching the `value` property, which returns the same scaled value of `compute()`:
+ *
+ * ```js
+ * const value = env.value; // Get scaled number
+ * ```
+ *
+ * @example Hold & release
+ * ```js
+ * env.trigger(true);   // Pass in true to hold
+ * ...envelope will stop at sustain stage...
+ * env.release();      // Release into decay
+ * ```
+ *
+ * Check if it's done:
+ *
+ * ```js
+ * env.isDone; // True if envelope is completed
+ * ```
+ *
+ * Envelope has events to track activity: 'change' and 'complete':
+ *
+ * ```
+ * env.addEventListener(`change`, ev => {
+ *  console.log(`Old: ${evt.oldState} new: ${ev.newState}`);
+ * })
+ * ```
+ *
+ * It's also possible to iterate over the values of the envelope:
+ * ```js
+ * const env = new Envelopes.Adsr();
+ * for await (const v of env) {
+ *  // v is the numeric value
+ *  await Flow.sleep(100); // Want to pause a little to give envelope time to run
+ * }
+ * // Envelope has finished
+ * ```
+ */
+declare class Adsr extends AdsrBase implements Iterable<number> {
+  readonly attackPath: Paths.Path;
+  readonly decayPath: Paths.Path;
+  readonly releasePath: Paths.Path;
+  readonly initialLevel: any;
+  readonly peakLevel: any;
+  readonly releaseLevel: any;
+  readonly sustainLevel: any;
+  readonly attackBend: any;
+  readonly decayBend: any;
+  readonly releaseBend: any;
+  protected initialLevelOverride: number | undefined;
+  readonly retrigger: boolean;
+  private releasedAt;
+  constructor(opts?: EnvelopeOpts);
+  protected onTrigger(): void;
+  [Symbol.iterator](): Iterator<number>;
+  /**
+   * Returns the scaled value
+   * Same as .compute()[1]
+   */
+  get value(): number;
+  /**
+   * Compute value of envelope at this point in time.
+   *
+   * Returns an array of [stage, scaled, raw]. Most likely you want to use {@link value} to just get the scaled value.
+   * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
+   */
+  compute(allowStateChange?: boolean, allowLooping?: boolean): [stage: string | undefined, scaled: number, raw: number];
+}
+//# sourceMappingURL=Adsr.d.ts.map
+declare namespace index_d_exports$1 {
+  export { Adsr, AdsrBase, AdsrEvents, AdsrIterableOpts, AdsrIterator, AdsrOpts, AdsrStateTransitions, AdsrTimingOpts, CompleteEvent, EnvelopeOpts, StateChangeEvent, adsr, adsrIterable, adsrStateTransitions, defaultAdsrOpts, defaultAdsrTimingOpts };
+}
+/**
+ * Returns a function that iterates over an envelope
+ * ```js
+ * const e = Envelopes.adsr();
+ *
+ * e(); // Yields current value
+ * ```
+ *
+ * Starts the envelope the first time the return function is called.
+ * When the envelope finishes, it continues to return the `releaseLevel` of the envelope.
+ *
+ * Options can be provided to set the shape of the envelope as usual, eg:
+ * ```js
+ * const e = Envelopes.adsr({
+ *  attackDuration: 1000,
+ *  releaseDuration: 500
+ * });
+ * ```
+ * @param opts
+ * @returns
+ */
+declare const adsr: (opts?: EnvelopeOpts) => () => any;
+/**
+ * Creates and runs an envelope, sampling its values at `sampleRateMs`.
+ * Note that if the envelope loops, iterator never returns.
+ *
+ * @example Init
+ * ```js
+ * import { Envelopes } from '@ixfx/modulation.js';
+ * import { IterableAsync } from  '@ixfx/iterable.js';
+ *
+ * const opts = {
+ *  attackDuration: 1000,
+ *  releaseDuration: 1000,
+ *  sustainLevel: 1,
+ *  attackBend: 1,
+ *  decayBend: -1
+ * };
+ * ```
+ *
+ * ```js
+ * //  Add data to array
+ * // Sample an envelope every 20ms into an array
+ * const data = await IterableAsync.toArray(Envelopes.adsrIterable(opts, 20));
+ * ```
+ *
+ * ```js
+ * // Iterate with `for await`
+ * // Work with values as sampled
+ * for await (const v of Envelopes.adsrIterable(opts, 5)) {
+ *  // Work with envelope value `v`...
+ * }
+ * ```
+ * @param opts Envelope options
+ * @returns
+ */
+declare function adsrIterable(opts: AdsrIterableOpts): AsyncGenerator<number>;
 //# sourceMappingURL=index.d.ts.map
 declare namespace forces_d_exports {
   export { ForceAffected, ForceFn, ForceKind, MassApplication, PendulumOpts, TargetOpts, accelerationForce, angleFromAccelerationForce, angleFromVelocityForce, angularForce, apply, attractionForce, computeAccelerationToTarget, computeAttractionForce, computePositionFromAngle, computePositionFromVelocity, computeVelocity, constrainBounce, guard, magnitudeForce, nullForce, orientationForce, pendulumForce, springForce, targetForce, velocityForce };
@@ -1042,7 +1071,7 @@ declare const apply: (t: ForceAffected, ...accelForces: readonly ForceKind[]) =>
  * It returns a function which can later be applied to a thing.
  *
  * ```js
- * import { Forces } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { Forces } from "@ixfx/dist/modulation.js"
  * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
  * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
  *
@@ -1281,11 +1310,54 @@ declare const computePositionFromAngle: (distance: number, angleRadians: number,
 declare const orientationForce: (interpolationAmt?: number) => ForceFn;
 //# sourceMappingURL=forces.d.ts.map
 //#endregion
+//#region packages/modulation/src/cubic-bezier.d.ts
+/**
+ * Creates an easing function using a simple cubic bezier defined by two points.
+ *
+ * Eg: https://cubic-bezier.com/#0,1.33,1,-1.25
+ *  a:0, b: 1.33, c: 1, d: -1.25
+ *
+ * ```js
+ * import { Easings } from "@ixfx/modulation.js";
+ * // Time-based easing using bezier
+ * const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
+ * e.compute();
+ * ```
+ * @param b
+ * @param d
+ * @returns Value
+ */
+declare const cubicBezierShape: (b: number, d: number) => ModFunction;
+//# sourceMappingURL=cubic-bezier.d.ts.map
+//#endregion
+//#region packages/modulation/src/drift.d.ts
+type Drifter = {
+  update(v: number): number;
+  reset(): void;
+};
+/**
+ * WIP
+ * Returns a {@link Drifter} that moves a value over time.
+ *
+ * It keeps track of how much time has elapsed, accumulating `driftAmtPerMs`.
+ * The accumulated drift is wrapped on a 0..1 scale.
+ * ```js
+ * // Set up the drifer
+ * const d = drif(0.001);
+ *
+ * d.update(1.0);
+ * // Returns 1.0 + accumulated drift
+ * ```
+ * @param driftAmtPerMs
+ * @returns
+ */
+declare const drift: (driftAmtPerMs: number) => Drifter;
+//# sourceMappingURL=drift.d.ts.map
+//#endregion
 //#region packages/modulation/src/gaussian.d.ts
 /**
  * Returns a roughly gaussian easing function
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const fn = Easings.gaussian();
  * ```
  *
@@ -1332,7 +1404,7 @@ type InterpolateOptions = BasicInterpolateOptions & {
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  *
  * // Create function
  * const fn = interpolate(0.1);
@@ -1352,7 +1424,7 @@ declare function interpolate(amount: number, options?: Partial<InterpolateOption
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  *
  * // Get the value at 10% of range between 50-100
  * const fn = interpolate(0.1, 50, 100);
@@ -1371,7 +1443,7 @@ declare function interpolate(amount: number, a: number, b: number, options?: Par
  * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  *
  * // Create function to interpolate between 50..100
  * const fn = interpolate(50, 100);
@@ -1424,7 +1496,7 @@ declare const interpolatorStepped: (incrementAmount: number, a?: number, b?: num
  * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
  *
  * ```js
- * import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interpolateAngle } from '@ixfx/data.js';
  * interpolateAngle(0.5, Math.PI, Math.PI/2);
  * ```
  * @param amount
@@ -1516,7 +1588,6 @@ declare const jitterAbsolute: (options: JitterOpts) => Jitterer;
  * `jitter` returns a function that calculates jitter. If you only need a one-off
  * jitter, you can immediately execute the returned function:
  * ```js
- * import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * // Compute 10% jitter of input 0.5
  * const value = jitter({ relative: 0.1 })(0.5);
  * ```
@@ -1524,7 +1595,6 @@ declare const jitterAbsolute: (options: JitterOpts) => Jitterer;
  * However, if the returned jitter function is to be used again,
  * assign it to a variable:
  * ```js
- * import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * const myJitter = jitter({ absolute: 0.5 });
  *
  * // Jitter an input value 1.0
@@ -1535,7 +1605,7 @@ declare const jitterAbsolute: (options: JitterOpts) => Jitterer;
  * random number generator:
  *
  * ```js
- * import { weighted } from 'https://unpkg.com/ixfx/dist/random.js';
+ * import { weighted } from '@ixfx/random.js';
  * jitter({ relative: 0.1, source: weighted });
  * ```
  *
@@ -1558,7 +1628,6 @@ declare const jitter: (options?: JitterOpts) => Jitterer;
  * to slowly ramp up to the fully modulated value.
  *
  * ```js
- * import { mix } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * // When 'amt' is 0, modulation doesn't affect value at all,
  * // original is returned
  * mix(0, 0.5, 0.9); // 0.5
@@ -1578,7 +1647,7 @@ declare const mix: (amount: number, original: number, modulation: number) => num
  * Both modulators are given the same input value.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { Easings } from "@ixfx/modulation.js";
  * // Get a 50/50 mix of two easing functions
  * const mix = Easings.mix(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  *
@@ -1604,7 +1673,7 @@ declare const mixModulators: (balance: number, a: ModFunction, b: ModFunction) =
  * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower values.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { Easings } from "@ixfx/modulation.js";
  * Easings.crossFade(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  * ```
  * @param a Easing A
@@ -1644,7 +1713,7 @@ declare const time: (fn: ModFunction, duration: Interval) => () => number;
  *
  * @example Time based easing
  * ```
- * import { timeModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { timeModulator } from "@ixfx/modulation.js";
  * const fn = (t) => {
  *  // 't' will be a value 0..1 representing time elapsed. 1 being end of period.
  *  return t*Math.random();
@@ -1688,7 +1757,7 @@ declare const ticks: (fn: ModFunction, totalTicks: number) => () => number;
  *
  * @example Tick-based modulator
  * ```
- * import { tickModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { tickModulator } from "@ixfx/modulation.js";
  * const fn = (t) => {
  *  // 't' will be values 0..1 based on completion
  *  return Math.random() * t;
@@ -1714,86 +1783,7 @@ declare const tickModulator: (fn: ModFunction, durationTicks: number) => Modulat
  */
 declare const noop: ModFunction;
 //# sourceMappingURL=no-op.d.ts.map
-declare namespace oscillator_d_exports {
-  export { saw, sine, sineBipolar, square, triangle };
-}
-/**
- * Sine oscillator.
- *
- * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
- * // Setup
- * const osc = Oscillators.sine(frequencyTimer(10));
- * const osc = Oscillators.sine(0.1);
- *
- * // Call whenever a value is needed
- * const v = osc.next().value;
- * ```
- *
- * @example Saw/tri pinch
- * ```js
- * const v = Math.pow(osc.value, 2);
- * ```
- *
- * @example Saw/tri bulge
- * ```js
- * const v = Math.pow(osc.value, 0.5);
- * ```
- *
- */
-declare function sine(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
-/**
- * Bipolar sine (-1 to 1)
- * @param timerOrFreq
- */
-declare function sineBipolar(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
-/**
- * Triangle oscillator
- *
- * ```js
- * // Setup
- * const osc = triangle(Timers.frequencyTimer(0.1));
- * const osc = triangle(0.1);
- *
- * // Call whenver a value is needed
- * const v = osc.next().value;
- * ```
- */
-declare function triangle(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
-/**
- * Saw oscillator
- *
- * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
- * // Setup
- * const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
- *
- * // Or
- * const osc = Oscillators.saw(0.1);
- *
- * // Call whenever a value is needed
- * const v = osc.next().value;
- * ```
- */
-declare function saw(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
-/**
- * Square oscillator
- *
- * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- *
- * // Setup
- * const osc = Oscillators.square(Timers.frequencyTimer(0.1));
- * const osc = Oscillators.square(0.1);
- *
- * // Call whenever a value is needed
- * osc.next().value;
- * ```
- */
-declare function square(timerOrFreq: Flow.Timer | number): Generator<1 | 0, void, unknown>;
-//# sourceMappingURL=oscillator.d.ts.map
+
 //#endregion
 //#region packages/modulation/src/ping-pong.d.ts
 /**
@@ -1802,7 +1792,6 @@ declare function square(timerOrFreq: Flow.Timer | number): Generator<1 | 0, void
  *
  * @example Usage
  * ```js
- * import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js';
  * for (const v of percentPingPong(0.1)) {
  *  // v will go up and down. Make sure you have a break somewhere because it is infinite
  * }
@@ -1853,8 +1842,8 @@ declare const pingPong: (interval: number, lower: number, upper: number, start?:
 /**
  * Produces values according to rough spring physics.
  * ```js
- * import { continuously } from "https://unpkg.com/ixfx/dist/flow.js"
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { continuously } from "@ixfx/flow.js"
+ * import { spring } from "@ixfx/modulation.js"
  *
  * const s = spring();
  *
@@ -1868,7 +1857,7 @@ declare const pingPong: (interval: number, lower: number, upper: number, start?:
  *
  * Parameters to the spring can be provided.
  * ```js
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { spring } from "@ixfx/modulation.js"
  * const s = spring({
  *  mass: 5,
  *  damping: 10
@@ -1890,14 +1879,14 @@ declare function spring(opts?: SpringOptions, timerOrFreq?: Flow.Timer | number)
  * a value. When the spring is done, 1 is returned instead of undefined.
  *
  * ```js
- * import { springValue } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { springValue } from "@ixfx/modulation.js"
  * const s = springValue();
  * s(); // 0..1 (roughly - exceeding 1 is possible)
  * ```
  *
  * Options can be provided:
  * ```js
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { spring } from "@ixfx/modulation.js"
  * const s = springValue({
  *  stiffness: 100,
  *  damping: 10
@@ -1905,7 +1894,7 @@ declare function spring(opts?: SpringOptions, timerOrFreq?: Flow.Timer | number)
  * ```
  * @example Applied
  * ```js
- * import { Modulation, Data } from  "https://unpkg.com/ixfx/dist/bundle.js"
+ * import { Modulation, Data } from  "@ixfx/bundle.js"
  * let state = {
  *  spring: Modulation.springValue()
  * }
@@ -2071,7 +2060,7 @@ declare function sineBipolarShape(period?: number): ModFunction;
 /**
  * Creates a wave modulator. Defaults to 5-second sine wave.
  * ```js
- * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { wave } from '@ixfx/modulation.js';
  * // Triangle wave that has a single cycle over two seconds
  * const m = wave({ secs: 2, shape: `triangle`});
  *
@@ -2082,8 +2071,8 @@ declare function sineBipolarShape(period?: number): ModFunction;
  *
  * @example
  * ```js
- * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
- * import { resolveFields } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { wave } from '@ixfx/modulation.js';
+ * import { resolveFields } from '@ixfx/data.js';
  *
  * const state = {
  *  intensity: wave({secs: 2, shape: `sine` }),
@@ -2159,7 +2148,6 @@ type WeightedOptions = Readonly<{
  * Use {@link weightedSource} to return a function instead.
  *
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * Random.weighted();          // quadIn easing by default, which skews toward low values
  * Random.weighted(`quadOut`); // quadOut favours high values
  * ```
@@ -2174,7 +2162,6 @@ declare const weighted: (easingNameOrOptions?: EasingName | WeightedOptions) => 
  * Use {@link weighted} to get a value directly.
  *
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * const r1 = Random.weightedSource();          // quadIn easing by default, which skews toward low values
  * r1(); // Produce a value
  *
@@ -2189,5 +2176,5 @@ declare const weightedSource: (easingNameOrOptions?: EasingName | WeightedOption
 //# sourceMappingURL=weighted-random.d.ts.map
 
 //#endregion
-export { Drifter, EasingName, EasingOptions, EasingTickOptions, EasingTimeOptions, index_d_exports as Easings, forces_d_exports as Forces, InterpolateOptions, JitterOpts, Jitterer, ModFunction, ModSettable, ModSettableFeedback, ModSettableOptions, ModSource, index_d_exports$1 as Modulation, ModulatorTimed, oscillator_d_exports as Oscillators, index_d_exports$2 as Sources, SpringOptions, TimingSourceFactory, TimingSources, WaveModulator, WaveOptions, WaveShaperFeedback, Waveforms, WeightedOptions, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate, interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
+export { Drifter, EasingName, EasingOptions, EasingTickOptions, EasingTimeOptions, index_d_exports as Easings, index_d_exports$1 as Envelopes, forces_d_exports as Forces, InterpolateOptions, JitterOpts, Jitterer, ModFunction, ModSettable, ModSettableFeedback, ModSettableOptions, ModSource, ModulatorTimed, oscillator_d_exports as Oscillators, index_d_exports$2 as Sources, SpringOptions, TimingSourceFactory, TimingSources, WaveModulator, WaveOptions, WaveShaperFeedback, Waveforms, WeightedOptions, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate, interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
 //# sourceMappingURL=modulation.d.ts.map

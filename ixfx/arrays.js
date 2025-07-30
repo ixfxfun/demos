@@ -1,4 +1,4 @@
-import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow } from "./src-BhN8B7uk.js";
+import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow, throwIfFailed } from "./src-C3Fpyyz5.js";
 
 //#region packages/arrays/src/cycle.ts
 /**
@@ -32,6 +32,7 @@ import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow } from 
 * @returns 
 */
 const cycle = (options) => {
+	throwIfFailed(arrayTest(options, `options`));
 	const opts = [...options];
 	let index = 0;
 	const next = () => {
@@ -100,18 +101,8 @@ const atWrap = (array, index) => {
 
 //#endregion
 //#region packages/arrays/src/chunks.ts
-/**
-* Return `array` broken up into chunks of `size` values
-*
-* ```js
-* chunks([1,2,3,4,5,6,7,8,9,10], 3);
-* // Yields: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
-* ```
-* @param array
-* @param size
-* @returns
-*/
 function chunks(array, size) {
+	throwIfFailed(integerTest(size, "aboveZero", `size`), arrayTest(array, `array`));
 	const output = [];
 	for (let index = 0; index < array.length; index += size) output.push(array.slice(index, index + size));
 	return output;
@@ -397,8 +388,6 @@ const filterAB = (data, filter) => {
 * of slicing the array before using `filter`.
 *
 * ```js
-* import { filterBetween } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * // Return 'registered' people between and including array indexes 5-10
 * const filtered = [...filterBetween(people, person => person.registered, 5, 10)];
 * ```
@@ -472,8 +461,6 @@ const frequencyByGroup = (groupBy$1, data) => {
 *
 * @example
 * ```js
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const data = [
 *  { age: 39, city: `London` },
 *  { age: 14, city: `Copenhagen` },
@@ -591,18 +578,31 @@ const unique = (arrays, toString = toStringDefault) => {
 //#region packages/arrays/src/insert-at.ts
 /**
 * Inserts `values` at position `index`, shuffling remaining
-* items further down.
+* items further down and returning changed result.
+* 
+* Does not modify the input array.
+* 
+* ```js
+* const data = [ 1, 2, 3 ]
+* 
+* // Inserts 20,30,40 at index 1
+* Arrays.insertAt(data, 1, 20, 30, 40);
+* 
+* // Yields: 1, 20, 30, 40, 2, 3
+* ```
 * @param data 
 * @param index 
 * @param values 
 * @returns 
 */
 const insertAt = (data, index, ...values) => {
-	if (!Array.isArray(data)) throw new TypeError(`Param 'data' is not an arry`);
+	throwIfFailed(arrayTest(data, `data`), arrayIndexTest(data, index, `index`));
+	if (index === data.length - 1) return [...data, ...values];
+	if (index === 0) return [...values, ...data];
 	return [
 		...data.slice(0, index),
 		...values,
-		...data.slice(index + 1)
+		...data.slice(index)
 	];
 };
 
@@ -612,8 +612,6 @@ const insertAt = (data, index, ...values) => {
 * Returns an interleaving of two or more arrays. All arrays must be the same length.
 *
 * ```js
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const a = [`a`, `b`, `c`];
 * const b = [`1`, `2`, `3`];
 * const c = Arrays.interleave(a, b);
@@ -831,8 +829,6 @@ const randomIndex = (array, rand = Math.random) => Math.floor(rand() * array.len
 * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
 *
 * ```js
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const v = [ 100, 20, 50 ];
 * const vv = Arrays.remove(2);
 *
@@ -866,8 +862,6 @@ const remove = (data, index) => {
 * @example 
 * By percentage - get half of the items
 * ```
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const list = [1,2,3,4,5,6,7,8,9,10];
 * const sub = Arrays.sample(list, 0.5);
 * // Yields: [2, 4, 6, 8, 10]
@@ -876,8 +870,6 @@ const remove = (data, index) => {
 * @example
 * By steps - every third value
 * ```
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const list = [1,2,3,4,5,6,7,8,9,10];
 * const sub = Arrays.sample(list, 3);
 * // Yields:
@@ -1069,8 +1061,6 @@ const without = (sourceArray, toRemove, comparer = isEqualDefault) => {
 * Zip combines the elements of two or more arrays based on their index.
 *
 * ```js
-* import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
-*
 * const a = [1,2,3];
 * const b = [`red`, `blue`, `green`];
 *
