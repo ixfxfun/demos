@@ -1,19 +1,19 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultThrow } from "./src-C3Fpyyz5.js";
-import { clamp, interpolate, pairwise, quantiseEvery } from "./src-BVzuGCxJ.js";
-import "./interval-type-CEZs43zj.js";
-import "./maps-C72wxMfj.js";
-import { StackImmutable, continuously, delayLoop } from "./src-Bip7wA20.js";
-import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
-import "./is-primitive-B-tAS1Xm.js";
-import "./key-value-CfwtfZWC.js";
-import "./dist-27gr6RC3.js";
-import "./resolve-core-CDPnQKIe.js";
-import { cloneFromFields } from "./records-D95EU4q-.js";
-import { ElementSizer, resolveEl } from "./src-CkUASbck.js";
-import { Empty$1 as Empty, EmptyPositioned, PointsTracker, angleConvert, angleParse, applyFields, corners, corners$1, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, multiplyScalar$1 as multiplyScalar, rows, scaler } from "./src-DB-SLoee.js";
-import "./bezier-DZRwSDvJ.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-AXYqc09L.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultThrow } from "./src-B5kzJkYi.js";
+import { clamp, interpolate, pairwise, quantiseEvery } from "./src-DtvLL3oi.js";
+import { cloneFromFields } from "./records-ButNOjS_.js";
+import "./is-primitive-Bo4OHt3v.js";
+import "./interval-type-klk0IZBm.js";
+import "./basic-BlF-8Fo-.js";
+import { StackImmutable, continuously, delayLoop } from "./src-CGZcvPbX.js";
+import { SimpleEventEmitter } from "./src-BB8BKEVc.js";
+import "./key-value-BXKMXEIP.js";
+import "./dist-STbyDn6P.js";
+import "./resolve-core-hiYZW4xF.js";
+import { ElementSizer, resolveEl } from "./src-mdH5NzeF.js";
+import { Empty$1 as Empty, EmptyPositioned, PointsTracker, angleConvert, angleParse, applyFields, corners, corners$1, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, multiplyScalar$1 as multiplyScalar, rows, scaler } from "./src-BxRlvgsb.js";
+import "./bezier-BF9M23nT.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-DBz_PpZQ.js";
 
 //#region packages/visual/src/drawing.ts
 var drawing_exports = {};
@@ -633,23 +633,23 @@ const textBlockAligned = (ctx, text, opts) => {
 //#endregion
 //#region packages/visual/src/colour/guards.ts
 const isHsl = (v) => {
-	if (typeof v === `object`) {
-		if (!(`h` in v && `s` in v && `l` in v)) return false;
-		if (!(`unit` in v)) return false;
-		if (`space` in v) {
-			if (v.space !== `hsl`) return false;
-		}
-	}
-	return false;
+	if (typeof v !== `object`) return false;
+	if (!(`h` in v)) return false;
+	if (!(`s` in v)) return false;
+	if (!(`l` in v)) return false;
+	if (!(`unit` in v)) return false;
+	if (!(`space` in v)) return false;
+	if (v.space !== `hsl`) return false;
+	return true;
 };
 const isRgb = (v) => {
-	if (typeof v === `object`) {
-		if (!(`r` in v && `g` in v && `b` in v)) return false;
-		if (!(`unit` in v)) return false;
-		if (`space` in v) {
-			if (v.space !== `srgb`) return false;
-		}
-	}
+	if (typeof v !== `object`) return false;
+	if (!(`r` in v)) return false;
+	if (!(`g` in v)) return false;
+	if (!(`b` in v)) return false;
+	if (!(`space` in v)) return false;
+	if (!(`unit` in v)) return false;
+	if (v.space === `srgb`) return true;
 	return false;
 };
 /**
@@ -680,22 +680,22 @@ const tryParseObjectToHsl = (v) => {
 	if (!(`space` in v)) v.space = `hsl`;
 	return v;
 };
-const isLch = (v) => {
-	if (typeof v === `object`) {
-		if (!(`l` in v && `c` in v && `h` in v)) return false;
-		if (!(`unit` in v)) return false;
-		if (`space` in v) {
-			if (v.space === `lch`) return true;
-			if (v.space == `oklch`) return true;
-		}
-	}
+const isOkLch = (v) => {
+	if (typeof v !== `object`) return false;
+	if (!(`l` in v)) return false;
+	if (!(`c` in v)) return false;
+	if (!(`h` in v)) return false;
+	if (!(`unit` in v)) return false;
+	if (!(`space` in v)) return false;
+	if (v.space === `lch`) return true;
+	if (v.space === `oklch`) return true;
 	return false;
 };
 const isColourish = (v) => {
 	if (typeof v === `string`) return true;
 	if (typeof v !== `object`) return false;
 	if (isHsl(v)) return true;
-	if (isLch(v)) return true;
+	if (isOkLch(v)) return true;
 	if (isRgb(v)) return true;
 	return false;
 };
@@ -744,9 +744,9 @@ __export(hsl_exports, {
 	guard: () => guard$5,
 	interpolator: () => interpolator$3,
 	parseCssHslFunction: () => parseCssHslFunction,
-	scalar: () => scalar$2,
+	scalar: () => scalar,
 	toAbsolute: () => toAbsolute$1,
-	toCssString: () => toCssString$2,
+	toCssString: () => toCssString,
 	toLibraryRgb: () => toLibraryRgb,
 	toScalar: () => toScalar$2,
 	withOpacity: () => withOpacity$3
@@ -756,8 +756,8 @@ __export(hsl_exports, {
 * ```js
 * withOpacity()
 * ```
-* @param value 
-* @param fn 
+* @param value Colour
+* @param fn Function that calcules opacity based on input scalar value
 * @returns 
 */
 const withOpacity$3 = (value, fn) => {
@@ -791,8 +791,8 @@ const withOpacity$3 = (value, fn) => {
 * lightness is 0..1 scale, otherwise 0..100 scale.
 * 
 * Use negative values to decrease (does not apply to 'fixed')
-* @param value 
-* @param amount 
+* @param value Hsl colour
+* @param amount Amount to change
 */
 const changeLightness$1 = (value, amount) => {
 	let newL = 0;
@@ -831,6 +831,13 @@ function fromCss$2(value, options = {}) {
 	if (value.startsWith(`hsla(`)) throw new Error(`hsla() not supported`);
 	if (value.startsWith(`rgba(`)) throw new Error(`rgba() not supported`);
 	if (value.startsWith(`#`)) return fromHexString$2(value, options);
+	if (value.startsWith(`--`)) try {
+		value = resolveCss(value);
+	} catch (error) {
+		if (typeof options.fallbackString !== `undefined`) value = options.fallbackString;
+		if (typeof options.fallbackColour !== `undefined`) return options.fallbackColour;
+		throw error;
+	}
 	if (value === `transparent`) return hslTransparent;
 	if (typeof cssDefinedHexColours[value] !== `undefined`) return fromHexString$2(cssDefinedHexColours[value], options);
 	if (value.startsWith(`rgb(`)) {
@@ -852,7 +859,7 @@ function fromCss$2(value, options = {}) {
 		throw error;
 	}
 }
-const toCssString$2 = (hsl) => {
+const toCssString = (hsl) => {
 	const abs = toAbsolute$1(hsl);
 	let css = `hsl(${abs.h}deg ${abs.s}% ${abs.l}%`;
 	if (`opacity` in abs && abs.opacity !== void 0 && abs.opacity < 100) css += ` / ${abs.opacity}%`;
@@ -865,7 +872,7 @@ function fromLibrary$2(hsl, parsingOptions = {}) {
 	}
 	const scalarOpt = parsingOptions.scalar ?? true;
 	resultThrow(numberInclusiveRangeTest(hsl.h, 0, 360, `h`), numberInclusiveRangeTest(hsl.s, 0, 100, `s`), numberInclusiveRangeTest(hsl.l, 0, 100, `l`), percentTest(hsl.alpha ?? 1, `alpha`));
-	if (scalarOpt) return scalar$2(hsl.h / 360, hsl.s / 100, hsl.l / 100, hsl.alpha ?? 1);
+	if (scalarOpt) return scalar(hsl.h / 360, hsl.s / 100, hsl.l / 100, hsl.alpha ?? 1);
 	else return absolute$1(hsl.h, hsl.s, hsl.l, (hsl.alpha ?? 1) * 100);
 }
 const toAbsolute$1 = (hslOrString) => {
@@ -972,7 +979,7 @@ const interpolator$3 = (a, b, direction = `shorter`) => {
 		const s = interpolate(amount, 0, satDistance);
 		const l = interpolate(amount, 0, lightDistance);
 		const o = interpolate(amount, 0, opacityDistance);
-		return scalar$2(wrapScalarHue(h), s + a.s, l + a.l, o + aOpacity);
+		return scalar(wrapScalarHue(h), s + a.s, l + a.l, o + aOpacity);
 	};
 };
 /**
@@ -983,7 +990,7 @@ const interpolator$3 = (a, b, direction = `shorter`) => {
 * @param opacity 
 * @returns 
 */
-function scalar$2(hue = .5, sat = 1, lightness$1 = .5, opacity = 1) {
+function scalar(hue = .5, sat = 1, lightness$1 = .5, opacity = 1) {
 	const hsl = {
 		unit: `scalar`,
 		space: `hsl`,
@@ -1051,12 +1058,12 @@ function parseCssHslFunction(value) {
 			split[4]
 		];
 	}
-	if (returnRelative) return scalar$2(valueAsScalar(split[0], 0), valueAsScalar(split[1], 1), valueAsScalar(split[2], 2), valueAsScalar(split[3] ?? `100%`, 3));
+	if (returnRelative) return scalar(valueAsScalar(split[0], 0), valueAsScalar(split[1], 1), valueAsScalar(split[2], 2), valueAsScalar(split[3] ?? `100%`, 3));
 	else return absolute$1(valueAsAbs(split[0], 0), valueAsAbs(split[1], 1), valueAsAbs(split[2], 2), valueAsAbs(split[3] ?? `100%`, 3));
 }
 /**
 * Converts a Hsl structure (or CSS string) to Colorizr's RGB format
-* @param rgb 
+* @param hsl HSL colour
 * @returns 
 */
 function toLibraryRgb(hsl) {
@@ -1088,9 +1095,9 @@ __export(oklch_exports, {
 	generateScalar: () => generateScalar,
 	guard: () => guard$4,
 	interpolator: () => interpolator$2,
-	scalar: () => scalar$1,
+	scalar: () => scalar$2,
 	toAbsolute: () => toAbsolute,
-	toCssString: () => toCssString$1,
+	toCssString: () => toCssString$2,
 	toScalar: () => toScalar$1,
 	withOpacity: () => withOpacity$2
 });
@@ -1115,8 +1122,8 @@ const guard$4 = (lch) => {
 * * alpha: 0..1
 * 
 * Default option: { scalar: true }
-* @param lch 
-* @param parsingOptions 
+* @param lch LCH value
+* @param parsingOptions Options for parsing 
 * @returns 
 */
 function fromLibrary$1(lch, parsingOptions = {}) {
@@ -1125,7 +1132,7 @@ function fromLibrary$1(lch, parsingOptions = {}) {
 	}
 	const scalarReturn = parsingOptions.scalar ?? true;
 	resultThrow(percentTest(lch.l, `l`), percentTest(lch.c, `c`), numberInclusiveRangeTest(lch.h, 0, 360, `h`), percentTest(lch.alpha ?? 1, `alpha`));
-	if (scalarReturn) return scalar$1(lch.l, lch.c / OKLCH_CHROMA_MAX, lch.h / 360, lch.alpha ?? 1);
+	if (scalarReturn) return scalar$2(lch.l, lch.c / OKLCH_CHROMA_MAX, lch.h / 360, lch.alpha ?? 1);
 	else return absolute(lch.l, lch.c, lch.h, lch.alpha ?? 1);
 }
 const fromHexString$1 = (hexString, options = {}) => {
@@ -1208,7 +1215,7 @@ const toScalar$1 = (lchOrString) => {
 * @param precision Set precision of numbers, defaults to 3 
 * @returns CSS colour string
 */
-const toCssString$1 = (lch, precision = 3) => {
+const toCssString$2 = (lch, precision = 3) => {
 	guard$4(lch);
 	const { l, c, h, opacity } = lch;
 	let css = ``;
@@ -1280,10 +1287,10 @@ const interpolator$2 = (a, b, direction = `shorter`) => {
 		const c = interpolate(amount, 0, chromaDistance);
 		const l = interpolate(amount, 0, lightDistance);
 		const o = interpolate(amount, 0, opacityDistance);
-		return scalar$1(l + a.l, c + a.c, wrapScalarHue(h), o + aOpacity);
+		return scalar$2(l + a.l, c + a.c, wrapScalarHue(h), o + aOpacity);
 	};
 };
-function scalar$1(lightness$1 = .7, chroma = .1, hue = .5, opacity = 1) {
+function scalar$2(lightness$1 = .7, chroma = .1, hue = .5, opacity = 1) {
 	const lch = {
 		unit: `scalar`,
 		space: `oklch`,
@@ -1346,6 +1353,30 @@ const fromCssColour = (colour) => {
 	if (colour.startsWith(`rgb(`)) return fromCss(colour, { scalar: true });
 	if (colour.startsWith(`oklch(`)) return fromCss$1(colour, { scalar: true });
 	throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour. Input: '${colour}'`);
+};
+/**
+* Resolves a named colour or CSS variable to a colour string.
+* Doesn't do conversion or parsing.
+* 
+* ```js
+* resolveCss(`red`);
+* resolveCss(`my-var`);
+* ```
+* @param colour Colour
+* @param fallback Fallback if CSS variable is missing
+* @returns 
+*/
+const resolveCss = (colour, fallback) => {
+	if (colour.startsWith(`--`)) {
+		const fromCss$3 = getComputedStyle(document.body).getPropertyValue(colour).trim();
+		if (fromCss$3.length === 0 || fromCss$3 === null) {
+			if (typeof fallback !== `undefined`) return fallback;
+			throw new Error(`CSS variable missing: '${colour}'`);
+		}
+		return resolveCss(fromCss$3);
+	}
+	if (typeof cssDefinedHexColours[colour] !== `undefined`) return cssDefinedHexColours[colour];
+	return colour;
 };
 const cssDefinedHexColours = {
 	"aliceblue": "#f0f8ff",
@@ -1504,9 +1535,9 @@ __export(srgb_exports, {
 	interpolator: () => interpolator$1,
 	lightness: () => lightness,
 	parseCssRgbFunction: () => parseCssRgbFunction,
-	scalar: () => scalar,
+	scalar: () => scalar$1,
 	to8bit: () => to8bit,
-	toCssString: () => toCssString,
+	toCssString: () => toCssString$1,
 	toLibraryHsl: () => toLibraryHsl,
 	toScalar: () => toScalar,
 	withOpacity: () => withOpacity$1
@@ -1575,7 +1606,7 @@ function fromCss(value, options = {}) {
 		throw error;
 	}
 }
-const toCssString = (rgb) => {
+const toCssString$1 = (rgb) => {
 	guard$3(rgb);
 	switch (rgb.unit) {
 		case `8bit`:
@@ -1658,7 +1689,7 @@ const guard$3 = (rgb) => {
 */
 const changeLightness = (rgb, amount) => {
 	let newL = 0;
-	const co = new index_default(toCssString(rgb));
+	const co = new index_default(toCssString$1(rgb));
 	const scalarUnit = rgb.unit === `scalar`;
 	if (typeof amount.pdelta !== `undefined`) newL = co.oklab.l + co.oklab.l * amount.pdelta;
 	else if (typeof amount.delta !== `undefined`) newL = co.oklab.l + amount.delta;
@@ -1684,7 +1715,7 @@ const changeLightness = (rgb, amount) => {
 * @returns 
 */
 function lightness(rgb) {
-	const co = new index_default(toCssString(rgb));
+	const co = new index_default(toCssString$1(rgb));
 	return co.oklab.l;
 }
 /**
@@ -1715,7 +1746,7 @@ function eightBit(red = 100, green = 100, blue = 100, opacity = 255) {
 * @param opacity 
 * @returns 
 */
-function scalar(red = .5, green = .5, blue = .5, opacity = 1) {
+function scalar$1(red = .5, green = .5, blue = .5, opacity = 1) {
 	const rgb = {
 		unit: `scalar`,
 		space: `srgb`,
@@ -1760,7 +1791,7 @@ function parseCssRgbFunction(value) {
 			split[4]
 		];
 	}
-	if (relativeCount > 1) return scalar(valueAsScalar(split[0], 0), valueAsScalar(split[1], 1), valueAsScalar(split[2], 2), valueAsScalar(split[3] ?? `1`, 3));
+	if (relativeCount > 1) return scalar$1(valueAsScalar(split[0], 0), valueAsScalar(split[1], 1), valueAsScalar(split[2], 2), valueAsScalar(split[3] ?? `1`, 3));
 	else return eightBit(valueAs8bit(split[0], 0), valueAs8bit(split[1], 1), valueAs8bit(split[2], 2), valueAs8bit(split[3] ?? `1`, 3));
 }
 /**
@@ -1785,7 +1816,7 @@ const interpolator$1 = (colourA, colourB) => {
 	const b = bb.b - aa.b;
 	return (amount) => {
 		amount = clamp(amount);
-		return scalar(aa.r + interpolate(amount, 0, r), aa.g + interpolate(amount, 0, g), aa.b + interpolate(amount, 0, b), aOpacity + interpolate(amount, 0, opacityDistance));
+		return scalar$1(aa.r + interpolate(amount, 0, r), aa.g + interpolate(amount, 0, g), aa.b + interpolate(amount, 0, b), aOpacity + interpolate(amount, 0, opacityDistance));
 	};
 };
 /**
@@ -2408,14 +2439,16 @@ const createOrResolve = (parent, type, queryOrExisting, suffix) => {
 */
 const goldenAngleColour = (index, saturation = .5, lightness$1 = .75, alpha = 1) => {
 	resultThrow(numberTest(index, `positive`, `index`), numberTest(saturation, `percentage`, `saturation`), numberTest(lightness$1, `percentage`, `lightness`), numberTest(alpha, `percentage`, `alpha`));
-	const hue = index * 137.508;
-	return alpha === 1 ? `hsl(${hue},${saturation * 100}%,${lightness$1 * 100}%)` : `hsl(${hue},${saturation * 100}%,${lightness$1 * 100}%,${alpha * 100}%)`;
+	const hueDeg = index * 137.508;
+	const hueRel = hueDeg % 360 / 360;
+	return toCssString(scalar(hueRel, saturation, lightness$1, alpha));
 };
 /**
 * Returns a random hue component (0..359)
+* 
 * ```
 * // Generate hue
-* const h =randomHue(); // 0-359
+* const h = randomHue(); // 0-359
 *
 * // Generate hue and assign as part of a HSL string
 * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
@@ -2423,10 +2456,7 @@ const goldenAngleColour = (index, saturation = .5, lightness$1 = .75, alpha = 1)
 * @param rand
 * @returns
 */
-const randomHue = (rand = Math.random) => {
-	const r = rand();
-	return r * 360;
-};
+const randomHue = (rand = Math.random) => rand() * 360;
 
 //#endregion
 //#region packages/visual/src/colour/math.ts
@@ -2439,8 +2469,8 @@ const randomHue = (rand = Math.random) => {
 * 
 * For example, to half the opacity, use `amount: 0.5`.
 * Clamps the result to ensure it's between 0..1
-* @param colourish 
-* @param amount 
+* @param colourish Colour
+* @param amount Amount
 * @returns 
 */
 function multiplyOpacity$1(colourish, amount) {
@@ -2471,6 +2501,12 @@ function withOpacity(colourish, fn) {
 	if (!result) throw new Error(`Is colour in correct form?`);
 	if (typeof colourish === `string`) return toCssColour(result);
 	return result;
+}
+function setOpacity(colourish, opacity) {
+	const colour = toColour(colourish);
+	colour.opacity = opacity;
+	if (typeof colourish === `string`) return toCssColour(colour);
+	return colour;
 }
 
 //#endregion
@@ -2634,14 +2670,22 @@ __export(colour_exports, {
 	goldenAngleColour: () => goldenAngleColour,
 	guard: () => guard$2,
 	interpolator: () => interpolator,
+	isColourish: () => isColourish,
+	isHsl: () => isHsl,
+	isOkLch: () => isOkLch,
+	isRgb: () => isRgb,
 	multiplyOpacity: () => multiplyOpacity$1,
 	randomHue: () => randomHue,
+	resolveCss: () => resolveCss,
 	rgbToHsl: () => rgbToHsl,
 	scale: () => scale,
+	setOpacity: () => setOpacity,
 	toColour: () => toColour,
 	toCssColour: () => toCssColour,
 	toLibraryColour: () => toLibraryColour,
 	toStringFirst: () => toStringFirst,
+	tryParseObjectToHsl: () => tryParseObjectToHsl,
+	tryParseObjectToRgb: () => tryParseObjectToRgb,
 	withOpacity: () => withOpacity
 });
 
@@ -2661,9 +2705,9 @@ function convert$1(colour, destination) {
 	} else if (destination === `hsl-absolute`) {
 		if (typeof colour === `string` || isHsl(colour)) return toAbsolute$1(colour);
 	} else if (destination === `oklch-scalar`) {
-		if (typeof colour === `string` || isLch(colour)) return toScalar$1(colour);
+		if (typeof colour === `string` || isOkLch(colour)) return toScalar$1(colour);
 	} else if (destination === `oklch-absolute`) {
-		if (typeof colour === `string` || isLch(colour)) return toAbsolute(colour);
+		if (typeof colour === `string` || isOkLch(colour)) return toAbsolute(colour);
 	} else if (destination === `srgb-8bit`) {
 		if (typeof colour === `string` || isRgb(colour)) return to8bit(colour);
 	} else if (destination === `srgb-scalar`) {
@@ -2689,13 +2733,13 @@ function convertScalar(colour, destination) {
 }
 const toCssColour = (colour) => {
 	if (typeof colour === `string`) return colour;
-	if (isHsl(colour)) return toCssString$2(colour);
-	if (isRgb(colour)) return toCssString(colour);
-	if (isLch(colour)) return toCssString$1(colour);
+	if (isHsl(colour)) return toCssString(colour);
+	if (isRgb(colour)) return toCssString$1(colour);
+	if (isOkLch(colour)) return toCssString$2(colour);
 	const asRgb = tryParseObjectToRgb(colour);
-	if (asRgb) return toCssString(asRgb);
+	if (asRgb) return toCssString$1(asRgb);
 	const asHsl = tryParseObjectToHsl(colour);
-	if (asHsl) return toCssString$2(asHsl);
+	if (asHsl) return toCssString(asHsl);
 	throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 };
 const toLibraryColour = (colour) => {
@@ -2710,11 +2754,14 @@ const guard$2 = (colour) => {
 		case `srgb`:
 			guard$3(colour);
 			break;
-		default: throw new Error(`Unknown colour space: '${colour.space}'`);
+		case `oklch`:
+			guard$4(colour);
+			break;
+		default: throw new Error(`Unsupported colour space: '${colour.space}'`);
 	}
 };
 const toColour = (colourish) => {
-	if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc.`);
+	if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc. Got: ${JSON.stringify(colourish)}`);
 	let c;
 	if (typeof colourish === `string`) c = fromCssColour(colourish);
 	else c = colourish;
@@ -2764,7 +2811,7 @@ function rgbToHsl(rgb, scalarResult) {
 	let h = (max + min) / 2;
 	let s = h;
 	const l = h;
-	if (max === min) if (scalarResult) return scalar$2(0, 0, 0, opacity);
+	if (max === min) if (scalarResult) return scalar(0, 0, 0, opacity);
 	else return absolute$1(0, 0, 0, opacity);
 	const d = max - min;
 	s = l >= .5 ? d / (2 - (max + min)) : d / (max + min);
@@ -2779,7 +2826,7 @@ function rgbToHsl(rgb, scalarResult) {
 			h = ((r - g) / d + 4) * 60;
 			break;
 	}
-	if (scalarResult) return scalar$2(h / 360, s, l, opacity);
+	if (scalarResult) return scalar(h / 360, s, l, opacity);
 	else return absolute$1(h, s * 100, l * 100, opacity);
 }
 

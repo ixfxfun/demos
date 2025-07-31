@@ -1,10 +1,10 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-C3Fpyyz5.js";
-import { containsDuplicateInstances, without } from "./src-BVzuGCxJ.js";
-import { intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-CEZs43zj.js";
-import { addValue, filterValues, findValue, hasAnyValue, sortByValueProperty, toArray } from "./maps-C72wxMfj.js";
-import { SimpleEventEmitter, defaultKeyer, last as last$1, last$1 as last, map, max, min, toStringAbbreviate } from "./src-BGGRKLH-.js";
-import { isPrimitive } from "./is-primitive-B-tAS1Xm.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-B5kzJkYi.js";
+import { containsDuplicateInstances, without } from "./src-DtvLL3oi.js";
+import { isPrimitive } from "./is-primitive-Bo4OHt3v.js";
+import { intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-klk0IZBm.js";
+import { addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./basic-BlF-8Fo-.js";
+import { SimpleEventEmitter, defaultKeyer, last as last$1, last$1 as last, map, max, min, toStringAbbreviate } from "./src-BB8BKEVc.js";
 
 //#region packages/collections/src/circular-array.ts
 /**
@@ -825,8 +825,6 @@ const hasAnyParent$1 = (child, prospectiveParent) => {
 * 
 * Use {@link queryParentsValue} to search for a particular value
 * @param child 
-* @param value 
-* @param eq 
 * @returns 
 */
 function* parentsValues(child) {
@@ -3946,17 +3944,44 @@ __export(map_exports, {
 	MapOfMutableImpl: () => MapOfMutableImpl,
 	MapOfSimple: () => MapOfSimple,
 	NumberMap: () => NumberMap,
+	addObjectEntriesMutate: () => addObjectEntriesMutate,
+	addValue: () => addValue,
+	addValueMutate: () => addValueMutate,
+	addValueMutator: () => addValueMutator,
+	deleteByValueCompareMutate: () => deleteByValueCompareMutate,
 	expiringMap: () => create,
+	filterValues: () => filterValues,
+	findBySomeKey: () => findBySomeKey,
+	findEntryByPredicate: () => findEntryByPredicate,
+	findEntryByValue: () => findEntryByValue,
+	findValue: () => findValue,
 	firstEntry: () => firstEntry,
 	firstEntryByValue: () => firstEntryByValue,
+	fromIterable: () => fromIterable,
+	fromObject: () => fromObject,
+	getClosestIntegerKey: () => getClosestIntegerKey,
+	getOrGenerate: () => getOrGenerate,
+	getOrGenerateSync: () => getOrGenerateSync,
+	hasAnyValue: () => hasAnyValue,
+	hasKeyValue: () => hasKeyValue,
 	immutable: () => immutable,
 	lengthMax: () => lengthMax,
 	mapOfSimpleMutable: () => ofSimpleMutable,
+	mapToArray: () => mapToArray,
+	mapToObjectTransform: () => mapToObjectTransform,
+	mergeByKey: () => mergeByKey,
 	mutable: () => mutable,
 	ofArrayMutable: () => ofArrayMutable,
 	ofCircularMutable: () => ofCircularMutable,
 	ofSetMutable: () => ofSetMutable,
-	ofSimple: () => ofSimple
+	ofSimple: () => ofSimple,
+	some: () => some,
+	sortByValue: () => sortByValue,
+	sortByValueProperty: () => sortByValueProperty,
+	toArray: () => toArray,
+	toObject: () => toObject,
+	transformMap: () => transformMap,
+	zipKeyValue: () => zipKeyValue
 });
 
 //#endregion
@@ -4051,7 +4076,7 @@ var Table = class {
 	}
 	/**
 	* Iterates over each row, including the labels if available
-	* @see {@link rowsWithLabelObject} to get rows in object format
+	* @see {@link rowsWithLabelsObject} to get rows in object format
 	*/
 	*rowsWithLabelsArray() {
 		for (let index = 0; index < this.rows.length; index++) {
@@ -4171,8 +4196,8 @@ var Table = class {
 	* Set the value of row,columm.
 	* Row is created if it doesn't exist, with the other column values being _undefined_
 	* @param row Index or label 
-	* @param columnIndex 
-	* @param value 
+	* @param column Column 
+	* @param value Value to set at row,column
 	*/
 	set(row, column, value$1) {
 		const result = this.#getOrCreateRawRow(row);

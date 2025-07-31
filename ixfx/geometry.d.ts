@@ -2187,10 +2187,12 @@ declare const PlaceholderPositioned: Readonly<{
  */
 declare const perimeter$4: (rect: Rect) => number;
 //# sourceMappingURL=perimeter.d.ts.map
+
 //#endregion
 //#region packages/geometry/src/rect/normalise-by-rect.d.ts
 /**
  * Returns a function that divides numbers or points by the largest dimension of `rect`.
+ *
  * ```js
  * const d = dividerByLargestDimension({width:100,height:50});
  * d(50);                // 0.5 (50/100)
@@ -3398,9 +3400,10 @@ declare const isPlaceholder$2: (p: Point) => boolean;
 //#endregion
 //#region packages/geometry/src/point/interpolate.d.ts
 /**
- * Returns a relative point between two points
+ * Returns a relative point between two points.
+ *
  * ```js
- * interpolate(0.5, a, b); // Halfway point between a and b
+ * interpolate(0.5, { x:0, y:0 }, { x:10, y:10 }); // Halfway { x, y }
  * ```
  *
  * Alias for Lines.interpolate(amount, a, b);
@@ -3530,6 +3533,10 @@ declare const normalise$2: (ptOrX: Point | number, y?: number) => Point;
 //#region packages/geometry/src/point/normalise-by-rect.d.ts
 /**
  * Normalises a point by a given width and height
+ *
+ * ```js
+ * normaliseByRect({ x: 10, y: 10 }, 20, 40 }); // { x: 0.5, y: 0.2 }
+ * ```
  * @param point Point
  * @param width Width
  * @param height Height
@@ -3537,12 +3544,20 @@ declare const normalise$2: (ptOrX: Point | number, y?: number) => Point;
 declare function normaliseByRect$1(point: Point, width: number, height: number): Point;
 /**
  * Normalises a point by a given rect's width and height
+ *
+ * ```js
+ * normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); // { x: 0.5, y: 0.2 }
+ * ```
  * @param pt
  * @param rect
  */
 declare function normaliseByRect$1(pt: Point, rect: Rect): Point;
 /**
  * Normalises x,y by width and height so it is on a 0..1 scale
+ *
+ * ```js
+ * normaliseByRect(10, 10, 20, 40); // { x: 0.5, y: 0.2 }
+ * ```
  * @param x
  * @param y
  * @param width
@@ -5270,10 +5285,16 @@ type Arc = {
  * An {@link Arc} that also has a center position, given in x, y
  */
 type ArcPositioned = Point & Arc;
+/**
+ * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
+ */
 type ArcInterpolate = {
   (amount: number, arc: Arc, allowOverflow: boolean, origin: Point): Point;
   (amount: number, arc: ArcPositioned, allowOverflow?: boolean): Point;
 };
+/**
+ * Function to convert an arc to SVG segments
+ */
 type ArcToSvg = {
   /**
    * SVG path for arc description

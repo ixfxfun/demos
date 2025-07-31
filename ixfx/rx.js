@@ -1,20 +1,20 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { resultIsError, resultToError, testPlainObjectOrPrimitive } from "./src-C3Fpyyz5.js";
-import { insertAt, remove, shuffle } from "./src-BVzuGCxJ.js";
-import { intervalToMs, isEqualContextString, isEqualValueDefault } from "./interval-type-CEZs43zj.js";
-import { average, elapsedInterval, max, min, rank, sleep, some, sum, tally, zipKeyValue } from "./maps-C72wxMfj.js";
-import { DispatchList, QueueMutable, connect, continuously, graph, init, timeout, to } from "./src-Bip7wA20.js";
-import { isAsyncIterable, isIterable, nextWithTimeout, wildcard } from "./src-BGGRKLH-.js";
-import "./is-integer-BPLQCDA2.js";
-import "./is-primitive-B-tAS1Xm.js";
-import "./key-value-CfwtfZWC.js";
-import "./dist-27gr6RC3.js";
-import { getErrorMessage } from "./resolve-core-CDPnQKIe.js";
-import { compareArrays, mapObjectShallow } from "./records-D95EU4q-.js";
-import { compareData, getField, interpolate, updateByPath } from "./src-BYvifgKg.js";
-import { setProperty } from "./src-CkUASbck.js";
-import "./src-DB-SLoee.js";
-import "./bezier-DZRwSDvJ.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { resultIsError, resultToError, testPlainObjectOrPrimitive } from "./src-B5kzJkYi.js";
+import { insertAt, interpolate, remove, shuffle } from "./src-DtvLL3oi.js";
+import { compareArrays, mapObjectShallow } from "./records-ButNOjS_.js";
+import "./is-primitive-Bo4OHt3v.js";
+import { intervalToMs, isEqualContextString, isEqualValueDefault } from "./interval-type-klk0IZBm.js";
+import { average, elapsedInterval, max, min, rank, sleep, some, sum, tally, zipKeyValue } from "./basic-BlF-8Fo-.js";
+import { compareData, getField, updateByPath } from "./src--zqQj9Fa.js";
+import { DispatchList, QueueMutable, connect, continuously, graph, init, timeout, to } from "./src-CGZcvPbX.js";
+import { isAsyncIterable, isIterable, nextWithTimeout, wildcard } from "./src-BB8BKEVc.js";
+import "./is-integer-CT5DoflS.js";
+import "./key-value-BXKMXEIP.js";
+import "./dist-STbyDn6P.js";
+import { getErrorMessage } from "./resolve-core-hiYZW4xF.js";
+import { setProperty } from "./src-mdH5NzeF.js";
+import "./src-BxRlvgsb.js";
+import "./bezier-BF9M23nT.js";
 
 //#region packages/rx/src/util.ts
 function messageIsSignal(message) {
@@ -1279,6 +1279,7 @@ function field(fieldSource, fieldName, options = {}) {
 * Passes all values where `predicate` function returns _true_.
 */
 function filter(input, predicate, options) {
+	if (typeof predicate !== `function`) throw new TypeError(`Param 'predicate' should be a function`);
 	const upstream = initUpstream(input, {
 		...options,
 		onValue(value) {
@@ -1291,6 +1292,7 @@ function filter(input, predicate, options) {
 * Drops all values where `predicate` function returns _true_.
 */
 function drop(input, predicate, options) {
+	if (typeof predicate !== `function`) throw new TypeError(`Param 'predicate' should be a function`);
 	const upstream = initUpstream(input, {
 		...options,
 		onValue(value) {
@@ -2302,6 +2304,7 @@ function event(targetOrQuery, name, initialValue, options = {}) {
 	if (target === null) throw new Error(`Param 'targetOrQuery' is null`);
 	const debugLifecycle = options.debugLifecycle ?? false;
 	const debugFiring = options.debugFiring ?? false;
+	const diff = options.diff ?? false;
 	const lazy = options.lazy ?? false;
 	if (initialValue === void 0) initialValue = {};
 	const rxObject = object(initialValue, { deepEntries: true });
@@ -3137,7 +3140,7 @@ const Ops = {
 	},
 	drop: (predicate) => opify(drop, predicate),
 	elapsed: () => opify(elapsed),
-	field: (fieldName, options) => {
+	field: (fieldName, options = {}) => {
 		return (source) => {
 			return field(source, fieldName, options);
 		};

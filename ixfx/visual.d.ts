@@ -530,6 +530,19 @@ declare function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute;
  * @returns
  */
 declare const fromCssColour: (colour: string) => Colour;
+/**
+ * Resolves a named colour or CSS variable to a colour string.
+ * Doesn't do conversion or parsing.
+ *
+ * ```js
+ * resolveCss(`red`);
+ * resolveCss(`my-var`);
+ * ```
+ * @param colour Colour
+ * @param fallback Fallback if CSS variable is missing
+ * @returns
+ */
+declare const resolveCss: (colour: string, fallback?: string) => string;
 declare const cssDefinedHexColours: {
   aliceblue: string;
   antiquewhite: string;
@@ -695,9 +708,10 @@ declare const cssDefinedHexColours: {
 declare const goldenAngleColour: (index: number, saturation?: number, lightness?: number, alpha?: number) => string;
 /**
  * Returns a random hue component (0..359)
+ *
  * ```
  * // Generate hue
- * const h =randomHue(); // 0-359
+ * const h = randomHue(); // 0-359
  *
  * // Generate hue and assign as part of a HSL string
  * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
@@ -708,39 +722,46 @@ declare const goldenAngleColour: (index: number, saturation?: number, lightness?
 declare const randomHue: (rand?: RandomSource) => number;
 //# sourceMappingURL=generate.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/math.d.ts
+//#region packages/visual/src/colour/guards.d.ts
+declare const isHsl: (v: any) => v is Hsl;
+declare const isRgb: (v: any) => v is Rgb;
 /**
- * Multiplies the opacity of a colour by `amount`, returning a computed CSS colour.
+ * If the input object has r,g&b properties, it will return a fully-
+ * formed Rgb type with `unit` and `space` properties.
  *
- * ```js
- * multiplyOpacity(`red`, 0.5); // Returns a colour string
- * ```
+ * If it lacks these basic three properties or they are out of range,
+ *  _undefined_ is returned.
  *
- * For example, to half the opacity, use `amount: 0.5`.
- * Clamps the result to ensure it's between 0..1
- * @param colourish
- * @param amount
+ * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
+ * If RGB values exceed 255, _undefined_ returned.
+ * @param v
  * @returns
  */
-declare function multiplyOpacity(colourish: string, amount: number): string;
+declare const tryParseObjectToRgb: (v: any) => Rgb | undefined;
+declare const tryParseObjectToHsl: (v: any) => Hsl | undefined;
+declare const isOkLch: (v: any) => v is OkLch;
+declare const isColourish: (v: any) => v is Colourish;
+//# sourceMappingURL=guards.d.ts.map
+//#endregion
+//#region packages/visual/src/colour/math.d.ts
+declare function multiplyOpacity<T extends Colourish>(colourish: T, amount: number): T extends string ? string : T extends Hsl ? Hsl : T extends OkLch ? OkLch : T extends Rgb ? Rgb : never;
 /**
  * Does a computation with the opacity of a colour, returning colour string
  * @param colourish Colour
  * @param fn Function that takes original opacity as input and returns output opacity
  */
-declare function withOpacity$3(colourish: string, fn: (scalarOpacity: number) => number): string;
 /**
  * Does a computation with the opacity of a colour in a HSL structure
  * @param hsl Colour
  * @param fn Function that takes original opacity as input and returns output opacity
  */
-declare function withOpacity$3(hsl: Hsl, fn: (scalarOpacity: number) => number): Hsl;
 /**
  * Does a computation with the opacity of a colour in a RGB structure
  * @param colourish Colour
  * @param fn Function that takes original opacity as input and returns output opacity
  */
-declare function withOpacity$3(rgb: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+declare function withOpacity$3<T extends Colourish>(colourish: T, fn: (scalarOpacity: number) => number): T extends string ? string : T extends Hsl ? Hsl : T extends OkLch ? OkLch : T extends Rgb ? Rgb : never;
+declare function setOpacity<T extends Colourish>(colourish: T, amount: number): T extends string ? string : T extends Hsl ? Hsl : T extends OkLch ? OkLch : T extends Rgb ? Rgb : never;
 //# sourceMappingURL=math.d.ts.map
 //#endregion
 //#region packages/visual/src/colour/interpolate.d.ts
@@ -807,8 +828,8 @@ declare namespace hsl_d_exports {
  * ```js
  * withOpacity()
  * ```
- * @param value
- * @param fn
+ * @param value Colour
+ * @param fn Function that calcules opacity based on input scalar value
  * @returns
  */
 declare const withOpacity$2: <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
@@ -831,8 +852,8 @@ declare const withOpacity$2: <T extends Hsl>(value: T, fn: (opacityScalar: numbe
  * lightness is 0..1 scale, otherwise 0..100 scale.
  *
  * Use negative values to decrease (does not apply to 'fixed')
- * @param value
- * @param amount
+ * @param value Hsl colour
+ * @param amount Amount to change
  */
 declare const changeLightness$1: (value: Hsl, amount: Partial<{
   pdelta: number;
@@ -842,7 +863,7 @@ declare const changeLightness$1: (value: Hsl, amount: Partial<{
 declare function fromHexString$2<T extends ParsingOptions<Hsl>>(hexString: string, scalar: T): T extends {
   scalar: true;
 } ? HslScalar : HslAbsolute;
-declare function fromCss$2<T extends ParsingOptions<Hsl>>(value: string, options: T): T extends {
+declare function fromCss$2<T extends ParsingOptions<Hsl>>(value: string, options?: T): T extends {
   scalar: true;
 } ? HslScalar : HslAbsolute;
 declare const toCssString$2: (hsl: Hsl) => string;
@@ -896,7 +917,7 @@ declare function absolute$1(hue?: number, sat?: number, lightness?: number, opac
 declare function parseCssHslFunction(value: string): Hsl;
 /**
  * Converts a Hsl structure (or CSS string) to Colorizr's RGB format
- * @param rgb
+ * @param hsl HSL colour
  * @returns
  */
 declare function toLibraryRgb(hsl: Hsl | string): C.RGB;
@@ -1037,7 +1058,7 @@ declare const interpolator: (colourA: Rgb | string, colourB: Rgb | string) => (a
 declare function toLibraryHsl(rgb: Rgb | string): C.HSL;
 //# sourceMappingURL=srgb.d.ts.map
 declare namespace index_d_exports {
-  export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, multiplyOpacity, randomHue, rgbToHsl, scale, toColour, toCssColour, toLibraryColour, toStringFirst, withOpacity$3 as withOpacity };
+  export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, isColourish, isHsl, isOkLch, isRgb, multiplyOpacity, randomHue, resolveCss, rgbToHsl, scale, setOpacity, toColour, toCssColour, toLibraryColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$3 as withOpacity };
 }
 declare namespace drawing_d_exports {
   export { CanvasContextQuery, ConnectedPointsOptions, DotOpts, DrawingHelper, DrawingOpts, DrawingStack, HorizAlign, LineOpts, RectOpts, StackOp, VertAlign, arc, bezier, circle, connectedPoints, copyToImg, dot, drawingStack, ellipse, getContext, line, lineThroughPoints, makeHelper, paths, pointLabels, rect, textBlock, textBlockAligned, textHeight, textRect, textWidth, translatePoint, triangle };

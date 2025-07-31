@@ -1589,5 +1589,5 @@ declare function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: 
 //# sourceMappingURL=index.d.ts.map
 
 //#endregion
-export { async_d_exports as Async, index_d_exports as Chains, ForEachOptions, IteratorControllerOptions, IteratorControllerState, sync_d_exports as Sync, ToArrayOptions, WithEvents, asCallback, chunks, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max, maxScore, min, minScore, numbersCompute, reduce, slice, some, toArray, unique, uniqueByValue, until, zip };
+export { async_d_exports as Async, index_d_exports as Chains, ForEachOptions, IteratorControllerOptions, IteratorControllerState, sync_d_exports as Sync, ToArrayOptions, WithEvents, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max, maxScore, min, minScore, numbersCompute, reduce, slice, some, toArray, unique, uniqueByValue, until, zip };
 //# sourceMappingURL=iterables.d.ts.map

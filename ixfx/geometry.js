@@ -1,14 +1,14 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./src-C3Fpyyz5.js";
-import { clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-BVzuGCxJ.js";
-import "./interval-type-CEZs43zj.js";
-import { zipKeyValue } from "./maps-C72wxMfj.js";
-import { mutable } from "./src-Bip7wA20.js";
-import "./src-BGGRKLH-.js";
-import "./is-primitive-B-tAS1Xm.js";
-import "./key-value-CfwtfZWC.js";
-import "./resolve-core-CDPnQKIe.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DZRwSDvJ.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { integerTest, numberTest, percentTest, resultThrow } from "./src-B5kzJkYi.js";
+import { clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-DtvLL3oi.js";
+import "./is-primitive-Bo4OHt3v.js";
+import "./interval-type-klk0IZBm.js";
+import { zipKeyValue } from "./basic-BlF-8Fo-.js";
+import { mutable } from "./src-CGZcvPbX.js";
+import "./src-BB8BKEVc.js";
+import "./key-value-BXKMXEIP.js";
+import "./resolve-core-hiYZW4xF.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-BF9M23nT.js";
 
 //#region packages/geometry/src/point/guard.ts
 /**
@@ -519,6 +519,12 @@ const isRectPositioned = (rect) => isRect(rect) && isPositioned$1(rect);
 //#region packages/geometry/src/point/normalise-by-rect.ts
 /**
 * Normalises a point so it is on a 0..1 scale
+* 
+* ```js
+* normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); 
+* normaliseByRect({ x: 10, y: 10 }, 20, 40); 
+* normaliseByRect(10, 10, 20, 40);
+* ```
 * @param a Point, or x
 * @param b y coord or width
 * @param c height or width
@@ -2831,9 +2837,10 @@ const fromNumbers = (...coords) => {
 //#endregion
 //#region packages/geometry/src/point/interpolate.ts
 /**
-* Returns a relative point between two points
+* Returns a relative point between two points.
+* 
 * ```js
-* interpolate(0.5, a, b); // Halfway point between a and b
+* interpolate(0.5, { x:0, y:0 }, { x:10, y:10 }); // Halfway { x, y }
 * ```
 *
 * Alias for Lines.interpolate(amount, a, b);
@@ -6131,6 +6138,7 @@ const perimeter$4 = (rect) => {
 //#region packages/geometry/src/rect/normalise-by-rect.ts
 /**
 * Returns a function that divides numbers or points by the largest dimension of `rect`.
+* 
 * ```js
 * const d = dividerByLargestDimension({width:100,height:50});
 * d(50);                // 0.5 (50/100)

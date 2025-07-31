@@ -1,12 +1,12 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-C3Fpyyz5.js";
-import { clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-BVzuGCxJ.js";
-import { elapsedToHumanString, intervalToMs } from "./interval-type-CEZs43zj.js";
-import { defaultComparer, elapsedInfinity, elapsedSince, sleep } from "./maps-C72wxMfj.js";
-import { continuously, mutable$1 as mutable, rateMinimum } from "./src-Bip7wA20.js";
-import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
-import "./is-primitive-B-tAS1Xm.js";
-import { getErrorMessage, logSet, resolve, resolveLogOption, resolveSync } from "./resolve-core-CDPnQKIe.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-B5kzJkYi.js";
+import { clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-DtvLL3oi.js";
+import "./is-primitive-Bo4OHt3v.js";
+import { elapsedToHumanString, intervalToMs } from "./interval-type-klk0IZBm.js";
+import { defaultComparer, elapsedInfinity, elapsedSince, sleep } from "./basic-BlF-8Fo-.js";
+import { continuously, mutable$1 as mutable, rateMinimum } from "./src-CGZcvPbX.js";
+import { SimpleEventEmitter } from "./src-BB8BKEVc.js";
+import { getErrorMessage, logSet, resolve, resolveLogOption, resolveSync } from "./resolve-core-hiYZW4xF.js";
 
 //#region packages/flow/src/behaviour-tree.ts
 const getName = (t, defaultValue = ``) => {
@@ -1008,7 +1008,7 @@ var Pool = class {
 	fullPolicy;
 	generateResource;
 	freeResource;
-	log;
+	log = logSet(`Pool`);
 	/**
 	* Constructor.
 	*
@@ -2910,14 +2910,17 @@ const cloneState = (toClone) => {
 *  shoes: 'shirt',
 *  shirt: null
 * }
+* 
 * // Defaults to first key, 'pants'
 * let sm = StateMachine.init(descr);
+* 
 * // Move to 'shoes' state
 * sm = StateMachine.to(sm, 'shoes');
 * sm.state; // 'shoes'
 * sm.visited; // [ 'pants' ]
-* StateMachineLight.isDdone(sm); // false
-* StateMachineLight.possible(sm); // [ 'shirt' ]
+* 
+* StateMachine.isDone(sm); // false
+* StateMachine.possible(sm); // [ 'shirt' ]
 * ```
 * @param stateMachine Settings for state machine
 * @param initialState Initial state name
@@ -3046,6 +3049,13 @@ const validateMachineState = (state) => {
 * Attempts to transition to a new state. Either a new
 * `MachineState` is returned reflecting the change, or
 * an exception is thrown.
+* 
+* @example Attempts to transition to 'name-of-state'
+* ```js
+* const newState = StateMachine.to(currentState, `name-of-state`);
+* ```
+* 
+* Note that 'currentState' is not changed.
 * @param sm
 * @param toState
 * @returns
@@ -3156,6 +3166,48 @@ const fromListBidirectional = (...states) => {
 /**
 * Drives a state machine.
 *
+* Uses a 'handlers' structure to determine when to change
+* state and actions to take.
+* 
+* The structure is a set of logical conditions: if we're in
+* this state, then move to this other state etc.
+* 
+* ```js
+* const handlers = [
+*  {
+*    // If we're in the 'sleeping' state, move to next state
+*    if: 'sleeping',
+*    then: { next: true }
+*  },
+*  {
+*    // If we're in the 'waking' state, randomly either go to 'resting' or 'sleeping' state
+*    if: 'waking',
+*    then: [
+*      () => {
+*        if (Math.random() > 0.5) {
+*          return { next: 'resting' }
+*        } else {
+*          return { next: 'sleeping' }
+*        }
+*      }
+*    ]
+*   }
+* ];
+* ```
+* 
+* Set up the driver, and call `run()` when you want to get
+* the machine to change state or take action:
+* 
+* ```js
+* const driver = await StateMachine.driver(states, handlers);
+* setInterval(async () => {
+*  await driver.run(); // Note use of 'await' again
+* }, 1000);
+* ```
+* 
+* Essentially, the 'handlers' structure gets run through each time `run()`
+* is called.
+* 
 * Defaults to selecting the highest-ranked result to determine
 * what to do next.
 * @param machine

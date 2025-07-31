@@ -113,9 +113,9 @@ declare const contains: <V>(haystack: ArrayLike<V>, needles: ArrayLike<V>, eq?: 
  * Uses JSON.toString() by default to compare values.
  *
  * See also:
- * * {@link containsDuplicateInstances}: Compare based on reference, rather than value
  * * {@link unique}: Get unique set of values in an array
- * * {@link isContentsTheSame}: Returns _true_ if every item in array is the same
+ * * {@link containsDuplicateInstances}: Compare based on reference, rather than value
+ * * {@link containsDuplicateValues}: Returns _true_ if every item in array is the same
  * @param data Array to examine
  * @param keyFunction Function to generate key string for object, uses JSON.stringify by default.
  * @returns

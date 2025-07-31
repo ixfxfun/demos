@@ -1,8 +1,8 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, resultThrow } from "./src-C3Fpyyz5.js";
-import { isEqual, numberArrayCompute } from "./src-BVzuGCxJ.js";
-import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-CEZs43zj.js";
-import { average, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./maps-C72wxMfj.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { integerTest, resultThrow } from "./src-B5kzJkYi.js";
+import { isEqual, numberArrayCompute } from "./src-DtvLL3oi.js";
+import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-klk0IZBm.js";
+import { average, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-BlF-8Fo-.js";
 
 //#region packages/iterables/src/guard.ts
 const isAsyncIterable = (v) => {
@@ -2848,7 +2848,7 @@ function unique(iterable$1) {
 * @param toString 
 */
 function* uniqueByValue(input, toString = toStringDefault, seen = /* @__PURE__ */ new Set()) {
-	return isAsyncIterable(input) ? uniqueByValue$2(input, toString, seen) : uniqueByValue$1(input, toString, seen);
+	yield* isAsyncIterable(input) ? uniqueByValue$2(input, toString, seen) : uniqueByValue$1(input, toString, seen);
 }
 /**
 * Returns an array of values from an iterator.
@@ -2910,7 +2910,7 @@ function zip(...its) {
 * Use `interval` to add time between each item.
 * The first item is yielded without delay.
 * @param iterable Iterable or AsyncIterable
-* @param [interval=1] Interval to wait between yield
+* @param [interval=1] Interval to wait between yield 
 */
 function fromIterable(iterable$1, interval) {
 	if (isAsyncIterable(iterable$1) || interval !== void 0) return fromIterable$2(iterable$1, interval);
@@ -2985,5 +2985,5 @@ function asCallback(input, callback, onDone) {
 }
 
 //#endregion
-export { async_exports as Async, chain_exports as Chains, sync_exports as Sync, asCallback, chunks, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max$1 as max, maxScore, min$1 as min, minScore, numbersCompute, reduce, slice, some$1 as some, toArray, unique, uniqueByValue, until, zip };
+export { async_exports as Async, chain_exports as Chains, sync_exports as Sync, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max$1 as max, maxScore, min$1 as min, minScore, numbersCompute, reduce, slice, some$1 as some, toArray, unique, uniqueByValue, until, zip };
 //# sourceMappingURL=iterables.js.map

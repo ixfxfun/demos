@@ -2,7 +2,7 @@ import { HasCompletion, Interval } from "@ixfx/core";
 import { SimpleEventEmitter } from "@ixfx/events";
 import * as Flow from "@ixfx/flow";
 import { Paths, Points, Rects } from "@ixfx/geometry";
-import { BasicInterpolateOptions } from "@ixfx/numbers";
+import { BasicInterpolateOptions, interpolate } from "@ixfx/numbers";
 import { RandomSource } from "@ixfx/random";
 
 //#region packages/modulation/src/types.d.ts
@@ -1071,7 +1071,6 @@ declare const apply: (t: ForceAffected, ...accelForces: readonly ForceKind[]) =>
  * It returns a function which can later be applied to a thing.
  *
  * ```js
- * import { Forces } from "@ixfx/dist/modulation.js"
  * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
  * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
  *
@@ -1417,47 +1416,10 @@ type InterpolateOptions = BasicInterpolateOptions & {
  * @param amount Interpolation value (0..1 usually)
  * @param options Options
  */
-declare function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
-/**
- * Interpolates between `a` and `b` by `amount`.
- *
- * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * import { interpolate } from '@ixfx/numbers.js';
- *
- * // Get the value at 10% of range between 50-100
- * const fn = interpolate(0.1, 50, 100);
- * ```
- *
- * This is useful if you have dynamic interpolation amount as well as A & B values.
- * Consider using `interpolate(amount)` if you have a fixed interpolation amount.
- * @param amount Interpolation value (0..1 usually)
- * @param a Starting value (corresponding to an interpolation of 0)
- * @param b End value (corresponding to an interpolation value of 1)
- * @param options Options
- */
-declare function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
-/**
- * Returns an interpolation function with a fixed A and B values.
- * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * import { interpolate } from '@ixfx/numbers.js';
- *
- * // Create function to interpolate between 50..100
- * const fn = interpolate(50, 100);
- *
- * // Later, use to interpolate
- * fn(0.1); // 10% of 50..100 range
- * ```
- * @param a Starting value (corresponding to an interpolation of 0)
- * @param b End value (corresponding to an interpolation value of 1)
- * @param options Options
- */
-declare function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
+
 /**
  * Returns a function that interpolates from A to B.
+ *
  * It steps through the interpolation with each call to the returned function.
  * This means that the `incrementAmount` will hinge on the rate
  * at which the function is called. Alternatively, consider {@link interpolatorInterval}
@@ -1841,6 +1803,7 @@ declare const pingPong: (interval: number, lower: number, upper: number, start?:
 //#region packages/modulation/src/spring.d.ts
 /**
  * Produces values according to rough spring physics.
+ * å
  * ```js
  * import { continuously } from "@ixfx/flow.js"
  * import { spring } from "@ixfx/modulation.js"
@@ -2018,6 +1981,7 @@ type WaveOptions = ModSettableOptions & {
 declare function triangleShape(period?: number): ModFunction;
 /**
  * Returns a function that shapes a 0..1 value as a square waveform.
+ *
  * `period` sets the number of cycles in the 0..1 range.
  * No bounds checks are performed on input value.
  * Ensure it is 0..1 (inclusive).
@@ -2058,7 +2022,9 @@ declare function sineShape(period?: number): ModFunction;
 declare function arcShape(period?: number): ModFunction;
 declare function sineBipolarShape(period?: number): ModFunction;
 /**
- * Creates a wave modulator. Defaults to 5-second sine wave.
+ * Creates a wave modulator by name.
+ *
+ * Defaults to 5-second sine wave.
  * ```js
  * import { wave } from '@ixfx/modulation.js';
  * // Triangle wave that has a single cycle over two seconds

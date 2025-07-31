@@ -1,3 +1,4 @@
+import { __export, __reExport } from "./chunk-Cn1u12Og.js";
 import { IWithEntries, Interval, IsEqual, ToString } from "@ixfx/core";
 import { SimpleEventEmitter } from "@ixfx/events";
 
@@ -203,7 +204,7 @@ type WrappedNode<T> = TraversableTree<T> & {
   queryValue: (value: T) => IterableIterator<WrappedNode<T>>;
   /**
   * Yields all parents of `child` that have a given value.
-  * Use {@link findParentsValue} to find the first match only.
+  * Use 'findParentsValue' to find the first match only.
   * @param child
   * @param value
   * @param eq
@@ -222,10 +223,8 @@ type WrappedNode<T> = TraversableTree<T> & {
    * Yields the node value of each parent of `child`.
    * _undefined_ values are not returned.
    *
-   * Use {@link queryParentsValue} to search for a particular value
+   * Use 'queryParentsValue' to search for a particular value
    * @param child
-   * @param value
-   * @param eq
    * @returns
    */
   parentsValues<T>(child: TreeNode<T>): IterableIterator<T>;
@@ -417,8 +416,6 @@ declare const hasAnyParent$1: <T>(child: TreeNode<T>, prospectiveParent: TreeNod
  *
  * Use {@link queryParentsValue} to search for a particular value
  * @param child
- * @param value
- * @param eq
  * @returns
  */
 declare function parentsValues<T>(child: TreeNode<T>): Generator<T & ({} | null), boolean, unknown>;
@@ -3335,6 +3332,9 @@ declare class NumberMap<K> extends Map<K, number> {
 declare namespace index_d_exports$1 {
   export { ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapSetOpts, MultiValue, NumberMap, create as expiringMap, firstEntry, firstEntryByValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple };
 }
+import * as import___ixfx_core_maps from "@ixfx/core/maps";
+__reExport(index_d_exports$1, import___ixfx_core_maps);
+
 //#endregion
 //#region packages/collections/src/table.d.ts
 /**
@@ -3408,7 +3408,7 @@ declare class Table<V> {
   rowsWithLabelsObject(): Generator<object | undefined, void, unknown>;
   /**
    * Iterates over each row, including the labels if available
-   * @see {@link rowsWithLabelObject} to get rows in object format
+   * @see {@link rowsWithLabelsObject} to get rows in object format
    */
   rowsWithLabelsArray(): Generator<[label: string | undefined, value: V | undefined][] | undefined, void, unknown>;
   /**
@@ -3468,8 +3468,8 @@ declare class Table<V> {
    * Set the value of row,columm.
    * Row is created if it doesn't exist, with the other column values being _undefined_
    * @param row Index or label
-   * @param columnIndex
-   * @param value
+   * @param column Column
+   * @param value Value to set at row,column
    */
   set(row: number | string, column: number | string, value: V | undefined): void;
   /**

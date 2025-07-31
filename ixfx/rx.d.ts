@@ -378,6 +378,14 @@ type GeneratorOptions = {
   whenStopped: `continue` | `reset`;
 };
 type EventSourceOptions = {
+  /**
+   * If true, behaves like Source.object where event
+   * properties are compared and source only
+   * emits where there is a change.
+   *
+   * Default: _false_
+   */
+  diff?: boolean;
   lazy?: Lazy;
   /**
    * If true, log messages are emitted
@@ -2277,7 +2285,7 @@ declare const Ops: {
    * @param options
    * @returns
    */
-  readonly field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options: FieldOptions<TSource, TFieldType>) => (source: ReactiveOrSource<TSource>) => Reactive<TFieldType>;
+  readonly field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options?: Partial<FieldOptions<TSource, TFieldType>>) => (source: ReactiveOrSource<TSource>) => Reactive<TFieldType>;
   /**
    * Filters the input stream, only re-emitting values that pass the predicate
    * @param predicate If it returns _true_ value is allowed through

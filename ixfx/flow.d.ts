@@ -1,4 +1,5 @@
 import { BasicType, Comparer, HasCompletion, Interval, ResolveToValue, ResolveToValueSync, sleep } from "@ixfx/core";
+import * as Debug from "@ixfx/debug";
 import { LogOption } from "@ixfx/debug";
 import { SimpleEventEmitter } from "@ixfx/events";
 import { Result } from "@ixfx/guards";
@@ -527,7 +528,7 @@ type FullPolicy = `error` | `evictOldestUser`;
 /**
  * Pool options
  */
-type Opts<V> = {
+type PoolOptions<V> = {
   /**
    * Maximum number of resources for this pool
    */
@@ -728,14 +729,14 @@ declare class Pool<V> {
   readonly fullPolicy: FullPolicy;
   private generateResource?;
   readonly freeResource?: (v: V) => void;
-  readonly log: any;
+  readonly log: Debug.LogSet;
   /**
    * Constructor.
    *
    * By default, no capacity limit, one user per resource
    * @param options Pool options
    */
-  constructor(options?: Opts<V>);
+  constructor(options?: PoolOptions<V>);
   /**
    * Returns a debug string of Pool state
    * @returns
@@ -846,7 +847,7 @@ declare class Pool<V> {
  * @param options
  * @returns
  */
-declare const create: <V>(options?: Opts<V>) => Pool<V>;
+declare const create: <V>(options?: PoolOptions<V>) => Pool<V>;
 //# sourceMappingURL=pool.d.ts.map
 //#endregion
 //#region packages/flow/src/promise-with-resolvers.d.ts
@@ -2204,6 +2205,48 @@ type State = Readonly<Record<string, StateHandler>>;
 /**
  * Drives a state machine.
  *
+ * Uses a 'handlers' structure to determine when to change
+ * state and actions to take.
+ *
+ * The structure is a set of logical conditions: if we're in
+ * this state, then move to this other state etc.
+ *
+ * ```js
+ * const handlers = [
+ *  {
+ *    // If we're in the 'sleeping' state, move to next state
+ *    if: 'sleeping',
+ *    then: { next: true }
+ *  },
+ *  {
+ *    // If we're in the 'waking' state, randomly either go to 'resting' or 'sleeping' state
+ *    if: 'waking',
+ *    then: [
+ *      () => {
+ *        if (Math.random() > 0.5) {
+ *          return { next: 'resting' }
+ *        } else {
+ *          return { next: 'sleeping' }
+ *        }
+ *      }
+ *    ]
+ *   }
+ * ];
+ * ```
+ *
+ * Set up the driver, and call `run()` when you want to get
+ * the machine to change state or take action:
+ *
+ * ```js
+ * const driver = await StateMachine.driver(states, handlers);
+ * setInterval(async () => {
+ *  await driver.run(); // Note use of 'await' again
+ * }, 1000);
+ * ```
+ *
+ * Essentially, the 'handlers' structure gets run through each time `run()`
+ * is called.
+ *
  * Defaults to selecting the highest-ranked result to determine
  * what to do next.
  * @param machine
@@ -2229,14 +2272,17 @@ declare const cloneState: <V extends Transitions>(toClone: MachineState<V>) => M
  *  shoes: 'shirt',
  *  shirt: null
  * }
+ *
  * // Defaults to first key, 'pants'
  * let sm = StateMachine.init(descr);
+ *
  * // Move to 'shoes' state
  * sm = StateMachine.to(sm, 'shoes');
  * sm.state; // 'shoes'
  * sm.visited; // [ 'pants' ]
- * StateMachineLight.isDdone(sm); // false
- * StateMachineLight.possible(sm); // [ 'shirt' ]
+ *
+ * StateMachine.isDone(sm); // false
+ * StateMachine.possible(sm); // [ 'shirt' ]
  * ```
  * @param stateMachine Settings for state machine
  * @param initialState Initial state name
@@ -2271,6 +2317,13 @@ declare const normaliseTargets: <V extends Transitions>(targets: StateTarget<V> 
  * Attempts to transition to a new state. Either a new
  * `MachineState` is returned reflecting the change, or
  * an exception is thrown.
+ *
+ * @example Attempts to transition to 'name-of-state'
+ * ```js
+ * const newState = StateMachine.to(currentState, `name-of-state`);
+ * ```
+ *
+ * Note that 'currentState' is not changed.
  * @param sm
  * @param toState
  * @returns
@@ -2426,5 +2479,5 @@ declare namespace index_d_exports {
   export { DriverExpressionOrResult, DriverOptions, DriverResult, DriverRunner, DriverStatesHandler, Machine, MachineState, State, StateChangeEvent, StateEvent, StateHandler, StateMachineEventMap, StateMachineWithEvents, StateMachineWithEventsOptions, StateNames, StateTarget, StateTargetStrict, StopEvent, TransitionCondition, TransitionResult, Transitions, TransitionsStrict, cloneState, driver, fromList, fromListBidirectional, init, isDone, isValidTransition, next, normaliseTargets, possible, possibleTargets, reset, to, validateMachine, validateTransition };
 }
 //#endregion
-export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, ModulationTimer, MovingAverageTimedOptions, Opts, Pool, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, index_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, ModulationTimer, MovingAverageTimedOptions, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, index_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
 //# sourceMappingURL=flow.d.ts.map

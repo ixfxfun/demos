@@ -1,15 +1,15 @@
-import { __export } from "./chunk-51aI8Tpl.js";
-import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-C3Fpyyz5.js";
-import { clamp, interpolate, interpolateAngle, scale, wrap } from "./src-BVzuGCxJ.js";
-import { intervalToMs } from "./interval-type-CEZs43zj.js";
-import "./maps-C72wxMfj.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-Bip7wA20.js";
-import { SimpleEventEmitter } from "./src-BGGRKLH-.js";
-import "./is-primitive-B-tAS1Xm.js";
-import "./key-value-CfwtfZWC.js";
-import { resolveWithFallbackSync } from "./resolve-core-CDPnQKIe.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-DB-SLoee.js";
-import { float, floatSource } from "./bezier-DZRwSDvJ.js";
+import { __export } from "./chunk-Cn1u12Og.js";
+import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-B5kzJkYi.js";
+import { clamp, interpolate, interpolateAngle, scale, wrap } from "./src-DtvLL3oi.js";
+import "./is-primitive-Bo4OHt3v.js";
+import { intervalToMs } from "./interval-type-klk0IZBm.js";
+import "./basic-BlF-8Fo-.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-CGZcvPbX.js";
+import { SimpleEventEmitter } from "./src-BB8BKEVc.js";
+import "./key-value-BXKMXEIP.js";
+import { resolveWithFallbackSync } from "./resolve-core-hiYZW4xF.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-BxRlvgsb.js";
+import { float, floatSource } from "./bezier-BF9M23nT.js";
 
 //#region packages/modulation/src/source/ticks.ts
 /**
@@ -1595,7 +1595,6 @@ const apply = (t, ...accelForces) => {
 * It returns a function which can later be applied to a thing.
 *
 * ```js
-* import { Forces } from "@ixfx/dist/modulation.js"
 * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
 * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
 *
@@ -2079,6 +2078,7 @@ function interpolate$2(pos1, pos2, pos3, pos4) {
 }
 /**
 * Returns a function that interpolates from A to B.
+* 
 * It steps through the interpolation with each call to the returned function.
 * This means that the `incrementAmount` will hinge on the rate
 * at which the function is called. Alternatively, consider {@link interpolatorInterval}
@@ -2491,6 +2491,7 @@ const pingPong = function* (interval, lower, upper, start, rounding) {
 //#region packages/modulation/src/spring.ts
 /**
 * Produces values according to rough spring physics.
+* å
 * ```js
 * import { continuously } from "@ixfx/flow.js"
 * import { spring } from "@ixfx/modulation.js"
@@ -2675,6 +2676,7 @@ function triangleShape(period = 1) {
 }
 /**
 * Returns a function that shapes a 0..1 value as a square waveform.
+* 
 * `period` sets the number of cycles in the 0..1 range.
 * No bounds checks are performed on input value.
 * Ensure it is 0..1 (inclusive).
@@ -2733,7 +2735,9 @@ function sineBipolarShape(period = 1) {
 	return (t) => Math.sin(t * period);
 }
 /**
-* Creates a wave modulator. Defaults to 5-second sine wave. 
+* Creates a wave modulator by name.
+* 
+* Defaults to 5-second sine wave. 
 * ```js
 * import { wave } from '@ixfx/modulation.js';
 * // Triangle wave that has a single cycle over two seconds
@@ -2882,5 +2886,5 @@ const weightedSource = (easingNameOrOptions = `quadIn`) => {
 };
 
 //#endregion
-export { easing_exports as Easings, envelope_exports as Envelopes, forces_exports as Forces, oscillator_exports as Oscillators, source_exports as Sources, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate$2 as interpolate, interpolateAngle$1 as interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
+export { easing_exports as Easings, envelope_exports as Envelopes, forces_exports as Forces, oscillator_exports as Oscillators, source_exports as Sources, arcShape, crossfade, cubicBezierShape, drift, gaussian, interpolate, interpolateAngle$1 as interpolateAngle, interpolatorInterval, interpolatorStepped, jitter, jitterAbsolute, mix, mixModulators, noop, pingPong, pingPongPercent, sineBipolarShape, sineShape, spring, springShape, springValue, squareShape, tickModulator, ticks, time, timeModulator, timingSourceFactory, triangleShape, wave, waveFromSource, weighted, weightedAverage, weightedSource };
 //# sourceMappingURL=modulation.js.map
