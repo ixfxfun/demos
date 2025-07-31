@@ -1432,6 +1432,46 @@ declare const minScore: <V>(iterable: Iterable<V>, scorer: (v: V) => number) => 
 declare const hasEqualValuesShallow: <V>(iterableA: Iterable<V>, iterableB: Iterable<V>, eq?: IsEqual<V>) => boolean;
 //# sourceMappingURL=compare-values.d.ts.map
 //#endregion
+//#region packages/iterables/src/controller.d.ts
+type IteratorController = {
+  get state(): IteratorControllerState;
+  /**
+   * Starts 'playback' of the iterator.
+   * If already started, this does nothing.
+   * If paused, continues playback.
+   * Use {@link restart} if you want to start with a reset.
+   * @returns
+   */
+  start: () => void;
+  /**
+   * Starts or restarts 'playback' of the iterator.
+   * @returns
+   */
+  restart: () => void;
+  /**
+   * Pauses 'playback' of the iterator.
+   * If already paused, does nothing.
+   * Use {@link start} to resume.
+   * @returns
+   */
+  pause: () => void;
+  /**
+   * Cancels the running timer. This will
+   * stop playback, and next time {@link start}
+   * is called, it will be from the beginning.
+   * @returns
+   */
+  cancel: () => void;
+};
+/**
+ * Retrieve values from an iterator, passing them to a callback.
+ * Allows iterator to be started, paused, or restarted and an optional delay between reading items from iterator.
+ * @param options
+ * @returns
+ */
+declare const iteratorController: <T>(options: IteratorControllerOptions<T>) => IteratorController;
+//# sourceMappingURL=controller.d.ts.map
+//#endregion
 //#region packages/iterables/src/from-event.d.ts
 declare const fromEvent: <V>(eventSource: WithEvents, eventType: string) => AsyncIterator<any>;
 //# sourceMappingURL=from-event.d.ts.map
@@ -1589,5 +1629,5 @@ declare function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: 
 //# sourceMappingURL=index.d.ts.map
 
 //#endregion
-export { async_d_exports as Async, index_d_exports as Chains, ForEachOptions, IteratorControllerOptions, IteratorControllerState, sync_d_exports as Sync, ToArrayOptions, WithEvents, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max, maxScore, min, minScore, numbersCompute, reduce, slice, some, toArray, unique, uniqueByValue, until, zip };
+export { async_d_exports as Async, index_d_exports as Chains, ForEachOptions, IteratorController, IteratorControllerOptions, IteratorControllerState, sync_d_exports as Sync, ToArrayOptions, WithEvents, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, iteratorController, last, map, max, maxScore, min, minScore, numbersCompute, reduce, slice, some, toArray, unique, uniqueByValue, until, zip };
 //# sourceMappingURL=iterables.d.ts.map

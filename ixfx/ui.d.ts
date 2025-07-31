@@ -1,6 +1,6 @@
 import * as _ixfx_core0 from "@ixfx/core";
 import { Interval, Pathed } from "@ixfx/core";
-import * as _ixfx_rx0 from "@ixfx/rx";
+import * as Rx from "@ixfx/rx";
 import { Reactive, ReactiveInitial, ReactiveNonInitial, ReactiveWritable } from "@ixfx/rx";
 import { Colour } from "@ixfx/visual";
 import { HslScalar } from "@ixfx/visual/colour";
@@ -21,12 +21,16 @@ import { EventSourceOptions } from "@ixfx/rx/from";
  * @param interval Tiemout before event gets triggered
  * @returns
  */
-declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => _ixfx_rx0.Reactive<ResizeObserverEntry[]>;
+declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => Rx.Reactive<ResizeObserverEntry[]>;
 /**
  * Returns an Reactive for window resize. Default 100ms debounce.
  * @param elapsed
  * @returns
  */
+declare const windowResize: (elapsed?: Interval) => Rx.Reactive<{
+  innerWidth: number;
+  innerHeight: number;
+}>;
 //# sourceMappingURL=browser-resize.d.ts.map
 //#endregion
 //#region packages/ui/src/rx/browser-theme-change.d.ts
@@ -41,7 +45,7 @@ declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Inte
  * });
  * ```
  */
-declare const cssClassChange: (target?: HTMLElement) => _ixfx_rx0.Reactive<MutationRecord[]>;
+declare const cssClassChange: (target?: HTMLElement) => Rx.Reactive<MutationRecord[]>;
 //# sourceMappingURL=browser-theme-change.d.ts.map
 //#endregion
 //#region packages/ui/src/rx/colour.d.ts
@@ -281,10 +285,10 @@ declare function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormE
  * @param query
  * @returns
  */
-declare function fromDomQuery(query: string): _ixfx_rx0.Reactive<HTMLElement[]> & {
+declare function fromDomQuery(query: string): Rx.Reactive<HTMLElement[]> & {
   set(value: HTMLElement[]): void;
 } & {
-  onField(fieldName: string, handler: (result: _ixfx_rx0.ObjectFieldHandler) => void): () => void;
+  onField(fieldName: string, handler: (result: Rx.ObjectFieldHandler) => void): () => void;
   onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
   update(changedPart: (_ixfx_core0.RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
   updateField(field: string, value: any): void;
@@ -300,7 +304,7 @@ declare function fromDomQuery(query: string): _ixfx_rx0.Reactive<HTMLElement[]> 
  * @param source
  * @param bindOpts
  */
-declare const bindText: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
+declare const bindText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
 /**
  * Updates an element's `value` (as well as the 'value' attribute) when the source value changes.s
  * @param source
@@ -308,7 +312,7 @@ declare const bindText: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery
  * @param bindOpts
  * @returns
  */
-declare const bindValueText: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
+declare const bindValueText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
 /**
  * Updates an element's `innerHTML` when the source value changes
  * ```js
@@ -321,7 +325,7 @@ declare const bindValueText: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOr
  * @param bindOpts
  * @returns
  */
-declare const bindHtml: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: DomBindSourceValue<TSource, string>) => PipeDomBinding;
+declare const bindHtml: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: DomBindSourceValue<TSource, string>) => PipeDomBinding;
 /**
  * Shortcut to bind to an elements attribute
  * @param elOrQuery
@@ -402,7 +406,7 @@ declare const bindHtml: <TSource>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery
  * @param source Source of data
  * @param binds Bindings
  */
-declare const bindElement: <TSource, TDestination>(source: _ixfx_rx0.Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: (DomBindSourceValue<TSource, TDestination> & DomBindValueTarget)[]) => PipeDomBinding;
+declare const bindElement: <TSource, TDestination>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: (DomBindSourceValue<TSource, TDestination> & DomBindValueTarget)[]) => PipeDomBinding;
 /**
  * Binds `source` to one or more element(s). One or more bindings for the same source
  * can be provided.
@@ -434,7 +438,7 @@ declare const bindElement: <TSource, TDestination>(source: _ixfx_rx0.Reactive<TS
  * @param bindsUnresolvedElements
  * @returns
  */
-declare const bind: <TSource, TDestination>(source: _ixfx_rx0.Reactive<TSource>, ...bindsUnresolvedElements: DomBindUnresolvedSource<TSource, TDestination>[]) => PipeDomBinding;
+declare const bind: <TSource, TDestination>(source: Rx.Reactive<TSource>, ...bindsUnresolvedElements: DomBindUnresolvedSource<TSource, TDestination>[]) => PipeDomBinding;
 /**
  * Calls `updater` whenever `source` produces a value. Useful when several fields from a value
  * are needed to update an element.
@@ -457,7 +461,7 @@ declare const bind: <TSource, TDestination>(source: _ixfx_rx0.Reactive<TSource>,
  * @param updater
  * @returns
  */
-declare const bindUpdate: <V>(source: _ixfx_rx0.Reactive<V>, elOrQuery: string | HTMLElement, updater: (v: V, el: HTMLElement) => void) => PipeDomBinding;
+declare const bindUpdate: <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElement, updater: (v: V, el: HTMLElement) => void) => PipeDomBinding;
 /**
  * Updates a HTML element based on diffs on an object.
  * ```js
@@ -491,7 +495,7 @@ declare const bindUpdate: <V>(source: _ixfx_rx0.Reactive<V>, elOrQuery: string |
  * @param opts
  * @returns
  */
-declare const bindDiffUpdate: <V>(source: _ixfx_rx0.ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: Pathed.PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
+declare const bindDiffUpdate: <V>(source: Rx.ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: Pathed.PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
   refresh: () => void;
 };
 /**
@@ -522,10 +526,10 @@ declare const bindDiffUpdate: <V>(source: _ixfx_rx0.ReactiveDiff<V>, elOrQuery: 
  * @param source
  * @param options
  */
-declare const elements: <T>(source: _ixfx_rx0.ReactiveDiff<T> | (_ixfx_rx0.ReactiveDiff<T> & _ixfx_rx0.ReactiveInitial<T>), options: Partial<ElementsOptions>) => void;
+declare const elements: <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & Rx.ReactiveInitial<T>), options: Partial<ElementsOptions>) => void;
 declare function win(): {
   dispose: (reason?: string) => void;
-  size: _ixfx_rx0.Reactive<{
+  size: Rx.Reactive<{
     lazy: string;
     transform: () => {
       width: number;
@@ -540,7 +544,7 @@ declare function win(): {
       };
     };
   };
-  pointer: _ixfx_rx0.Reactive<{
+  pointer: Rx.Reactive<{
     lazy: string;
     transform: (args: Event | undefined) => {
       x: number;
@@ -558,8 +562,8 @@ declare function win(): {
 };
 //# sourceMappingURL=dom.d.ts.map
 declare namespace index_d_exports {
-  export { BindUpdateOpts, DomBindInputOptions, DomBindResolvedSource, DomBindSourceValue, DomBindTargetNode, DomBindTargetNodeResolved, DomBindUnresolvedSource, DomBindValueTarget, DomCreateOptions, DomFormOptions, DomNumberInputValueOptions, DomValueOptions, ElementBind, ElementsOptions, PipeDomBinding, ReactiveColour, bind, bindDiffUpdate, bindElement, bindHtml, bindText, bindUpdate, bindValueText, browserResizeObservable, colour, cssClassChange, domForm, domHslInputValue, domInputValue, domNumberInputValue, elements, fromDomQuery, win };
+  export { BindUpdateOpts, DomBindInputOptions, DomBindResolvedSource, DomBindSourceValue, DomBindTargetNode, DomBindTargetNodeResolved, DomBindUnresolvedSource, DomBindValueTarget, DomCreateOptions, DomFormOptions, DomNumberInputValueOptions, DomValueOptions, ElementBind, ElementsOptions, PipeDomBinding, ReactiveColour, bind, bindDiffUpdate, bindElement, bindHtml, bindText, bindUpdate, bindValueText, browserResizeObservable, colour, cssClassChange, domForm, domHslInputValue, domInputValue, domNumberInputValue, elements, fromDomQuery, win, windowResize };
 }
 //#endregion
-export { index_d_exports as Rx };
+export { index_d_exports as RxUi };
 //# sourceMappingURL=ui.d.ts.map

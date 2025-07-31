@@ -1,16 +1,16 @@
 import { __export, __toESM } from "./chunk-Cn1u12Og.js";
-import { resultToError } from "./src-B5kzJkYi.js";
-import { clamp, round } from "./src-DtvLL3oi.js";
+import { resultToError } from "./src-Bo4oKRxs.js";
+import { clamp$1 as clamp, round } from "./src-CiSY0kkK.js";
 import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-klk0IZBm.js";
-import "./basic-BlF-8Fo-.js";
-import "./src-CGZcvPbX.js";
-import { afterMatch } from "./src-BB8BKEVc.js";
-import "./key-value-BXKMXEIP.js";
-import { require_dist, uniqueInstances } from "./dist-STbyDn6P.js";
-import { getErrorMessage } from "./resolve-core-hiYZW4xF.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-BxRlvgsb.js";
-import { shortGuid } from "./bezier-BF9M23nT.js";
+import "./interval-type-DUpgykUG.js";
+import "./basic-DnPjgQBm.js";
+import { afterMatch } from "./src-DPAoZbZ8.js";
+import "./key-value-BeAGVpK0.js";
+import { require_dist, uniqueInstances } from "./dist-BypOHkm6.js";
+import { getErrorMessage } from "./resolve-core-CT6vIfBp.js";
+import "./src-0RBLjKoZ.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-B5bQEXF9.js";
+import { shortGuid } from "./bezier-Dpa_k_f-.js";
 
 //#region packages/dom/src/resolve-el.ts
 /**
@@ -85,6 +85,615 @@ const resolveEls = (selectors) => {
 		return elements;
 	}
 	return [selectors];
+};
+
+//#endregion
+//#region packages/dom/src/data-table.ts
+var data_table_exports = {};
+__export(data_table_exports, {
+	fromList: () => fromList,
+	fromObject: () => fromObject
+});
+var import_dist$1 = __toESM(require_dist(), 1);
+const padding = (v, options) => {
+	if (options.leftPadding) {
+		if (v.length < options.leftPadding) return "&nbsp;".repeat(options.leftPadding - v.length) + v;
+	}
+	return v;
+};
+const convertNumber = (v, o) => {
+	v = o.roundNumbers !== void 0 ? round(o.roundNumbers, v) : v;
+	let asString = o.precision !== void 0 ? v.toFixed(o.precision) : v.toString();
+	asString = padding(asString.toString(), o);
+	return asString;
+};
+const toHtmlSimple = (v, options) => {
+	if (v === null) return `(null)`;
+	if (v === void 0) return `(undefined)`;
+	if (typeof v === `boolean`) return v ? `true` : `false`;
+	if (typeof v === `string`) return `"${v}"`;
+	if (typeof v === `number`) return convertNumber(v, options.numbers);
+	if (typeof v === `object`) return toTableSimple(v, options);
+	return import_dist$1.default.stringify(v);
+};
+const toTableSimple = (v, options) => {
+	let html = `<div style="display:grid; grid-template-columns: repeat(2, 1fr)">`;
+	for (const entry of Object.entries(v)) {
+		const value = toHtmlSimple(entry[1], options);
+		html += `<div class="label" style="display:table-cell">${entry[0]}</div>
+      <div class="data" style="display:table-cell">${value}</div>`;
+	}
+	html += `</div>`;
+	return html;
+};
+/**
+* Creates a table of data points for each object in the map
+* ```
+* const t = DataTable.fromList(parentEl, map);
+* t.update(newMap);
+* ```
+*/
+const fromList = (parentOrQuery, data) => {
+	const parent = resolveEl(parentOrQuery);
+	let container = document.createElement(`DIV`);
+	parent.append(container);
+	const options = {
+		numbers: {},
+		objectsAsTables: true
+	};
+	const remove = () => {
+		if (!container) return false;
+		container.remove();
+		container = void 0;
+		return true;
+	};
+	const update = (data$1) => {
+		const seenTables = /* @__PURE__ */ new Set();
+		for (const [key, value] of data$1) {
+			const tKey = `table-${key}`;
+			seenTables.add(tKey);
+			let t = parent.querySelector(`#${tKey}`);
+			if (t === null) {
+				t = document.createElement(`table`);
+				if (!t) throw new Error(`Could not create table element`);
+				t.id = tKey;
+				parent.append(t);
+			}
+			updateElement(t, value, options);
+		}
+		const tables = Array.from(parent.querySelectorAll(`table`));
+		for (const t of tables) if (!seenTables.has(t.id)) t.remove();
+	};
+	if (data) update(data);
+	return {
+		update,
+		remove
+	};
+};
+/**
+* Updates the given table element so each entry in the map is a
+* row in the table.
+*
+* Rows are keyed by the map key. Rows with keys not found in the map are deleted.
+* @param t Table
+* @param data Map of data
+* @param options Options
+* @returns
+*/
+const updateElement = (t, data, options) => {
+	const numberFormatting = options.numbers ?? {};
+	const idPrefix = options.idPrefix ?? ``;
+	const objectsAsTables = options.objectsAsTables ?? false;
+	if (data === void 0) {
+		t.innerHTML = ``;
+		return;
+	}
+	const seenRows = /* @__PURE__ */ new Set();
+	for (const [key, value] of Object.entries(data)) {
+		const domKey = `${idPrefix}-row-${key}`;
+		seenRows.add(domKey);
+		let rowEl = t.querySelector(`tr[data-key='${domKey}']`);
+		if (rowEl === null) {
+			rowEl = document.createElement(`tr`);
+			t.append(rowEl);
+			rowEl.setAttribute(`data-key`, domKey);
+			const keyEl = document.createElement(`td`);
+			keyEl.textContent = key;
+			keyEl.classList.add(`label`);
+			rowEl.append(keyEl);
+		}
+		let valEl = rowEl.querySelector(`td[data-key='${domKey}-val']`);
+		if (valEl === null) {
+			valEl = document.createElement(`td`);
+			valEl.classList.add(`data`);
+			valEl.setAttribute(`data-key`, `${domKey}-val`);
+			rowEl.append(valEl);
+		}
+		let valueHTML;
+		if (options.formatter) valueHTML = options.formatter(value, key);
+		if (valueHTML === void 0) if (typeof value === `object`) valueHTML = objectsAsTables ? toTableSimple(value, options) : import_dist$1.default.stringify(value);
+		else if (typeof value === `number`) valueHTML = convertNumber(value, numberFormatting);
+		else if (typeof value === `boolean`) valueHTML = value ? `true` : `false`;
+		else if (typeof value === `string`) valueHTML = `"${value}"`;
+		else valueHTML = JSON.stringify(value);
+		valEl.innerHTML = valueHTML;
+	}
+	const rows = Array.from(t.querySelectorAll(`tr`));
+	for (const r of rows) {
+		const key = r.getAttribute(`data-key`);
+		if (!seenRows.has(key)) r.remove();
+	}
+};
+/**
+* Creates a HTML table where each row is a key-value pair from `data`.
+* First column is the key, second column data.
+*
+* ```js
+* const dt = fromObject(`#hostDiv`);
+* ```
+*
+* `dt` is a function to call when you want to update data:
+*
+* ```js
+* dt({
+*  name: `Blerg`,
+*  height: 120
+* });
+* ```
+*/
+const fromObject = (parentOrQuery, data, opts = {}) => {
+	const parent = resolveEl(parentOrQuery);
+	const idPrefix = opts.idPrefix ?? Math.floor(Math.random() * 1e3).toString();
+	const options = {
+		numbers: {},
+		objectsAsTables: true,
+		idPrefix: ``,
+		...opts
+	};
+	let t = document.createElement(`table`);
+	parent.append(t);
+	const remove = () => {
+		if (!t) return false;
+		t.remove();
+		t = void 0;
+		return true;
+	};
+	if (data) updateElement(t, data, options);
+	const update = (d) => {
+		if (!t) throw new Error(`Table disposed`);
+		updateElement(t, d, {
+			...options,
+			idPrefix
+		});
+	};
+	return {
+		remove,
+		update
+	};
+};
+
+//#endregion
+//#region packages/dom/src/drag-drop.ts
+var drag_drop_exports = {};
+__export(drag_drop_exports, { draggable: () => draggable });
+const draggable = (elemOrQuery, listener, options = {}) => {
+	const elem = resolveEl(elemOrQuery);
+	/**
+	* Viewport location at drag start
+	*/
+	let initialPointerPosition = Placeholder;
+	let token;
+	const autoTranslate = options.autoTranslate ?? false;
+	const quickDrag = options.quickDrag ?? false;
+	const fence = options.fence ? resolveEl(options.fence) : void 0;
+	const fenceViewport = options.fenceViewport;
+	let fenceOffset = PlaceholderPositioned;
+	const relativePosition = window.getComputedStyle(elem).position === `relative`;
+	const onParentClick = () => {
+		const selected = elem.classList.contains(`drag-sel`);
+		if (selected) elem.classList.remove(`drag-sel`);
+	};
+	const onElementClick = (event) => {
+		const selected = elem.classList.contains(`drag-sel`);
+		if (selected) elem.classList.remove(`drag-sel`);
+		else elem.classList.add(`drag-sel`);
+		event.stopPropagation();
+	};
+	elem.ownerDocument.addEventListener(`click`, onParentClick);
+	elem.addEventListener(`click`, onElementClick);
+	const dragCleanup = () => {
+		elem.classList.remove(`drag-progress`);
+		elem.ownerDocument.removeEventListener(`pointermove`, onPointerMove);
+		elem.ownerDocument.removeEventListener(`pointerup`, onPointerUp);
+		elem.ownerDocument.removeEventListener(`pointercancel`, onDragCancel);
+	};
+	const dispose = () => {
+		if (elem.classList.contains(`drag-progress`)) onDragCancel(void 0, `dispose`);
+		else dragCleanup();
+		elem.ownerDocument.removeEventListener(`click`, onParentClick);
+		elem.removeEventListener(`click`, onElementClick);
+	};
+	const validateOffsetAndPoint = (offset, x, y) => {
+		if (!isPlaceholder(fenceOffset)) {
+			offset = {
+				x: clamp(offset.x, fenceOffset.x, fenceOffset.width),
+				y: clamp(offset.y, fenceOffset.y, fenceOffset.height)
+			};
+			if (fenceViewport) {
+				x = clamp(x, fenceViewport.x, fenceViewport.x + fenceViewport.width);
+				y = clamp(y, fenceViewport.y, fenceViewport.y + fenceViewport.height);
+			}
+		}
+		return [offset, {
+			x,
+			y
+		}];
+	};
+	let lastMoveOffset = Empty;
+	const onPointerMove = (moveEvent) => {
+		moveEvent.preventDefault();
+		moveEvent.stopPropagation();
+		const { x, y } = moveEvent;
+		let offset = isPlaceholder$1(initialPointerPosition) ? {
+			x: moveEvent.offsetX,
+			y: moveEvent.offsetY
+		} : {
+			x: x - initialPointerPosition.x,
+			y: y - initialPointerPosition.y
+		};
+		const r = validateOffsetAndPoint(offset, x, y);
+		offset = r[0];
+		const state = {
+			delta: offset,
+			initial: initialPointerPosition,
+			token,
+			viewport: r[1]
+		};
+		if (typeof listener.progress !== `undefined`) {
+			const p = listener.progress(state);
+			if (p.abort) {
+				onDragCancel(void 0, `discontinued`);
+				return;
+			}
+			if (p.viewport) offset = {
+				x: p.viewport.x - initialPointerPosition.x,
+				y: p.viewport.y - initialPointerPosition.y
+			};
+		}
+		lastMoveOffset = offset;
+		if (autoTranslate) {
+			const offsetX = offset.x;
+			const offsetY = offset.y;
+			elem.style.translate = `${offsetX}px ${offsetY}px`;
+		}
+	};
+	const onPointerUp = (upEvent) => {
+		const bounds = elem.getBoundingClientRect();
+		dragCleanup();
+		const { x, y } = upEvent;
+		const r = validateOffsetAndPoint(lastMoveOffset, x, y);
+		const state = {
+			initial: initialPointerPosition,
+			token,
+			delta: r[0],
+			viewport: r[1]
+		};
+		if (autoTranslate) {
+			elem.style.translate = `none`;
+			if (relativePosition) {
+				const parent = elem.parentElement?.getBoundingClientRect();
+				elem.style.left = `${bounds.x - parent.left}px`;
+				elem.style.top = `${bounds.y - parent.top}px`;
+			} else {
+				elem.style.left = `${bounds.x}px`;
+				elem.style.top = `${bounds.y}px`;
+			}
+		}
+		if (typeof listener.success !== `undefined`) listener.success(state);
+	};
+	const onDragCancel = (event, reason = `pointercancel`) => {
+		dragCleanup();
+		let viewport = Placeholder;
+		if (event && `x` in event && `y` in event) viewport = {
+			x: event.x,
+			y: event.y
+		};
+		const state = {
+			token,
+			initial: initialPointerPosition,
+			delta: {
+				x: -1,
+				y: -1
+			},
+			viewport
+		};
+		if (typeof listener.abort !== `undefined`) listener.abort(reason, state);
+	};
+	elem.addEventListener(`pointerdown`, (event) => {
+		const selected = elem.classList.contains(`drag-sel`);
+		if (!selected && !quickDrag) return;
+		const event_ = event;
+		initialPointerPosition = {
+			x: event_.x,
+			y: event_.y
+		};
+		const s = typeof listener.start === `undefined` ? {
+			allow: true,
+			token
+		} : listener.start();
+		if (!s.allow) return;
+		token = s.token;
+		if (fence) {
+			const fenceBounds = fence.getBoundingClientRect();
+			fenceOffset = {
+				x: fenceBounds.x - initialPointerPosition.x,
+				y: fenceBounds.y - initialPointerPosition.y,
+				width: fenceBounds.x + fenceBounds.width - initialPointerPosition.x,
+				height: fenceBounds.y + fenceBounds.height - initialPointerPosition.y
+			};
+		} else if (fenceViewport) fenceOffset = {
+			x: fenceViewport.x - initialPointerPosition.x,
+			y: fenceViewport.y - initialPointerPosition.y,
+			width: fenceViewport.width + fenceViewport.x - initialPointerPosition.x,
+			height: fenceViewport.height + fenceViewport.y - initialPointerPosition.y
+		};
+		elem.classList.add(`drag-progress`);
+		elem.ownerDocument.addEventListener(`pointermove`, onPointerMove);
+		elem.ownerDocument.addEventListener(`pointerup`, onPointerUp);
+		elem.ownerDocument.addEventListener(`pointercancel`, onDragCancel);
+	});
+	return dispose;
+};
+
+//#endregion
+//#region packages/dom/src/forms.ts
+var forms_exports = {};
+__export(forms_exports, {
+	button: () => button,
+	buttonCreate: () => buttonCreate,
+	checkbox: () => checkbox,
+	numeric: () => numeric,
+	select: () => select,
+	textAreaKeyboard: () => textAreaKeyboard
+});
+/**
+* Adds tab and shift+tab to TEXTAREA
+* @param el
+*/
+const textAreaKeyboard = (el$1) => {
+	el$1.addEventListener(`keydown`, (event) => {
+		const elementValue = el$1.value;
+		const start = el$1.selectionStart;
+		const end = el$1.selectionEnd;
+		if (event.key === `Tab` && event.shiftKey) {
+			if (el$1.value.substring(start - 2, start) === `  `) el$1.value = elementValue.slice(0, Math.max(0, start - 2)) + elementValue.slice(Math.max(0, end));
+			el$1.selectionStart = el$1.selectionEnd = start - 2;
+			event.preventDefault();
+			return false;
+		} else if (event.key === `Tab`) {
+			el$1.value = elementValue.slice(0, Math.max(0, start)) + `  ` + elementValue.slice(Math.max(0, end));
+			el$1.selectionStart = el$1.selectionEnd = start + 2;
+			event.preventDefault();
+			return false;
+		}
+	});
+};
+/**
+* Quick access to <input type="checkbox"> value.
+* Provide a checkbox by string id or object reference. If a callback is
+* supplied, it will be called when the checkbox changes value.
+*
+* ```
+* const opt = checkbox(`#chkMate`);
+* opt.checked; // Gets/sets
+*
+* const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
+*  if (newVal) ...
+* });
+* ```
+* @param {(string | HTMLInputElement)} domIdOrEl
+* @param {(currentVal:boolean) => void} [onChanged]
+* @returns
+*/
+const checkbox = (domIdOrEl, onChanged) => {
+	const el$1 = resolveEl(domIdOrEl);
+	if (onChanged) el$1.addEventListener(`change`, () => {
+		onChanged(el$1.checked);
+	});
+	return {
+		get checked() {
+			return el$1.checked;
+		},
+		set checked(value) {
+			el$1.checked = value;
+		}
+	};
+};
+/**
+* Numeric INPUT
+*
+* ```
+* const el = numeric(`#num`, (currentValue) => {
+*  // Called when input changes
+* })
+* ```
+*
+* Get/set value
+* ```
+* el.value = 10;
+* ```
+* @param domIdOrEl
+* @param onChanged
+* @param live If true, event handler fires based on `input` event, rather than `change`
+* @returns
+*/
+const numeric = (domIdOrEl, onChanged, live) => {
+	const el$1 = resolveEl(domIdOrEl);
+	const eventName = live ? `change` : `input`;
+	if (onChanged) el$1.addEventListener(eventName, () => {
+		onChanged(Number.parseInt(el$1.value));
+	});
+	return {
+		get value() {
+			return Number.parseInt(el$1.value);
+		},
+		set value(value) {
+			el$1.value = value.toString();
+		}
+	};
+};
+/**
+* Button
+*
+* ```
+* const b = button(`#myButton`, () => {
+*  console.log(`Button clicked`);
+* });
+* ```
+*
+* ```
+* b.click(); // Call the click handler
+* b.disabled = true / false;
+* ```
+* @param domQueryOrEl Query string or element instance
+* @param onClickHandler Callback when button is clicked
+* @returns
+*/
+const button = (domQueryOrEl, onClickHandler) => {
+	const el$1 = resolveEl(domQueryOrEl);
+	const addEvent = () => {
+		if (onClickHandler) el$1.addEventListener(`click`, onClickHandler);
+	};
+	const removeEvent = () => {
+		if (onClickHandler) el$1.removeEventListener(`click`, onClickHandler);
+	};
+	addEvent();
+	return {
+		get title() {
+			return el$1.textContent;
+		},
+		set title(value) {
+			el$1.textContent = value;
+		},
+		dispose(deleteElement = false) {
+			removeEvent();
+			if (deleteElement) el$1.remove();
+		},
+		onClick(handler) {
+			removeEvent();
+			onClickHandler = handler;
+			addEvent();
+		},
+		click() {
+			if (onClickHandler) onClickHandler();
+		},
+		set disabled(value) {
+			el$1.disabled = value;
+		},
+		get el() {
+			return el$1;
+		}
+	};
+};
+/**
+* Creates a BUTTON element, wrapping it via {@link button} and returning it.
+* ```js
+* const b = buttonCreate(`Stop`, () => console.log(`Stop`));
+* someParent.addNode(b.el);
+* ```
+* @param title 
+* @param onClick 
+* @returns 
+*/
+const buttonCreate = (title, onClick) => {
+	const el$1 = document.createElement(`button`);
+	const w = button(el$1, onClick);
+	w.title = title;
+	return w;
+};
+/**
+* SELECT element.
+*
+* Handle changes in value:
+* ```
+* const mySelect = select(`#mySelect`, (newValue) => {
+*  console.log(`Value is now ${newValue}`);
+* });
+* ```
+*
+* Enable/disable:
+* ```
+* mySelect.disabled = true / false;
+* ```
+*
+* Get currently selected index or value:
+* ```
+* mySelect.value / mySelect.index
+* ```
+*
+* Is the currently selected value a placeholder?
+* ```
+* mySelect.isSelectedPlaceholder
+* ```
+*
+* Set list of options
+* ```
+* // Adds options, preselecting `opt2`.
+* mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
+* ```
+*
+* Select an element
+* ```
+* mySelect.select(1); // Select second item
+* mySelect.select(1, true); // If true is added, change handler fires as well
+* ```
+* @param domQueryOrEl Query (eg `#id`) or element
+* @param onChanged Callback when a selection is made
+* @param options Options
+* @return
+*/
+const select = (domQueryOrEl, onChanged, options = {}) => {
+	const el$1 = resolveEl(domQueryOrEl);
+	const { placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1 } = options;
+	const change = () => {
+		if (onChanged !== void 0) onChanged(el$1.value);
+		if (autoSelectAfterChoice >= 0) el$1.selectedIndex = autoSelectAfterChoice;
+	};
+	if (onChanged) el$1.addEventListener(`change`, (_event) => {
+		change();
+	});
+	return {
+		set disabled(value) {
+			el$1.disabled = value;
+		},
+		get value() {
+			return el$1.value;
+		},
+		get index() {
+			return el$1.selectedIndex;
+		},
+		get isSelectedPlaceholder() {
+			return (shouldAddChoosePlaceholder || options.placeholderOpt !== void 0) && el$1.selectedIndex === 0;
+		},
+		setOpts(opts, preSelect) {
+			el$1.options.length = 0;
+			if (shouldAddChoosePlaceholder) opts = [`-- Choose --`, ...opts];
+			else if (placeholderOpt !== void 0) opts = [placeholderOpt, ...opts];
+			let toSelect = 0;
+			for (const [index, o] of opts.entries()) {
+				const optEl = document.createElement(`option`);
+				optEl.value = o;
+				optEl.innerHTML = o;
+				if (preSelect !== void 0 && o === preSelect) toSelect = index;
+				el$1.options.add(optEl);
+			}
+			el$1.selectedIndex = toSelect;
+		},
+		select(index = 0, trigger = false) {
+			el$1.selectedIndex = index;
+			if (trigger && onChanged) change();
+		}
+	};
 };
 
 //#endregion
@@ -391,186 +1000,6 @@ const setCssDisplay = (selectors, value) => {
 };
 
 //#endregion
-//#region packages/dom/src/data-table.ts
-var import_dist$1 = __toESM(require_dist(), 1);
-const padding = (v, options) => {
-	if (options.leftPadding) {
-		if (v.length < options.leftPadding) return "&nbsp;".repeat(options.leftPadding - v.length) + v;
-	}
-	return v;
-};
-const convertNumber = (v, o) => {
-	v = o.roundNumbers !== void 0 ? round(o.roundNumbers, v) : v;
-	let asString = o.precision !== void 0 ? v.toFixed(o.precision) : v.toString();
-	asString = padding(asString.toString(), o);
-	return asString;
-};
-const toHtmlSimple = (v, options) => {
-	if (v === null) return `(null)`;
-	if (v === void 0) return `(undefined)`;
-	if (typeof v === `boolean`) return v ? `true` : `false`;
-	if (typeof v === `string`) return `"${v}"`;
-	if (typeof v === `number`) return convertNumber(v, options.numbers);
-	if (typeof v === `object`) return toTableSimple(v, options);
-	return import_dist$1.default.stringify(v);
-};
-const toTableSimple = (v, options) => {
-	let html = `<div style="display:grid; grid-template-columns: repeat(2, 1fr)">`;
-	for (const entry of Object.entries(v)) {
-		const value = toHtmlSimple(entry[1], options);
-		html += `<div class="label" style="display:table-cell">${entry[0]}</div>
-      <div class="data" style="display:table-cell">${value}</div>`;
-	}
-	html += `</div>`;
-	return html;
-};
-/**
-* Creates a table of data points for each object in the map
-* ```
-* const t = DataTable.fromList(parentEl, map);
-* t.update(newMap);
-* ```
-*/
-const fromList = (parentOrQuery, data) => {
-	const parent = resolveEl(parentOrQuery);
-	let container = document.createElement(`DIV`);
-	parent.append(container);
-	const options = {
-		numbers: {},
-		objectsAsTables: true
-	};
-	const remove = () => {
-		if (!container) return false;
-		container.remove();
-		container = void 0;
-		return true;
-	};
-	const update = (data$1) => {
-		const seenTables = /* @__PURE__ */ new Set();
-		for (const [key, value] of data$1) {
-			const tKey = `table-${key}`;
-			seenTables.add(tKey);
-			let t = parent.querySelector(`#${tKey}`);
-			if (t === null) {
-				t = document.createElement(`table`);
-				if (!t) throw new Error(`Could not create table element`);
-				t.id = tKey;
-				parent.append(t);
-			}
-			updateElement(t, value, options);
-		}
-		const tables = Array.from(parent.querySelectorAll(`table`));
-		for (const t of tables) if (!seenTables.has(t.id)) t.remove();
-	};
-	if (data) update(data);
-	return {
-		update,
-		remove
-	};
-};
-/**
-* Updates the given table element so each entry in the map is a
-* row in the table.
-*
-* Rows are keyed by the map key. Rows with keys not found in the map are deleted.
-* @param t Table
-* @param data Map of data
-* @param options Options
-* @returns
-*/
-const updateElement = (t, data, options) => {
-	const numberFormatting = options.numbers ?? {};
-	const idPrefix = options.idPrefix ?? ``;
-	const objectsAsTables = options.objectsAsTables ?? false;
-	if (data === void 0) {
-		t.innerHTML = ``;
-		return;
-	}
-	const seenRows = /* @__PURE__ */ new Set();
-	for (const [key, value] of Object.entries(data)) {
-		const domKey = `${idPrefix}-row-${key}`;
-		seenRows.add(domKey);
-		let rowEl = t.querySelector(`tr[data-key='${domKey}']`);
-		if (rowEl === null) {
-			rowEl = document.createElement(`tr`);
-			t.append(rowEl);
-			rowEl.setAttribute(`data-key`, domKey);
-			const keyEl = document.createElement(`td`);
-			keyEl.textContent = key;
-			keyEl.classList.add(`label`);
-			rowEl.append(keyEl);
-		}
-		let valEl = rowEl.querySelector(`td[data-key='${domKey}-val']`);
-		if (valEl === null) {
-			valEl = document.createElement(`td`);
-			valEl.classList.add(`data`);
-			valEl.setAttribute(`data-key`, `${domKey}-val`);
-			rowEl.append(valEl);
-		}
-		let valueHTML;
-		if (options.formatter) valueHTML = options.formatter(value, key);
-		if (valueHTML === void 0) if (typeof value === `object`) valueHTML = objectsAsTables ? toTableSimple(value, options) : import_dist$1.default.stringify(value);
-		else if (typeof value === `number`) valueHTML = convertNumber(value, numberFormatting);
-		else if (typeof value === `boolean`) valueHTML = value ? `true` : `false`;
-		else if (typeof value === `string`) valueHTML = `"${value}"`;
-		else valueHTML = JSON.stringify(value);
-		valEl.innerHTML = valueHTML;
-	}
-	const rows = Array.from(t.querySelectorAll(`tr`));
-	for (const r of rows) {
-		const key = r.getAttribute(`data-key`);
-		if (!seenRows.has(key)) r.remove();
-	}
-};
-/**
-* Creates a HTML table where each row is a key-value pair from `data`.
-* First column is the key, second column data.
-*
-* ```js
-* const dt = fromObject(`#hostDiv`);
-* ```
-*
-* `dt` is a function to call when you want to update data:
-*
-* ```js
-* dt({
-*  name: `Blerg`,
-*  height: 120
-* });
-* ```
-*/
-const fromObject = (parentOrQuery, data, opts = {}) => {
-	const parent = resolveEl(parentOrQuery);
-	const idPrefix = opts.idPrefix ?? Math.floor(Math.random() * 1e3).toString();
-	const options = {
-		numbers: {},
-		objectsAsTables: true,
-		idPrefix: ``,
-		...opts
-	};
-	let t = document.createElement(`table`);
-	parent.append(t);
-	const remove = () => {
-		if (!t) return false;
-		t.remove();
-		t = void 0;
-		return true;
-	};
-	if (data) updateElement(t, data, options);
-	const update = (d) => {
-		if (!t) throw new Error(`Table disposed`);
-		updateElement(t, d, {
-			...options,
-			idPrefix
-		});
-	};
-	return {
-		remove,
-		update
-	};
-};
-
-//#endregion
 //#region packages/dom/src/data-display.ts
 /**
 * Creates a simple display for data. Designed to show ixfx state data
@@ -652,177 +1081,6 @@ var DataDisplay = class {
 	update(data) {
 		this.dataTable.update(data);
 	}
-};
-
-//#endregion
-//#region packages/dom/src/drag-drop.ts
-const draggable = (elemOrQuery, listener, options = {}) => {
-	const elem = resolveEl(elemOrQuery);
-	/**
-	* Viewport location at drag start
-	*/
-	let initialPointerPosition = Placeholder;
-	let token;
-	const autoTranslate = options.autoTranslate ?? false;
-	const quickDrag = options.quickDrag ?? false;
-	const fence = options.fence ? resolveEl(options.fence) : void 0;
-	const fenceViewport = options.fenceViewport;
-	let fenceOffset = PlaceholderPositioned;
-	const relativePosition = window.getComputedStyle(elem).position === `relative`;
-	const onParentClick = () => {
-		const selected = elem.classList.contains(`drag-sel`);
-		if (selected) elem.classList.remove(`drag-sel`);
-	};
-	const onElementClick = (event) => {
-		const selected = elem.classList.contains(`drag-sel`);
-		if (selected) elem.classList.remove(`drag-sel`);
-		else elem.classList.add(`drag-sel`);
-		event.stopPropagation();
-	};
-	elem.ownerDocument.addEventListener(`click`, onParentClick);
-	elem.addEventListener(`click`, onElementClick);
-	const dragCleanup = () => {
-		elem.classList.remove(`drag-progress`);
-		elem.ownerDocument.removeEventListener(`pointermove`, onPointerMove);
-		elem.ownerDocument.removeEventListener(`pointerup`, onPointerUp);
-		elem.ownerDocument.removeEventListener(`pointercancel`, onDragCancel);
-	};
-	const dispose = () => {
-		if (elem.classList.contains(`drag-progress`)) onDragCancel(void 0, `dispose`);
-		else dragCleanup();
-		elem.ownerDocument.removeEventListener(`click`, onParentClick);
-		elem.removeEventListener(`click`, onElementClick);
-	};
-	const validateOffsetAndPoint = (offset, x, y) => {
-		if (!isPlaceholder(fenceOffset)) {
-			offset = {
-				x: clamp(offset.x, fenceOffset.x, fenceOffset.width),
-				y: clamp(offset.y, fenceOffset.y, fenceOffset.height)
-			};
-			if (fenceViewport) {
-				x = clamp(x, fenceViewport.x, fenceViewport.x + fenceViewport.width);
-				y = clamp(y, fenceViewport.y, fenceViewport.y + fenceViewport.height);
-			}
-		}
-		return [offset, {
-			x,
-			y
-		}];
-	};
-	let lastMoveOffset = Empty;
-	const onPointerMove = (moveEvent) => {
-		moveEvent.preventDefault();
-		moveEvent.stopPropagation();
-		const { x, y } = moveEvent;
-		let offset = isPlaceholder$1(initialPointerPosition) ? {
-			x: moveEvent.offsetX,
-			y: moveEvent.offsetY
-		} : {
-			x: x - initialPointerPosition.x,
-			y: y - initialPointerPosition.y
-		};
-		const r = validateOffsetAndPoint(offset, x, y);
-		offset = r[0];
-		const state = {
-			delta: offset,
-			initial: initialPointerPosition,
-			token,
-			viewport: r[1]
-		};
-		if (typeof listener.progress !== `undefined`) {
-			const p = listener.progress(state);
-			if (p.abort) {
-				onDragCancel(void 0, `discontinued`);
-				return;
-			}
-			if (p.viewport) offset = {
-				x: p.viewport.x - initialPointerPosition.x,
-				y: p.viewport.y - initialPointerPosition.y
-			};
-		}
-		lastMoveOffset = offset;
-		if (autoTranslate) {
-			const offsetX = offset.x;
-			const offsetY = offset.y;
-			elem.style.translate = `${offsetX}px ${offsetY}px`;
-		}
-	};
-	const onPointerUp = (upEvent) => {
-		const bounds = elem.getBoundingClientRect();
-		dragCleanup();
-		const { x, y } = upEvent;
-		const r = validateOffsetAndPoint(lastMoveOffset, x, y);
-		const state = {
-			initial: initialPointerPosition,
-			token,
-			delta: r[0],
-			viewport: r[1]
-		};
-		if (autoTranslate) {
-			elem.style.translate = `none`;
-			if (relativePosition) {
-				const parent = elem.parentElement?.getBoundingClientRect();
-				elem.style.left = `${bounds.x - parent.left}px`;
-				elem.style.top = `${bounds.y - parent.top}px`;
-			} else {
-				elem.style.left = `${bounds.x}px`;
-				elem.style.top = `${bounds.y}px`;
-			}
-		}
-		if (typeof listener.success !== `undefined`) listener.success(state);
-	};
-	const onDragCancel = (event, reason = `pointercancel`) => {
-		dragCleanup();
-		let viewport = Placeholder;
-		if (event && `x` in event && `y` in event) viewport = {
-			x: event.x,
-			y: event.y
-		};
-		const state = {
-			token,
-			initial: initialPointerPosition,
-			delta: {
-				x: -1,
-				y: -1
-			},
-			viewport
-		};
-		if (typeof listener.abort !== `undefined`) listener.abort(reason, state);
-	};
-	elem.addEventListener(`pointerdown`, (event) => {
-		const selected = elem.classList.contains(`drag-sel`);
-		if (!selected && !quickDrag) return;
-		const event_ = event;
-		initialPointerPosition = {
-			x: event_.x,
-			y: event_.y
-		};
-		const s = typeof listener.start === `undefined` ? {
-			allow: true,
-			token
-		} : listener.start();
-		if (!s.allow) return;
-		token = s.token;
-		if (fence) {
-			const fenceBounds = fence.getBoundingClientRect();
-			fenceOffset = {
-				x: fenceBounds.x - initialPointerPosition.x,
-				y: fenceBounds.y - initialPointerPosition.y,
-				width: fenceBounds.x + fenceBounds.width - initialPointerPosition.x,
-				height: fenceBounds.y + fenceBounds.height - initialPointerPosition.y
-			};
-		} else if (fenceViewport) fenceOffset = {
-			x: fenceViewport.x - initialPointerPosition.x,
-			y: fenceViewport.y - initialPointerPosition.y,
-			width: fenceViewport.width + fenceViewport.x - initialPointerPosition.x,
-			height: fenceViewport.height + fenceViewport.y - initialPointerPosition.y
-		};
-		elem.classList.add(`drag-progress`);
-		elem.ownerDocument.addEventListener(`pointermove`, onPointerMove);
-		elem.ownerDocument.addEventListener(`pointerup`, onPointerUp);
-		elem.ownerDocument.addEventListener(`pointercancel`, onDragCancel);
-	});
-	return dispose;
 };
 
 //#endregion
@@ -1180,257 +1438,6 @@ const defaultErrorHandler = () => {
 	return {
 		show,
 		hide
-	};
-};
-
-//#endregion
-//#region packages/dom/src/forms.ts
-var forms_exports = {};
-__export(forms_exports, {
-	button: () => button,
-	buttonCreate: () => buttonCreate,
-	checkbox: () => checkbox,
-	numeric: () => numeric,
-	select: () => select,
-	textAreaKeyboard: () => textAreaKeyboard
-});
-/**
-* Adds tab and shift+tab to TEXTAREA
-* @param el
-*/
-const textAreaKeyboard = (el$1) => {
-	el$1.addEventListener(`keydown`, (event) => {
-		const elementValue = el$1.value;
-		const start = el$1.selectionStart;
-		const end = el$1.selectionEnd;
-		if (event.key === `Tab` && event.shiftKey) {
-			if (el$1.value.substring(start - 2, start) === `  `) el$1.value = elementValue.slice(0, Math.max(0, start - 2)) + elementValue.slice(Math.max(0, end));
-			el$1.selectionStart = el$1.selectionEnd = start - 2;
-			event.preventDefault();
-			return false;
-		} else if (event.key === `Tab`) {
-			el$1.value = elementValue.slice(0, Math.max(0, start)) + `  ` + elementValue.slice(Math.max(0, end));
-			el$1.selectionStart = el$1.selectionEnd = start + 2;
-			event.preventDefault();
-			return false;
-		}
-	});
-};
-/**
-* Quick access to <input type="checkbox"> value.
-* Provide a checkbox by string id or object reference. If a callback is
-* supplied, it will be called when the checkbox changes value.
-*
-* ```
-* const opt = checkbox(`#chkMate`);
-* opt.checked; // Gets/sets
-*
-* const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
-*  if (newVal) ...
-* });
-* ```
-* @param {(string | HTMLInputElement)} domIdOrEl
-* @param {(currentVal:boolean) => void} [onChanged]
-* @returns
-*/
-const checkbox = (domIdOrEl, onChanged) => {
-	const el$1 = resolveEl(domIdOrEl);
-	if (onChanged) el$1.addEventListener(`change`, () => {
-		onChanged(el$1.checked);
-	});
-	return {
-		get checked() {
-			return el$1.checked;
-		},
-		set checked(value) {
-			el$1.checked = value;
-		}
-	};
-};
-/**
-* Numeric INPUT
-*
-* ```
-* const el = numeric(`#num`, (currentValue) => {
-*  // Called when input changes
-* })
-* ```
-*
-* Get/set value
-* ```
-* el.value = 10;
-* ```
-* @param domIdOrEl
-* @param onChanged
-* @param live If true, event handler fires based on `input` event, rather than `change`
-* @returns
-*/
-const numeric = (domIdOrEl, onChanged, live) => {
-	const el$1 = resolveEl(domIdOrEl);
-	const eventName = live ? `change` : `input`;
-	if (onChanged) el$1.addEventListener(eventName, () => {
-		onChanged(Number.parseInt(el$1.value));
-	});
-	return {
-		get value() {
-			return Number.parseInt(el$1.value);
-		},
-		set value(value) {
-			el$1.value = value.toString();
-		}
-	};
-};
-/**
-* Button
-*
-* ```
-* const b = button(`#myButton`, () => {
-*  console.log(`Button clicked`);
-* });
-* ```
-*
-* ```
-* b.click(); // Call the click handler
-* b.disabled = true / false;
-* ```
-* @param domQueryOrEl Query string or element instance
-* @param onClickHandler Callback when button is clicked
-* @returns
-*/
-const button = (domQueryOrEl, onClickHandler) => {
-	const el$1 = resolveEl(domQueryOrEl);
-	const addEvent = () => {
-		if (onClickHandler) el$1.addEventListener(`click`, onClickHandler);
-	};
-	const removeEvent = () => {
-		if (onClickHandler) el$1.removeEventListener(`click`, onClickHandler);
-	};
-	addEvent();
-	return {
-		get title() {
-			return el$1.textContent;
-		},
-		set title(value) {
-			el$1.textContent = value;
-		},
-		dispose(deleteElement = false) {
-			removeEvent();
-			if (deleteElement) el$1.remove();
-		},
-		onClick(handler) {
-			removeEvent();
-			onClickHandler = handler;
-			addEvent();
-		},
-		click() {
-			if (onClickHandler) onClickHandler();
-		},
-		set disabled(value) {
-			el$1.disabled = value;
-		},
-		get el() {
-			return el$1;
-		}
-	};
-};
-/**
-* Creates a BUTTON element, wrapping it via {@link button} and returning it.
-* ```js
-* const b = buttonCreate(`Stop`, () => console.log(`Stop`));
-* someParent.addNode(b.el);
-* ```
-* @param title 
-* @param onClick 
-* @returns 
-*/
-const buttonCreate = (title, onClick) => {
-	const el$1 = document.createElement(`button`);
-	const w = button(el$1, onClick);
-	w.title = title;
-	return w;
-};
-/**
-* SELECT element.
-*
-* Handle changes in value:
-* ```
-* const mySelect = select(`#mySelect`, (newValue) => {
-*  console.log(`Value is now ${newValue}`);
-* });
-* ```
-*
-* Enable/disable:
-* ```
-* mySelect.disabled = true / false;
-* ```
-*
-* Get currently selected index or value:
-* ```
-* mySelect.value / mySelect.index
-* ```
-*
-* Is the currently selected value a placeholder?
-* ```
-* mySelect.isSelectedPlaceholder
-* ```
-*
-* Set list of options
-* ```
-* // Adds options, preselecting `opt2`.
-* mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
-* ```
-*
-* Select an element
-* ```
-* mySelect.select(1); // Select second item
-* mySelect.select(1, true); // If true is added, change handler fires as well
-* ```
-* @param domQueryOrEl Query (eg `#id`) or element
-* @param onChanged Callback when a selection is made
-* @param options Options
-* @return
-*/
-const select = (domQueryOrEl, onChanged, options = {}) => {
-	const el$1 = resolveEl(domQueryOrEl);
-	const { placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1 } = options;
-	const change = () => {
-		if (onChanged !== void 0) onChanged(el$1.value);
-		if (autoSelectAfterChoice >= 0) el$1.selectedIndex = autoSelectAfterChoice;
-	};
-	if (onChanged) el$1.addEventListener(`change`, (_event) => {
-		change();
-	});
-	return {
-		set disabled(value) {
-			el$1.disabled = value;
-		},
-		get value() {
-			return el$1.value;
-		},
-		get index() {
-			return el$1.selectedIndex;
-		},
-		get isSelectedPlaceholder() {
-			return (shouldAddChoosePlaceholder || options.placeholderOpt !== void 0) && el$1.selectedIndex === 0;
-		},
-		setOpts(opts, preSelect) {
-			el$1.options.length = 0;
-			if (shouldAddChoosePlaceholder) opts = [`-- Choose --`, ...opts];
-			else if (placeholderOpt !== void 0) opts = [placeholderOpt, ...opts];
-			let toSelect = 0;
-			for (const [index, o] of opts.entries()) {
-				const optEl = document.createElement(`option`);
-				optEl.value = o;
-				optEl.innerHTML = o;
-				if (preSelect !== void 0 && o === preSelect) toSelect = index;
-				el$1.options.add(optEl);
-			}
-			el$1.selectedIndex = toSelect;
-		},
-		select(index = 0, trigger = false) {
-			el$1.selectedIndex = index;
-			if (trigger && onChanged) change();
-		}
 	};
 };
 
@@ -2193,5 +2200,5 @@ const byId = (id) => {
 };
 
 //#endregion
-export { DataDisplay, ElementSizer, forms_exports as Forms, addShadowCss, byId, cardinalPosition, clear, copyToClipboard, createAfter, createIn, cycleCssClass, defaultErrorHandler, draggable, el, elRequery, fromList, fromObject, getBoundingClientRectWithBorder, getComputedPixels, getCssVariable, getCssVariablesFromStyles, getCssVariablesWithFallback, getTranslation, inlineConsole, insertSorted, log, parseCssVariablesAsAttributes, pointScaler, positionFn, positionFromMiddle, positionRelative, query, reconcileChildren, resolveEl, resolveElementTry, resolveEls, setCssClass, setCssDisplay, setCssToggle, setCssVariables, setFromCssVariables, setHtml, setProperty, setText, tabSet, viewportToSpace };
+export { DataDisplay, data_table_exports as DataTable, drag_drop_exports as DragDrop, ElementSizer, forms_exports as Forms, addShadowCss, byId, cardinalPosition, clear, copyToClipboard, createAfter, createIn, cycleCssClass, defaultErrorHandler, el, elRequery, getBoundingClientRectWithBorder, getComputedPixels, getCssVariable, getCssVariablesFromStyles, getCssVariablesWithFallback, getTranslation, inlineConsole, insertSorted, log, parseCssVariablesAsAttributes, pointScaler, positionFn, positionFromMiddle, positionRelative, query, reconcileChildren, resolveEl, resolveElementTry, resolveEls, setCssClass, setCssDisplay, setCssToggle, setCssVariables, setFromCssVariables, setHtml, setProperty, setText, tabSet, viewportToSpace };
 //# sourceMappingURL=dom.js.map

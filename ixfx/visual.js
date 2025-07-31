@@ -1,19 +1,19 @@
 import { __export } from "./chunk-Cn1u12Og.js";
-import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultThrow } from "./src-B5kzJkYi.js";
-import { clamp, interpolate, pairwise, quantiseEvery } from "./src-DtvLL3oi.js";
-import { cloneFromFields } from "./records-ButNOjS_.js";
+import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./src-Bo4oKRxs.js";
+import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-CiSY0kkK.js";
+import { cloneFromFields } from "./records-Ba-VkRoc.js";
 import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-klk0IZBm.js";
-import "./basic-BlF-8Fo-.js";
-import { StackImmutable, continuously, delayLoop } from "./src-CGZcvPbX.js";
-import { SimpleEventEmitter } from "./src-BB8BKEVc.js";
-import "./key-value-BXKMXEIP.js";
-import "./dist-STbyDn6P.js";
-import "./resolve-core-hiYZW4xF.js";
-import { ElementSizer, resolveEl } from "./src-mdH5NzeF.js";
-import { Empty$1 as Empty, EmptyPositioned, PointsTracker, angleConvert, angleParse, applyFields, corners, corners$1, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, multiplyScalar$1 as multiplyScalar, rows, scaler } from "./src-BxRlvgsb.js";
-import "./bezier-BF9M23nT.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-DBz_PpZQ.js";
+import "./interval-type-DUpgykUG.js";
+import { continuously } from "./basic-DnPjgQBm.js";
+import { SimpleEventEmitter } from "./src-DPAoZbZ8.js";
+import "./key-value-BeAGVpK0.js";
+import "./dist-BypOHkm6.js";
+import "./resolve-core-CT6vIfBp.js";
+import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-0RBLjKoZ.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-Cst-Mrgn.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, center, corners, corners$1, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, rows, scaler as scaler$1, subtract, subtractSize } from "./src-B5bQEXF9.js";
+import "./bezier-Dpa_k_f-.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-GJA4hucx.js";
 
 //#region packages/visual/src/drawing.ts
 var drawing_exports = {};
@@ -2035,8 +2035,8 @@ var CanvasHelper = class extends SimpleEventEmitter {
 			skipCss: opts.skipCss ?? false,
 			colourSpace: `srgb`
 		};
-		this.#scaler = scaler(`both`);
-		this.#scalerSize = scaler(`both`, size);
+		this.#scaler = scaler$1(`both`);
+		this.#scalerSize = scaler$1(`both`, size);
 		this.#init();
 	}
 	getRectangle() {
@@ -2090,8 +2090,8 @@ var CanvasHelper = class extends SimpleEventEmitter {
 		guard$1(logicalSize, `logicalSize`);
 		const logicalSizeInteger = applyFields((v) => Math.floor(v), logicalSize);
 		const ratio = this.opts.pixelZoom;
-		this.#scaler = scaler(this.opts.coordinateScale, logicalSize);
-		this.#scalerSize = scaler(`both`, logicalSize);
+		this.#scaler = scaler$1(this.opts.coordinateScale, logicalSize);
+		this.#scalerSize = scaler$1(`both`, logicalSize);
 		const pixelScaled = multiplyScalar(logicalSize, ratio);
 		this.el.width = pixelScaled.width;
 		this.el.height = pixelScaled.height;
@@ -3228,6 +3228,1260 @@ const manualCapture = (sourceVideoEl, opts = {}) => {
 };
 
 //#endregion
+//#region packages/visual/src/plot/bipolar-view.ts
+var bipolar_view_exports = {};
+__export(bipolar_view_exports, { init: () => init });
+function getNumericAttribute(el, name, defaultValue) {
+	const a = el.getAttribute(name);
+	if (a === null) return defaultValue;
+	return Number.parseInt(a);
+}
+/**
+* Initialises a plotter for bipolar values (-1...1)
+* 
+* ```js
+* const p = BipolarView.init(`#my-canvas`);
+* // Shows the dot at 1, 0.5
+* p(1, 0.5);
+* ```
+* @param elementQuery 
+* @param options 
+* @returns 
+*/
+const init = (elementQuery, options = {}) => {
+	const element = document.querySelector(elementQuery);
+	if (!element) throw new Error(`Element query could not be found (${elementQuery})`);
+	const labels = options.labels ?? [`x`, `y`];
+	const labelPrecision = options.labelPrecision ?? 2;
+	const asPercentages = options.asPercentages ?? false;
+	const displayLastValues = options.displayLastValues ?? 0;
+	const showWhiskers = options.showWhiskers ?? true;
+	const showDot = options.showDot ?? true;
+	const showLabels = options.showLabels ?? true;
+	const yAxisBottomNegative = options.yAxisBottomNegative ?? true;
+	const axisColour = toStringFirst(options.axisColour, `silver`);
+	const bgColour = toStringFirst(options.bgColour, `white`);
+	const whiskerColour = toStringFirst(options.whiskerColour, `black`);
+	const dotColour = toStringFirst(options.dotColour, options.whiskerColour, `black`);
+	const labelColour = toStringFirst(options.labelColour, options.axisColour, `silver`);
+	const axisWidth = options.axisWidth ?? 1 * window.devicePixelRatio;
+	const dotRadius = options.dotRadius ?? 5 * window.devicePixelRatio;
+	const pad = options.padding ?? 10 * window.devicePixelRatio;
+	const whiskerSize = options.whiskerSize ?? 5 * window.devicePixelRatio;
+	const width = options.width ?? getNumericAttribute(element, `width`, 200) * window.devicePixelRatio;
+	const height = options.height ?? getNumericAttribute(element, `height`, 200) * window.devicePixelRatio;
+	let lastValues;
+	if (displayLastValues > 0) lastValues = new QueueImmutable({
+		capacity: displayLastValues,
+		discardPolicy: `older`
+	});
+	element.width = width;
+	element.height = height;
+	element.style.width = `${width / window.devicePixelRatio}px`;
+	element.style.height = `${height / window.devicePixelRatio}px`;
+	const midY = height / 2;
+	const midX = width / 2;
+	const ctx = element.getContext(`2d`);
+	if (!ctx) throw new Error(`Could not create drawing context`);
+	if (window.devicePixelRatio >= 2) ctx.font = `20px sans-serif`;
+	const percentageFormat = (v) => `${Math.round(v * 100)}%`;
+	const fixedFormat = (v) => v.toFixed(labelPrecision);
+	const valueFormat = asPercentages ? percentageFormat : fixedFormat;
+	if (showLabels) {
+		labels[0] = labels[0] + `:`;
+		labels[1] = labels[1] + `:`;
+	} else {
+		labels[0] = ``;
+		labels[1] = ``;
+	}
+	const renderBackground = options.renderBackground ?? ((ctx$1, width$1, height$1) => {
+		if (options.bgColour === `transparent`) ctx$1.clearRect(0, 0, width$1, height$1);
+		else {
+			ctx$1.fillStyle = bgColour;
+			ctx$1.fillRect(0, 0, width$1, height$1);
+		}
+	});
+	return (x, y) => {
+		x = clamp$1(x);
+		y = clamp$1(y);
+		renderBackground(ctx, width, height);
+		ctx.fillStyle = labelColour;
+		ctx.textBaseline = `top`;
+		ctx.save();
+		ctx.translate(midX, midY);
+		ctx.rotate(-Math.PI / 2);
+		ctx.fillText((labels[1] + ` ` + valueFormat(y)).trim(), -midX + pad, 1);
+		ctx.restore();
+		ctx.fillText((labels[0] + ` ` + valueFormat(x)).trim(), pad, midX + 2);
+		if (!yAxisBottomNegative) y *= -1;
+		ctx.strokeStyle = axisColour;
+		ctx.lineWidth = axisWidth;
+		ctx.beginPath();
+		ctx.moveTo(pad, midY);
+		ctx.lineTo(width - pad, midY);
+		ctx.moveTo(midX, pad);
+		ctx.lineTo(midX, height - pad);
+		ctx.stroke();
+		ctx.closePath();
+		const yy = (height - pad - pad) / 2 * -y;
+		const xx = (width - pad - pad) / 2 * x;
+		const dotPos = {
+			x: xx,
+			y: yy,
+			radius: dotRadius
+		};
+		if (lastValues) lastValues = lastValues.enqueue(dotPos);
+		ctx.save();
+		ctx.translate(midX, midY);
+		if (showDot) if (lastValues) {
+			const opacityStep = 1 / lastValues.length;
+			let opacity = 1;
+			lastValues.forEach((d) => {
+				const colour = multiplyOpacity$1(dotColour, opacity);
+				circle$1(ctx, d, { fillStyle: colour });
+				opacity -= opacityStep;
+			});
+		} else circle$1(ctx, dotPos, { fillStyle: dotColour });
+		if (showWhiskers) {
+			ctx.strokeStyle = whiskerColour;
+			ctx.beginPath();
+			ctx.moveTo(0, yy - whiskerSize);
+			ctx.lineTo(0, yy + whiskerSize);
+			ctx.moveTo(xx - whiskerSize, 0);
+			ctx.lineTo(xx + whiskerSize, 0);
+			ctx.stroke();
+			ctx.closePath();
+		}
+		ctx.restore();
+	};
+};
+
+//#endregion
+//#region packages/visual/src/plot/cartesian.ts
+const computeMinMax = (mm) => {
+	const x = mm.map((m) => m.x);
+	const y = mm.map((m) => m.y);
+	const minX = Math.min(...x);
+	const maxX = Math.max(...x);
+	const minY = Math.min(...y);
+	const maxY = Math.max(...y);
+	const width = maxX - minX;
+	const height = maxY - minY;
+	return {
+		min: {
+			x: minX,
+			y: minY
+		},
+		max: {
+			x: maxX,
+			y: maxY
+		},
+		width,
+		height,
+		minDim: Math.min(width, height),
+		maxDim: Math.max(width, height)
+	};
+};
+const relativeCompute = (minMax) => {
+	if (!Number.isFinite(minMax.height)) return (point) => point;
+	const xScale = scaler(minMax.min.x, minMax.max.x);
+	const yScale = scaler(minMax.min.y, minMax.max.y);
+	return (point) => ({
+		x: xScale(point.x),
+		y: yScale(point.y)
+	});
+};
+const absoluteCompute = (minMax) => {
+	const xScale = scaler(0, 1, minMax.min.x, minMax.max.x);
+	const yScale = scaler(0, 1, minMax.min.y, minMax.max.y);
+	return (point) => ({
+		x: xScale(point.x),
+		y: yScale(point.y)
+	});
+};
+const computeAxisMark = (mm, increments, major) => {
+	const xValues = [];
+	let count = 0;
+	for (let x = mm.min.x; x < mm.max.x; x += increments) {
+		const isMajor = count % major === 0;
+		xValues.push({
+			x,
+			y: 0,
+			major: isMajor
+		});
+		count++;
+	}
+	count = 0;
+	const yValues = [];
+	for (let y = mm.min.y; y < mm.max.y; y += increments) {
+		const isMajor = count % major === 0;
+		yValues.push({
+			x: 0,
+			y,
+			major: isMajor
+		});
+		count++;
+	}
+	return {
+		x: xValues,
+		y: yValues
+	};
+};
+
+//#endregion
+//#region packages/visual/src/plot/DataSet.ts
+var DataSet = class {
+	#data;
+	#meta;
+	lastChange;
+	constructor() {
+		this.lastChange = performance.now();
+		this.#data = new MapOfSimpleMutable();
+		this.#meta = /* @__PURE__ */ new Map();
+	}
+	get metaCount() {
+		return this.#meta.size;
+	}
+	clear() {
+		this.#data.clear();
+		this.lastChange = performance.now();
+	}
+	set(series, data) {
+		this.#data.setValues(series, data);
+	}
+	deleteBySeries(series) {
+		const changed = this.#data.delete(series);
+		if (changed) this.lastChange = performance.now();
+		return changed;
+	}
+	setMeta(series, meta) {
+		this.#meta.set(series, meta);
+	}
+	hasMeta(series) {
+		return this.#meta.has(series);
+	}
+	getMeta(series) {
+		return this.#meta.get(series);
+	}
+	*getValues() {
+		yield* this.#data.valuesFlat();
+	}
+	*getEntries() {
+		yield* this.#data.entries();
+	}
+	*getSeries() {
+		yield* this.#data.values();
+	}
+	add(value, series = `default`) {
+		this.#data.addKeyedValues(series, value);
+		this.lastChange = performance.now();
+	}
+};
+
+//#endregion
+//#region packages/visual/src/pi-pi.ts
+const piPi = Math.PI * 2;
+
+//#endregion
+//#region packages/visual/src/canvas-region.ts
+var CanvasSource = class {
+	#canvasEl;
+	#ctx;
+	#sizeBasis;
+	#sizeScaler;
+	#logicalSize;
+	#pixelScaling;
+	#regions = [];
+	constructor(canvasElementOrQuery, sizeBasis = `min`) {
+		this.#canvasEl = resolveEl(canvasElementOrQuery);
+		this.#sizeBasis = sizeBasis;
+		this.#pixelScaling = window.devicePixelRatio || 1;
+		this.#sizeScaler = this.#createSizeScaler();
+		this.#logicalSize = this.setLogicalSize({
+			width: this.#canvasEl.width,
+			height: this.#canvasEl.height
+		});
+	}
+	setLogicalSize(size) {
+		this.#logicalSize = size;
+		const el = this.#canvasEl;
+		el.width = size.width * this.#pixelScaling;
+		el.height = size.height * this.#pixelScaling;
+		el.style.width = `${size.width.toString()}px`;
+		el.style.height = `${size.height.toString()}px`;
+		this.#sizeScaler = this.#createSizeScaler();
+		this.invalidateContext();
+		return size;
+	}
+	#createSizeScaler() {
+		let inMax = 1;
+		switch (this.#sizeBasis) {
+			case `min`:
+				inMax = Math.min(this.#canvasEl.width, this.#canvasEl.height);
+				break;
+			case `max`:
+				inMax = Math.max(this.#canvasEl.width, this.#canvasEl.height);
+				break;
+		}
+		const s = scalerTwoWay(0, inMax, 0, 1);
+		return {
+			abs: s.in,
+			rel: s.out
+		};
+	}
+	invalidateContext() {
+		this.#ctx = void 0;
+	}
+	#add(region) {
+		if (!region) throw new Error(`Param 'region' is undefined/null`);
+		if (this.#regions.includes(region)) throw new Error(`Region already exists`);
+		this.#regions.push(region);
+		return region;
+	}
+	toAbsPoint(pt, kind = `independent`) {
+		let { x, y } = pt;
+		switch (kind) {
+			case `independent`:
+				x *= this.width;
+				y *= this.height;
+		}
+		return {
+			x,
+			y
+		};
+	}
+	get offset() {
+		const b = this.#canvasEl.getBoundingClientRect();
+		return {
+			x: b.left,
+			y: b.top
+		};
+	}
+	toRelPoint(pt, source, kind = `independent`, clamped = true) {
+		let { x, y } = pt;
+		if (source === `screen`) {
+			const b = this.#canvasEl.getBoundingClientRect();
+			x -= b.x;
+			y -= b.y;
+		}
+		switch (kind) {
+			case `independent`:
+				x /= this.width;
+				y /= this.height;
+				break;
+			case `skip`: break;
+		}
+		if (clamped) {
+			x = clamp(x);
+			y = clamp(y);
+		}
+		return {
+			x,
+			y
+		};
+	}
+	toAbsRect(rect$1, kind = `independent`) {
+		let { width, height } = rect$1;
+		switch (kind) {
+			case `independent`:
+				width *= this.width;
+				height *= this.height;
+				if (isRectPositioned(rect$1)) return {
+					...this.toAbsPoint(rect$1),
+					width,
+					height
+				};
+		}
+		return {
+			width,
+			height
+		};
+	}
+	/**
+	* Creates a region
+	* 
+	* Absolute positioned. Uses source coordinates which don't change
+	* ```js
+	* source.createRegion({ 
+	*  absPositioned: { x: 0, y: 0, width: 100, height: 100} 
+	* });
+	* ```
+	* 
+	* Relative positioned. Uses coordiantes relative to source dimensions.
+	* Updated if source changes.
+	* ```js
+	* source.createRegion({
+	*  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
+	*  scale: `independent`
+	* });
+	* ```
+	* 
+	* Relative sized. Uses size relative to source dimension. By default centers.
+	* ```js
+	* source.createRegion({
+	*  relativeSize: { width: 0.5, height: 0.5 }
+	*  position: `center`
+	* })
+	* ```
+	* @param spec 
+	* @returns 
+	*/
+	createRegion(spec) {
+		const marginPx = spec.marginPx ?? 0;
+		const marginPx2 = marginPx * 2;
+		if (`absPositioned` in spec) {
+			const rect$1 = subtractSize(spec.absPositioned, marginPx, marginPx);
+			return this.#add(new CanvasRegion(this, () => rect$1));
+		}
+		if (`relativePositioned` in spec) {
+			let compute;
+			const rect$1 = spec.relativePositioned;
+			switch (spec.scale) {
+				case `independent`:
+					compute = (source) => ({
+						x: rect$1.x * source.width + marginPx,
+						y: rect$1.y * source.height + marginPx,
+						width: rect$1.width * source.width - marginPx2,
+						height: rect$1.height * source.height - marginPx2
+					});
+					break;
+				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
+			}
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		if (`relativeSize` in spec) {
+			let compute;
+			const rect$1 = spec.relativeSize;
+			const position = spec.position;
+			switch (spec.scale) {
+				case `independent`:
+					compute = (source) => {
+						const width = rect$1.width * source.width - marginPx2;
+						const height = rect$1.height * source.height - marginPx2;
+						let x = source.width / 2 - width / 2;
+						let y = source.height / 2 - height / 2;
+						switch (position) {
+							case `n`:
+								y = 0;
+								break;
+							case `s`:
+								y = source.height - height;
+								break;
+							default:
+						}
+						x += marginPx;
+						y += marginPx;
+						return {
+							width,
+							height,
+							x,
+							y
+						};
+					};
+					break;
+				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
+			}
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		if (`match` in spec) {
+			const result = resolveElementTry(spec.match);
+			if (!result.success) throw new Error(`Could not resolve match element. ${resultErrorToString(result)}`);
+			const compute = (_source) => {
+				const bounds = result.value.getBoundingClientRect();
+				return {
+					x: bounds.x + marginPx,
+					y: bounds.y + marginPx,
+					width: bounds.width - marginPx2,
+					height: bounds.height - marginPx2
+				};
+			};
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		throw new Error(`Spec doesn't seem valid`);
+	}
+	clear() {
+		const c = this.context;
+		c.clearRect(0, 0, this.width, this.height);
+	}
+	get context() {
+		if (this.#ctx) return this.#ctx;
+		const c = this.#canvasEl.getContext(`2d`);
+		if (!c) throw new Error(`Could not create 2d context`);
+		c.setTransform(1, 0, 0, 1, 0, 0);
+		c.scale(this.#pixelScaling, this.#pixelScaling);
+		this.#ctx = c;
+		for (const r of this.#regions) r.recomputeRegion();
+		return this.#ctx;
+	}
+	get sizeScaler() {
+		return this.#sizeScaler;
+	}
+	get width() {
+		return this.#logicalSize.width;
+	}
+	get height() {
+		return this.#logicalSize.height;
+	}
+};
+/**
+* Draws on a canvas, constrained to a specific region
+*/
+var CanvasRegion = class {
+	source;
+	#regionCompute;
+	#r;
+	/**
+	* Creates, using coordinate in canvas coordinates
+	*/
+	constructor(source, regionCompute) {
+		this.source = source;
+		this.#regionCompute = regionCompute;
+		this.#r = regionCompute(source);
+	}
+	/**
+	* Calls the original `regionCompute` function passed in to the constructor
+	* to recompute the absolute region
+	*/
+	recomputeRegion() {
+		this.#r = this.#regionCompute(this.source);
+	}
+	/**
+	* Converts a region-relative point (0..1) to an absolute
+	* point, which uses region-relative coordinates.
+	* 
+	* Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
+	* will return 0,0.
+	*
+	* @param regionRel 
+	* @param scaleBy 
+	* @returns 
+	*/
+	toAbsRegion(regionRel, scaleBy = `both`) {
+		switch (scaleBy) {
+			case `both`: return {
+				x: regionRel.x * this.#r.width,
+				y: regionRel.y * this.#r.height
+			};
+		}
+	}
+	/**
+	* Returns a copy of `p` offset by the region's x & y
+	* @param p 
+	* @returns 
+	*/
+	applyRegionOffset(p) {
+		return {
+			x: p.x + this.#r.x,
+			y: p.y + this.#r.y
+		};
+	}
+	/**
+	* Draws a line from a series of points.
+	* Assumes region-relative, % coordinates (ie 0..1 scale)
+	* @param relativePoints Points to connect, in region-relative coordinates
+	* @param strokeStyle Stroke style
+	* @param lineWidth Line with
+	*/
+	drawConnectedPointsRelative(relativePoints, strokeStyle, lineWidth = 1) {
+		const points = relativePoints.map((p) => this.toAbsRegion(p));
+		this.drawConnectedPoints(points, strokeStyle, lineWidth);
+	}
+	/**
+	* Draws connected points in absolute coordinates,
+	* however with 0,0 being the top-left of the region.
+	* 
+	* Thus, this will apply the region offset before drawing.
+	* @param points Points to draw
+	* @param strokeStyle Stroke style
+	* @param lineWidth Line width
+	*/
+	drawConnectedPoints(points, strokeStyle, lineWidth = 1) {
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		c.beginPath();
+		c.strokeStyle = strokeStyle;
+		c.lineWidth = lineWidth;
+		for (let index = 0; index < points.length; index++) if (index === 0) c.moveTo(points[index].x, points[index].y);
+		else c.lineTo(points[index].x, points[index].y);
+		c.stroke();
+		c.restore();
+	}
+	/**
+	* Fills text at a relative position
+	* @param text 
+	* @param relPos Relative, meaning 0.5,0.5 is the middle of the region
+	* @param fillStyle 
+	* @param baseline 
+	* @param align 
+	*/
+	fillTextRelative(text, relPos, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+		const point = this.toAbsRegion(relPos);
+		this.fillTextRelative(text, point, fillStyle, font, baseline, align);
+	}
+	/**
+	* Fills text at a region-relative position
+	* @param text 
+	* @param point Region relative, meaning 0,0 is top-left of region
+	* @param fillStyle 
+	* @param baseline 
+	* @param align 
+	*/
+	fillText(text, point, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		if (font.length > 0) c.font = font;
+		c.textBaseline = baseline;
+		c.textAlign = align;
+		c.fillStyle = fillStyle;
+		c.fillText(text, point.x, point.y);
+		c.restore();
+	}
+	drawCircles(relativeCircles, fillStyle, strokeStyle = ``, lineWidth = 1) {
+		const circles = relativeCircles.map((c$1) => {
+			return {
+				...this.toAbsRegion(c$1),
+				radius: this.source.sizeScaler.abs(c$1.radius)
+			};
+		});
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		c.fillStyle = fillStyle;
+		c.strokeStyle = strokeStyle;
+		c.lineWidth = lineWidth;
+		for (const circle$2 of circles) {
+			c.beginPath();
+			c.arc(circle$2.x, circle$2.y, circle$2.radius, 0, piPi);
+			c.closePath();
+			if (fillStyle.length > 0) c.fill();
+			if (strokeStyle.length > 0) c.stroke();
+		}
+		c.restore();
+	}
+	clear() {
+		const c = this.context;
+		c.clearRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
+	}
+	fill(fillStyle = `white`) {
+		const c = this.context;
+		c.fillStyle = fillStyle;
+		c.fillRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
+	}
+	drawBounds(strokeStyle, lineWidth = 1) {
+		this.drawConnectedPointsRelative([
+			{
+				x: 0,
+				y: 0
+			},
+			{
+				x: 1,
+				y: 0
+			},
+			{
+				x: 1,
+				y: 1
+			},
+			{
+				x: 0,
+				y: 1
+			},
+			{
+				x: 0,
+				y: 0
+			}
+		], strokeStyle, lineWidth);
+		this.drawConnectedPointsRelative([{
+			x: 0,
+			y: 1
+		}, {
+			x: 1,
+			y: 0
+		}], strokeStyle, lineWidth);
+		this.drawConnectedPointsRelative([{
+			x: 0,
+			y: 0
+		}, {
+			x: 1,
+			y: 1
+		}], strokeStyle, lineWidth);
+	}
+	/**
+	* Converts a  point to a region-relative one.
+	* @param pt 
+	* @param kind 
+	* @returns 
+	*/
+	toRelPoint(pt, source = `screen`, kind = `independent`, clamped = true) {
+		pt = this.source.toRelPoint(pt, source, `skip`, false);
+		let { x, y } = pt;
+		x -= this.x;
+		y -= this.y;
+		switch (kind) {
+			case `independent`:
+				x /= this.width;
+				y /= this.height;
+		}
+		if (clamped) {
+			x = clamp(x);
+			y = clamp(y);
+		}
+		return {
+			x,
+			y
+		};
+	}
+	absToRegionPoint(pt, source, clamped) {
+		if (source === `screen`) pt = subtract(pt, this.source.offset);
+		let { x, y } = pt;
+		x -= this.x;
+		y -= this.y;
+		if (clamped) {
+			if (x < 0) x = 0;
+			if (y < 0) y = 0;
+			if (x > this.width + this.x) x = this.x + this.width;
+			if (y > this.height + this.y) y = this.y + this.height;
+		}
+		return {
+			x,
+			y
+		};
+	}
+	get center() {
+		return center(this.#r);
+	}
+	get context() {
+		return this.source.context;
+	}
+	set region(value) {
+		this.#r = value;
+	}
+	get region() {
+		return this.#r;
+	}
+	get width() {
+		return this.#r.width;
+	}
+	get height() {
+		return this.#r.height;
+	}
+	get x() {
+		return this.#r.x;
+	}
+	get y() {
+		return this.#r.y;
+	}
+	get dimensionMin() {
+		return Math.min(this.#r.width, this.#r.height);
+	}
+};
+
+//#endregion
+//#region packages/visual/src/plot/cartesian-canvas-plot.ts
+const insert = (insertOptions, options = {}) => {
+	const parentEl = insertOptions.parent === void 0 ? document.body : resolveEl(insertOptions.parent);
+	const canvasEl = document.createElement(`canvas`);
+	parentEl.prepend(canvasEl);
+	const ds = new DataSet();
+	const source = new CanvasSource(canvasEl, `min`);
+	const spec = insertOptions.region ?? { relativePositioned: {
+		x: 0,
+		y: 0,
+		width: 1,
+		height: 1
+	} };
+	const region = source.createRegion(spec);
+	const p = new CartesianCanvasPlot(region, ds, options);
+	if (insertOptions.canvasResizeTo === `viewport`) ElementSizer.canvasViewport(canvasEl, { onSetSize: (size, _el) => {
+		source.setLogicalSize(size);
+		p.invalidateRange();
+		p.draw();
+	} });
+	else ElementSizer.canvasParent(canvasEl, { onSetSize: (size, _el) => {
+		source.setLogicalSize(size);
+		p.invalidateRange();
+		p.draw();
+	} });
+	return p;
+};
+/**
+* Simple plotting of cartesian values.
+* 
+* Create a plot that fills screen
+* ```js
+* const p = Plot.insert({fill`viewport});
+* const dataSet = p.dataSet;
+* 
+* // Add data
+* ds.add({ x: 1, y: 2 });
+* 
+* // Draw
+* p.draw();
+* ```
+*
+* Create a plot that fills a container
+* ```js
+* const p = Plot.insert({parent:`#someel`});
+* ```
+* 
+* Add data using the created data set
+* ```js
+* 
+* // Add a value to the `alpha` series
+* p.dataSet.add({x:1,y:1}, `alpha`);
+* ```
+* 
+* Set default series formatting
+* ```js
+* p.setMeta(`default`, {
+*  colour: `hsl(50,100%,50%)`,
+*  lineWidth: 10
+* });
+* ```
+* 
+* Series can have metadata associated with it in the DataSet
+* ```js
+* // Use 'pink' by default for the series 'alpha'
+* p.setMeta(`alpha`, { colour: `pink` });
+* ``
+* 
+*/
+var CartesianCanvasPlot = class {
+	#data;
+	#lastDataChange;
+	#canvasRegion;
+	actualDataRange = EmptyPositioned;
+	visibleRange = PlaceholderPositioned;
+	show;
+	whiskerLength;
+	axisRounder = round(1, true);
+	onInvalidated;
+	/**
+	* List of lines to draw after drawing everything else.
+	* Lines are given in value-coordinate space
+	*/
+	overlayLines = [];
+	#grid;
+	#rangeMode;
+	#currentRange;
+	#axisStyle;
+	#valueStyle;
+	#connectStyle;
+	#rangeManual;
+	#textStyle;
+	#visualPadding;
+	#visualClear;
+	constructor(cr, data, options = {}) {
+		if (!data) throw new TypeError(`Param 'data' is undefined`);
+		if (typeof data !== `object`) throw new TypeError(`Param 'data' is not an object. Got: ${typeof data}`);
+		this.onInvalidated = options.onInvalidated;
+		this.#data = data;
+		this.#canvasRegion = cr;
+		this.#lastDataChange = 0;
+		this.#visualClear = options.clear ?? `region`;
+		this.#rangeMode = options.range ?? `auto`;
+		this.#valueStyle = options.valueStyle ?? `dot`;
+		this.#connectStyle = options.connectStyle ?? ``;
+		this.whiskerLength = options.whiskerLength ?? 5;
+		this.#visualPadding = options.visualPadding ?? 20;
+		this.show = {
+			axes: true,
+			axisValues: true,
+			grid: true,
+			whiskers: true,
+			...options.show
+		};
+		this.#axisStyle = {
+			colour: `black`,
+			width: 2,
+			...options.axisStyle
+		};
+		this.#textStyle = {
+			colour: `black`,
+			size: `1em`,
+			font: `system-ui`,
+			...options.textStyle
+		};
+		this.#grid = {
+			increments: .1,
+			major: 5,
+			colour: `whitesmoke`,
+			width: 1,
+			...options.grid
+		};
+	}
+	getCurrentRange() {
+		if (this.#data.lastChange === this.#lastDataChange && this.#currentRange) return this.#currentRange;
+		this.#lastDataChange = this.#data.lastChange;
+		const r = this.#createRange();
+		this.#currentRange = r;
+		if (this.onInvalidated) this.onInvalidated();
+		return r;
+	}
+	invalidateRange() {
+		this.#currentRange = void 0;
+	}
+	#createRange() {
+		const range = this.getDataRange();
+		const absDataToRelative = relativeCompute(range);
+		const relDataToAbs = absoluteCompute(range);
+		const cr = this.#canvasRegion;
+		const padding = this.#visualPadding;
+		let xOffset = cr.x + padding;
+		let yOffset = cr.y + padding;
+		const allowedHeight = cr.height - padding * 2;
+		const allowedWidth = cr.width - padding * 2;
+		const dimensionMin = Math.min(allowedHeight, allowedWidth);
+		if (allowedWidth >= allowedHeight) xOffset += allowedWidth / 2 - dimensionMin / 2;
+		else yOffset += allowedHeight / 2 - dimensionMin / 2;
+		const relDataToCanvas = (pt) => {
+			let { x, y } = pt;
+			if (x === Number.NEGATIVE_INFINITY) x = 0;
+			else if (x === Number.POSITIVE_INFINITY) x = 1;
+			if (y === Number.NEGATIVE_INFINITY) y = 0;
+			else if (y === Number.POSITIVE_INFINITY) y = 1;
+			x = x * dimensionMin;
+			y = (1 - y) * dimensionMin;
+			x += xOffset;
+			y += yOffset;
+			return {
+				x,
+				y
+			};
+		};
+		const canvasToRelData = (pt) => {
+			let { x, y } = pt;
+			x -= xOffset;
+			y -= yOffset;
+			x = x / dimensionMin;
+			y = 1 - y / dimensionMin;
+			return {
+				x,
+				y
+			};
+		};
+		const regionSpaceToRelative = (pt) => {
+			let { x, y } = pt;
+			x = x - cr.x + this.#visualPadding;
+			y = dimensionMin + this.#visualPadding - y;
+			x /= dimensionMin;
+			y = y / dimensionMin;
+			return {
+				x,
+				y
+			};
+		};
+		return {
+			absDataToRelative,
+			relDataToCanvas,
+			canvasToRelData,
+			regionSpaceToRelative,
+			relDataToAbs,
+			range
+		};
+	}
+	/**
+	* Positions an element at the viewport location of `data` point.
+	* Ensure the element has `position:absolute` set.
+	* @param data 
+	* @param elementToPosition 
+	* @param by 
+	*/
+	positionElementAt(data, elementToPosition, by = `middle`, relativeToQuery) {
+		const el = resolveEl(elementToPosition);
+		let { x, y } = this.valueToScreenSpace(data);
+		if (by === `middle`) {
+			const bounds = el.getBoundingClientRect();
+			x -= bounds.width / 2;
+			y -= bounds.height / 2;
+		} else if (by === `top-left`) {} else throw new Error(`Param 'by' expected to be 'middle' or 'top-left'.`);
+		if (relativeToQuery) {
+			const relativeTo = resolveEl(relativeToQuery);
+			const bounds = relativeTo.getBoundingClientRect();
+			x -= bounds.x;
+			y -= bounds.y;
+		}
+		el.style.left = `${x}px`;
+		el.style.top = `${y}px`;
+	}
+	/**
+	* When range is auto, returns the range of the data
+	* Otherwise returns the user-provided range.
+	* @returns 
+	*/
+	getDataRange() {
+		if (this.#rangeMode === `auto`) return computeMinMax([...this.#data.getValues()]);
+		else {
+			if (!this.#rangeManual) this.#rangeManual = computeMinMax([this.#rangeMode.max, this.#rangeMode.min]);
+			return this.#rangeManual;
+		}
+	}
+	valueToScreenSpace(dataPoint) {
+		const region = this.valueToRegionSpace(dataPoint);
+		const offset = this.canvasSource.offset;
+		const scr = {
+			x: region.x + offset.x,
+			y: region.y + offset.y
+		};
+		return scr;
+	}
+	valueToRegionSpace(dataValue, debug = false) {
+		const ds = this.getCurrentRange();
+		const rel = ds.absDataToRelative(dataValue);
+		const region = ds.relDataToCanvas(rel);
+		if (debug) console.log(`orig: ${dataValue.x}x${dataValue.y} rel: ${rel.x}x${rel.y} region: ${region.x}x${region.y}`);
+		return {
+			...dataValue,
+			x: region.x,
+			y: region.y
+		};
+	}
+	/**
+	* Converts a point in pixel coordinates to a value.
+	* Useful for converting from user input coordinates.
+	* @param point 
+	* @returns 
+	*/
+	pointToValue(point, _source) {
+		const ds = this.getCurrentRange();
+		const canvasPoint = subtract(point, this.canvasSource.offset);
+		const v = ds.canvasToRelData(canvasPoint);
+		return ds.relDataToAbs(v);
+	}
+	/**
+	* Compute canvas-relative coordinates based on two points in value space
+	* @param valueA 
+	* @param valueB 
+	*/
+	#valueLineToCanvasSpace(valueA, valueB, debug = false) {
+		valueA = this.valueToRegionSpace(valueA, debug);
+		valueB = this.valueToRegionSpace(valueB, debug);
+		return {
+			a: valueA,
+			b: valueB
+		};
+	}
+	getDefaultMeta() {
+		return {
+			colour: goldenAngleColour(this.#data.metaCount),
+			lineWidth: 2,
+			dotRadius: 5
+		};
+	}
+	draw() {
+		if (this.#visualClear === `region`) this.#canvasRegion.clear();
+		else this.canvasSource.clear();
+		this.#useGrid();
+		if (this.show.axes) this.#drawAxes();
+		for (const [k, v] of this.#data.getEntries()) {
+			let meta = this.#data.getMeta(k);
+			if (!meta) {
+				meta = this.getDefaultMeta();
+				this.#data.setMeta(k, meta);
+			}
+			this.#drawSeries(k, v, meta);
+		}
+		for (const line$1 of this.overlayLines) this.drawLine(line$1, line$1.colour, line$1.width);
+	}
+	/**
+	* Draws a line in value-coordinate space
+	* @param line 
+	* @param colour 
+	* @param width 
+	*/
+	drawLine(line$1, colour, width) {
+		const l = this.#valueLineToCanvasSpace(line$1.a, line$1.b);
+		this.#drawLineCanvasSpace(l, colour, width);
+	}
+	setMeta(series, meta) {
+		this.#data.setMeta(series, {
+			...this.getDefaultMeta(),
+			...meta
+		});
+	}
+	#drawAxes() {
+		const { colour, width } = this.#axisStyle;
+		const yAxis = this.#valueLineToCanvasSpace({
+			x: 0,
+			y: Number.NEGATIVE_INFINITY
+		}, {
+			x: 0,
+			y: Number.POSITIVE_INFINITY
+		}, false);
+		const xAxis = this.#valueLineToCanvasSpace({
+			x: Number.NEGATIVE_INFINITY,
+			y: 0
+		}, {
+			x: Number.POSITIVE_INFINITY,
+			y: 0
+		}, false);
+		this.#drawLineCanvasSpace(xAxis, colour, width, false);
+		this.#drawLineCanvasSpace(yAxis, colour, width, false);
+	}
+	#drawYAxisValues(yPoints) {
+		const ctx = this.#canvasRegion.context;
+		ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
+		ctx.fillStyle = this.#textStyle.colour;
+		ctx.textBaseline = `middle`;
+		for (const p of yPoints) {
+			if (p.x === 0 && p.y === 0) continue;
+			const reg = this.valueToRegionSpace(p, false);
+			const value = this.axisRounder(p.y);
+			const label = value.toString();
+			const measure = ctx.measureText(label);
+			const x = reg.x - measure.width - this.whiskerLength / 2 - 5;
+			const y = reg.y;
+			ctx.fillText(label, x, y);
+		}
+	}
+	#drawXAxisValues(xPoints) {
+		const ctx = this.#canvasRegion.context;
+		ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
+		ctx.fillStyle = this.#textStyle.colour;
+		ctx.textBaseline = `top`;
+		for (const p of xPoints) {
+			const reg = this.valueToRegionSpace(p, false);
+			const value = this.axisRounder(p.x);
+			const label = value.toString();
+			const measure = ctx.measureText(label);
+			const x = reg.x - measure.width / 2;
+			const y = reg.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + this.whiskerLength / 2;
+			ctx.fillText(label, x, y);
+		}
+	}
+	#drawWhisker(p, vertical) {
+		const whiskerHalfLength = this.whiskerLength / 2;
+		const v = vertical ? {
+			x: p.x,
+			y: 0
+		} : {
+			y: p.y,
+			x: 0
+		};
+		const reg = this.valueToRegionSpace(v, false);
+		const line$1 = vertical ? {
+			a: {
+				x: reg.x,
+				y: reg.y - whiskerHalfLength
+			},
+			b: {
+				x: reg.x,
+				y: reg.y + whiskerHalfLength
+			}
+		} : {
+			a: {
+				y: reg.y,
+				x: reg.x - whiskerHalfLength
+			},
+			b: {
+				y: reg.y,
+				x: reg.x + whiskerHalfLength
+			}
+		};
+		this.#drawLineCanvasSpace(line$1, this.#axisStyle.colour, this.#axisStyle.width, false);
+	}
+	#drawGridline(p, vertical) {
+		const line$1 = vertical ? this.#valueLineToCanvasSpace({
+			x: p.x,
+			y: Number.NEGATIVE_INFINITY
+		}, {
+			x: p.x,
+			y: Number.POSITIVE_INFINITY
+		}) : this.#valueLineToCanvasSpace({
+			y: p.y,
+			x: Number.NEGATIVE_INFINITY
+		}, {
+			y: p.y,
+			x: Number.POSITIVE_INFINITY
+		}, false);
+		this.#drawLineCanvasSpace(line$1, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
+	}
+	#useGrid() {
+		const g = this.#grid;
+		const showGrid = this.show.grid;
+		const showWhiskers = this.show.whiskers;
+		const showValues = this.show.axisValues;
+		const mm = this.getCurrentRange().range;
+		const { increments, major } = g;
+		const axisMarks = computeAxisMark(mm, increments, major);
+		for (const p of axisMarks.x) {
+			if (showGrid) this.#drawGridline(p, true);
+			if (showWhiskers && p.major) this.#drawWhisker(p, true);
+		}
+		for (const p of axisMarks.y) {
+			if (showGrid) this.#drawGridline(p, false);
+			if (showWhiskers && p.major) this.#drawWhisker(p, false);
+		}
+		if (showValues) {
+			this.#drawXAxisValues(axisMarks.x.filter((p) => p.major));
+			this.#drawYAxisValues(axisMarks.y.filter((p) => p.major));
+		}
+	}
+	#drawSeries(name, series, meta) {
+		if (this.#connectStyle === `line`) this.#drawConnected(series, meta.colour, meta.lineWidth);
+		if (this.#valueStyle === `dot`) for (const v of series) this.#drawDot(v, meta.colour, meta.dotRadius);
+	}
+	#drawConnected(dots, colour, width) {
+		const ctx = this.#canvasRegion.context;
+		ctx.beginPath();
+		for (const [index, dot_] of dots.entries()) {
+			const dot$1 = this.valueToRegionSpace(dot_, false);
+			if (index === 0) ctx.moveTo(dot$1.x, dot$1.y);
+			ctx.lineTo(dot$1.x, dot$1.y);
+		}
+		ctx.strokeStyle = toCssColour(colour);
+		ctx.lineWidth = width;
+		ctx.stroke();
+		ctx.closePath();
+	}
+	#drawDot(originalDot, fallbackColour, fallbackRadius) {
+		const colour = toCssColour(originalDot.fillStyle ?? fallbackColour);
+		const pos = this.valueToRegionSpace(originalDot);
+		const radius = originalDot.radius ?? fallbackRadius;
+		this.#canvasRegion.drawCircles([{
+			...pos,
+			radius
+		}], colour);
+	}
+	#drawLineCanvasSpace(line$1, colour, width, debug = false) {
+		if (debug) console.log(line$1);
+		const ctx = this.#canvasRegion.context;
+		colour = toCssColour(colour);
+		ctx.beginPath();
+		ctx.moveTo(line$1.a.x, line$1.a.y);
+		ctx.lineTo(line$1.b.x, line$1.b.y);
+		ctx.strokeStyle = toCssColour(colour);
+		ctx.lineWidth = width;
+		ctx.stroke();
+		ctx.closePath();
+	}
+	get dataSet() {
+		return this.#data;
+	}
+	get canvasRegion() {
+		return this.#canvasRegion;
+	}
+	get canvasSource() {
+		return this.#canvasRegion.source;
+	}
+};
+
+//#endregion
+//#region packages/visual/src/plot/index.ts
+var plot_exports = {};
+__export(plot_exports, {
+	BipolarView: () => bipolar_view_exports,
+	CartesianCanvasPlot: () => CartesianCanvasPlot,
+	DataSet: () => DataSet,
+	absoluteCompute: () => absoluteCompute,
+	computeAxisMark: () => computeAxisMark,
+	computeMinMax: () => computeMinMax,
+	insert: () => insert,
+	relativeCompute: () => relativeCompute
+});
+
+//#endregion
 //#region packages/visual/src/index.ts
 try {
 	if (typeof window !== `undefined`) window.ixfx = {
@@ -3241,5 +4495,5 @@ try {
 } catch {}
 
 //#endregion
-export { CanvasHelper, colour_exports as Colour, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, video_exports as Video, pointerVisualise };
+export { CanvasHelper, colour_exports as Colour, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, plot_exports as Plot, video_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.js.map

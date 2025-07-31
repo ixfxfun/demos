@@ -1,15 +1,15 @@
 import { __export } from "./chunk-Cn1u12Og.js";
-import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-B5kzJkYi.js";
-import { clamp, interpolate, interpolateAngle, scale, wrap } from "./src-DtvLL3oi.js";
+import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-Bo4oKRxs.js";
+import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-CiSY0kkK.js";
 import "./is-primitive-Bo4OHt3v.js";
-import { intervalToMs } from "./interval-type-klk0IZBm.js";
-import "./basic-BlF-8Fo-.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-CGZcvPbX.js";
-import { SimpleEventEmitter } from "./src-BB8BKEVc.js";
-import "./key-value-BXKMXEIP.js";
-import { resolveWithFallbackSync } from "./resolve-core-hiYZW4xF.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-BxRlvgsb.js";
-import { float, floatSource } from "./bezier-BF9M23nT.js";
+import { intervalToMs } from "./interval-type-DUpgykUG.js";
+import "./basic-DnPjgQBm.js";
+import { SimpleEventEmitter } from "./src-DPAoZbZ8.js";
+import "./key-value-BeAGVpK0.js";
+import { resolveWithFallbackSync } from "./resolve-core-CT6vIfBp.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-0RBLjKoZ.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-B5bQEXF9.js";
+import { float, floatSource } from "./bezier-Dpa_k_f-.js";
 
 //#region packages/modulation/src/source/ticks.ts
 /**

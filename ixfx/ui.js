@@ -1,22 +1,22 @@
 import { __export } from "./chunk-Cn1u12Og.js";
-import "./src-B5kzJkYi.js";
-import "./src-DtvLL3oi.js";
-import "./records-ButNOjS_.js";
+import "./src-Bo4oKRxs.js";
+import "./src-CiSY0kkK.js";
+import "./records-Ba-VkRoc.js";
 import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-klk0IZBm.js";
-import { findBySomeKey } from "./basic-BlF-8Fo-.js";
-import { getPathsAndData } from "./src--zqQj9Fa.js";
-import { QueueMutable } from "./src-CGZcvPbX.js";
-import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "./src-BB8BKEVc.js";
-import "./is-integer-CT5DoflS.js";
-import "./key-value-BXKMXEIP.js";
-import "./dist-STbyDn6P.js";
-import "./resolve-core-hiYZW4xF.js";
-import { resolveEl } from "./src-mdH5NzeF.js";
-import "./src-BxRlvgsb.js";
-import "./bezier-BF9M23nT.js";
-import { fromCss as fromCss$1, fromCss$1 as fromCss, toColour, toCssColour, toCssString } from "./src-DBz_PpZQ.js";
-import { debounce, event, eventTrigger, hasLast, initStream, messageHasValue, messageIsSignal, object, observable, transform } from "./src-D9XCZEsz.js";
+import "./interval-type-DUpgykUG.js";
+import { findBySomeKey } from "./basic-DnPjgQBm.js";
+import { getPathsAndData } from "./src-B3tlbqFA.js";
+import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "./src-DPAoZbZ8.js";
+import "./is-integer-B5Y2Xbq0.js";
+import "./key-value-BeAGVpK0.js";
+import "./dist-BypOHkm6.js";
+import "./resolve-core-CT6vIfBp.js";
+import { QueueMutable } from "./src-0RBLjKoZ.js";
+import { resolveEl } from "./src-Cst-Mrgn.js";
+import "./src-B5bQEXF9.js";
+import "./bezier-Dpa_k_f-.js";
+import { fromCss as fromCss$1, fromCss$1 as fromCss, toColour, toCssColour, toCssString } from "./src-GJA4hucx.js";
+import { debounce, event, eventTrigger, hasLast, initStream, messageHasValue, messageIsSignal, object, observable, transform } from "./src-CmWS4J6Y.js";
 
 //#region packages/ui/src/rx/browser-resize.ts
 /**
@@ -51,6 +51,10 @@ const browserResizeObservable = (elem, interval) => {
 * @param elapsed
 * @returns
 */
+const windowResize = (elapsed) => debounce({ elapsed: elapsed ?? 100 })(event(window, `resize`, {
+	innerWidth: 0,
+	innerHeight: 0
+}));
 
 //#endregion
 //#region packages/ui/src/rx/browser-theme-change.ts
@@ -961,9 +965,10 @@ __export(rx_exports, {
 	domNumberInputValue: () => domNumberInputValue,
 	elements: () => elements,
 	fromDomQuery: () => fromDomQuery,
-	win: () => win
+	win: () => win,
+	windowResize: () => windowResize
 });
 
 //#endregion
-export { rx_exports as Rx };
+export { rx_exports as RxUi };
 //# sourceMappingURL=ui.js.map

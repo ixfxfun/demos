@@ -1,14 +1,18 @@
+import { RecursivePartial } from "@ixfx/core";
 import { ElementResizeLogic } from "@ixfx/dom";
 import { SimpleEventEmitter } from "@ixfx/events";
 import * as _ixfx_geometry0 from "@ixfx/geometry";
 import { Angle, Arcs, Beziers, Circles, Ellipses, Grids, Lines, Paths, Points, Rects, ScaleBy, Triangles } from "@ixfx/geometry";
 import { RandomSource } from "@ixfx/random";
+import { Point } from "@ixfx/geometry/point";
 import { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import * as _ixfx_geometry_grid0 from "@ixfx/geometry/grid";
 import { Grid } from "@ixfx/geometry/grid";
 import * as C from "colorizr";
 import Colorizr from "colorizr";
 import { IStackImmutable } from "@ixfx/collections/stack";
+import { CirclePositioned } from "@ixfx/geometry/circle";
+import { Line } from "@ixfx/geometry/line";
 
 //#region packages/visual/src/colour/types.d.ts
 type HslBase = {
@@ -1392,6 +1396,512 @@ declare function byRow(image: ImageData): Generator<(Rgb8Bit | undefined)[], voi
  */
 declare function byColumn(image: ImageData): Generator<Rgb8Bit[], void, unknown>;
 //# sourceMappingURL=image-data-grid.d.ts.map
+declare namespace bipolar_view_d_exports {
+  export { BipolarView, BipolarViewOptions, Render, init };
+}
+/**
+ * Options
+ */
+type BipolarViewOptions = Readonly<{
+  width?: number;
+  height?: number;
+  labelPrecision?: number;
+  labels?: [string, string];
+  axisColour?: string;
+  bgColour?: string;
+  whiskerColour?: string;
+  whiskerSize?: number;
+  dotColour?: string;
+  dotRadius?: number;
+  showWhiskers?: boolean;
+  showDot?: boolean;
+  showLabels?: boolean;
+  padding?: number;
+  labelColour?: string;
+  axisWidth?: number;
+  asPercentages?: boolean;
+  /**
+   * If non-zero, will render the last X number of values with increasing opacity.
+   * Default: 0
+   */
+  displayLastValues?: number;
+  /**
+   * If _true_, (default) negative y values are at the bottom.
+   * If _false_  negative y values are at the top.
+   */
+  yAxisBottomNegative?: boolean;
+  /**
+   * Custom rendering for background
+   */
+  renderBackground?: Render;
+}>;
+type Render = (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
+/**
+ * A function that plots a point on the graph
+ */
+type BipolarView = (x: number, y: number) => void;
+/**
+ * Initialises a plotter for bipolar values (-1...1)
+ *
+ * ```js
+ * const p = BipolarView.init(`#my-canvas`);
+ * // Shows the dot at 1, 0.5
+ * p(1, 0.5);
+ * ```
+ * @param elementQuery
+ * @param options
+ * @returns
+ */
+declare const init: (elementQuery: string, options?: BipolarViewOptions) => BipolarView;
+//# sourceMappingURL=bipolar-view.d.ts.map
+//#endregion
+//#region packages/visual/src/plot/types.d.ts
+type TextStyle = {
+  font: string;
+  colour: string;
+  size: string;
+};
+type LineStyle = {
+  colour: string;
+  width: number;
+};
+type GridStyle = LineStyle & {
+  increments: number;
+  major: number;
+};
+type ShowOptions = {
+  axes: boolean;
+  axisValues: boolean;
+  grid: boolean;
+  whiskers: boolean;
+};
+type SeriesMeta = {
+  colour: string;
+  lineWidth: number;
+  dotRadius: number;
+};
+//# sourceMappingURL=types.d.ts.map
+//#endregion
+//#region packages/visual/src/plot/cartesian.d.ts
+type PointMinMax = {
+  min: Point;
+  max: Point;
+  width: number;
+  height: number;
+  minDim: number;
+  maxDim: number;
+};
+type PlotPoint = Point & {
+  fillStyle?: string;
+  radius?: number;
+};
+type CartesianScaler = (pt: Point) => Point;
+type CartesianDataRange = {
+  /**
+   * Converts a data value to relative value (0..1)
+   */
+  absDataToRelative: CartesianScaler;
+  /**
+   * Converts a relative value to element-based coordinates
+   * (ie 0,0 is top-left of CANVAS)
+   */
+  relDataToCanvas: CartesianScaler;
+  canvasToRelData: CartesianScaler;
+  /**
+   * Converts canvas coordinate to relative
+   */
+  regionSpaceToRelative: CartesianScaler;
+  /**
+   * Converts relative coordinate to value
+   */
+  relDataToAbs: CartesianScaler;
+  range: PointMinMax;
+};
+type CartesianPlotOptions = {
+  clear: `region` | `canvas`;
+  onInvalidated: () => void;
+  /**
+  * Margin around whole plot area. Use
+  * to avoid dots being cut off by edge of canvas
+  */
+  visualPadding: number;
+  show: Partial<ShowOptions>;
+  /**
+   * If 'auto' (default), range of plot is based on data.
+   * Otherwise specify the range, eg:
+   * `{ min: {x:-1,y:-1}, {x:1,y:1}}`
+   *
+   */
+  range: `auto` | {
+    min: Point;
+    max: Point;
+  };
+  /**
+   * Gridline setting
+   */
+  grid: Partial<GridStyle>;
+  /**
+   * Drawing settings for axis (if 'showAxes' is enabled)
+   */
+  axisStyle: LineStyle;
+  /**
+   * How values are drawn. Default: 'dot'
+   */
+  valueStyle: `dot` | ``;
+  /**
+   * How values are connected. Default: '' (no connecting)
+   * Values are connected in order of dataset.
+   */
+  connectStyle: `` | `line`;
+  textStyle: TextStyle;
+  whiskerLength: number;
+};
+declare const computeMinMax: (mm: Point[]) => PointMinMax;
+declare const relativeCompute: (minMax: PointMinMax) => ((point: Point) => Point) | ((point: Point) => {
+  x: number;
+  y: number;
+});
+declare const absoluteCompute: (minMax: PointMinMax) => (point: Point) => {
+  x: number;
+  y: number;
+};
+type AxisMark = Point & {
+  major: boolean;
+};
+declare const computeAxisMark: (mm: PointMinMax, increments: number, major: number) => {
+  x: AxisMark[];
+  y: AxisMark[];
+};
+//# sourceMappingURL=cartesian.d.ts.map
+//#endregion
+//#region packages/visual/src/plot/DataSet.d.ts
+declare class DataSet<TValue, TSeriesMeta> {
+  #private;
+  lastChange: any;
+  constructor();
+  get metaCount(): any;
+  clear(): void;
+  set(series: string, data: TValue[]): void;
+  deleteBySeries(series: string): any;
+  setMeta(series: string, meta: TSeriesMeta): void;
+  hasMeta(series: string): any;
+  getMeta(series: string): any;
+  getValues(): Generator<any, void, any>;
+  getEntries(): Generator<any, void, any>;
+  getSeries(): Generator<any, void, any>;
+  add(value: TValue, series?: string): void;
+}
+//# sourceMappingURL=DataSet.d.ts.map
+//#endregion
+//#region packages/visual/src/canvas-region.d.ts
+type CanvasRegionSpecRelativePositioned = {
+  relativePositioned: RectPositioned;
+  scale?: `independent`;
+};
+type CanvasRegionSpecAbsolutePositioned = {
+  absPositioned: RectPositioned;
+};
+type CanvasRegionSpecRelativeSized = {
+  relativeSize: Rect;
+  scale?: `independent`;
+  /**
+   * Cardinal directions, or 'center' (default)
+   */
+  position: `center` | `n` | `s`;
+};
+type CanvasRegionSpecMatched = {
+  match: HTMLElement | string;
+};
+type CanvasRegionSpec = {
+  marginPx?: number;
+} & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
+declare class CanvasSource {
+  #private;
+  constructor(canvasElementOrQuery: HTMLCanvasElement | string, sizeBasis?: `min` | `max`);
+  setLogicalSize(size: Rect): Rect;
+  invalidateContext(): void;
+  toAbsPoint(pt: Point, kind?: `independent`): {
+    x: number;
+    y: number;
+  };
+  get offset(): {
+    x: number;
+    y: number;
+  };
+  toRelPoint(pt: Point, source: `screen` | `source`, kind?: `independent` | `skip`, clamped?: boolean): {
+    x: number;
+    y: number;
+  };
+  toAbsRect(rect: Rect | RectPositioned, kind?: `independent`): {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  } | {
+    width: number;
+    height: number;
+  };
+  /**
+   * Creates a region
+   *
+   * Absolute positioned. Uses source coordinates which don't change
+   * ```js
+   * source.createRegion({
+   *  absPositioned: { x: 0, y: 0, width: 100, height: 100}
+   * });
+   * ```
+   *
+   * Relative positioned. Uses coordiantes relative to source dimensions.
+   * Updated if source changes.
+   * ```js
+   * source.createRegion({
+   *  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
+   *  scale: `independent`
+   * });
+   * ```
+   *
+   * Relative sized. Uses size relative to source dimension. By default centers.
+   * ```js
+   * source.createRegion({
+   *  relativeSize: { width: 0.5, height: 0.5 }
+   *  position: `center`
+   * })
+   * ```
+   * @param spec
+   * @returns
+   */
+  createRegion(spec: CanvasRegionSpec): CanvasRegion;
+  clear(): void;
+  get context(): CanvasRenderingContext2D;
+  get sizeScaler(): any;
+  get width(): number;
+  get height(): number;
+}
+/**
+ * Draws on a canvas, constrained to a specific region
+ */
+declare class CanvasRegion {
+  #private;
+  source: CanvasSource;
+  /**
+   * Creates, using coordinate in canvas coordinates
+   */
+  constructor(source: CanvasSource, regionCompute: (parent: CanvasSource) => RectPositioned);
+  /**
+   * Calls the original `regionCompute` function passed in to the constructor
+   * to recompute the absolute region
+   */
+  recomputeRegion(): void;
+  /**
+   * Converts a region-relative point (0..1) to an absolute
+   * point, which uses region-relative coordinates.
+   *
+   * Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
+   * will return 0,0.
+   *
+   * @param regionRel
+   * @param scaleBy
+   * @returns
+   */
+  toAbsRegion(regionRel: Point, scaleBy?: `both`): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Returns a copy of `p` offset by the region's x & y
+   * @param p
+   * @returns
+   */
+  applyRegionOffset(p: Point): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Draws a line from a series of points.
+   * Assumes region-relative, % coordinates (ie 0..1 scale)
+   * @param relativePoints Points to connect, in region-relative coordinates
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line with
+   */
+  drawConnectedPointsRelative(relativePoints: Point[], strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Draws connected points in absolute coordinates,
+   * however with 0,0 being the top-left of the region.
+   *
+   * Thus, this will apply the region offset before drawing.
+   * @param points Points to draw
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line width
+   */
+  drawConnectedPoints(points: Point[], strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Fills text at a relative position
+   * @param text
+   * @param relPos Relative, meaning 0.5,0.5 is the middle of the region
+   * @param fillStyle
+   * @param baseline
+   * @param align
+   */
+  fillTextRelative(text: string, relPos: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
+  /**
+   * Fills text at a region-relative position
+   * @param text
+   * @param point Region relative, meaning 0,0 is top-left of region
+   * @param fillStyle
+   * @param baseline
+   * @param align
+   */
+  fillText(text: string, point: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
+  drawCircles(relativeCircles: CirclePositioned[], fillStyle: string, strokeStyle?: string, lineWidth?: number): void;
+  clear(): void;
+  fill(fillStyle?: string): void;
+  drawBounds(strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Converts a  point to a region-relative one.
+   * @param pt
+   * @param kind
+   * @returns
+   */
+  toRelPoint(pt: Point, source?: `screen` | `source`, kind?: `independent`, clamped?: boolean): {
+    x: number;
+    y: number;
+  };
+  absToRegionPoint(pt: Point, source: `screen`, clamped: boolean): {
+    x: number;
+    y: number;
+  };
+  get center(): Point;
+  get context(): CanvasRenderingContext2D;
+  set region(value: RectPositioned);
+  get region(): RectPositioned;
+  get width(): number;
+  get height(): number;
+  get x(): number;
+  get y(): number;
+  get dimensionMin(): number;
+}
+//# sourceMappingURL=canvas-region.d.ts.map
+//#endregion
+//#region packages/visual/src/plot/cartesian-canvas-plot.d.ts
+type InsertOptions = {
+  region?: CanvasRegionSpec;
+  /**
+   * Parent to insert CANVAS element into.
+   * If undefined, it will be added to the body.
+   */
+  parent?: HTMLElement | string;
+  /**
+   * How canvas should be sized
+   */
+  canvasResizeTo: `parent` | `viewport`;
+};
+declare const insert: (insertOptions: InsertOptions, options?: RecursivePartial<CartesianPlotOptions>) => CartesianCanvasPlot;
+/**
+ * Simple plotting of cartesian values.
+ *
+ * Create a plot that fills screen
+ * ```js
+ * const p = Plot.insert({fill`viewport});
+ * const dataSet = p.dataSet;
+ *
+ * // Add data
+ * ds.add({ x: 1, y: 2 });
+ *
+ * // Draw
+ * p.draw();
+ * ```
+ *
+ * Create a plot that fills a container
+ * ```js
+ * const p = Plot.insert({parent:`#someel`});
+ * ```
+ *
+ * Add data using the created data set
+ * ```js
+ *
+ * // Add a value to the `alpha` series
+ * p.dataSet.add({x:1,y:1}, `alpha`);
+ * ```
+ *
+ * Set default series formatting
+ * ```js
+ * p.setMeta(`default`, {
+ *  colour: `hsl(50,100%,50%)`,
+ *  lineWidth: 10
+ * });
+ * ```
+ *
+ * Series can have metadata associated with it in the DataSet
+ * ```js
+ * // Use 'pink' by default for the series 'alpha'
+ * p.setMeta(`alpha`, { colour: `pink` });
+ * ``
+ *
+ */
+declare class CartesianCanvasPlot {
+  #private;
+  actualDataRange: RectPositioned;
+  visibleRange: RectPositioned;
+  show: ShowOptions;
+  whiskerLength: number;
+  axisRounder: (v: number) => number;
+  onInvalidated: undefined | (() => void);
+  /**
+   * List of lines to draw after drawing everything else.
+   * Lines are given in value-coordinate space
+   */
+  overlayLines: (Line & LineStyle)[];
+  constructor(cr: CanvasRegion, data: DataSet<PlotPoint, SeriesMeta>, options?: RecursivePartial<CartesianPlotOptions>);
+  getCurrentRange(): CartesianDataRange;
+  invalidateRange(): void;
+  /**
+   * Positions an element at the viewport location of `data` point.
+   * Ensure the element has `position:absolute` set.
+   * @param data
+   * @param elementToPosition
+   * @param by
+   */
+  positionElementAt(data: Point, elementToPosition: HTMLElement | string, by?: `middle` | `top-left`, relativeToQuery?: HTMLElement | string): void;
+  /**
+   * When range is auto, returns the range of the data
+   * Otherwise returns the user-provided range.
+   * @returns
+   */
+  getDataRange(): PointMinMax;
+  valueToScreenSpace(dataPoint: Point): {
+    x: number;
+    y: number;
+  };
+  valueToRegionSpace(dataValue: Point, debug?: boolean): {
+    x: number;
+    y: number;
+    z?: number;
+  };
+  /**
+   * Converts a point in pixel coordinates to a value.
+   * Useful for converting from user input coordinates.
+   * @param point
+   * @returns
+   */
+  pointToValue(point: Point, _source: `screen`): Points.Point;
+  getDefaultMeta(): SeriesMeta;
+  draw(): void;
+  /**
+   * Draws a line in value-coordinate space
+   * @param line
+   * @param colour
+   * @param width
+   */
+  drawLine(line: Line, colour: string, width: number): void;
+  setMeta(series: string, meta: Partial<SeriesMeta>): void;
+  get dataSet(): any;
+  get canvasRegion(): CanvasRegion;
+  get canvasSource(): CanvasSource;
+}
+//# sourceMappingURL=cartesian-canvas-plot.d.ts.map
+declare namespace index_d_exports$1 {
+  export { AxisMark, bipolar_view_d_exports as BipolarView, CartesianCanvasPlot, CartesianDataRange, CartesianPlotOptions, CartesianScaler, DataSet, GridStyle, InsertOptions, LineStyle, PlotPoint, PointMinMax, SeriesMeta, ShowOptions, TextStyle, absoluteCompute, computeAxisMark, computeMinMax, insert, relativeCompute };
+}
 declare namespace video_d_exports {
   export { CaptureOpts, Capturer, FramesOpts, ManualCaptureOpts, ManualCapturer, capture, frames, manualCapture };
 }
@@ -1538,5 +2048,5 @@ declare const manualCapture: (sourceVideoEl: HTMLVideoElement, opts?: ManualCapt
 //# sourceMappingURL=video.d.ts.map
 
 //#endregion
-export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, image_data_grid_d_exports as ImageDataGrid, Opts, video_d_exports as Video, pointerVisualise };
+export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Plot, video_d_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.d.ts.map

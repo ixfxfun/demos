@@ -1,8 +1,8 @@
 import { Continuously, Interval } from "@ixfx/core";
 import { ISimpleEventEmitter, SimpleEventEmitter } from "@ixfx/events";
 import { Video } from "@ixfx/visual";
-import { Rect } from "@ixfx/geometry/rect";
 import { Point } from "@ixfx/geometry/point";
+import { Rect } from "@ixfx/geometry/rect";
 import { StateChangeEvent, StateChangeEvent as StateChangeEvent$1, StateMachineWithEvents, Transitions } from "@ixfx/flow/state-machine";
 import { QueueMutable } from "@ixfx/collections/queue";
 

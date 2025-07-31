@@ -1,14 +1,14 @@
 import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./src-B5kzJkYi.js";
-import { clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-DtvLL3oi.js";
+import { integerTest, numberTest, percentTest, resultThrow } from "./src-Bo4oKRxs.js";
+import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-CiSY0kkK.js";
 import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-klk0IZBm.js";
-import { zipKeyValue } from "./basic-BlF-8Fo-.js";
-import { mutable } from "./src-CGZcvPbX.js";
-import "./src-BB8BKEVc.js";
-import "./key-value-BXKMXEIP.js";
-import "./resolve-core-hiYZW4xF.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-BF9M23nT.js";
+import "./interval-type-DUpgykUG.js";
+import { zipKeyValue } from "./basic-DnPjgQBm.js";
+import "./src-DPAoZbZ8.js";
+import "./key-value-BeAGVpK0.js";
+import "./resolve-core-CT6vIfBp.js";
+import { mutable } from "./src-0RBLjKoZ.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-Dpa_k_f-.js";
 
 //#region packages/geometry/src/point/guard.ts
 /**

@@ -1,9 +1,367 @@
 import { Points, Rects } from "@ixfx/geometry";
 import { Result } from "@ixfx/guards";
-import { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import { Point } from "@ixfx/geometry/point";
+import { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import { GridCardinalDirection } from "@ixfx/geometry/grid";
 
+//#region packages/dom/src/data-table.d.ts
+declare namespace data_table_d_exports {
+  export { DataFormatter, DataTable, DataTableOpts, FormattingOptions, NumberFormattingOptions, fromList, fromObject };
+}
+type NumberFormattingOptions = Readonly<{
+  precision?: number;
+  roundNumbers?: number;
+  leftPadding?: number;
+}>;
+type FormattingOptions = Readonly<{
+  numbers: NumberFormattingOptions;
+}>;
+type DataTableOpts = FormattingOptions & {
+  readonly formatter?: DataFormatter;
+  readonly objectsAsTables?: boolean;
+  readonly idPrefix?: string;
+};
+type DataTable<V> = {
+  update(data: V): void;
+  remove(): boolean;
+};
+/**
+ * Creates a table of data points for each object in the map
+ * ```
+ * const t = DataTable.fromList(parentEl, map);
+ * t.update(newMap);
+ * ```
+ */
+declare const fromList: (parentOrQuery: HTMLElement | string, data: Map<string, object>) => DataTable<Map<string, object>>;
+/**
+ * Format data. Return _undefined_ to signal that
+ * data was not handled.
+ */
+type DataFormatter = (data: object, path: string) => string | undefined;
+/**
+ * Creates a HTML table where each row is a key-value pair from `data`.
+ * First column is the key, second column data.
+ *
+ * ```js
+ * const dt = fromObject(`#hostDiv`);
+ * ```
+ *
+ * `dt` is a function to call when you want to update data:
+ *
+ * ```js
+ * dt({
+ *  name: `Blerg`,
+ *  height: 120
+ * });
+ * ```
+ */
+declare const fromObject: (parentOrQuery: HTMLElement | string, data?: object, opts?: Partial<DataTableOpts>) => DataTable<object>;
+//# sourceMappingURL=data-table.d.ts.map
+declare namespace drag_drop_d_exports {
+  export { DragListener, DragOptions, DragProgress, DragStart, DragState, draggable };
+}
+/**
+ * State of drag
+ */
+type DragState = Readonly<{
+  /**
+   * Optional data, if this was given during drag start
+   */
+  token?: object;
+  /**
+   * Initial pointer position in viewport coordinates
+   */
+  initial: Point;
+  /**
+   * Delta of movement from initial position
+   */
+  delta: Point;
+  /**
+   * Viewport-relative current position
+   */
+  viewport: Point;
+}>;
+/**
+ * Return data for `start` function
+ */
+type DragStart = Readonly<{
+  /**
+   * If _true_, drag start is allowed
+   */
+  allow: boolean;
+  /**
+   * Optional data to associate with drag
+   */
+  token?: object;
+}>;
+/**
+ * Return data for `progress` function
+ */
+type DragProgress = Readonly<{
+  /**
+   * If true, aborts drag operation
+   */
+  abort?: boolean;
+  /**
+   * If returned, this will be viewport coordinates
+   * to snap the drag to
+   */
+  viewport?: Point;
+}>;
+type DragListener = Readonly<{
+  start?: () => DragStart;
+  progress?: (state: DragState) => DragProgress;
+  abort?: (reason: string, state: DragState) => void;
+  success?: (state: DragState) => void;
+}>;
+type DragOptions = {
+  autoTranslate: boolean;
+  /**
+   * If true, it's not necessary to select item first
+   */
+  quickDrag: boolean;
+  fence: HTMLElement | string;
+  fenceViewport: RectPositioned;
+};
+declare const draggable: (elemOrQuery: SVGElement | HTMLElement | string, listener: DragListener, options?: Partial<DragOptions>) => () => void;
+//# sourceMappingURL=drag-drop.d.ts.map
+declare namespace forms_d_exports {
+  export { SelectHandler, SelectOpts, button, buttonCreate, checkbox, numeric, select, textAreaKeyboard };
+}
+/**
+ * Adds tab and shift+tab to TEXTAREA
+ * @param el
+ */
+declare const textAreaKeyboard: (el: HTMLTextAreaElement) => void;
+/**
+ * Quick access to <input type="checkbox"> value.
+ * Provide a checkbox by string id or object reference. If a callback is
+ * supplied, it will be called when the checkbox changes value.
+ *
+ * ```
+ * const opt = checkbox(`#chkMate`);
+ * opt.checked; // Gets/sets
+ *
+ * const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
+ *  if (newVal) ...
+ * });
+ * ```
+ * @param {(string | HTMLInputElement)} domIdOrEl
+ * @param {(currentVal:boolean) => void} [onChanged]
+ * @returns
+ */
+declare const checkbox: (domIdOrEl: string | HTMLInputElement, onChanged?: (currentValue: boolean) => void) => {
+  checked: boolean;
+};
+/**
+ * Numeric INPUT
+ *
+ * ```
+ * const el = numeric(`#num`, (currentValue) => {
+ *  // Called when input changes
+ * })
+ * ```
+ *
+ * Get/set value
+ * ```
+ * el.value = 10;
+ * ```
+ * @param domIdOrEl
+ * @param onChanged
+ * @param live If true, event handler fires based on `input` event, rather than `change`
+ * @returns
+ */
+declare const numeric: (domIdOrEl: string | HTMLInputElement, onChanged?: (currentValue: number) => void, live?: boolean) => {
+  value: number;
+};
+/**
+ * SELECT options
+ */
+type SelectOpts = {
+  /**
+   * Placeholder item
+   */
+  readonly placeholderOpt?: string;
+  /**
+   * If true, a placeholder option 'Choose' is added to the list
+   */
+  readonly shouldAddChoosePlaceholder?: boolean;
+  /**
+   * Item to choose after a selection is made
+   */
+  readonly autoSelectAfterChoice?: number;
+};
+/**
+ * Button
+ *
+ * ```
+ * const b = button(`#myButton`, () => {
+ *  console.log(`Button clicked`);
+ * });
+ * ```
+ *
+ * ```
+ * b.click(); // Call the click handler
+ * b.disabled = true / false;
+ * ```
+ * @param domQueryOrEl Query string or element instance
+ * @param onClickHandler Callback when button is clicked
+ * @returns
+ */
+declare const button: (domQueryOrEl: string | HTMLButtonElement, onClickHandler?: () => void) => {
+  /**
+   * Gets text content of button
+   */
+  get title(): string | null;
+  /**
+   * Sets text content of button
+   */
+  set title(value: string);
+  /**
+   * Disposes the button.
+   * Removes event handler and optionally removes from document
+   * @param deleteElement
+   */
+  dispose(deleteElement?: boolean): void;
+  /**
+   * Sets the click handler, overwriting existing.
+   * @param handler
+   */
+  onClick(handler?: () => void): void;
+  /**
+   * Trigger onClick handler
+   */
+  click(): void;
+  /**
+   * Sets disabled state of button
+   */
+  disabled: boolean;
+  /**
+   * Gets the button element
+   */
+  readonly el: HTMLButtonElement;
+};
+/**
+ * Creates a BUTTON element, wrapping it via {@link button} and returning it.
+ * ```js
+ * const b = buttonCreate(`Stop`, () => console.log(`Stop`));
+ * someParent.addNode(b.el);
+ * ```
+ * @param title
+ * @param onClick
+ * @returns
+ */
+declare const buttonCreate: (title: string, onClick?: () => void) => {
+  /**
+   * Gets text content of button
+   */
+  get title(): string | null;
+  /**
+   * Sets text content of button
+   */
+  set title(value: string);
+  /**
+   * Disposes the button.
+   * Removes event handler and optionally removes from document
+   * @param deleteElement
+   */
+  dispose(deleteElement?: boolean): void;
+  /**
+   * Sets the click handler, overwriting existing.
+   * @param handler
+   */
+  onClick(handler?: () => void): void;
+  /**
+   * Trigger onClick handler
+   */
+  click(): void;
+  /**
+   * Sets disabled state of button
+   */
+  disabled: boolean;
+  /**
+   * Gets the button element
+   */
+  readonly el: HTMLButtonElement;
+};
+/**
+ * SELECT handler
+ */
+type SelectHandler = {
+  /**
+   * Gets/Sets disabled
+   */
+  set disabled(value: boolean);
+  get disabled(): boolean;
+  /**
+   * Gets value
+   */
+  get value(): string;
+  /**
+   * Sets selected index
+   */
+  get index(): number;
+  /**
+   * _True_ if currently selected item is the placeholder
+   */
+  get isSelectedPlaceholder(): boolean;
+  /**
+   * Set options
+   * @param options Options
+   * @param preSelect Item to preselect
+   */
+  setOpts(options: readonly string[], preSelect?: string): void;
+  /**
+   * Select item by index
+   * @param index Index
+   * @param trigger If true, triggers change event
+   */
+  select(index?: number, trigger?: boolean): void;
+};
+/**
+ * SELECT element.
+ *
+ * Handle changes in value:
+ * ```
+ * const mySelect = select(`#mySelect`, (newValue) => {
+ *  console.log(`Value is now ${newValue}`);
+ * });
+ * ```
+ *
+ * Enable/disable:
+ * ```
+ * mySelect.disabled = true / false;
+ * ```
+ *
+ * Get currently selected index or value:
+ * ```
+ * mySelect.value / mySelect.index
+ * ```
+ *
+ * Is the currently selected value a placeholder?
+ * ```
+ * mySelect.isSelectedPlaceholder
+ * ```
+ *
+ * Set list of options
+ * ```
+ * // Adds options, preselecting `opt2`.
+ * mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
+ * ```
+ *
+ * Select an element
+ * ```
+ * mySelect.select(1); // Select second item
+ * mySelect.select(1, true); // If true is added, change handler fires as well
+ * ```
+ * @param domQueryOrEl Query (eg `#id`) or element
+ * @param onChanged Callback when a selection is made
+ * @param options Options
+ * @return
+ */
+declare const select: (domQueryOrEl: string | HTMLSelectElement, onChanged?: (currentValue: string) => void, options?: SelectOpts) => SelectHandler;
+//# sourceMappingURL=forms.d.ts.map
+//#endregion
 //#region packages/dom/src/css-variables.d.ts
 /**
  * CSS Variable
@@ -278,57 +636,6 @@ declare const setCssToggle: (selectors: QueryOrElements, cssClass: string) => vo
 declare const setCssDisplay: (selectors: QueryOrElements, value: string) => void;
 //# sourceMappingURL=css.d.ts.map
 //#endregion
-//#region packages/dom/src/data-table.d.ts
-type NumberFormattingOptions = Readonly<{
-  precision?: number;
-  roundNumbers?: number;
-  leftPadding?: number;
-}>;
-type FormattingOptions = Readonly<{
-  numbers: NumberFormattingOptions;
-}>;
-type DataTableOpts = FormattingOptions & {
-  readonly formatter?: DataFormatter;
-  readonly objectsAsTables?: boolean;
-  readonly idPrefix?: string;
-};
-type DataTable<V> = {
-  update(data: V): void;
-  remove(): boolean;
-};
-/**
- * Creates a table of data points for each object in the map
- * ```
- * const t = DataTable.fromList(parentEl, map);
- * t.update(newMap);
- * ```
- */
-declare const fromList: (parentOrQuery: HTMLElement | string, data: Map<string, object>) => DataTable<Map<string, object>>;
-/**
- * Format data. Return _undefined_ to signal that
- * data was not handled.
- */
-type DataFormatter = (data: object, path: string) => string | undefined;
-/**
- * Creates a HTML table where each row is a key-value pair from `data`.
- * First column is the key, second column data.
- *
- * ```js
- * const dt = fromObject(`#hostDiv`);
- * ```
- *
- * `dt` is a function to call when you want to update data:
- *
- * ```js
- * dt({
- *  name: `Blerg`,
- *  height: 120
- * });
- * ```
- */
-declare const fromObject: (parentOrQuery: HTMLElement | string, data?: object, opts?: Partial<DataTableOpts>) => DataTable<object>;
-//# sourceMappingURL=data-table.d.ts.map
-//#endregion
 //#region packages/dom/src/data-display.d.ts
 type DataDisplayOptions = FormattingOptions & {
   theme?: `dark` | `light`;
@@ -354,73 +661,6 @@ declare class DataDisplay {
   update(data: object): void;
 }
 //# sourceMappingURL=data-display.d.ts.map
-//#endregion
-//#region packages/dom/src/drag-drop.d.ts
-/**
- * State of drag
- */
-type DragState = Readonly<{
-  /**
-   * Optional data, if this was given during drag start
-   */
-  token?: object;
-  /**
-   * Initial pointer position in viewport coordinates
-   */
-  initial: Point;
-  /**
-   * Delta of movement from initial position
-   */
-  delta: Point;
-  /**
-   * Viewport-relative current position
-   */
-  viewport: Point;
-}>;
-/**
- * Return data for `start` function
- */
-type DragStart = Readonly<{
-  /**
-   * If _true_, drag start is allowed
-   */
-  allow: boolean;
-  /**
-   * Optional data to associate with drag
-   */
-  token?: object;
-}>;
-/**
- * Return data for `progress` function
- */
-type DragProgress = Readonly<{
-  /**
-   * If true, aborts drag operation
-   */
-  abort?: boolean;
-  /**
-   * If returned, this will be viewport coordinates
-   * to snap the drag to
-   */
-  viewport?: Point;
-}>;
-type DragListener = Readonly<{
-  start?: () => DragStart;
-  progress?: (state: DragState) => DragProgress;
-  abort?: (reason: string, state: DragState) => void;
-  success?: (state: DragState) => void;
-}>;
-type DragOptions = {
-  autoTranslate: boolean;
-  /**
-   * If true, it's not necessary to select item first
-   */
-  quickDrag: boolean;
-  fence: HTMLElement | string;
-  fenceViewport: RectPositioned;
-};
-declare const draggable: (elemOrQuery: SVGElement | HTMLElement | string, listener: DragListener, options?: Partial<DragOptions>) => () => void;
-//# sourceMappingURL=drag-drop.d.ts.map
 //#endregion
 //#region packages/dom/src/el.d.ts
 /**
@@ -580,242 +820,6 @@ declare const defaultErrorHandler: () => {
   hide: () => void;
 };
 //# sourceMappingURL=error-handler.d.ts.map
-declare namespace forms_d_exports {
-  export { SelectHandler, SelectOpts, button, buttonCreate, checkbox, numeric, select, textAreaKeyboard };
-}
-/**
- * Adds tab and shift+tab to TEXTAREA
- * @param el
- */
-declare const textAreaKeyboard: (el: HTMLTextAreaElement) => void;
-/**
- * Quick access to <input type="checkbox"> value.
- * Provide a checkbox by string id or object reference. If a callback is
- * supplied, it will be called when the checkbox changes value.
- *
- * ```
- * const opt = checkbox(`#chkMate`);
- * opt.checked; // Gets/sets
- *
- * const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
- *  if (newVal) ...
- * });
- * ```
- * @param {(string | HTMLInputElement)} domIdOrEl
- * @param {(currentVal:boolean) => void} [onChanged]
- * @returns
- */
-declare const checkbox: (domIdOrEl: string | HTMLInputElement, onChanged?: (currentValue: boolean) => void) => {
-  checked: boolean;
-};
-/**
- * Numeric INPUT
- *
- * ```
- * const el = numeric(`#num`, (currentValue) => {
- *  // Called when input changes
- * })
- * ```
- *
- * Get/set value
- * ```
- * el.value = 10;
- * ```
- * @param domIdOrEl
- * @param onChanged
- * @param live If true, event handler fires based on `input` event, rather than `change`
- * @returns
- */
-declare const numeric: (domIdOrEl: string | HTMLInputElement, onChanged?: (currentValue: number) => void, live?: boolean) => {
-  value: number;
-};
-/**
- * SELECT options
- */
-type SelectOpts = {
-  /**
-   * Placeholder item
-   */
-  readonly placeholderOpt?: string;
-  /**
-   * If true, a placeholder option 'Choose' is added to the list
-   */
-  readonly shouldAddChoosePlaceholder?: boolean;
-  /**
-   * Item to choose after a selection is made
-   */
-  readonly autoSelectAfterChoice?: number;
-};
-/**
- * Button
- *
- * ```
- * const b = button(`#myButton`, () => {
- *  console.log(`Button clicked`);
- * });
- * ```
- *
- * ```
- * b.click(); // Call the click handler
- * b.disabled = true / false;
- * ```
- * @param domQueryOrEl Query string or element instance
- * @param onClickHandler Callback when button is clicked
- * @returns
- */
-declare const button: (domQueryOrEl: string | HTMLButtonElement, onClickHandler?: () => void) => {
-  /**
-   * Gets text content of button
-   */
-  get title(): string | null;
-  /**
-   * Sets text content of button
-   */
-  set title(value: string);
-  /**
-   * Disposes the button.
-   * Removes event handler and optionally removes from document
-   * @param deleteElement
-   */
-  dispose(deleteElement?: boolean): void;
-  /**
-   * Sets the click handler, overwriting existing.
-   * @param handler
-   */
-  onClick(handler?: () => void): void;
-  /**
-   * Trigger onClick handler
-   */
-  click(): void;
-  /**
-   * Sets disabled state of button
-   */
-  disabled: boolean;
-  /**
-   * Gets the button element
-   */
-  readonly el: HTMLButtonElement;
-};
-/**
- * Creates a BUTTON element, wrapping it via {@link button} and returning it.
- * ```js
- * const b = buttonCreate(`Stop`, () => console.log(`Stop`));
- * someParent.addNode(b.el);
- * ```
- * @param title
- * @param onClick
- * @returns
- */
-declare const buttonCreate: (title: string, onClick?: () => void) => {
-  /**
-   * Gets text content of button
-   */
-  get title(): string | null;
-  /**
-   * Sets text content of button
-   */
-  set title(value: string);
-  /**
-   * Disposes the button.
-   * Removes event handler and optionally removes from document
-   * @param deleteElement
-   */
-  dispose(deleteElement?: boolean): void;
-  /**
-   * Sets the click handler, overwriting existing.
-   * @param handler
-   */
-  onClick(handler?: () => void): void;
-  /**
-   * Trigger onClick handler
-   */
-  click(): void;
-  /**
-   * Sets disabled state of button
-   */
-  disabled: boolean;
-  /**
-   * Gets the button element
-   */
-  readonly el: HTMLButtonElement;
-};
-/**
- * SELECT handler
- */
-type SelectHandler = {
-  /**
-   * Gets/Sets disabled
-   */
-  set disabled(value: boolean);
-  get disabled(): boolean;
-  /**
-   * Gets value
-   */
-  get value(): string;
-  /**
-   * Sets selected index
-   */
-  get index(): number;
-  /**
-   * _True_ if currently selected item is the placeholder
-   */
-  get isSelectedPlaceholder(): boolean;
-  /**
-   * Set options
-   * @param options Options
-   * @param preSelect Item to preselect
-   */
-  setOpts(options: readonly string[], preSelect?: string): void;
-  /**
-   * Select item by index
-   * @param index Index
-   * @param trigger If true, triggers change event
-   */
-  select(index?: number, trigger?: boolean): void;
-};
-/**
- * SELECT element.
- *
- * Handle changes in value:
- * ```
- * const mySelect = select(`#mySelect`, (newValue) => {
- *  console.log(`Value is now ${newValue}`);
- * });
- * ```
- *
- * Enable/disable:
- * ```
- * mySelect.disabled = true / false;
- * ```
- *
- * Get currently selected index or value:
- * ```
- * mySelect.value / mySelect.index
- * ```
- *
- * Is the currently selected value a placeholder?
- * ```
- * mySelect.isSelectedPlaceholder
- * ```
- *
- * Set list of options
- * ```
- * // Adds options, preselecting `opt2`.
- * mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
- * ```
- *
- * Select an element
- * ```
- * mySelect.select(1); // Select second item
- * mySelect.select(1, true); // If true is added, change handler fires as well
- * ```
- * @param domQueryOrEl Query (eg `#id`) or element
- * @param onChanged Callback when a selection is made
- * @param options Options
- * @return
- */
-declare const select: (domQueryOrEl: string | HTMLSelectElement, onChanged?: (currentValue: string) => void, options?: SelectOpts) => SelectHandler;
-//# sourceMappingURL=forms.d.ts.map
 //#endregion
 //#region packages/dom/src/log.d.ts
 type LogOpts = {
@@ -1218,5 +1222,5 @@ declare const byId: <T extends HTMLElement>(id: string) => T;
 //# sourceMappingURL=utility.d.ts.map
 
 //#endregion
-export { ComputedPixelsMap, CreateUpdateElement, CssVariable, CssVariableByIdOption, CssVariableByObjectOption, CssVariableByQueryOption, CssVariableOption, DataDisplay, DataDisplayOptions, DataFormatter, DataTable, DataTableOpts, DragListener, DragOptions, DragProgress, DragStart, DragState, ElPositionOpts, ElementQueryOptions, ElementResizeLogic, ElementSizer, ElementSizerOptions, FormattingOptions, forms_d_exports as Forms, InlineConsoleOptions, Log, LogOpts, NumberFormattingOptions, Panel, PointSpaces, QueryOrElements, WrappedElement, addShadowCss, byId, cardinalPosition, clear, copyToClipboard, createAfter, createIn, cycleCssClass, defaultErrorHandler, draggable, el, elRequery, fromList, fromObject, getBoundingClientRectWithBorder, getComputedPixels, getCssVariable, getCssVariablesFromStyles, getCssVariablesWithFallback, getTranslation, inlineConsole, insertSorted, log, parseCssVariablesAsAttributes, pointScaler, positionFn, positionFromMiddle, positionRelative, query, reconcileChildren, resolveEl, resolveElementTry, resolveEls, setCssClass, setCssDisplay, setCssToggle, setCssVariables, setFromCssVariables, setHtml, setProperty, setText, tabSet, viewportToSpace };
+export { ComputedPixelsMap, CreateUpdateElement, CssVariable, CssVariableByIdOption, CssVariableByObjectOption, CssVariableByQueryOption, CssVariableOption, DataDisplay, DataDisplayOptions, data_table_d_exports as DataTable, drag_drop_d_exports as DragDrop, ElPositionOpts, ElementQueryOptions, ElementResizeLogic, ElementSizer, ElementSizerOptions, forms_d_exports as Forms, InlineConsoleOptions, Log, LogOpts, Panel, PointSpaces, QueryOrElements, WrappedElement, addShadowCss, byId, cardinalPosition, clear, copyToClipboard, createAfter, createIn, cycleCssClass, defaultErrorHandler, el, elRequery, getBoundingClientRectWithBorder, getComputedPixels, getCssVariable, getCssVariablesFromStyles, getCssVariablesWithFallback, getTranslation, inlineConsole, insertSorted, log, parseCssVariablesAsAttributes, pointScaler, positionFn, positionFromMiddle, positionRelative, query, reconcileChildren, resolveEl, resolveElementTry, resolveEls, setCssClass, setCssDisplay, setCssToggle, setCssVariables, setFromCssVariables, setHtml, setProperty, setText, tabSet, viewportToSpace };
 //# sourceMappingURL=dom.d.ts.map

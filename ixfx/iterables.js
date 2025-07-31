@@ -1,8 +1,8 @@
 import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, resultThrow } from "./src-B5kzJkYi.js";
-import { isEqual, numberArrayCompute } from "./src-DtvLL3oi.js";
-import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-klk0IZBm.js";
-import { average, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-BlF-8Fo-.js";
+import { integerTest, resultThrow } from "./src-Bo4oKRxs.js";
+import { isEqual, numberArrayCompute } from "./src-CiSY0kkK.js";
+import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-DUpgykUG.js";
+import { average, continuously, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-DnPjgQBm.js";
 
 //#region packages/iterables/src/guard.ts
 const isAsyncIterable = (v) => {
@@ -2392,6 +2392,73 @@ const hasEqualValuesShallow = (iterableA, iterableB, eq) => {
 };
 
 //#endregion
+//#region packages/iterables/src/controller.ts
+/**
+* Retrieve values from an iterator, passing them to a callback.
+* Allows iterator to be started, paused, or restarted and an optional delay between reading items from iterator.
+* @param options 
+* @returns 
+*/
+const iteratorController = (options) => {
+	const delayMs = intervalToMs(options.delay, 10);
+	let gen;
+	const onValue = options.onValue;
+	let state = `stopped`;
+	const loop = continuously(async () => {
+		if (gen) {
+			const r = await gen.next();
+			if (r.done) {
+				state = `stopped`;
+				return false;
+			}
+			const r2 = onValue(r.value);
+			if (typeof r2 === `boolean`) {
+				if (!r2) state = `stopped`;
+				return r2;
+			}
+			return true;
+		} else {
+			state = `stopped`;
+			return false;
+		}
+	}, delayMs);
+	const cancel = () => {
+		if (state === `stopped`) return;
+		gen = void 0;
+		loop.cancel();
+		state = `stopped`;
+	};
+	const pause = () => {
+		if (state === `paused`) return;
+		loop.cancel();
+		state = `paused`;
+	};
+	const start = () => {
+		if (state === `running`) return;
+		if (!gen) remake();
+		state = `running`;
+		loop.start();
+	};
+	const remake = () => {
+		if (options.iterator) gen = options.iterator();
+		else throw new Error(`No source iterator`);
+	};
+	const restart = () => {
+		remake();
+		start();
+	};
+	return {
+		start,
+		cancel,
+		restart,
+		pause,
+		get state() {
+			return state;
+		}
+	};
+};
+
+//#endregion
 //#region packages/iterables/src/from-event.ts
 const fromEvent = (eventSource, eventType) => {
 	const pullQueue = [];
@@ -2985,5 +3052,5 @@ function asCallback(input, callback, onDone) {
 }
 
 //#endregion
-export { async_exports as Async, chain_exports as Chains, sync_exports as Sync, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, last, map, max$1 as max, maxScore, min$1 as min, minScore, numbersCompute, reduce, slice, some$1 as some, toArray, unique, uniqueByValue, until, zip };
+export { async_exports as Async, chain_exports as Chains, sync_exports as Sync, asCallback, chunks, combineLatestToArray, combineLatestToObject, computeAverage, concat, dropWhile, equals, every, fill, filter, find, flatten, forEach, fromArray, fromEvent, fromFunction, fromFunctionAwaited, fromIterable, hasEqualValuesShallow, isAsyncIterable, isIterable, iteratorController, last, map, max$1 as max, maxScore, min$1 as min, minScore, numbersCompute, reduce, slice, some$1 as some, toArray, unique, uniqueByValue, until, zip };
 //# sourceMappingURL=iterables.js.map
