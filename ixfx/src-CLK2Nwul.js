@@ -8,9 +8,9 @@ import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
 import { isInteger } from "./is-integer-BwgNgMII.js";
 import { resolveWithFallbackSync } from "./resolve-core-ibINXx_1.js";
 import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-LtkApSyv.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-B1ZZ0gLL.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum as sum$1, toCartesian$1 as toCartesian, toPath } from "./src-C2bEaWi0.js";
-import { float, floatSource } from "./bezier-D98xhuzA.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-D8qEf6yn.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum as sum$1, toCartesian$1 as toCartesian, toPath } from "./src-CKv6-Ox5.js";
+import { float, floatSource } from "./bezier-DS5b_ULE.js";
 
 //#region packages/core/dist/src/pathed.js
 var pathed_exports = {};
@@ -3526,4 +3526,4 @@ __export(src_exports, {
 
 //#endregion
 export { compareData, getField, getPathsAndData, pathed_exports, src_exports, src_exports$1, updateByPath };
-//# sourceMappingURL=src-Dz1O3AVz.js.map
+//# sourceMappingURL=src-CLK2Nwul.js.map

@@ -6,7 +6,7 @@ import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
 import { keyValueSorter } from "./key-value-DZNL5nwk.js";
 import "./resolve-core-ibINXx_1.js";
 import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-LtkApSyv.js";
-import { timeout } from "./src-B1ZZ0gLL.js";
+import { timeout } from "./src-D8qEf6yn.js";
 
 //#region packages/trackers/src/frequency-mutable.ts
 /**

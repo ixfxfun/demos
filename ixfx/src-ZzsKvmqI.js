@@ -5,8 +5,8 @@ import { afterMatch } from "./src-IqHxJtRK.js";
 import { require_dist, uniqueInstances } from "./dist-sNLZPlTa.js";
 import { getErrorMessage } from "./resolve-core-ibINXx_1.js";
 import { clamp$1 as clamp, round } from "./src-LtkApSyv.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-C2bEaWi0.js";
-import { shortGuid } from "./bezier-D98xhuzA.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-CKv6-Ox5.js";
+import { shortGuid } from "./bezier-DS5b_ULE.js";
 
 //#region packages/dom/dist/src/resolve-el.js
 /**
@@ -2265,4 +2265,4 @@ __export(src_exports, {
 
 //#endregion
 export { ElementSizer, resolveEl, resolveElementTry, setProperty, src_exports };
-//# sourceMappingURL=src-DdQKKHdC.js.map
+//# sourceMappingURL=src-ZzsKvmqI.js.map

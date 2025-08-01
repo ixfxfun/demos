@@ -7,8 +7,8 @@ import "./src-IqHxJtRK.js";
 import "./key-value-DZNL5nwk.js";
 import "./resolve-core-ibINXx_1.js";
 import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-LtkApSyv.js";
-import { mutable } from "./src-B1ZZ0gLL.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-D98xhuzA.js";
+import { mutable } from "./src-D8qEf6yn.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DS5b_ULE.js";
 
 //#region packages/geometry/src/point/guard.ts
 /**

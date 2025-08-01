@@ -8,9 +8,9 @@ import "./key-value-DZNL5nwk.js";
 import { require_dist, uniqueInstances } from "./dist-sNLZPlTa.js";
 import { getErrorMessage } from "./resolve-core-ibINXx_1.js";
 import { clamp$1 as clamp, round } from "./src-LtkApSyv.js";
-import "./src-B1ZZ0gLL.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-C2bEaWi0.js";
-import { shortGuid } from "./bezier-D98xhuzA.js";
+import "./src-D8qEf6yn.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-CKv6-Ox5.js";
+import { shortGuid } from "./bezier-DS5b_ULE.js";
 
 //#region packages/dom/src/resolve-el.ts
 /**

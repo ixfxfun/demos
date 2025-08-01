@@ -2414,6 +2414,220 @@ interface IMapOf<V> {
 }
 //# sourceMappingURL=imap-of.d.ts.map
 //#endregion
+//#region packages/collections/src/map/imap-of-mutable.d.ts
+interface IMapOfMutable<V> extends IMapOf<V> {
+  /**
+   * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
+   * @param key
+   * @param values
+   */
+  addKeyedValues(key: string, ...values: readonly V[]): void;
+  /**
+   * Adds a value, automatically extracting a key via the
+   * `groupBy` function assigned in the constructor options.
+   * @param values Adds several values
+   */
+  addValue(...values: readonly V[]): void;
+  /**
+   * Clears the map
+   */
+  clear(): void;
+  /**
+   * Returns the number of keys
+   */
+  get lengthKeys(): number;
+  /**
+   * Deletes all values under `key` that match `value`.
+   * @param key Key
+   * @param value Value
+   */
+  deleteKeyValue(key: string, value: V): boolean;
+  /**
+   * Delete all occurrences of `value`, regardless of
+   * key it is stored under.
+   * Returns _true_ if something was deleted.
+   * @param value
+   */
+  deleteByValue(value: V): boolean;
+  /**
+   * Deletes all values stored under `key`. Returns _true_ if key was found
+   * @param key
+   */
+  delete(key: string): boolean;
+}
+//# sourceMappingURL=imap-of-mutable.d.ts.map
+//#endregion
+//#region packages/collections/src/map/map-of-simple-base.d.ts
+declare class MapOfSimpleBase<V> {
+  protected map: Map<string, readonly V[]>;
+  protected readonly groupBy: any;
+  protected valueEq: any;
+  /**
+   * Constructor
+   * @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
+   * @param valueEq Compare values. By default uses JS logic for equality
+   */
+  constructor(groupBy?: (value: V) => string, valueEq?: IsEqual<V>, initial?: [string, readonly V[]][]);
+  /**
+   * Returns _true_ if `key` exists
+   * @param key
+   * @returns
+   */
+  has(key: string): boolean;
+  /**
+   * Returns _true_ if `value` exists under `key`.
+   * @param key Key
+   * @param value Value to seek under `key`
+   * @returns _True_ if `value` exists under `key`.
+   */
+  hasKeyValue(key: string, value: V): boolean;
+  /**
+   * Debug dump of contents
+   * @returns
+   */
+  debugString(): string;
+  /**
+   * Return number of values stored under `key`.
+   * Returns 0 if `key` is not found.
+   * @param key
+   * @returns
+   */
+  count(key: string): number;
+  /**
+  * Returns first key that contains `value`
+  * @param value
+  * @param eq
+  * @returns
+  */
+  firstKeyByValue(value: V, eq?: IsEqual<V>): string | undefined;
+  /**
+   * Iterate over all entries
+   */
+  entriesFlat(): IterableIterator<[key: string, value: V]>;
+  /**
+   * Iterate over keys and array of values for that key
+   */
+  entries(): IterableIterator<[key: string, value: V[]]>;
+  /**
+   * Get all values under `key`
+   * @param key
+   * @returns
+   */
+  get(key: string): IterableIterator<V>;
+  /**
+   * Iterate over all keys
+   */
+  keys(): IterableIterator<string>;
+  /**
+   * Iterate over all values (regardless of key).
+   * Use {@link values} to iterate over a set of values per key
+   */
+  valuesFlat(): IterableIterator<V>;
+  /**
+   * Yields the values for each key in sequence, returning an array.
+   * Use {@link valuesFlat} to iterate over all keys regardless of key.
+   */
+  values(): IterableIterator<readonly V[]>;
+  /**
+   * Iterate over keys and length of values stored under keys
+   */
+  keysAndCounts(): IterableIterator<[string, number]>;
+  /**
+   * Returns the count of keys.
+   */
+  get lengthKeys(): number;
+  /**
+  * _True_ if empty
+  */
+  get isEmpty(): boolean;
+}
+//# sourceMappingURL=map-of-simple-base.d.ts.map
+//#endregion
+//#region packages/collections/src/map/map-of-simple-mutable.d.ts
+/**
+ * A simple mutable map of arrays, without events. It can store multiple values
+ * under the same key.
+ *
+ * For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
+ *
+ * @example
+ * ```js
+ * const m = mapOfSimpleMutable();
+ * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
+ * m.delete(`hello`);       // Deletes everything under `hello`
+ *
+ * const hellos = m.get(`hello`); // Get list of items under `hello`
+ * ```
+ *
+ * Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the
+ * basis by which values are keyed when using `addValues`.
+ *
+ * Constructor takes a `valueEq` parameter, which compares values. This is used when checking
+ * if a value exists under a key, for example.
+ * @typeParam V - Type of items
+ */
+declare class MapOfSimpleMutable<V> extends MapOfSimpleBase<V> implements IMapOfMutable<V> {
+  addKeyedValues(key: string, ...values: readonly V[]): void;
+  /**
+   * Set `values` to `key`.
+   * Previous data stored under `key` is thrown away.
+   * @param key
+   * @param values
+   */
+  setValues(key: string, values: readonly V[]): void;
+  /**
+   * Adds a value, automatically extracting a key via the
+   * `groupBy` function assigned in the constructor options.
+   * @param values Adds several values
+   */
+  addValue(...values: readonly V[]): void;
+  /**
+   * Delete `value` under a particular `key`
+   * @param key
+   * @param value
+   * @returns _True_ if `value` was found under `key`
+   */
+  deleteKeyValue(key: string, value: V): boolean;
+  /**
+   * Deletes `value` regardless of key.
+   *
+   * Uses the constructor-defined equality function.
+   * @param value Value to delete
+   * @returns
+   */
+  deleteByValue(value: V): boolean;
+  /**
+   * Deletes all values under `key`,
+   * @param key
+   * @returns _True_ if `key` was found and values stored
+   */
+  delete(key: string): boolean;
+  /**
+   * Clear contents
+   */
+  clear(): void;
+}
+/**
+ * A simple mutable map of arrays, without events. It can store multiple values
+ * under the same key.
+ *
+ * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
+ *
+ * @example
+ * ```js
+ * const m = mapOfSimpleMutable();
+ * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
+ * m.delete(`hello`);       // Deletes everything under `hello`
+ *
+ * const hellos = m.get(`hello`); // Get list of items under `hello`
+ * ```
+ *
+ * @typeParam V - Type of items
+ * @returns New instance
+ */
+declare const ofSimpleMutable: <V>(groupBy?: (value: V) => string, valueEq?: IsEqual<V>) => IMapOfMutable<V>;
+//# sourceMappingURL=map-of-simple-mutable.d.ts.map
+//#endregion
 //#region packages/collections/src/map/imap-base.d.ts
 interface IMapBase<K, V> {
   /**
@@ -2608,49 +2822,6 @@ interface IMapMutable<K, V> extends IMapBase<K, V> {
 declare const mutable: <K, V>(...data: EitherKey<K, V>) => IMapMutable<K, V>;
 //# sourceMappingURL=map-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/imap-of-mutable.d.ts
-interface IMapOfMutable<V> extends IMapOf<V> {
-  /**
-   * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
-   * @param key
-   * @param values
-   */
-  addKeyedValues(key: string, ...values: readonly V[]): void;
-  /**
-   * Adds a value, automatically extracting a key via the
-   * `groupBy` function assigned in the constructor options.
-   * @param values Adds several values
-   */
-  addValue(...values: readonly V[]): void;
-  /**
-   * Clears the map
-   */
-  clear(): void;
-  /**
-   * Returns the number of keys
-   */
-  get lengthKeys(): number;
-  /**
-   * Deletes all values under `key` that match `value`.
-   * @param key Key
-   * @param value Value
-   */
-  deleteKeyValue(key: string, value: V): boolean;
-  /**
-   * Delete all occurrences of `value`, regardless of
-   * key it is stored under.
-   * Returns _true_ if something was deleted.
-   * @param value
-   */
-  deleteByValue(value: V): boolean;
-  /**
-   * Deletes all values stored under `key`. Returns _true_ if key was found
-   * @param key
-   */
-  delete(key: string): boolean;
-}
-//# sourceMappingURL=imap-of-mutable.d.ts.map
-//#endregion
 //#region packages/collections/src/map/imap-of-mutable-extended.d.ts
 /**
  * Events from mapArray
@@ -2792,177 +2963,7 @@ type MapArrayOpts<V> = MapMultiOpts<V> & {
  */
 declare const ofArrayMutable: <V>(options?: MapArrayOpts<V>) => IMapOfMutableExtended<V, readonly V[]>;
 //# sourceMappingURL=map-of-array-mutable.d.ts.map
-//#endregion
-//#region packages/collections/src/map/map-of-simple-base.d.ts
-declare class MapOfSimpleBase<V> {
-  protected map: Map<string, readonly V[]>;
-  protected readonly groupBy: any;
-  protected valueEq: any;
-  /**
-   * Constructor
-   * @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
-   * @param valueEq Compare values. By default uses JS logic for equality
-   */
-  constructor(groupBy?: (value: V) => string, valueEq?: IsEqual<V>, initial?: [string, readonly V[]][]);
-  /**
-   * Returns _true_ if `key` exists
-   * @param key
-   * @returns
-   */
-  has(key: string): boolean;
-  /**
-   * Returns _true_ if `value` exists under `key`.
-   * @param key Key
-   * @param value Value to seek under `key`
-   * @returns _True_ if `value` exists under `key`.
-   */
-  hasKeyValue(key: string, value: V): boolean;
-  /**
-   * Debug dump of contents
-   * @returns
-   */
-  debugString(): string;
-  /**
-   * Return number of values stored under `key`.
-   * Returns 0 if `key` is not found.
-   * @param key
-   * @returns
-   */
-  count(key: string): number;
-  /**
-  * Returns first key that contains `value`
-  * @param value
-  * @param eq
-  * @returns
-  */
-  firstKeyByValue(value: V, eq?: IsEqual<V>): string | undefined;
-  /**
-   * Iterate over all entries
-   */
-  entriesFlat(): IterableIterator<[key: string, value: V]>;
-  /**
-   * Iterate over keys and array of values for that key
-   */
-  entries(): IterableIterator<[key: string, value: V[]]>;
-  /**
-   * Get all values under `key`
-   * @param key
-   * @returns
-   */
-  get(key: string): IterableIterator<V>;
-  /**
-   * Iterate over all keys
-   */
-  keys(): IterableIterator<string>;
-  /**
-   * Iterate over all values (regardless of key).
-   * Use {@link values} to iterate over a set of values per key
-   */
-  valuesFlat(): IterableIterator<V>;
-  /**
-   * Yields the values for each key in sequence, returning an array.
-   * Use {@link valuesFlat} to iterate over all keys regardless of key.
-   */
-  values(): IterableIterator<readonly V[]>;
-  /**
-   * Iterate over keys and length of values stored under keys
-   */
-  keysAndCounts(): IterableIterator<[string, number]>;
-  /**
-   * Returns the count of keys.
-   */
-  get lengthKeys(): number;
-  /**
-  * _True_ if empty
-  */
-  get isEmpty(): boolean;
-}
-//# sourceMappingURL=map-of-simple-base.d.ts.map
-//#endregion
-//#region packages/collections/src/map/map-of-simple-mutable.d.ts
-/**
- * A simple mutable map of arrays, without events. It can store multiple values
- * under the same key.
- *
- * For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
- *
- * @example
- * ```js
- * const m = mapOfSimpleMutable();
- * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
- * m.delete(`hello`);       // Deletes everything under `hello`
- *
- * const hellos = m.get(`hello`); // Get list of items under `hello`
- * ```
- *
- * Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the
- * basis by which values are keyed when using `addValues`.
- *
- * Constructor takes a `valueEq` parameter, which compares values. This is used when checking
- * if a value exists under a key, for example.
- * @typeParam V - Type of items
- */
-declare class MapOfSimpleMutable<V> extends MapOfSimpleBase<V> implements IMapOfMutable<V> {
-  addKeyedValues(key: string, ...values: readonly V[]): void;
-  /**
-   * Set `values` to `key`.
-   * Previous data stored under `key` is thrown away.
-   * @param key
-   * @param values
-   */
-  setValues(key: string, values: readonly V[]): void;
-  /**
-   * Adds a value, automatically extracting a key via the
-   * `groupBy` function assigned in the constructor options.
-   * @param values Adds several values
-   */
-  addValue(...values: readonly V[]): void;
-  /**
-   * Delete `value` under a particular `key`
-   * @param key
-   * @param value
-   * @returns _True_ if `value` was found under `key`
-   */
-  deleteKeyValue(key: string, value: V): boolean;
-  /**
-   * Deletes `value` regardless of key.
-   *
-   * Uses the constructor-defined equality function.
-   * @param value Value to delete
-   * @returns
-   */
-  deleteByValue(value: V): boolean;
-  /**
-   * Deletes all values under `key`,
-   * @param key
-   * @returns _True_ if `key` was found and values stored
-   */
-  delete(key: string): boolean;
-  /**
-   * Clear contents
-   */
-  clear(): void;
-}
-/**
- * A simple mutable map of arrays, without events. It can store multiple values
- * under the same key.
- *
- * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
- *
- * @example
- * ```js
- * const m = mapOfSimpleMutable();
- * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
- * m.delete(`hello`);       // Deletes everything under `hello`
- *
- * const hellos = m.get(`hello`); // Get list of items under `hello`
- * ```
- *
- * @typeParam V - Type of items
- * @returns New instance
- */
-declare const ofSimpleMutable: <V>(groupBy?: (value: V) => string, valueEq?: IsEqual<V>) => IMapOfMutable<V>;
-//# sourceMappingURL=map-of-simple-mutable.d.ts.map
+
 //#endregion
 //#region packages/collections/src/map/imap-of-immutable.d.ts
 /**
@@ -3330,7 +3331,7 @@ declare class NumberMap<K> extends Map<K, number> {
 }
 //# sourceMappingURL=number-map.d.ts.map
 declare namespace index_d_exports$1 {
-  export { ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapSetOpts, MultiValue, NumberMap, create as expiringMap, firstEntry, firstEntryByValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple };
+  export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapOfSimpleMutable, MapSetOpts, MultiValue, NumberMap, create as expiringMap, firstEntry, firstEntryByValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple, ofSimpleMutable };
 }
 import * as import___ixfx_core_maps from "@ixfx/core/maps";
 __reExport(index_d_exports$1, import___ixfx_core_maps);

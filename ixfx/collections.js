@@ -2960,6 +2960,317 @@ var ExpiringMap = class extends SimpleEventEmitter {
 };
 
 //#endregion
+//#region packages/collections/src/map/map-multi-fns.ts
+/**
+* Finds first entry by iterable value. Expects a map with an iterable as values.
+*
+* ```js
+* const map = new Map();
+* map.set('hello', ['a', 'b', 'c']);
+* map.set('there', ['d', 'e', 'f']);
+*
+* const entry = firstEntry(map, (value, key) => {
+*  return (value === 'e');
+* });
+* // Entry is: ['there', ['d', 'e', 'f']]
+* ```
+*
+* An alternative is {@link firstEntryByValue} to search by value.
+* @param map Map to search
+* @param predicate Filter function returns true when there is a match of value
+* @returns Entry, or _undefined_ if `filter` function never returns _true_
+*/
+const firstEntry = (map$1, predicate) => {
+	for (const e of map$1.entries()) {
+		const value$1 = e[1];
+		for (const subValue of value$1) if (predicate(subValue, e[0])) return e;
+	}
+};
+/**
+* Returns the size of the largest key, or 0 if empty.
+*/
+const lengthMax = (map$1) => {
+	let largest = ["", 0];
+	for (const e of map$1.keysAndCounts()) if (e[1] > largest[1]) largest = e;
+	return largest[1];
+};
+/**
+* Finds first entry by iterable value. Expects a map with an iterable as values.
+*
+* ```js
+* const map = new Map();
+* map.set('hello', ['a', 'b', 'c']);
+* map.set('there', ['d', 'e', 'f']);
+*
+* const entry = firstEntryByValue(map, 'e');
+* // Entry is: ['there', ['d', 'e', 'f']]
+* ```
+*
+* An alternative is {@link firstEntry} to search by predicate function.
+* @param map Map to search
+* @param value Value to seek
+* @param isEqual Filter function which checks equality. Uses JS comparer by default.
+* @returns Entry, or _undefined_ if `value` not found.
+*/
+const firstEntryByValue = (map$1, value$1, isEqual = isEqualDefault) => {
+	for (const e of map$1.entries()) {
+		const value_ = e[1];
+		for (const subValue of value_) if (isEqual(subValue, value$1)) return e;
+	}
+};
+
+//#endregion
+//#region packages/collections/src/map/map-of-simple-base.ts
+var MapOfSimpleBase = class {
+	map;
+	groupBy;
+	valueEq;
+	/**
+	* Constructor
+	* @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
+	* @param valueEq Compare values. By default uses JS logic for equality
+	*/
+	constructor(groupBy = defaultKeyer, valueEq = isEqualDefault, initial = []) {
+		this.groupBy = groupBy;
+		this.valueEq = valueEq;
+		this.map = new Map(initial);
+	}
+	/**
+	* Returns _true_ if `key` exists
+	* @param key
+	* @returns
+	*/
+	has(key) {
+		return this.map.has(key);
+	}
+	/**
+	* Returns _true_ if `value` exists under `key`.
+	* @param key Key
+	* @param value Value to seek under `key`
+	* @returns _True_ if `value` exists under `key`.
+	*/
+	hasKeyValue(key, value$1) {
+		const values = this.map.get(key);
+		if (!values) return false;
+		for (const v of values) if (this.valueEq(v, value$1)) return true;
+		return false;
+	}
+	/**
+	* Debug dump of contents
+	* @returns
+	*/
+	debugString() {
+		let r = ``;
+		const keys = [...this.map.keys()];
+		keys.every((k) => {
+			const v = this.map.get(k);
+			if (v === void 0) return;
+			r += k + ` (${v.length}) = ${JSON.stringify(v)}\r\n`;
+		});
+		return r;
+	}
+	/**
+	* Return number of values stored under `key`.
+	* Returns 0 if `key` is not found.
+	* @param key
+	* @returns
+	*/
+	count(key) {
+		const values = this.map.get(key);
+		if (!values) return 0;
+		return values.length;
+	}
+	/**
+	* Returns first key that contains `value`
+	* @param value 
+	* @param eq 
+	* @returns 
+	*/
+	firstKeyByValue(value$1, eq = isEqualDefault) {
+		const entry = firstEntryByValue(this, value$1, eq);
+		if (entry) return entry[0];
+	}
+	/**
+	* Iterate over all entries
+	*/
+	*entriesFlat() {
+		for (const key of this.map.keys()) for (const value$1 of this.map.get(key)) yield [key, value$1];
+	}
+	/**
+	* Iterate over keys and array of values for that key
+	*/
+	*entries() {
+		for (const [k, v] of this.map.entries()) yield [k, [...v]];
+	}
+	/**
+	* Get all values under `key`
+	* @param key
+	* @returns
+	*/
+	*get(key) {
+		const m = this.map.get(key);
+		if (!m) return;
+		yield* m.values();
+	}
+	/**
+	* Iterate over all keys
+	*/
+	*keys() {
+		yield* this.map.keys();
+	}
+	/**
+	* Iterate over all values (regardless of key).
+	* Use {@link values} to iterate over a set of values per key
+	*/
+	*valuesFlat() {
+		for (const entries of this.map) yield* entries[1];
+	}
+	/**
+	* Yields the values for each key in sequence, returning an array.
+	* Use {@link valuesFlat} to iterate over all keys regardless of key.
+	*/
+	*values() {
+		for (const entries of this.map) yield entries[1];
+	}
+	/**
+	* Iterate over keys and length of values stored under keys
+	*/
+	*keysAndCounts() {
+		for (const entries of this.map) yield [entries[0], entries[1].length];
+	}
+	/**
+	* Returns the count of keys.
+	*/
+	get lengthKeys() {
+		return this.map.size;
+	}
+	/**
+	* _True_ if empty
+	*/
+	get isEmpty() {
+		return this.map.size === 0;
+	}
+};
+
+//#endregion
+//#region packages/collections/src/map/map-of-simple-mutable.ts
+/**
+* A simple mutable map of arrays, without events. It can store multiple values
+* under the same key.
+*
+* For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
+*
+* @example
+* ```js
+* const m = mapOfSimpleMutable();
+* m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
+* m.delete(`hello`);       // Deletes everything under `hello`
+*
+* const hellos = m.get(`hello`); // Get list of items under `hello`
+* ```
+*
+* Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the
+* basis by which values are keyed when using `addValues`.
+*
+* Constructor takes a `valueEq` parameter, which compares values. This is used when checking
+* if a value exists under a key, for example.
+* @typeParam V - Type of items
+*/
+var MapOfSimpleMutable = class extends MapOfSimpleBase {
+	addKeyedValues(key, ...values) {
+		const existing = this.map.get(key);
+		if (existing === void 0) this.map.set(key, values);
+		else this.map.set(key, [...existing, ...values]);
+	}
+	/**
+	* Set `values` to `key`.
+	* Previous data stored under `key` is thrown away.
+	* @param key 
+	* @param values 
+	*/
+	setValues(key, values) {
+		this.map.set(key, values);
+	}
+	/**
+	* Adds a value, automatically extracting a key via the
+	* `groupBy` function assigned in the constructor options.
+	* @param values Adds several values
+	*/
+	addValue(...values) {
+		for (const v of values) {
+			const key = this.groupBy(v);
+			this.addKeyedValues(key, v);
+		}
+	}
+	/**
+	* Delete `value` under a particular `key`
+	* @param key
+	* @param value
+	* @returns _True_ if `value` was found under `key`
+	*/
+	deleteKeyValue(key, value$1) {
+		const existing = this.map.get(key);
+		if (existing === void 0) return false;
+		const without$1 = existing.filter((existingValue) => !this.valueEq(existingValue, value$1));
+		this.map.set(key, without$1);
+		return without$1.length < existing.length;
+	}
+	/**
+	* Deletes `value` regardless of key.
+	*
+	* Uses the constructor-defined equality function.
+	* @param value Value to delete
+	* @returns
+	*/
+	deleteByValue(value$1) {
+		let del$1 = false;
+		const entries = [...this.map.entries()];
+		for (const keyEntries of entries) for (const values of keyEntries[1]) if (this.valueEq(values, value$1)) {
+			del$1 = true;
+			this.deleteKeyValue(keyEntries[0], value$1);
+		}
+		return del$1;
+	}
+	/**
+	* Deletes all values under `key`,
+	* @param key
+	* @returns _True_ if `key` was found and values stored
+	*/
+	delete(key) {
+		const values = this.map.get(key);
+		if (!values) return false;
+		if (values.length === 0) return false;
+		this.map.delete(key);
+		return true;
+	}
+	/**
+	* Clear contents
+	*/
+	clear() {
+		this.map.clear();
+	}
+};
+/**
+* A simple mutable map of arrays, without events. It can store multiple values
+* under the same key.
+*
+* For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
+*
+* @example
+* ```js
+* const m = mapOfSimpleMutable();
+* m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
+* m.delete(`hello`);       // Deletes everything under `hello`
+*
+* const hellos = m.get(`hello`); // Get list of items under `hello`
+* ```
+*
+* @typeParam V - Type of items
+* @returns New instance
+*/
+const ofSimpleMutable = (groupBy = defaultKeyer, valueEq = isEqualDefault) => new MapOfSimpleMutable(groupBy, valueEq);
+
+//#endregion
 //#region packages/collections/src/map/map-immutable-fns.ts
 /**
 * Adds an array o [k,v] to the map, returning a new instance
@@ -3564,317 +3875,6 @@ const ofArrayMutable = (options = {}) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-multi-fns.ts
-/**
-* Finds first entry by iterable value. Expects a map with an iterable as values.
-*
-* ```js
-* const map = new Map();
-* map.set('hello', ['a', 'b', 'c']);
-* map.set('there', ['d', 'e', 'f']);
-*
-* const entry = firstEntry(map, (value, key) => {
-*  return (value === 'e');
-* });
-* // Entry is: ['there', ['d', 'e', 'f']]
-* ```
-*
-* An alternative is {@link firstEntryByValue} to search by value.
-* @param map Map to search
-* @param predicate Filter function returns true when there is a match of value
-* @returns Entry, or _undefined_ if `filter` function never returns _true_
-*/
-const firstEntry = (map$1, predicate) => {
-	for (const e of map$1.entries()) {
-		const value$1 = e[1];
-		for (const subValue of value$1) if (predicate(subValue, e[0])) return e;
-	}
-};
-/**
-* Returns the size of the largest key, or 0 if empty.
-*/
-const lengthMax = (map$1) => {
-	let largest = ["", 0];
-	for (const e of map$1.keysAndCounts()) if (e[1] > largest[1]) largest = e;
-	return largest[1];
-};
-/**
-* Finds first entry by iterable value. Expects a map with an iterable as values.
-*
-* ```js
-* const map = new Map();
-* map.set('hello', ['a', 'b', 'c']);
-* map.set('there', ['d', 'e', 'f']);
-*
-* const entry = firstEntryByValue(map, 'e');
-* // Entry is: ['there', ['d', 'e', 'f']]
-* ```
-*
-* An alternative is {@link firstEntry} to search by predicate function.
-* @param map Map to search
-* @param value Value to seek
-* @param isEqual Filter function which checks equality. Uses JS comparer by default.
-* @returns Entry, or _undefined_ if `value` not found.
-*/
-const firstEntryByValue = (map$1, value$1, isEqual = isEqualDefault) => {
-	for (const e of map$1.entries()) {
-		const value_ = e[1];
-		for (const subValue of value_) if (isEqual(subValue, value$1)) return e;
-	}
-};
-
-//#endregion
-//#region packages/collections/src/map/map-of-simple-base.ts
-var MapOfSimpleBase = class {
-	map;
-	groupBy;
-	valueEq;
-	/**
-	* Constructor
-	* @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
-	* @param valueEq Compare values. By default uses JS logic for equality
-	*/
-	constructor(groupBy = defaultKeyer, valueEq = isEqualDefault, initial = []) {
-		this.groupBy = groupBy;
-		this.valueEq = valueEq;
-		this.map = new Map(initial);
-	}
-	/**
-	* Returns _true_ if `key` exists
-	* @param key
-	* @returns
-	*/
-	has(key) {
-		return this.map.has(key);
-	}
-	/**
-	* Returns _true_ if `value` exists under `key`.
-	* @param key Key
-	* @param value Value to seek under `key`
-	* @returns _True_ if `value` exists under `key`.
-	*/
-	hasKeyValue(key, value$1) {
-		const values = this.map.get(key);
-		if (!values) return false;
-		for (const v of values) if (this.valueEq(v, value$1)) return true;
-		return false;
-	}
-	/**
-	* Debug dump of contents
-	* @returns
-	*/
-	debugString() {
-		let r = ``;
-		const keys = [...this.map.keys()];
-		keys.every((k) => {
-			const v = this.map.get(k);
-			if (v === void 0) return;
-			r += k + ` (${v.length}) = ${JSON.stringify(v)}\r\n`;
-		});
-		return r;
-	}
-	/**
-	* Return number of values stored under `key`.
-	* Returns 0 if `key` is not found.
-	* @param key
-	* @returns
-	*/
-	count(key) {
-		const values = this.map.get(key);
-		if (!values) return 0;
-		return values.length;
-	}
-	/**
-	* Returns first key that contains `value`
-	* @param value 
-	* @param eq 
-	* @returns 
-	*/
-	firstKeyByValue(value$1, eq = isEqualDefault) {
-		const entry = firstEntryByValue(this, value$1, eq);
-		if (entry) return entry[0];
-	}
-	/**
-	* Iterate over all entries
-	*/
-	*entriesFlat() {
-		for (const key of this.map.keys()) for (const value$1 of this.map.get(key)) yield [key, value$1];
-	}
-	/**
-	* Iterate over keys and array of values for that key
-	*/
-	*entries() {
-		for (const [k, v] of this.map.entries()) yield [k, [...v]];
-	}
-	/**
-	* Get all values under `key`
-	* @param key
-	* @returns
-	*/
-	*get(key) {
-		const m = this.map.get(key);
-		if (!m) return;
-		yield* m.values();
-	}
-	/**
-	* Iterate over all keys
-	*/
-	*keys() {
-		yield* this.map.keys();
-	}
-	/**
-	* Iterate over all values (regardless of key).
-	* Use {@link values} to iterate over a set of values per key
-	*/
-	*valuesFlat() {
-		for (const entries of this.map) yield* entries[1];
-	}
-	/**
-	* Yields the values for each key in sequence, returning an array.
-	* Use {@link valuesFlat} to iterate over all keys regardless of key.
-	*/
-	*values() {
-		for (const entries of this.map) yield entries[1];
-	}
-	/**
-	* Iterate over keys and length of values stored under keys
-	*/
-	*keysAndCounts() {
-		for (const entries of this.map) yield [entries[0], entries[1].length];
-	}
-	/**
-	* Returns the count of keys.
-	*/
-	get lengthKeys() {
-		return this.map.size;
-	}
-	/**
-	* _True_ if empty
-	*/
-	get isEmpty() {
-		return this.map.size === 0;
-	}
-};
-
-//#endregion
-//#region packages/collections/src/map/map-of-simple-mutable.ts
-/**
-* A simple mutable map of arrays, without events. It can store multiple values
-* under the same key.
-*
-* For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
-*
-* @example
-* ```js
-* const m = mapOfSimpleMutable();
-* m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
-* m.delete(`hello`);       // Deletes everything under `hello`
-*
-* const hellos = m.get(`hello`); // Get list of items under `hello`
-* ```
-*
-* Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the
-* basis by which values are keyed when using `addValues`.
-*
-* Constructor takes a `valueEq` parameter, which compares values. This is used when checking
-* if a value exists under a key, for example.
-* @typeParam V - Type of items
-*/
-var MapOfSimpleMutable = class extends MapOfSimpleBase {
-	addKeyedValues(key, ...values) {
-		const existing = this.map.get(key);
-		if (existing === void 0) this.map.set(key, values);
-		else this.map.set(key, [...existing, ...values]);
-	}
-	/**
-	* Set `values` to `key`.
-	* Previous data stored under `key` is thrown away.
-	* @param key 
-	* @param values 
-	*/
-	setValues(key, values) {
-		this.map.set(key, values);
-	}
-	/**
-	* Adds a value, automatically extracting a key via the
-	* `groupBy` function assigned in the constructor options.
-	* @param values Adds several values
-	*/
-	addValue(...values) {
-		for (const v of values) {
-			const key = this.groupBy(v);
-			this.addKeyedValues(key, v);
-		}
-	}
-	/**
-	* Delete `value` under a particular `key`
-	* @param key
-	* @param value
-	* @returns _True_ if `value` was found under `key`
-	*/
-	deleteKeyValue(key, value$1) {
-		const existing = this.map.get(key);
-		if (existing === void 0) return false;
-		const without$1 = existing.filter((existingValue) => !this.valueEq(existingValue, value$1));
-		this.map.set(key, without$1);
-		return without$1.length < existing.length;
-	}
-	/**
-	* Deletes `value` regardless of key.
-	*
-	* Uses the constructor-defined equality function.
-	* @param value Value to delete
-	* @returns
-	*/
-	deleteByValue(value$1) {
-		let del$1 = false;
-		const entries = [...this.map.entries()];
-		for (const keyEntries of entries) for (const values of keyEntries[1]) if (this.valueEq(values, value$1)) {
-			del$1 = true;
-			this.deleteKeyValue(keyEntries[0], value$1);
-		}
-		return del$1;
-	}
-	/**
-	* Deletes all values under `key`,
-	* @param key
-	* @returns _True_ if `key` was found and values stored
-	*/
-	delete(key) {
-		const values = this.map.get(key);
-		if (!values) return false;
-		if (values.length === 0) return false;
-		this.map.delete(key);
-		return true;
-	}
-	/**
-	* Clear contents
-	*/
-	clear() {
-		this.map.clear();
-	}
-};
-/**
-* A simple mutable map of arrays, without events. It can store multiple values
-* under the same key.
-*
-* For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
-*
-* @example
-* ```js
-* const m = mapOfSimpleMutable();
-* m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
-* m.delete(`hello`);       // Deletes everything under `hello`
-*
-* const hellos = m.get(`hello`); // Get list of items under `hello`
-* ```
-*
-* @typeParam V - Type of items
-* @returns New instance
-*/
-const ofSimpleMutable = (groupBy = defaultKeyer, valueEq = isEqualDefault) => new MapOfSimpleMutable(groupBy, valueEq);
-
-//#endregion
 //#region packages/collections/src/map/map-of-simple.ts
 /**
 * Simple immutable MapOf
@@ -3941,8 +3941,10 @@ const ofSimple = (groupBy = defaultKeyer, valueEq = isEqualDefault) => new MapOf
 //#region packages/collections/src/map/index.ts
 var map_exports = {};
 __export(map_exports, {
+	ExpiringMap: () => ExpiringMap,
 	MapOfMutableImpl: () => MapOfMutableImpl,
 	MapOfSimple: () => MapOfSimple,
+	MapOfSimpleMutable: () => MapOfSimpleMutable,
 	NumberMap: () => NumberMap,
 	addObjectEntriesMutate: () => addObjectEntriesMutate,
 	addValue: () => addValue,
@@ -3975,6 +3977,7 @@ __export(map_exports, {
 	ofCircularMutable: () => ofCircularMutable,
 	ofSetMutable: () => ofSetMutable,
 	ofSimple: () => ofSimple,
+	ofSimpleMutable: () => ofSimpleMutable,
 	some: () => some,
 	sortByValue: () => sortByValue,
 	sortByValueProperty: () => sortByValueProperty,

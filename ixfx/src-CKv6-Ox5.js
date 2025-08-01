@@ -2,8 +2,8 @@ import { __export } from "./chunk-Cn1u12Og.js";
 import { integerTest, numberTest, percentTest, resultThrow } from "./src-Bo4oKRxs.js";
 import { zipKeyValue } from "./basic-BcTIVreK.js";
 import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-LtkApSyv.js";
-import { mutable } from "./src-B1ZZ0gLL.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-D98xhuzA.js";
+import { mutable } from "./src-D8qEf6yn.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DS5b_ULE.js";
 
 //#region packages/geometry/dist/src/point/guard.js
 /**
@@ -10402,4 +10402,4 @@ __export(src_exports, {
 
 //#endregion
 export { Empty, Empty$3 as Empty$1, EmptyPositioned, Placeholder$2 as Placeholder, PlaceholderPositioned, PointsTracker, Unit, abs, angleConvert, angleParse, angleRadian, applyFields, cardinal, center$1 as center, clampMagnitude, compare, corners, corners$1, cubic, distance, divide$1 as divide, fromLine, fromNumbers$1 as fromNumbers, getEdgeX, getEdgeY, getPointParameter, guard$6 as guard, guard$1, indexFromCell, interpolate$4 as interpolate, interpolator, invert$1 as invert, isCubicBezier, isEqual$5 as isEqual, isLine, isPlaceholder$3 as isPlaceholder, isPlaceholder as isPlaceholder$1, isQuadraticBezier, isRectPositioned, multiply$1 as multiply, multiplyScalar, multiplyScalar$2 as multiplyScalar$1, normalise, pipeline, pipelineApply, quadraticSimple, rows, scaler, src_exports, subtract, subtractSize, sum, toCartesian$2 as toCartesian, toCartesian as toCartesian$1, toPath$1 as toPath };
-//# sourceMappingURL=src-C2bEaWi0.js.map
+//# sourceMappingURL=src-CKv6-Ox5.js.map
