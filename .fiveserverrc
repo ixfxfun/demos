@@ -5,6 +5,8 @@
   "watch": [
     "**/*"
   ],
+  "injectBody": false,
+  "injectCss": false,
   "browser": [
     "google chrome canary"
   ],

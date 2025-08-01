@@ -1,5 +1,5 @@
 import { Grids } from '@ixfx/geometry.js';
-import { Maps } from '../../ixfx/collections.js';
+import { Maps } from '@ixfx/collections.js';
 import { CanvasHelper } from '@ixfx/visual.js';
 import * as Arrays from '@ixfx/arrays.js';
 

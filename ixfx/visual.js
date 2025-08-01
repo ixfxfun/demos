@@ -1,19 +1,19 @@
 import { __export } from "./chunk-Cn1u12Og.js";
 import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./src-Bo4oKRxs.js";
-import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-CiSY0kkK.js";
-import { cloneFromFields } from "./records-Ba-VkRoc.js";
-import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-DUpgykUG.js";
-import { continuously } from "./basic-DnPjgQBm.js";
-import { SimpleEventEmitter } from "./src-DPAoZbZ8.js";
-import "./key-value-BeAGVpK0.js";
-import "./dist-BypOHkm6.js";
-import "./resolve-core-CT6vIfBp.js";
-import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-0RBLjKoZ.js";
-import { ElementSizer, resolveEl, resolveElementTry } from "./src-Cst-Mrgn.js";
-import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, center, corners, corners$1, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, rows, scaler as scaler$1, subtract, subtractSize } from "./src-B5bQEXF9.js";
-import "./bezier-Dpa_k_f-.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-GJA4hucx.js";
+import { cloneFromFields } from "./records-qkLbe1PW.js";
+import "./is-primitive-BD8Wwhed.js";
+import "./interval-type-Bu6U9yES.js";
+import { continuously } from "./basic-BcTIVreK.js";
+import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
+import "./key-value-DZNL5nwk.js";
+import "./dist-sNLZPlTa.js";
+import "./resolve-core-ibINXx_1.js";
+import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-LtkApSyv.js";
+import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-B1ZZ0gLL.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-DdQKKHdC.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-C2bEaWi0.js";
+import "./bezier-D98xhuzA.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-BS8-Uw8D.js";
 
 //#region packages/visual/src/drawing.ts
 var drawing_exports = {};
@@ -27,9 +27,9 @@ __export(drawing_exports, {
 	drawingStack: () => drawingStack,
 	ellipse: () => ellipse,
 	getContext: () => getContext,
-	line: () => line,
+	line: () => line$1,
 	lineThroughPoints: () => lineThroughPoints,
-	makeHelper: () => makeHelper,
+	makeHelper: () => makeHelper$1,
 	paths: () => paths,
 	pointLabels: () => pointLabels,
 	rect: () => rect,
@@ -60,7 +60,7 @@ const getContext = (canvasElementContextOrQuery) => {
 * @param canvasBounds Bounds of drawing (optional). Used for limiting `textBlock`
 * @returns
 */
-const makeHelper = (ctxOrCanvasEl, canvasBounds) => {
+const makeHelper$1 = (ctxOrCanvasEl, canvasBounds) => {
 	const ctx = getContext(ctxOrCanvasEl);
 	return {
 		ctx,
@@ -68,7 +68,7 @@ const makeHelper = (ctxOrCanvasEl, canvasBounds) => {
 			paths(ctx, pathsToDraw, opts);
 		},
 		line(lineToDraw, opts) {
-			line(ctx, lineToDraw, opts);
+			line$1(ctx, lineToDraw, opts);
 		},
 		rect(rectsToDraw, opts) {
 			rect(ctx, rectsToDraw, opts);
@@ -269,10 +269,10 @@ const ellipse = (ctx, ellipsesToDraw, opts = {}) => {
 */
 const paths = (ctx, pathsToDraw, opts = {}) => {
 	applyOpts$1(ctx, opts);
-	const draw = (path) => {
-		if (isQuadraticBezier(path)) quadraticBezier(ctx, path, opts);
-		else if (isLine(path)) line(ctx, path, opts);
-		else throw new Error(`Unknown path type ${JSON.stringify(path)}`);
+	const draw = (path$1) => {
+		if (isQuadraticBezier(path$1)) quadraticBezier(ctx, path$1, opts);
+		else if (isLine(path$1)) line$1(ctx, path$1, opts);
+		else throw new Error(`Unknown path type ${JSON.stringify(path$1)}`);
 	};
 	if (Array.isArray(pathsToDraw)) for (const p of pathsToDraw) draw(p);
 	else draw(pathsToDraw);
@@ -453,7 +453,7 @@ const quadraticBezier = (ctx, bezierToDraw, opts = {}) => {
 * @param toDraw
 * @param opts
 */
-const line = (ctx, toDraw, opts = {}) => {
+const line$1 = (ctx, toDraw, opts = {}) => {
 	const isDebug = opts.debug ?? false;
 	const o = lineOp(opts.lineWidth, opts.lineJoin, opts.lineCap);
 	applyOpts$1(ctx, opts, o);
@@ -547,21 +547,21 @@ const rect = (ctx, toDraw, opts = {}) => {
 * @param widthMultiple
 * @returns
 */
-const textWidth = (ctx, text, padding = 0, widthMultiple) => {
-	const rect$1 = textRect(ctx, text, padding, widthMultiple);
+const textWidth = (ctx, text$1, padding = 0, widthMultiple) => {
+	const rect$1 = textRect(ctx, text$1, padding, widthMultiple);
 	return rect$1.width;
 };
-const textRect = (ctx, text, padding = 0, widthMultiple) => {
-	if (text === void 0 || text === null || text.length === 0) return Empty;
-	const m = ctx.measureText(text);
+const textRect = (ctx, text$1, padding = 0, widthMultiple) => {
+	if (text$1 === void 0 || text$1 === null || text$1.length === 0) return Empty;
+	const m = ctx.measureText(text$1);
 	const width = widthMultiple ? quantiseEvery(m.width, widthMultiple) + padding : m.width + padding;
 	return {
 		width,
 		height: m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + padding + padding
 	};
 };
-const textHeight = (ctx, text, padding = 0) => {
-	const rect$1 = textRect(ctx, text, padding);
+const textHeight = (ctx, text$1, padding = 0) => {
+	const rect$1 = textRect(ctx, text$1, padding);
 	return rect$1.height;
 };
 /**
@@ -595,18 +595,18 @@ const textBlock = (ctx, lines, opts) => {
 	if (y < bounds.y) y = bounds.y + anchorPadding;
 	if (align === `top`) ctx.textBaseline = `top`;
 	else ctx.textBaseline = `middle`;
-	for (const [index, line$1] of lines.entries()) {
-		ctx.fillText(line$1, x, y);
+	for (const [index, line$2] of lines.entries()) {
+		ctx.fillText(line$2, x, y);
 		y += heights[index];
 	}
 };
 /**
 * Draws an aligned text block
 */
-const textBlockAligned = (ctx, text, opts) => {
+const textBlockAligned = (ctx, text$1, opts) => {
 	const { bounds } = opts;
 	const { horiz = `left`, vert = `top` } = opts;
-	const lines = typeof text === `string` ? [text] : text;
+	const lines = typeof text$1 === `string` ? [text$1] : text$1;
 	applyOpts$1(ctx, opts);
 	ctx.save();
 	ctx.translate(bounds.x, bounds.y);
@@ -620,11 +620,11 @@ const textBlockAligned = (ctx, text, opts) => {
 	let y = 0;
 	if (vert === `center`) y = middleY - totalHeight / 2;
 	else if (vert === `bottom`) y = bounds.height - totalHeight;
-	for (const [index, line$1] of lines.entries()) {
+	for (const [index, line$2] of lines.entries()) {
 		let x = 0;
 		if (horiz === `center`) x = middleX - blocks[index].width / 2;
 		else if (horiz === `right`) x = bounds.width - blocks[index].width;
-		ctx.fillText(line$1, x, y);
+		ctx.fillText(line$2, x, y);
 		y += heights[index];
 	}
 	ctx.restore();
@@ -1848,7 +1848,7 @@ __export(image_data_grid_exports, {
 	accessor: () => accessor,
 	byColumn: () => byColumn,
 	byRow: () => byRow,
-	grid: () => grid,
+	grid: () => grid$1,
 	setter: () => setter,
 	wrap: () => wrap
 });
@@ -1857,7 +1857,7 @@ __export(image_data_grid_exports, {
 * @param image ImageData
 * @returns Grid
 */
-const grid = (image) => {
+const grid$1 = (image) => {
 	const g = {
 		rows: image.width,
 		cols: image.height
@@ -1887,7 +1887,7 @@ const grid = (image) => {
 */
 const wrap = (image) => {
 	return {
-		...grid(image),
+		...grid$1(image),
 		get: accessor(image),
 		set: setter(image)
 	};
@@ -1898,7 +1898,7 @@ const wrap = (image) => {
 * @returns 
 */
 const accessor = (image) => {
-	const g = grid(image);
+	const g = grid$1(image);
 	const data = image.data;
 	const fn = (cell, bounds = `undefined`) => {
 		const index = indexFromCell(g, cell, bounds);
@@ -1921,7 +1921,7 @@ const accessor = (image) => {
 * @returns 
 */
 const setter = (image) => {
-	const g = grid(image);
+	const g = grid$1(image);
 	const data = image.data;
 	const fn = (value, cell, bounds = `undefined`) => {
 		const index = indexFromCell(g, cell, bounds);
@@ -1941,7 +1941,7 @@ const setter = (image) => {
 */
 function* byRow(image) {
 	const a = accessor(image);
-	const g = grid(image);
+	const g = grid$1(image);
 	const v = rows(g, {
 		x: 0,
 		y: 0
@@ -1957,7 +1957,7 @@ function* byRow(image) {
 */
 function* byColumn(image) {
 	const a = accessor(image);
-	const g = grid(image);
+	const g = grid$1(image);
 	for (let x = 0; x < g.cols; x++) {
 		const col = [];
 		for (let y = 0; y < g.rows; y++) {
@@ -2029,7 +2029,8 @@ var CanvasHelper = class extends SimpleEventEmitter {
 			width: opts.width ?? size.width,
 			zIndex: opts.zIndex ?? -1,
 			coordinateScale: opts.coordinateScale ?? `both`,
-			onResize: opts.onResize,
+			onResizing: opts.onResizing,
+			onResized: opts.onResized,
 			clearOnResize: opts.clearOnResize ?? true,
 			draw: opts.draw,
 			skipCss: opts.skipCss ?? false,
@@ -2081,7 +2082,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 	* If one is already created it is reused.
 	*/
 	getDrawHelper() {
-		if (!this.#drawHelper) this.#drawHelper = makeHelper(this.#getContext(), {
+		if (!this.#drawHelper) this.#drawHelper = makeHelper$1(this.#getContext(), {
 			width: this.width,
 			height: this.height
 		});
@@ -2100,10 +2101,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 		this.#getContext(true);
 		if (this.opts.clearOnResize) this.ctx.clearRect(0, 0, this.width, this.height);
 		this.#logicalSize = logicalSizeInteger;
-		const r = this.opts.onResize;
-		if (r) setTimeout(() => {
-			r(this.ctx, this.size, this);
-		}, 100);
+		if (this.opts.onResizing) this.opts.onResizing(this.ctx, this.size, this);
 		this.fireEvent(`resize`, {
 			ctx: this.ctx,
 			size: this.#logicalSize,
@@ -2129,9 +2127,12 @@ var CanvasHelper = class extends SimpleEventEmitter {
 		});
 		else {
 			const resizerOptions = {
-				onSetSize: (size) => {
+				onSizeChanging: (size) => {
 					if (isEqual(this.#logicalSize, size)) return;
 					this.setLogicalSize(size);
+				},
+				onSizeDone: (size, el) => {
+					this.#onResizeDone(size);
 				},
 				naturalSize: {
 					width: this.opts.width,
@@ -2142,6 +2143,14 @@ var CanvasHelper = class extends SimpleEventEmitter {
 			this.#resizer = new ElementSizer(this.el, resizerOptions);
 		}
 		this.#getContext();
+	}
+	#onResizeDone(size) {
+		if (this.opts.onResized) this.opts.onResized(this.ctx, this.size, this);
+		this.fireEvent(`resized`, {
+			ctx: this.ctx,
+			size: this.#logicalSize,
+			helper: this
+		});
 	}
 	#handleEvents() {
 		const handlePointerEvent = (event) => {
@@ -2358,14 +2367,14 @@ var CanvasHelper = class extends SimpleEventEmitter {
 	getWritableBuffer() {
 		const ctx = this.ctx;
 		const data = this.getImageData();
-		const grid$1 = grid(data);
+		const grid$2 = grid$1(data);
 		const get = accessor(data);
 		const set = setter(data);
 		const flip = () => {
 			ctx.putImageData(data, 0, 0);
 		};
 		return {
-			grid: grid$1,
+			grid: grid$2,
 			get,
 			set,
 			flip
@@ -2387,7 +2396,45 @@ const applyOpts = (elem, opts) => {
 };
 
 //#endregion
+//#region packages/visual/src/svg/bounds.ts
+/**
+* Get the bounds of an SVG element (determined by its width/height attribs)
+* @param svg
+* @returns
+*/
+const getBounds = (svg) => {
+	const w = svg.getAttributeNS(null, `width`);
+	const width = w === null ? 0 : Number.parseFloat(w);
+	const h = svg.getAttributeNS(null, `height`);
+	const height = h === null ? 0 : Number.parseFloat(h);
+	return {
+		width,
+		height
+	};
+};
+/**
+* Set the bounds of an element, using its width/height attribs.
+* @param svg
+* @param bounds
+*/
+const setBounds = (svg, bounds) => {
+	svg.setAttributeNS(null, `width`, bounds.width.toString());
+	svg.setAttributeNS(null, `height`, bounds.height.toString());
+};
+
+//#endregion
 //#region packages/visual/src/svg/create.ts
+/**
+* Creates an element of `type` and with `id` (if specified)
+* @param type Element type, eg `circle`
+* @param id Optional id to assign to element
+* @returns Element
+*/
+const createEl = (type, id) => {
+	const m = document.createElementNS(`http://www.w3.org/2000/svg`, type);
+	if (id) m.id = id;
+	return m;
+};
 /**
 * Creates and appends a SVG element.
 *
@@ -2846,7 +2893,134 @@ const applyStrokeOpts = (elem, opts) => {
 };
 
 //#endregion
+//#region packages/visual/src/svg/markers.ts
+const createMarker = (id, opts, childCreator) => {
+	const m = createEl(`marker`, id);
+	if (opts.markerWidth) m.setAttribute(`markerWidth`, opts.markerWidth?.toString());
+	if (opts.markerHeight) m.setAttribute(`markerHeight`, opts.markerHeight?.toString());
+	if (opts.orient) m.setAttribute(`orient`, opts.orient.toString());
+	else m.setAttribute(`orient`, `auto-start-reverse`);
+	if (opts.viewBox) m.setAttribute(`viewBox`, opts.viewBox.toString());
+	if (opts.refX) m.setAttribute(`refX`, opts.refX.toString());
+	if (opts.refY) m.setAttribute(`refY`, opts.refY.toString());
+	if (childCreator) {
+		const c = childCreator();
+		m.appendChild(c);
+	}
+	return m;
+};
+const markerPrebuilt = (elem, opts, _context) => {
+	if (elem === null) return `(elem null)`;
+	const parent = elem.ownerSVGElement;
+	if (parent === null) throw new Error(`parent for elem is null`);
+	const defsEl = createOrResolve(parent, `defs`, `defs`);
+	let defEl = defsEl.querySelector(`#${opts.id}`);
+	if (defEl !== null) return `url(#${opts.id})`;
+	if (opts.id === `triangle`) {
+		opts = {
+			...opts,
+			strokeStyle: `transparent`
+		};
+		if (!opts.markerHeight) opts = {
+			...opts,
+			markerHeight: 6
+		};
+		if (!opts.markerWidth) opts = {
+			...opts,
+			markerWidth: 6
+		};
+		if (!opts.refX) opts = {
+			...opts,
+			refX: opts.markerWidth
+		};
+		if (!opts.refY) opts = {
+			...opts,
+			refY: opts.markerHeight
+		};
+		if (!opts.fillStyle || opts.fillStyle === `none`) opts = {
+			...opts,
+			fillStyle: `black`
+		};
+		if (!opts.viewBox) opts = {
+			...opts,
+			viewBox: `0 0 10 10`
+		};
+		defEl = createMarker(opts.id, opts, () => {
+			const tri = createEl(`path`);
+			tri.setAttribute(`d`, `M 0 0 L 10 5 L 0 10 z`);
+			if (opts) applyOpts(tri, opts);
+			return tri;
+		});
+	} else throw new Error(`Do not know how to make ${opts.id}`);
+	defEl.id = opts.id;
+	defsEl.appendChild(defEl);
+	return `url(#${opts.id})`;
+};
+
+//#endregion
+//#region packages/visual/src/svg/path.ts
+/**
+* Applies path drawing options to given element
+* Applies: markerEnd, markerStart, markerMid
+* @param elem Element (presumed path)
+* @param opts Options
+*/
+const applyPathOpts = (elem, opts) => {
+	if (opts.markerEnd) elem.setAttribute(`marker-end`, markerPrebuilt(elem, opts.markerEnd, opts));
+	if (opts.markerStart) elem.setAttribute(`marker-start`, markerPrebuilt(elem, opts.markerStart, opts));
+	if (opts.markerMid) elem.setAttribute(`marker-mid`, markerPrebuilt(elem, opts.markerMid, opts));
+};
+
+//#endregion
 //#region packages/visual/src/svg/elements.ts
+var elements_exports = {};
+__export(elements_exports, {
+	circle: () => circle,
+	circleUpdate: () => circleUpdate,
+	grid: () => grid,
+	group: () => group,
+	groupUpdate: () => groupUpdate,
+	line: () => line,
+	lineUpdate: () => lineUpdate,
+	path: () => path,
+	pathUpdate: () => pathUpdate,
+	polarRayUpdate: () => polarRayUpdate,
+	text: () => text,
+	textPath: () => textPath,
+	textPathUpdate: () => textPathUpdate,
+	textUpdate: () => textUpdate
+});
+const numberOrPercentage = (v) => {
+	if (v >= 0 && v <= 1) return `${v * 100}%`;
+	return v.toString();
+};
+/**
+* Creates and adds an SVG path element
+* @example
+* ```js
+* const paths = [
+*  `M300,200`,
+*  `a25,25 -30 0,1 50, -25 l 50,-25`
+* ]
+* const pathEl = path(paths, parentEl);
+* ```
+* @param svgOrArray Path syntax, or array of paths. Can be empty if path data will be added later
+* @param parent SVG parent element
+* @param opts Options Drawing options
+* @returns
+*/
+const path = (svgOrArray, parent, opts, queryOrExisting) => {
+	const elem = createOrResolve(parent, `path`, queryOrExisting);
+	const svg = typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
+	elem.setAttributeNS(null, `d`, svg);
+	parent.append(elem);
+	return pathUpdate(elem, opts);
+};
+const pathUpdate = (elem, opts) => {
+	if (opts) applyOpts(elem, opts);
+	if (opts) applyStrokeOpts(elem, opts);
+	return elem;
+};
 /**
 * Updates an existing `SVGCircleElement` with potentially updated circle data and drawing options
 * @param elem Element
@@ -2876,6 +3050,302 @@ const circle = (circle$2, parent, opts, queryOrExisting) => {
 	const p = createOrResolve(parent, `circle`, queryOrExisting);
 	return circleUpdate(p, circle$2, opts);
 };
+/**
+* Creates or resuses a `SVGGElement` (group)
+*
+* To update an existing elemnet, use `groupUpdate`
+* @param children
+* @param parent
+* @param queryOrExisting
+* @returns
+*/
+const group = (children, parent, queryOrExisting) => {
+	const p = createOrResolve(parent, `g`, queryOrExisting);
+	return groupUpdate(p, children);
+};
+const groupUpdate = (elem, children) => {
+	for (const c of children) if (c.parentNode !== elem) elem.append(c);
+	return elem;
+};
+/**
+* Creates or reuses a SVGLineElement.
+*
+* @param line
+* @param parent
+* @param opts
+* @param queryOrExisting
+* @returns
+*/
+const line = (line$2, parent, opts, queryOrExisting) => {
+	const lineEl = createOrResolve(parent, `line`, queryOrExisting);
+	return lineUpdate(lineEl, line$2, opts);
+};
+/**
+* Updates a SVGLineElement instance with potentially changed line and drawing data
+* @param lineEl
+* @param line
+* @param opts
+* @returns
+*/
+const lineUpdate = (lineEl, line$2, opts) => {
+	lineEl.setAttributeNS(null, `x1`, line$2.a.x.toString());
+	lineEl.setAttributeNS(null, `y1`, line$2.a.y.toString());
+	lineEl.setAttributeNS(null, `x2`, line$2.b.x.toString());
+	lineEl.setAttributeNS(null, `y2`, line$2.b.y.toString());
+	if (opts) applyOpts(lineEl, opts);
+	if (opts) applyPathOpts(lineEl, opts);
+	if (opts) applyStrokeOpts(lineEl, opts);
+	return lineEl;
+};
+const polarRayUpdate = (lineEl, ray, opts) => {
+	const l = toCartesian(ray);
+	lineEl.setAttributeNS(null, `x1`, l.a.x.toString());
+	lineEl.setAttributeNS(null, `y1`, l.a.y.toString());
+	lineEl.setAttributeNS(null, `x2`, l.b.x.toString());
+	lineEl.setAttributeNS(null, `y2`, l.b.y.toString());
+	if (opts) applyOpts(lineEl, opts);
+	if (opts) applyPathOpts(lineEl, opts);
+	if (opts) applyStrokeOpts(lineEl, opts);
+	return lineEl;
+};
+/**
+* Updates an existing SVGTextPathElement instance with text and drawing options
+* @param el
+* @param text
+* @param opts
+* @returns
+*/
+const textPathUpdate = (el, text$1, opts) => {
+	if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
+	if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
+	if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
+	if (opts?.startOffset) el.setAttributeNS(null, `startOffset`, numberOrPercentage(opts.startOffset));
+	if (opts?.textLength) el.setAttributeNS(null, `textLength`, numberOrPercentage(opts.textLength));
+	if (text$1) el.textContent = text$1;
+	if (opts) applyOpts(el, opts);
+	if (opts) applyStrokeOpts(el, opts);
+	return el;
+};
+/**
+* Creates or reuses a SVGTextPathElement.
+* @param pathReference
+* @param text
+* @param parent
+* @param opts
+* @param textQueryOrExisting
+* @param pathQueryOrExisting
+* @returns
+*/
+const textPath = (pathReference, text$1, parent, opts, textQueryOrExisting, pathQueryOrExisting) => {
+	const textEl = createOrResolve(parent, `text`, textQueryOrExisting, `-text`);
+	textUpdate(textEl, void 0, void 0, opts);
+	const p = createOrResolve(textEl, `textPath`, pathQueryOrExisting);
+	p.setAttributeNS(null, `href`, pathReference);
+	return textPathUpdate(p, text$1, opts);
+};
+/**
+* Updates an existing SVGTextElement instance with position, text and drawing options
+* @param el
+* @param pos
+* @param text
+* @param opts
+* @returns
+*/
+const textUpdate = (el, pos, text$1, opts) => {
+	if (pos) {
+		el.setAttributeNS(null, `x`, pos.x.toString());
+		el.setAttributeNS(null, `y`, pos.y.toString());
+	}
+	if (text$1) el.textContent = text$1;
+	if (opts) {
+		applyOpts(el, opts);
+		if (opts) applyStrokeOpts(el, opts);
+		if (opts.anchor) el.setAttributeNS(null, `text-anchor`, opts.anchor);
+		if (opts.align) el.setAttributeNS(null, `alignment-baseline`, opts.align);
+		const userSelect = opts.userSelect ?? true;
+		if (!userSelect) el.style.userSelect = `none`;
+	}
+	return el;
+};
+/**
+* Creates or reuses a SVGTextElement
+* @param pos Position of text
+* @param text Text
+* @param parent
+* @param opts
+* @param queryOrExisting
+* @returns
+*/
+const text = (text$1, parent, pos, opts, queryOrExisting) => {
+	const p = createOrResolve(parent, `text`, queryOrExisting);
+	return textUpdate(p, pos, text$1, opts);
+};
+/**
+* Creates a square grid based at a center point, with cells having `spacing` height and width.
+*
+* It fits in as many cells as it can within `width` and `height`.
+*
+* Returns a SVG group, consisting of horizontal and vertical lines
+* @param parent Parent element
+* @param center Center point of grid
+* @param spacing Width/height of cells
+* @param width How wide grid should be
+* @param height How high grid should be
+* @param opts
+*/
+const grid = (parent, center$1, spacing, width, height, opts = {}) => {
+	if (!opts.strokeStyle) opts = {
+		...opts,
+		strokeStyle: toStringFirst(`bg-dim`, `silver`)
+	};
+	if (!opts.strokeWidth) opts = {
+		...opts,
+		strokeWidth: 1
+	};
+	const g = createEl(`g`);
+	applyOpts(g, opts);
+	applyPathOpts(g, opts);
+	applyStrokeOpts(g, opts);
+	let y = 0;
+	while (y < height) {
+		const horiz = fromNumbers(0, y, width, y);
+		line(horiz, g);
+		y += spacing;
+	}
+	let x = 0;
+	while (x < width) {
+		const vert = fromNumbers(x, 0, x, height);
+		line(vert, g);
+		x += spacing;
+	}
+	parent.append(g);
+	return g;
+};
+
+//#endregion
+//#region packages/visual/src/svg/geometry.ts
+/**
+* Returns a Line type from an SVGLineElement
+* @param el SVG Line Element
+* @returns 
+*/
+const lineFromSvgLine = (el) => {
+	if (!el) throw new Error(`Param 'el' is undefined`);
+	const a = {
+		x: el.x1.baseVal.value,
+		y: el.y1.baseVal.value
+	};
+	const b = {
+		x: el.x2.baseVal.value,
+		y: el.y2.baseVal.value
+	};
+	return {
+		a,
+		b
+	};
+};
+const polarRayFromSvgLine = (el, origin) => {
+	const l = lineFromSvgLine(el);
+	return fromLine(l, origin);
+};
+
+//#endregion
+//#region packages/visual/src/svg/remove.ts
+/**
+* Removes an SVG element from a parent
+* @param parent Parent
+* @param queryOrExisting Query or existing element 
+* @returns 
+*/
+const remove = (parent, queryOrExisting) => {
+	if (typeof queryOrExisting === `string`) {
+		const elem = parent.querySelector(queryOrExisting);
+		if (elem === null) return;
+		elem.remove();
+	} else queryOrExisting.remove();
+};
+/**
+* Removes all children of `parent`, but not `parent` itself.
+* @param parent 
+*/
+const clear = (parent) => {
+	let c = parent.lastElementChild;
+	while (c) {
+		c.remove();
+		c = parent.lastElementChild;
+	}
+};
+
+//#endregion
+//#region packages/visual/src/svg/helper.ts
+/**
+* Creates a {@link SvgHelper} for the creating and management of SVG elements.
+* @param parent
+* @param parentOpts
+* @returns
+*/
+const makeHelper = (parent, parentOpts) => {
+	if (parentOpts) {
+		applyOpts(parent, parentOpts);
+		applyStrokeOpts(parent, parentOpts);
+	}
+	const o = {
+		remove: (queryOrExisting) => {
+			remove(parent, queryOrExisting);
+		},
+		text: (text$1, pos, opts, queryOrExisting) => text(text$1, parent, pos, opts, queryOrExisting),
+		textPath: (pathReference, text$1, opts, textQueryOrExisting, pathQueryOrExisting) => textPath(pathReference, text$1, parent, opts, textQueryOrExisting, pathQueryOrExisting),
+		line: (line$2, opts, queryOrExisting) => line(line$2, parent, opts, queryOrExisting),
+		circle: (circle$2, opts, queryOrExisting) => circle(circle$2, parent, opts, queryOrExisting),
+		path: (svgString, opts, queryOrExisting) => path(svgString, parent, opts, queryOrExisting),
+		grid: (center$1, spacing, width, height, opts) => grid(parent, center$1, spacing, width, height, opts),
+		query: (selectors) => parent.querySelector(selectors),
+		get width() {
+			const w = parent.getAttributeNS(null, `width`);
+			if (w === null) return 0;
+			return Number.parseFloat(w);
+		},
+		set width(width) {
+			parent.setAttributeNS(null, `width`, width.toString());
+		},
+		get parent() {
+			return parent;
+		},
+		get height() {
+			const w = parent.getAttributeNS(null, `height`);
+			if (w === null) return 0;
+			return Number.parseFloat(w);
+		},
+		set height(height) {
+			parent.setAttributeNS(null, `height`, height.toString());
+		},
+		clear: () => {
+			while (parent.firstChild) parent.lastChild.remove();
+		}
+	};
+	return o;
+};
+
+//#endregion
+//#region packages/visual/src/svg/index.ts
+var svg_exports = {};
+__export(svg_exports, {
+	Elements: () => elements_exports,
+	applyOpts: () => applyOpts,
+	applyPathOpts: () => applyPathOpts,
+	applyStrokeOpts: () => applyStrokeOpts,
+	clear: () => clear,
+	createEl: () => createEl,
+	createMarker: () => createMarker,
+	createOrResolve: () => createOrResolve,
+	getBounds: () => getBounds,
+	lineFromSvgLine: () => lineFromSvgLine,
+	makeHelper: () => makeHelper,
+	markerPrebuilt: () => markerPrebuilt,
+	polarRayFromSvgLine: () => polarRayFromSvgLine,
+	remove: () => remove,
+	setBounds: () => setBounds
+});
 
 //#endregion
 //#region packages/visual/src/pointer-visualise.ts
@@ -3815,9 +4285,9 @@ var CanvasRegion = class {
 	* @param baseline 
 	* @param align 
 	*/
-	fillTextRelative(text, relPos, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+	fillTextRelative(text$1, relPos, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
 		const point = this.toAbsRegion(relPos);
-		this.fillTextRelative(text, point, fillStyle, font, baseline, align);
+		this.fillTextRelative(text$1, point, fillStyle, font, baseline, align);
 	}
 	/**
 	* Fills text at a region-relative position
@@ -3827,7 +4297,7 @@ var CanvasRegion = class {
 	* @param baseline 
 	* @param align 
 	*/
-	fillText(text, point, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+	fillText(text$1, point, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
 		const c = this.context;
 		c.save();
 		c.translate(this.#r.x, this.#r.y);
@@ -3835,7 +4305,7 @@ var CanvasRegion = class {
 		c.textBaseline = baseline;
 		c.textAlign = align;
 		c.fillStyle = fillStyle;
-		c.fillText(text, point.x, point.y);
+		c.fillText(text$1, point.x, point.y);
 		c.restore();
 	}
 	drawCircles(relativeCircles, fillStyle, strokeStyle = ``, lineWidth = 1) {
@@ -3993,12 +4463,12 @@ const insert = (insertOptions, options = {}) => {
 	} };
 	const region = source.createRegion(spec);
 	const p = new CartesianCanvasPlot(region, ds, options);
-	if (insertOptions.canvasResizeTo === `viewport`) ElementSizer.canvasViewport(canvasEl, { onSetSize: (size, _el) => {
+	if (insertOptions.canvasResizeTo === `viewport`) ElementSizer.canvasViewport(canvasEl, { onSizeChanging: (size, _el) => {
 		source.setLogicalSize(size);
 		p.invalidateRange();
 		p.draw();
 	} });
-	else ElementSizer.canvasParent(canvasEl, { onSetSize: (size, _el) => {
+	else ElementSizer.canvasParent(canvasEl, { onSizeChanging: (size, _el) => {
 		source.setLogicalSize(size);
 		p.invalidateRange();
 		p.draw();
@@ -4282,7 +4752,7 @@ var CartesianCanvasPlot = class {
 			}
 			this.#drawSeries(k, v, meta);
 		}
-		for (const line$1 of this.overlayLines) this.drawLine(line$1, line$1.colour, line$1.width);
+		for (const line$2 of this.overlayLines) this.drawLine(line$2, line$2.colour, line$2.width);
 	}
 	/**
 	* Draws a line in value-coordinate space
@@ -4290,8 +4760,8 @@ var CartesianCanvasPlot = class {
 	* @param colour 
 	* @param width 
 	*/
-	drawLine(line$1, colour, width) {
-		const l = this.#valueLineToCanvasSpace(line$1.a, line$1.b);
+	drawLine(line$2, colour, width) {
+		const l = this.#valueLineToCanvasSpace(line$2.a, line$2.b);
 		this.#drawLineCanvasSpace(l, colour, width);
 	}
 	setMeta(series, meta) {
@@ -4360,7 +4830,7 @@ var CartesianCanvasPlot = class {
 			x: 0
 		};
 		const reg = this.valueToRegionSpace(v, false);
-		const line$1 = vertical ? {
+		const line$2 = vertical ? {
 			a: {
 				x: reg.x,
 				y: reg.y - whiskerHalfLength
@@ -4379,10 +4849,10 @@ var CartesianCanvasPlot = class {
 				x: reg.x + whiskerHalfLength
 			}
 		};
-		this.#drawLineCanvasSpace(line$1, this.#axisStyle.colour, this.#axisStyle.width, false);
+		this.#drawLineCanvasSpace(line$2, this.#axisStyle.colour, this.#axisStyle.width, false);
 	}
 	#drawGridline(p, vertical) {
-		const line$1 = vertical ? this.#valueLineToCanvasSpace({
+		const line$2 = vertical ? this.#valueLineToCanvasSpace({
 			x: p.x,
 			y: Number.NEGATIVE_INFINITY
 		}, {
@@ -4395,7 +4865,7 @@ var CartesianCanvasPlot = class {
 			y: p.y,
 			x: Number.POSITIVE_INFINITY
 		}, false);
-		this.#drawLineCanvasSpace(line$1, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
+		this.#drawLineCanvasSpace(line$2, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
 	}
 	#useGrid() {
 		const g = this.#grid;
@@ -4444,13 +4914,13 @@ var CartesianCanvasPlot = class {
 			radius
 		}], colour);
 	}
-	#drawLineCanvasSpace(line$1, colour, width, debug = false) {
-		if (debug) console.log(line$1);
+	#drawLineCanvasSpace(line$2, colour, width, debug = false) {
+		if (debug) console.log(line$2);
 		const ctx = this.#canvasRegion.context;
 		colour = toCssColour(colour);
 		ctx.beginPath();
-		ctx.moveTo(line$1.a.x, line$1.a.y);
-		ctx.lineTo(line$1.b.x, line$1.b.y);
+		ctx.moveTo(line$2.a.x, line$2.a.y);
+		ctx.lineTo(line$2.b.x, line$2.b.y);
 		ctx.strokeStyle = toCssColour(colour);
 		ctx.lineWidth = width;
 		ctx.stroke();
@@ -4495,5 +4965,5 @@ try {
 } catch {}
 
 //#endregion
-export { CanvasHelper, colour_exports as Colour, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, plot_exports as Plot, video_exports as Video, pointerVisualise };
+export { CanvasHelper, colour_exports as Colour, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, plot_exports as Plot, svg_exports as Svg, video_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.js.map

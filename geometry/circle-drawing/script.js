@@ -1,9 +1,9 @@
-import { Modulation, Iterables } from '@ixfx/index.js';
+import { Modulation, Iterables } from '@ixfx';
 import * as Numbers from '@ixfx/numbers.js';
 import { CanvasHelper } from '@ixfx/visual.js';
 
 const settings = Object.freeze({
-  canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both`, coordinateScale: `min` }),
+  canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both`, clearOnResize: false, coordinateScale: `min` }),
   outerColour: `indigo`,
   innerColour: `pink`,
   piPi: Math.PI * 2,

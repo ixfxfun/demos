@@ -1,3 +1,4 @@
+import { Interval } from "@ixfx/core";
 import { Points, Rects } from "@ixfx/geometry";
 import { Result } from "@ixfx/guards";
 import { Point } from "@ixfx/geometry/point";
@@ -755,7 +756,9 @@ type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
    * If not specified, the element's parent is used
    */
   containerEl?: HTMLElement | string;
-  onSetSize: (size: Rects.Rect, el: T) => void;
+  onSizeChanging: (size: Rects.Rect, el: T) => void;
+  onSizeDone?: (size: Rects.Rect, el: T) => void;
+  debounceTimeout?: Interval;
 };
 /**
  * Consider using static methods:

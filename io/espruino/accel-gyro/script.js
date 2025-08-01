@@ -46,7 +46,7 @@ function use() {
 
 /**
  * Called when data is received
- * @param {import('ixfx/io.js').IoDataEvent} event 
+ * @param {import('@ixfx/io.js').IoDataEvent} event 
  * @returns 
  */
 function onData(event) {

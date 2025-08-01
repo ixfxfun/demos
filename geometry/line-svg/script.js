@@ -1,6 +1,6 @@
+import { Dom, Modulation } from '@ixfx';
 import { Svg, Colour } from '@ixfx/visual.js';
 import { Points, Rects } from '@ixfx/geometry.js';
-import { Dom, Modulation } from '@ixfx/index.js';
 
 const settings = Object.freeze({
   // Relative middle

@@ -1,7 +1,5 @@
 import { CanvasHelper } from '@ixfx/visual.js';
-import { Colour } from '@ixfx/visual.js';
 import { Lines } from '@ixfx/geometry.js';
-import { Visual } from '@ixfx/index.js';
 import { getCssVariable } from '@ixfx/dom.js';
 
 const piPi = Math.PI * 2;

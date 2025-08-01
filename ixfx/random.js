@@ -856,7 +856,7 @@ const weightedInteger = (options) => weightedIntegerSource(options)();
 //#region packages/random/src/weighted.ts
 /***
 * Returns a random number, 0..1, weighted by a given easing function.
-*
+* See @ixfx/modulation.weighted to use a named easing function.
 * Use {@link weightedSource} to return a function instead.
 *
 * @see {@link weightedSource} Returns a function rather than value
@@ -865,7 +865,7 @@ const weightedInteger = (options) => weightedIntegerSource(options)();
 const weighted = (options) => weightedSource(options)();
 /***
 * Returns a random number, 0..1, weighted by a given easing function.
-* 
+* See @ixfx/modulation.weighted to use a named easing function.
 * Use {@link weighted} to get a value directly.
 *
 * @see {@link weighted} Returns value instead of function
@@ -873,12 +873,9 @@ const weighted = (options) => weightedSource(options)();
 */
 const weightedSource = (options) => {
 	const source = options.source ?? Math.random;
+	if (typeof options.easing !== `undefined`) throw new Error(`Param 'easingName' unavailable. Use @ixfx/modulation.weighted instead.`);
 	if (typeof options.easingFunction === `undefined`) throw new Error(`Param 'easingFunction' is undefined`);
-	const compute = () => {
-		const r = source();
-		return options.easingFunction(r);
-	};
-	return compute;
+	return () => options.easingFunction(source());
 };
 
 //#endregion

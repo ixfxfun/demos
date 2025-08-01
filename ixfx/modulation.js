@@ -1,15 +1,15 @@
 import { __export } from "./chunk-Cn1u12Og.js";
 import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-Bo4oKRxs.js";
-import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-CiSY0kkK.js";
-import "./is-primitive-Bo4OHt3v.js";
-import { intervalToMs } from "./interval-type-DUpgykUG.js";
-import "./basic-DnPjgQBm.js";
-import { SimpleEventEmitter } from "./src-DPAoZbZ8.js";
-import "./key-value-BeAGVpK0.js";
-import { resolveWithFallbackSync } from "./resolve-core-CT6vIfBp.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-0RBLjKoZ.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian, toPath } from "./src-B5bQEXF9.js";
-import { float, floatSource } from "./bezier-Dpa_k_f-.js";
+import "./is-primitive-BD8Wwhed.js";
+import { intervalToMs } from "./interval-type-Bu6U9yES.js";
+import "./basic-BcTIVreK.js";
+import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
+import "./key-value-DZNL5nwk.js";
+import { resolveWithFallbackSync } from "./resolve-core-ibINXx_1.js";
+import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-LtkApSyv.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-B1ZZ0gLL.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-C2bEaWi0.js";
+import { float, floatSource } from "./bezier-D98xhuzA.js";
 
 //#region packages/modulation/src/source/ticks.ts
 /**

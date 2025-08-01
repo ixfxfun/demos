@@ -2,6 +2,6 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "motform.ixfx-highlight",
-    "yandeu.five-server"
+    "ms-vscode.live-server"
   ]
 }

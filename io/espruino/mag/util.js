@@ -69,7 +69,7 @@ export async function connect(script, deviceFilter) {
 /**
  * Data received from Espruino.
  * Need to parse JSON and pass through provided normalise function
- * @param {import('ixfx/io.js').IoDataEvent} event 
+ * @param {import('@ixfx/io.js').IoDataEvent} event 
  * @returns 
  */
 function onData(event) {

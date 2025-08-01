@@ -1,6 +1,6 @@
 import { Arcs } from '@ixfx/geometry.js';
 import { Svg } from '@ixfx/visual.js';
-import { Numbers, Dom, Modulation } from '@ixfx/index.js';
+import { Numbers, Dom, Modulation } from '@ixfx';
 
 // Define settings
 const settings = Object.freeze({

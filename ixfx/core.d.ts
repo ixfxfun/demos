@@ -251,7 +251,7 @@ declare const compareObjectKeys: (a: object, b: object) => {
  * @param a
  * @param b
  */
-declare const changedObjectDataFields: (a: object, b: object) => Record<string, unknown> | object[];
+declare const changedObjectDataFields: (a: object, b: object) => object[] | Record<string, unknown>;
 /**
  * Produces a {@link CompareChangeSet} between two arrays.
  *

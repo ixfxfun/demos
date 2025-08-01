@@ -1,16 +1,16 @@
 import { __export, __toESM } from "./chunk-Cn1u12Og.js";
 import { resultToError } from "./src-Bo4oKRxs.js";
-import { clamp$1 as clamp, round } from "./src-CiSY0kkK.js";
-import "./is-primitive-Bo4OHt3v.js";
-import "./interval-type-DUpgykUG.js";
-import "./basic-DnPjgQBm.js";
-import { afterMatch } from "./src-DPAoZbZ8.js";
-import "./key-value-BeAGVpK0.js";
-import { require_dist, uniqueInstances } from "./dist-BypOHkm6.js";
-import { getErrorMessage } from "./resolve-core-CT6vIfBp.js";
-import "./src-0RBLjKoZ.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-B5bQEXF9.js";
-import { shortGuid } from "./bezier-Dpa_k_f-.js";
+import "./is-primitive-BD8Wwhed.js";
+import { intervalToMs } from "./interval-type-Bu6U9yES.js";
+import "./basic-BcTIVreK.js";
+import { afterMatch } from "./src-IqHxJtRK.js";
+import "./key-value-DZNL5nwk.js";
+import { require_dist, uniqueInstances } from "./dist-sNLZPlTa.js";
+import { getErrorMessage } from "./resolve-core-ibINXx_1.js";
+import { clamp$1 as clamp, round } from "./src-LtkApSyv.js";
+import "./src-B1ZZ0gLL.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-C2bEaWi0.js";
+import { shortGuid } from "./bezier-D98xhuzA.js";
 
 //#region packages/dom/src/resolve-el.ts
 /**
@@ -1183,6 +1183,17 @@ const elRequery = (selectors) => ({
 });
 
 //#endregion
+//#region packages/dom/src/internal/debounce.ts
+const debounce = (callback, interval) => {
+	let timer;
+	const ms = intervalToMs(interval, 100);
+	return () => {
+		if (timer) clearTimeout(timer);
+		timer = setTimeout(callback, ms);
+	};
+};
+
+//#endregion
 //#region packages/dom/src/element-sizing.ts
 /**
 * Consider using static methods:
@@ -1204,19 +1215,24 @@ var ElementSizer = class ElementSizer {
 	#naturalSize;
 	#naturalRatio;
 	#viewport;
-	#onSetSize;
+	#onSizeChanging;
 	#el;
 	#containerEl;
 	#disposed = false;
 	#resizeObservable;
+	#sizeDebounce = () => ({});
 	constructor(elOrQuery, options) {
 		this.#el = resolveEl(elOrQuery);
 		this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement;
 		this.#stretch = options.stretch ?? `none`;
-		this.#onSetSize = options.onSetSize;
+		this.#onSizeChanging = options.onSizeChanging;
 		this.#size = Empty$1;
+		const onSizeDone = options.onSizeDone;
+		if (typeof onSizeDone !== `undefined`) this.#sizeDebounce = debounce(() => {
+			onSizeDone(this.size, this.#el);
+		}, options.debounceTimeout);
 		let naturalSize = options.naturalSize;
-		if (naturalSize === void 0) naturalSize = this.#el.getBoundingClientRect();
+		naturalSize ??= this.#el.getBoundingClientRect();
 		this.#naturalRatio = 1;
 		this.#naturalSize = naturalSize;
 		this.setNaturalSize(naturalSize);
@@ -1236,10 +1252,10 @@ var ElementSizer = class ElementSizer {
 		const el$1 = resolveEl(canvasElementOrQuery);
 		const er = new ElementSizer(el$1, {
 			...options,
-			onSetSize(size, el$2) {
+			onSizeChanging(size, el$2) {
 				el$2.width = size.width;
 				el$2.height = size.height;
-				if (options.onSetSize) options.onSetSize(size, el$2);
+				if (options.onSizeChanging) options.onSizeChanging(size, el$2);
 			}
 		});
 		return er;
@@ -1265,7 +1281,7 @@ var ElementSizer = class ElementSizer {
 		const er = new ElementSizer(svg, {
 			containerEl: document.body,
 			stretch: `both`,
-			onSetSize(size) {
+			onSizeChanging(size) {
 				svg.setAttribute(`width`, size.width.toString());
 				svg.setAttribute(`height`, size.height.toString());
 				if (onSizeSet) onSizeSet(size);
@@ -1352,7 +1368,8 @@ var ElementSizer = class ElementSizer {
 	set size(size) {
 		guard(size, `size`);
 		this.#size = size;
-		this.#onSetSize(size, this.#el);
+		this.#onSizeChanging(size, this.#el);
+		this.#sizeDebounce();
 	}
 	get size() {
 		return this.#size;

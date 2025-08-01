@@ -2,7 +2,6 @@
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
-  
   "editor.formatOnPaste": false,
   "editor.formatOnType": false,
   "editor.formatOnSave": true,
@@ -12,7 +11,7 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/_lib": true,
-    "ml/**/*":true,
+    "ml/**/*": true,
     "**/*.code-search": true
   },
   "editor.codeActionsOnSave": {
@@ -60,6 +59,12 @@
   "typescript.format.insertSpaceAfterTypeAssertion": true,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
   "typescript.format.indentSwitchCase": true,
+  "chat.agent.enabled": false,
+  "chat.commandCenter.enabled": false,
+  "chat.mcp.enabled": false,
+  "chat.extensionTools.enabled": false,
+  "chat.sendElementsToChat.enabled": false,
+  "livePreview.showServerStatusNotifications": false,
   "json.schemas": [
     {
       "fileMatch": [

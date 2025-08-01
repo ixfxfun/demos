@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "moduleDetection":"force",
+    "moduleDetection": "force",
     "target": "ES2023",
     "jsx": "react",
     "allowImportingTsExtensions": false,
@@ -12,38 +12,22 @@
     "strictFunctionTypes": true,
     "baseUrl": "./",
     "paths": {
-      //"@ixfx/geometry":[".build/dist-esbuild/geometry.d.ts"]
-
-      // Works for npm install
-      //"@ixfx/*":[".build/node_modules/@ixfx/*"]
-
-      // Works for separate packages
-      "@ixfx/*":["./ixfx/*"]
-      // Works for bundle via tsup
-      //"ixfx*":["./ixfx/index.js"]
-      // "@ixfxfun/arrays":["./_lib/arrays"],
-      // "@ixfxfun/collections":["./_lib/collections"],
-      // "@ixfxfun/core":["./_lib/core"],
-      // "@ixfxfun/debug":["./_lib/debug"],
-      // "@ixfxfun/dom":["./_lib/dom"],
-      // "@ixfxfun/events":["./_lib/events"],
-      // "@ixfxfun/flow":["./_lib/flow"],
-      // "@ixfxfun/geometry":["./_lib/geometry"],
-      // "@ixfxfun/guards":["./_lib/guards"],
-      // "@ixfxfun/iterables":["./_lib/iterables"],
-      // "@ixfxfun/modulation":["./_lib/modulation"],
-      // "@ixfxfun/numbers":["./_lib/numbers"],
-      // "@ixfxfun/process":["./_lib/process"],
-      // "@ixfxfun/random":["./_lib/random"],
-      // "@ixfxfun/rx":["./_lib/rx"],
-      // "@ixfxfun/ui":["./_lib/ui"],
-      // "@ixfxfun/visual":["./_lib/visual"]
+      "@ixfx": [
+        "./ixfx/index.js"
+      ],
+      "@ixfx/*": [
+        "./ixfx/*"
+      ]
     },
     "lib": [
-      "DOM","ESNext"
+      "DOM",
+      "ESNext"
     ]
   },
-  "include": ["./**/*.d.ts", "./**/*.js", "bundle/modulation/modulation.ts"],
+  "include": [
+    "./**/*.d.ts",
+    "./**/*.js"
+  ],
   "exclude": [
     "node_modules",
     "**/node_modules/*"

@@ -638,7 +638,7 @@ declare const weightedInteger: (options: WeightedOptions) => number;
 //#region packages/random/src/weighted.d.ts
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
- *
+ * See @ixfx/modulation.weighted to use a named easing function.
  * Use {@link weightedSource} to return a function instead.
  *
  * @see {@link weightedSource} Returns a function rather than value
@@ -647,7 +647,7 @@ declare const weightedInteger: (options: WeightedOptions) => number;
 declare const weighted: (options: WeightedOptions) => number;
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
- *
+ * See @ixfx/modulation.weighted to use a named easing function.
  * Use {@link weighted} to get a value directly.
  *
  * @see {@link weighted} Returns value instead of function

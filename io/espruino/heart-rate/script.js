@@ -53,7 +53,7 @@ function use() {
 
 /**
  * Called when data is received from Espruino
- * @param {import('ixfx/io.js').IoDataEvent} event 
+ * @param {import('@ixfx/io.js').IoDataEvent} event 
  * @returns 
  */
 function onData(event) {

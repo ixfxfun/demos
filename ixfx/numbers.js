@@ -1,6 +1,6 @@
 import { __export } from "./chunk-Cn1u12Og.js";
 import { integerTest, numberTest, resultThrow } from "./src-Bo4oKRxs.js";
-import { interpolate, scale, scaler, zip } from "./src-CiSY0kkK.js";
+import { interpolate, scale, scaler, zip } from "./src-LtkApSyv.js";
 
 //#region packages/numbers/src/apply-to-values.ts
 /**

@@ -1,4 +1,4 @@
-import { Modulation, Numbers } from '@ixfx/index.js';
+import { Modulation, Numbers } from '@ixfx';
 import { CanvasHelper } from '@ixfx/visual.js';
 import { Polar } from '@ixfx/geometry.js';
 

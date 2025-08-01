@@ -3,7 +3,7 @@
  */
 import cpy from 'cpy';
 import { deleteSync } from 'del';
-
+import { replaceInFileSync } from 'replace-in-file';
 const destinationRoot = `../demos-npm`;
 const destination = `${destinationRoot}/src`;
 
@@ -17,9 +17,25 @@ for (const c of categories) {
   await cpy([`${c}/**/*`], `${destination}/${c}`);
 }
 
-// Copy loose files
-await cpy([`index.html`, `favicon.ico`, `demos.css`], `${destination}/`);
-await cpy([`.eslintrc.json`], `${destinationRoot}/`);
+// Re-write imports
+replaceInFileSync({
+  files: `${destination}/**/*.js`,
+  from: /^(import.*?["'])((?:@ixfx[^"']+))\.js(["'])/gm,
+  to: `$1$2$3`
+});
 
+replaceInFileSync({
+  files: `${destination}/**/*.js`,
+  //from: /^import.*['"]@ixfx['"]/,
+  from: /from\s+['"]@ixfx['"]/g,
+  to: `from '@ixfx/bundle'`
+});
+
+
+// Copy loose files
+await cpy([`index.html`, `eslint.config.mjs`, `favicon.ico`, `demos.css`], `${destination}/`);
+//await cpy([`.eslintrc.json`], `${destinationRoot}/`);
+
+await cpy([`${destinationRoot}/jsconfig.json`], `${destination}/`, { flat: true });
 
 console.log(`copy-for-npm done`);
