@@ -1,4 +1,4 @@
-//#region packages/debug/src/util.ts
+//#region ../debug/src/util.ts
 const getOrGenerateSync = (map, fn) => (key, args) => {
 	let value = map.get(key);
 	if (value !== void 0) return value;
@@ -8,7 +8,7 @@ const getOrGenerateSync = (map, fn) => (key, args) => {
 };
 
 //#endregion
-//#region packages/debug/src/logger.ts
+//#region ../debug/src/logger.ts
 /**
 * Returns a console logging function which prefixes messages. This is
 * useful for tracing messages from different components. Each prefix
@@ -139,7 +139,7 @@ const logColours = getOrGenerateSync(/* @__PURE__ */ new Map(), () => {
 });
 
 //#endregion
-//#region packages/debug/src/fps-counter.ts
+//#region ../debug/src/fps-counter.ts
 /**
 * Calculates frames per second.
 * 
@@ -176,7 +176,7 @@ const fpsCounter = (autoDisplay = true, computeAfterFrames = 500) => {
 };
 
 //#endregion
-//#region packages/debug/src/error-message.ts
+//#region ../debug/src/error-message.ts
 /**
 * Returns a string representation of an error
 * @param ex 

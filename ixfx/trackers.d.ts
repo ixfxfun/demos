@@ -1,9 +1,11 @@
-import { Interval, KeyValue, KeyValueSortSyles, ToString } from "@ixfx/core";
-import { SimpleEventEmitter } from "@ixfx/events";
-import * as _ixfx_numbers0 from "@ixfx/numbers";
-import { GetOrGenerate } from "@ixfx/core/maps";
+import "./is-equal-aUE7iVHd.js";
+import { Interval, KeyValue, ToString } from "./types-BEAJ_GOH.js";
+import { GetOrGenerate } from "./maps-DpHdi7xH.js";
+import { KeyValueSortSyles } from "./key-value-C5-ymAG2.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { NumbersComputeResult } from "./types-DhvE0DAd.js";
 
-//#region packages/trackers/src/frequency-mutable.d.ts
+//#region ../trackers/src/frequency-mutable.d.ts
 type FrequencyEventMap = {
   readonly change: {
     context: unknown;
@@ -96,7 +98,7 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
    * Calculate min,max,avg,total & count from values
    * @returns Returns `{min,max,avg,total}`
    */
-  computeValues(): _ixfx_numbers0.NumbersComputeResult;
+  computeValues(): NumbersComputeResult;
   /**
    * Return entries sorted
    * @param sortStyle Sorting style (default: _value_, ie. count)
@@ -112,7 +114,7 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
 declare const frequency: <V>(keyString?: ToString<V>) => FrequencyTracker<V>;
 //# sourceMappingURL=frequency-mutable.d.ts.map
 //#endregion
-//#region packages/trackers/src/types.d.ts
+//#region ../trackers/src/types.d.ts
 type Timestamped = {
   readonly at: number;
 };
@@ -152,7 +154,7 @@ type TimestampedPrimitive<V extends number | string> = {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/trackers/src/tracker-base.d.ts
+//#region ../trackers/src/tracker-base.d.ts
 /**
  * Base tracker class
  */
@@ -220,7 +222,7 @@ declare abstract class TrackerBase<V, SeenResultType> {
 }
 //# sourceMappingURL=tracker-base.d.ts.map
 //#endregion
-//#region packages/trackers/src/primitive-tracker.d.ts
+//#region ../trackers/src/primitive-tracker.d.ts
 declare abstract class PrimitiveTracker<V extends number | string, TResult> extends TrackerBase<V, TResult> {
   values: V[];
   timestamps: number[];
@@ -250,7 +252,7 @@ declare abstract class PrimitiveTracker<V extends number | string, TResult> exte
 }
 //# sourceMappingURL=primitive-tracker.d.ts.map
 //#endregion
-//#region packages/trackers/src/number-tracker.d.ts
+//#region ../trackers/src/number-tracker.d.ts
 type NumberTrackerResults = {
   readonly total: number;
   readonly min: number;
@@ -339,7 +341,7 @@ declare class NumberTracker extends PrimitiveTracker<number, NumberTrackerResult
 declare const number: (opts?: TrackedValueOpts) => NumberTracker;
 //# sourceMappingURL=number-tracker.d.ts.map
 //#endregion
-//#region packages/trackers/src/interval-tracker.d.ts
+//#region ../trackers/src/interval-tracker.d.ts
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
  */
@@ -380,7 +382,7 @@ declare class IntervalTracker extends NumberTracker {
 declare const interval: (options?: TrackedValueOpts) => IntervalTracker;
 //# sourceMappingURL=interval-tracker.d.ts.map
 //#endregion
-//#region packages/trackers/src/rate-tracker.d.ts
+//#region ../trackers/src/rate-tracker.d.ts
 type RateTrackerOpts = Readonly<{
   /**
   * If above zero, tracker will reset after this many samples
@@ -476,7 +478,7 @@ declare class RateTracker {
 declare const rate: (opts?: Partial<RateTrackerOpts>) => RateTracker;
 //# sourceMappingURL=rate-tracker.d.ts.map
 //#endregion
-//#region packages/trackers/src/object-tracker.d.ts
+//#region ../trackers/src/object-tracker.d.ts
 /**
  * A tracked value of type `V`.
  */
@@ -519,7 +521,7 @@ declare abstract class ObjectTracker<V extends object, SeenResultType> extends T
 }
 //# sourceMappingURL=object-tracker.d.ts.map
 //#endregion
-//#region packages/trackers/src/tracked-value.d.ts
+//#region ../trackers/src/tracked-value.d.ts
 /**
  * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
  * must extend from `TrackerBase<V>`, eg `PointTracker`.

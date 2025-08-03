@@ -1,12 +1,16 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, nullUndefTest, numberTest, resultThrow, testPlainObjectOrPrimitive } from "./src-Bo4oKRxs.js";
-import { recordEntriesDepthFirst } from "./records-qkLbe1PW.js";
-import { isPrimitive } from "./is-primitive-BD8Wwhed.js";
-import { compareIterableValuesShallow, intervalToMs, isEqualContextString, isEqualDefault, toStringDefault } from "./interval-type-Bu6U9yES.js";
-import { isInteger } from "./is-integer-BwgNgMII.js";
-import { getErrorMessage, resolve, resolveSync } from "./resolve-core-ibINXx_1.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
+import { isPrimitive, nullUndefTest } from "./is-primitive-BDz6cwtd.js";
+import { recordEntriesDepthFirst, testPlainObjectOrPrimitive } from "./records-XG4QHVXn.js";
+import { toStringDefault } from "./to-string-Dg1sJUf1.js";
+import { isEqualContextString, isEqualDefault } from "./is-equal-edylSnsn.js";
+import { isInteger } from "./is-integer-D1QCbjZ-.js";
+import { compareIterableValuesShallow } from "./iterable-compare-values-shallow-DOeUS4hy.js";
+import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { resolve, resolveSync } from "./resolve-core-cAVLLopl.js";
+import { getErrorMessage } from "./error-message-B6EPesrV.js";
 
-//#region packages/core/src/records/map-object-keys.ts
+//#region ../core/src/records/map-object-keys.ts
 /**
 * Maps the keys of an object, returning a transformed object.
 * ```js
@@ -33,7 +37,7 @@ const mapObjectKeys = (object, mapFunction) => {
 };
 
 //#endregion
-//#region packages/core/src/records/compare.ts
+//#region ../core/src/records/compare.ts
 /**
 * Compares the keys of two objects, returning a set of those in
 * common, and those in either A or B exclusively.
@@ -211,7 +215,7 @@ const compareObjectData = (a, b, assumeSameShape = false, eq = isEqualDefault) =
 };
 
 //#endregion
-//#region packages/core/src/records/clone-from-fields.ts
+//#region ../core/src/records/clone-from-fields.ts
 const cloneFromFields = (source) => {
 	const entries = [];
 	for (const field in source) {
@@ -222,7 +226,7 @@ const cloneFromFields = (source) => {
 };
 
 //#endregion
-//#region packages/core/src/records/map-object.ts
+//#region ../core/src/records/map-object.ts
 /**
 * Maps the top-level properties of an object through a map function.
 * That is, run each of the values of an object through a function,
@@ -316,7 +320,7 @@ function mapObjectByObject(data, mapper) {
 }
 
 //#endregion
-//#region packages/core/src/is-primitive.ts
+//#region ../core/src/is-primitive.ts
 /**
 * Returns _true_ if `value` is number, string, bigint or boolean.
 * Returns _false_ if `value` is an object, null, undefined
@@ -346,7 +350,7 @@ function isPrimitiveOrObject(value) {
 }
 
 //#endregion
-//#region packages/core/src/records/traverse.ts
+//#region ../core/src/records/traverse.ts
 /**
 * Helper function to get a 'friendly' string representation of an array of {@link RecordEntry}.
 * @param entries 
@@ -578,13 +582,13 @@ function getNamedRecordEntry(node, defaultName = ``) {
 }
 
 //#endregion
-//#region packages/core/src/records/merge.ts
+//#region ../core/src/records/merge.ts
 function mergeObjects(...a) {
 	return Object.assign({}, ...a);
 }
 
 //#endregion
-//#region packages/core/src/records/keys-to-numbers.ts
+//#region ../core/src/records/keys-to-numbers.ts
 /**
 * Returns a copy of `object` with integer numbers as keys instead of whatever it has.
 * ```js
@@ -630,7 +634,7 @@ const keysToNumbers = (object, onInvalidKey = `throw`) => {
 };
 
 //#endregion
-//#region packages/core/src/records/index.ts
+//#region ../core/src/records/index.ts
 var records_exports = {};
 __export(records_exports, {
 	changedObjectDataFields: () => changedObjectDataFields,
@@ -652,7 +656,7 @@ __export(records_exports, {
 });
 
 //#endregion
-//#region packages/core/src/records/circular.ts
+//#region ../core/src/records/circular.ts
 const removeCircularReferences = (value, replaceWith = null, seen = /* @__PURE__ */ new WeakSet(), path = ``) => {
 	if (value === null) return value;
 	if (typeof value !== `object`) throw new TypeError(`Param 'value' must be an object. Got type: ${typeof value}`);
@@ -671,7 +675,7 @@ const removeCircularReferences = (value, replaceWith = null, seen = /* @__PURE__
 };
 
 //#endregion
-//#region packages/core/src/to-string.ts
+//#region ../core/src/to-string.ts
 const objectToString = Object.prototype.toString;
 const toTypeString = (value) => objectToString.call(value);
 /**
@@ -713,7 +717,7 @@ const defaultToString = (value) => {
 };
 
 //#endregion
-//#region packages/core/src/comparers.ts
+//#region ../core/src/comparers.ts
 /**
 * Sort numbers in ascending order.
 *
@@ -797,7 +801,7 @@ const defaultComparer = (x, y) => {
 };
 
 //#endregion
-//#region packages/core/src/is-equal.ts
+//#region ../core/src/is-equal.ts
 /**
 * If input is a string, it is returned.
 * Otherwise, it returns the result of JSON.stringify() with fields ordered.
@@ -915,7 +919,7 @@ const isEqualContextString$1 = (a, b, _path) => {
 };
 
 //#endregion
-//#region packages/core/src/maps.ts
+//#region ../core/src/maps.ts
 var maps_exports = {};
 __export(maps_exports, {
 	addObjectEntriesMutate: () => addObjectEntriesMutate,
@@ -1592,7 +1596,7 @@ const getOrGenerate = (map, fn) => async (key, args) => {
 };
 
 //#endregion
-//#region packages/core/src/pathed.ts
+//#region ../core/src/pathed.ts
 var pathed_exports = {};
 __export(pathed_exports, {
 	applyChanges: () => applyChanges,
@@ -1984,11 +1988,11 @@ function* getPathsAndDataImpl(o, prefix, onlyLeaves = false, maxDepth) {
 }
 
 //#endregion
-//#region packages/core/src/trackers/index.ts
+//#region ../core/src/trackers/index.ts
 var trackers_exports = {};
 
 //#endregion
-//#region packages/core/src/continuously.ts
+//#region ../core/src/continuously.ts
 /**
 * Returns a {@link Continuously} that continually executes `callback` at `interval` rate.
 * 
@@ -2073,7 +2077,7 @@ var trackers_exports = {};
 * @returns Instance to control looping.
 * @see Flow.timeout if you want to trigger something once.
 */
-const continuously = (callback, interval, options = {}) => {
+const continuously = (callback, interval = 0, options = {}) => {
 	let intervalMs = intervalToMs(interval, 0);
 	resultThrow(integerTest(intervalMs, `positive`, `interval`));
 	const fireBeforeWait = options.fireBeforeWait ?? false;
@@ -2195,7 +2199,7 @@ const continuously = (callback, interval, options = {}) => {
 };
 
 //#endregion
-//#region packages/core/src/correlate.ts
+//#region ../core/src/correlate.ts
 const orderScore = (a, b) => {
 	if (a.score > b.score) return -1;
 	else if (a.score < b.score) return 1;
@@ -2306,7 +2310,7 @@ const alignById = (fn, options = {}) => {
 };
 
 //#endregion
-//#region packages/core/src/default-keyer.ts
+//#region ../core/src/default-keyer.ts
 /**
 * If values are strings, uses that as the key.
 * Otherwise uses `JSON.stringify`.
@@ -2318,7 +2322,7 @@ const defaultKeyer = (a) => {
 };
 
 //#endregion
-//#region packages/core/src/elapsed.ts
+//#region ../core/src/elapsed.ts
 /**
 * Returns elapsed time since the initial call.
 * 
@@ -2425,7 +2429,7 @@ const elapsedInfinity = () => {
 };
 
 //#endregion
-//#region packages/core/src/filters.ts
+//#region ../core/src/filters.ts
 /**
 * Returns `v` if `predicate` returns _true_,
 * alternatively returning `skipValue`.
@@ -2448,7 +2452,7 @@ const filterValue = (v, predicate, skipValue) => {
 };
 
 //#endregion
-//#region packages/core/src/text.ts
+//#region ../core/src/text.ts
 /**
 * Given a long string, abbreviates it with ...
 * ```js
@@ -2485,7 +2489,7 @@ const toStringAbbreviate = (source, maxLength = 20) => {
 };
 
 //#endregion
-//#region packages/core/src/is-equal-test.ts
+//#region ../core/src/is-equal-test.ts
 /**
 * Wraps the `eq` function, tracing the input data result
 * ```js
@@ -2506,7 +2510,7 @@ const isEqualTrace = (eq) => {
 };
 
 //#endregion
-//#region packages/core/src/is-integer.ts
+//#region ../core/src/is-integer.ts
 /**
 * Returns _true_ if `value` is an integer. Parses string input, but
 * all other data types return _false_.
@@ -2542,7 +2546,7 @@ const isInteger$1 = (value) => {
 };
 
 //#endregion
-//#region packages/core/src/iterable-compare-values-shallow.ts
+//#region ../core/src/iterable-compare-values-shallow.ts
 /**
 * Compares the values of two iterables, returning a list
 * of items they have in common and those unique in `a` or `b`.
@@ -2592,7 +2596,7 @@ const compareIterableValuesShallow$1 = (a, b, eq = isEqualDefault$1) => {
 };
 
 //#endregion
-//#region packages/core/src/key-value.ts
+//#region ../core/src/key-value.ts
 const sorterByValueIndex = (index, reverse = false) => {
 	return (values) => {
 		const s = values.toSorted((a, b) => {
@@ -2613,7 +2617,7 @@ const keyValueSorter = (sortStyle) => {
 };
 
 //#endregion
-//#region packages/core/src/util/round.ts
+//#region ../core/src/util/round.ts
 /**
 * Rounds a number.
 *
@@ -2647,7 +2651,7 @@ function round(a, b, roundUp) {
 }
 
 //#endregion
-//#region packages/core/src/interval-type.ts
+//#region ../core/src/interval-type.ts
 /**
 * Return the millisecond value of an Interval.
 * 
@@ -2740,7 +2744,7 @@ const elapsedToHumanString = (millisOrFunction, rounding = 2) => {
 };
 
 //#endregion
-//#region packages/core/src/track-unique.ts
+//#region ../core/src/track-unique.ts
 /**
 * Tracks unique values. Returns _true_ if value is unique.
 * Alternatively: {@link uniqueInstances}
@@ -2794,7 +2798,7 @@ const uniqueInstances = () => {
 };
 
 //#endregion
-//#region packages/core/src/platform.ts
+//#region ../core/src/platform.ts
 /**
 * Returns _true_ if it seems like the code is running on iOS (iPad/iPhone)
 * @returns 
@@ -2809,7 +2813,7 @@ const runningiOS = () => [
 ].includes(navigator.platform) || navigator.userAgent.includes(`Mac`) && `ontouchend` in document;
 
 //#endregion
-//#region packages/core/src/promise-from-event.ts
+//#region ../core/src/promise-from-event.ts
 const promiseFromEvent = (target, name) => {
 	return new Promise((resolve$2) => {
 		const handler = (...args) => {
@@ -2822,7 +2826,7 @@ const promiseFromEvent = (target, name) => {
 };
 
 //#endregion
-//#region packages/core/src/reactive-core.ts
+//#region ../core/src/reactive-core.ts
 /**
 * Returns _true_ if `rx` is a Reactive
 * @param rx 
@@ -2850,7 +2854,7 @@ const hasLast = (rx) => {
 };
 
 //#endregion
-//#region packages/core/src/resolve-core.ts
+//#region ../core/src/resolve-core.ts
 /**
 * Resolves `r` to a value, where `r` is:
 * * primitive value
@@ -2978,7 +2982,7 @@ function resolveWithFallbackSync(p, fallback, ...args) {
 }
 
 //#endregion
-//#region packages/core/src/util/zip.ts
+//#region ../core/src/util/zip.ts
 const zip = (...arrays) => {
 	if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
 	const lengths = arrays.map((a) => a.length);
@@ -2989,7 +2993,7 @@ const zip = (...arrays) => {
 };
 
 //#endregion
-//#region packages/core/src/resolve-fields.ts
+//#region ../core/src/resolve-fields.ts
 /**
 * Returns a copy of `object`, with the same properties. For each property
 * that has a basic value (string, number, boolean, object), the value is set
@@ -3063,7 +3067,7 @@ function resolveFieldsSync(object) {
 */
 
 //#endregion
-//#region packages/core/src/sleep.ts
+//#region ../core/src/sleep.ts
 if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
 	if (typeof window === `undefined`) globalThis.requestAnimationFrame = (callback) => {
 		setTimeout(callback, 1);

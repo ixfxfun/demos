@@ -1,173 +1,9 @@
-import { Result } from "@ixfx/guards";
+import { IsEqual, IsEqualContext } from "./is-equal-aUE7iVHd.js";
+import { BasicType, Interval, ToString } from "./types-BEAJ_GOH.js";
+import { Result } from "./types-CePLSdIj.js";
+import { ReactiveNonInitial, ResolveToValue } from "./resolve-core-p1htK_C7.js";
 
-//#region packages/core/dist/src/is-equal.d.ts
-/**
- * Function that returns true if `a` and `b` are considered equal
- */
-type IsEqual$1<T> = (a: T, b: T) => boolean;
-/**
- * If input is a string, it is returned.
- * Otherwise, it returns the result of JSON.stringify() with fields ordered.
- *
- * This allows for more consistent comparisons when object field orders are different but values the same.
- * @param itemToMakeStringFor
- * @returns
- */
-
-/**
- * Return _true_ if `a` and `b` ought to be considered equal
- * at a given path
- */
-type IsEqualContext$1<V> = (a: V, b: V | undefined, path: string) => boolean;
-/**
- * Returns _true_ if `a` and `b` are equal based on their JSON representations.
- * `path` is ignored.
- * @param a
- * @param b
- * @param path
- * @returns
- */
-//#endregion
-//#region packages/core/dist/src/types.d.ts
-type ToString$1<V> = (itemToMakeStringFor: V) => string;
-type StringOrNumber$1 = string | number | bigint;
-type BasicType$1 = StringOrNumber$1 | object | boolean;
-/**
- * Interval types allows for more expressive coding, rather than embedding millisecond values.
- *
- * That is, we can use `{ mins: 5 }` to mean 5 minutes rather than `5*60*1000`
- * or worse, 300000, for the same value.
- *
- * @example
- * ```js
- * { hours: 1 };  // 1 hour
- * { mins: 5 };   // 5 mins
- * { secs: 5 };   // 5 secs
- * { millis: 5 }; // 5 milliseconds
- * ```
- *
- * If several fields are used, this sums their value
- * ```js
- * { secs: 2, millis: 1 }; // equal 2001 milliseconds.
- * ```
- *
- * Wherever ixfx takes an `Interval`, you can also just provide a number instead.
- * This will be taken as a millisecond value.
- *
- * @see {@link intervalToMs} to convert to milliseconds.
- * @see {@link isInterval} check whether input is an Interval type
- * @see {@link elapsedToHumanString} render interval in human-friendly form
- */
-type Interval$1 = number | {
-  readonly millis?: number;
-  readonly secs?: number;
-  readonly hours?: number;
-  readonly mins?: number;
-};
-//#endregion
-//#region packages/core/dist/src/types-reactive.d.ts
-/**
- * A reactive that does not have an initial value
- */
-type ReactiveNonInitial$1<V> = Reactive$1<V> & {
-  last(): V | undefined;
-};
-/**
- * A reactive with an initial value
- */
-
-/**
- * Unsubscribes from a reactive
- */
-type Unsubscriber$1 = () => void;
-/**
- * Signals
- */
-type SignalKinds$1 = `done` | `warn`;
-/**
- * A message
- */
-type Passed$1<V> = {
-  value: V | undefined;
-  signal?: SignalKinds$1;
-  context?: string;
-};
-/**
- * A Reactive
- */
-type Reactive$1<V> = {
-  /**
-   * Subscribes to a reactive. Receives
-   * data as well as signals. Use `onValue` if you
-   * just care about values.
-   *
-   * Return result unsubscribes.
-   *
-   * ```js
-   * const unsub = someReactive.on(msg => {
-   *    // Do something with msg.value
-   * });
-   *
-   * unsub(); // Unsubscribe
-   * ```
-   * @param handler
-   */
-  on(handler: (value: Passed$1<V>) => void): Unsubscriber$1;
-  /**
-   * Subscribes to a reactive's values.
-   * Returns a function that unsubscribes.
-   * @param handler
-   */
-  onValue(handler: (value: V) => void): Unsubscriber$1;
-  /**
-   * Disposes the reactive, providing a reason for debug tracing
-   * @param reason
-   */
-  dispose(reason: string): void;
-  /**
-   * Returns _true_ if Reactive is disposed
-   */
-  isDisposed(): boolean;
-  /**
-   * Optional 'set' to write a value.
-   * @param value
-   */
-  set?(value: V): void;
-};
-//# sourceMappingURL=types-reactive.d.ts.map
-//#endregion
-//#region packages/core/dist/src/resolve-core.d.ts
-/**
- * Something that can resolve to a value
- */
-type ResolveToValueSync$1<V> = BasicType$1 | ReactiveNonInitial$1<V> | Generator<V> | IterableIterator<V> | ((args: any) => V);
-type ResolveToValueAsync$1<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V> | ((args: any) => Promise<V>);
-type ResolveToValue$1<V> = ResolveToValueAsync$1<V> | ResolveToValueSync$1<V>;
-/**
- * Resolves `r` to a value, where `r` is:
- * * primitive value
- * * a/sync function
- * * a/sync generator/iterator
- * * ReactiveNonInitial
- * ```js
- * await resolve(10);       // 10
- * await resolve(() => 10); // 10
- * await resole(async () => {
- *  sleep(100);
- *  return 10;
- * });                // 10
- * ```
- *
- * To resolve an object's properties, use {@link resolveFields}.
- *
- * Resolve is not recursive. So if `r` is an object, it will be returned, even
- * though its properties may be resolvable.
- * @param r
- * @param args
- * @returns
- */
-//#endregion
-//#region packages/core/src/types-compare.d.ts
+//#region ../core/src/types-compare.d.ts
 /**
  * Kind of change
  */
@@ -211,7 +47,7 @@ type CompareChangeSet<TKey extends string | number> = {
 };
 //# sourceMappingURL=types-compare.d.ts.map
 //#endregion
-//#region packages/core/src/records/compare.d.ts
+//#region ../core/src/records/compare.d.ts
 /**
  * Compares the keys of two objects, returning a set of those in
  * common, and those in either A or B exclusively.
@@ -260,7 +96,7 @@ declare const changedObjectDataFields: (a: object, b: object) => object[] | Reco
  * @param eq Equality comparison for values
  * @returns Change set.
  */
-declare const compareArrays: <TValue>(a: TValue[], b: TValue[], eq?: IsEqual$1<TValue>) => CompareChangeSet<number>;
+declare const compareArrays: <TValue>(a: TValue[], b: TValue[], eq?: IsEqual<TValue>) => CompareChangeSet<number>;
 /**
  * Compares A to B. Assumes they are simple objects, essentially key-value pairs, where the
  * values are primitive values or other simple objects. It also works with arrays.
@@ -269,15 +105,15 @@ declare const compareArrays: <TValue>(a: TValue[], b: TValue[], eq?: IsEqual$1<T
  * @param a
  * @param b
  */
-declare const compareObjectData: <T>(a: object | null, b: object | null, assumeSameShape?: boolean, eq?: IsEqual$1<T>) => CompareChangeSet<string>;
+declare const compareObjectData: <T>(a: object | null, b: object | null, assumeSameShape?: boolean, eq?: IsEqual<T>) => CompareChangeSet<string>;
 //# sourceMappingURL=compare.d.ts.map
 //#endregion
-//#region packages/core/src/records/clone-from-fields.d.ts
+//#region ../core/src/records/clone-from-fields.d.ts
 declare const cloneFromFields: <T extends object>(source: T) => T;
 //# sourceMappingURL=clone-from-fields.d.ts.map
 
 //#endregion
-//#region packages/core/src/ts-utility.d.ts
+//#region ../core/src/ts-utility.d.ts
 /**
  * Remaps `TShape` so each field has type `TFieldValue`.
  * Recursive.
@@ -306,7 +142,7 @@ type Rest<T extends any[]> = T extends [infer A, ...infer R] ? R : never;
 //# sourceMappingURL=ts-utility.d.ts.map
 
 //#endregion
-//#region packages/core/src/records/map-object.d.ts
+//#region ../core/src/records/map-object.d.ts
 /**
  * Maps the top-level properties of an object through a map function.
  * That is, run each of the values of an object through a function,
@@ -392,7 +228,7 @@ declare function mapObjectByObject(data: object, mapper: Record<string, (value: 
 };
 //# sourceMappingURL=map-object.d.ts.map
 //#endregion
-//#region packages/core/src/records/map-object-keys.d.ts
+//#region ../core/src/records/map-object-keys.d.ts
 /**
  * Maps the keys of an object, returning a transformed object.
  * ```js
@@ -412,7 +248,7 @@ declare function mapObjectByObject(data: object, mapper: Record<string, (value: 
 declare const mapObjectKeys: <TKeySource extends string | number | symbol, TKeyDestination extends string | number | symbol>(object: Record<TKeySource, unknown>, mapFunction: (key: TKeySource) => TKeyDestination) => Record<TKeyDestination, unknown>;
 //# sourceMappingURL=map-object-keys.d.ts.map
 //#endregion
-//#region packages/core/src/records/traverse.d.ts
+//#region ../core/src/records/traverse.d.ts
 type RecordEntry = Readonly<{
   name: string;
   sourceValue: any;
@@ -569,7 +405,7 @@ declare function getRecordEntryByPath<T extends object>(path: string, node: T, o
 declare function traceRecordEntryByPath<T extends object>(path: string, node: T, options?: PathOpts): Iterable<RecordEntryWithAncestors>;
 //# sourceMappingURL=traverse.d.ts.map
 //#endregion
-//#region packages/core/src/records/merge.d.ts
+//#region ../core/src/records/merge.d.ts
 type OptionalPropertyNames<T> = { [K in keyof T]-?: ({} extends Record<K, T[K]> ? K : never) }[keyof T];
 type SpreadProperties<L, R, K extends keyof L & keyof R> = { [P in K]: L[P] | Exclude<R[P], undefined> };
 type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
@@ -577,7 +413,7 @@ type SpreadTwo<L, R> = Id<Pick<L, Exclude<keyof L, keyof R>> & Pick<R, Exclude<k
 type Spread<A extends readonly [...any]> = A extends [infer L, ...infer R] ? SpreadTwo<L, Spread<R>> : unknown;
 declare function mergeObjects<A extends object[]>(...a: [...A]): Spread<A>;
 //#endregion
-//#region packages/core/src/records/keys-to-numbers.d.ts
+//#region ../core/src/records/keys-to-numbers.d.ts
 /**
  * Returns a copy of `object` with integer numbers as keys instead of whatever it has.
  * ```js
@@ -610,11 +446,11 @@ declare namespace index_d_exports {
   export { ChangeKind, ChangeRecord, CompareChangeSet, MapObjectArgs, PathOpts, RecordChildrenOptions, RecordEntry, RecordEntryStatic, RecordEntryWithAncestors, Spread, changedObjectDataFields, cloneFromFields, compareArrays, compareObjectData, compareObjectKeys, getRecordEntryByPath, keysToNumbers, mapObjectByObject, mapObjectKeys, mapObjectShallow, mergeObjects, prettyPrintEntries, recordChildren, recordEntriesDepthFirst, recordEntryPrettyPrint, traceRecordEntryByPath };
 }
 //#endregion
-//#region packages/core/src/is-equal.d.ts
+//#region ../core/src/is-equal.d.ts
 /**
  * Function that returns true if `a` and `b` are considered equal
  */
-type IsEqual<T> = (a: T, b: T) => boolean;
+type IsEqual$1<T> = (a: T, b: T) => boolean;
 /**
  * If input is a string, it is returned.
  * Otherwise, it returns the result of JSON.stringify() with fields ordered.
@@ -674,7 +510,7 @@ declare const isEqualValueDefault: <T>(a: T, b: T) => boolean;
  * @param fieldComparer
  * @returns
  */
-declare const isEqualValuePartial: (a: Record<string, unknown>, b: Record<string, unknown>, fieldComparer?: IsEqual<unknown>) => boolean;
+declare const isEqualValuePartial: (a: Record<string, unknown>, b: Record<string, unknown>, fieldComparer?: IsEqual$1<unknown>) => boolean;
 /**
  * Comparer returns true if string representation of `a` and `b` are equal, regardless of field ordering.
  * Uses `toStringOrdered` to generate a string representation (via JSON.stringify`).
@@ -699,7 +535,7 @@ declare const isEmptyEntries: (value: object) => boolean;
  * Return _true_ if `a` and `b` ought to be considered equal
  * at a given path
  */
-type IsEqualContext<V> = (a: V, b: V | undefined, path: string) => boolean;
+type IsEqualContext$1<V> = (a: V, b: V | undefined, path: string) => boolean;
 /**
  * Returns _true_ if `a` and `b` are equal based on their JSON representations.
  * `path` is ignored.
@@ -708,15 +544,15 @@ type IsEqualContext<V> = (a: V, b: V | undefined, path: string) => boolean;
  * @param path
  * @returns
  */
-declare const isEqualContextString: IsEqualContext<unknown>;
+declare const isEqualContextString: IsEqualContext$1<unknown>;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/core/src/types.d.ts
-type ToString<V> = (itemToMakeStringFor: V) => string;
+//#region ../core/src/types.d.ts
+type ToString$1<V> = (itemToMakeStringFor: V) => string;
 type StringOrNumber = string | number | bigint;
 type Primitive = string | number | bigint | boolean;
 type PrimitiveOrObject = Primitive | object;
-type BasicType = StringOrNumber | object | boolean;
+type BasicType$1 = StringOrNumber | object | boolean;
 type KeyValue = readonly [key: string, value: StringOrNumber];
 /**
  * Interval types allows for more expressive coding, rather than embedding millisecond values.
@@ -744,7 +580,7 @@ type KeyValue = readonly [key: string, value: StringOrNumber];
  * @see {@link isInterval} check whether input is an Interval type
  * @see {@link elapsedToHumanString} render interval in human-friendly form
  */
-type Interval = number | {
+type Interval$1 = number | {
   readonly millis?: number;
   readonly secs?: number;
   readonly hours?: number;
@@ -840,7 +676,7 @@ declare const findBySomeKey: <T>(data: ReadonlyMap<string, T>, keys: Iterable<st
  * @param comparer Function to determine match. By default uses === comparison.
  * @returns True if key is found
  */
-declare const hasKeyValue: <K, V>(map: ReadonlyMap<K, V>, key: K, value: V, comparer?: IsEqual<V>) => boolean;
+declare const hasKeyValue: <K, V>(map: ReadonlyMap<K, V>, key: K, value: V, comparer?: IsEqual$1<V>) => boolean;
 /**
  * Deletes all key/values from map where value matches `value`,
  * with optional comparer. Mutates map.
@@ -856,7 +692,7 @@ declare const hasKeyValue: <K, V>(map: ReadonlyMap<K, V>, key: K, value: V, comp
  * @param value
  * @param comparer Uses === equality by default. Use isEqualValueDefault to compare by value
  */
-declare const deleteByValueCompareMutate: <K, V>(map: Map<K, V>, value: V, comparer?: IsEqual<V>) => void;
+declare const deleteByValueCompareMutate: <K, V>(map: Map<K, V>, value: V, comparer?: IsEqual$1<V>) => void;
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
  *
@@ -896,7 +732,7 @@ declare const findEntryByPredicate: <K, V>(map: IWithEntries<K, V>, predicate: (
  * @param isEqual Filter function which checks equality. Uses JS comparer by default.
  * @returns Entry, or _undefined_ if `value` not found.
  */
-declare const findEntryByValue: <K, V>(map: IWithEntries<K, V>, value: V, isEqual?: IsEqual<V>) => readonly [key: K, value: V] | undefined;
+declare const findEntryByValue: <K, V>(map: IWithEntries<K, V>, value: V, isEqual?: IsEqual$1<V>) => readonly [key: K, value: V] | undefined;
 /**
  * Adds items to a map only if their key doesn't already exist
  *
@@ -933,7 +769,7 @@ declare const findEntryByValue: <K, V>(map: IWithEntries<K, V>, value: V, isEqua
  * @param collisionPolicy What to do if the key already exists
  * @returns Map instance
  */
-declare const addValueMutate: <V>(map: Map<string, V> | undefined, hasher: ToString<V>, collisionPolicy: `overwrite` | `skip` | `throw`, ...values: readonly V[]) => Map<string, V>;
+declare const addValueMutate: <V>(map: Map<string, V> | undefined, hasher: ToString$1<V>, collisionPolicy: `overwrite` | `skip` | `throw`, ...values: readonly V[]) => Map<string, V>;
 /**
  * Adds values to a map, returning a new, modified copy and leaving the original
  * intact.
@@ -945,7 +781,7 @@ declare const addValueMutate: <V>(map: Map<string, V> | undefined, hasher: ToStr
  * @param values Values to add
  * @returns A new map containing values
  */
-declare const addValue: <V>(map: Map<string, V> | ReadonlyMap<string, V> | undefined, hasher: ToString<V>, collisionPolicy: `overwrite` | `skip` | `throw`, ...values: readonly V[]) => Map<string, V>;
+declare const addValue: <V>(map: Map<string, V> | ReadonlyMap<string, V> | undefined, hasher: ToString$1<V>, collisionPolicy: `overwrite` | `skip` | `throw`, ...values: readonly V[]) => Map<string, V>;
 /**
  * Returns a function that adds values to a map, using a hashing function to produce a key.
  * Use {@link addValueMutate} if you don't need a reusable function.
@@ -973,7 +809,7 @@ declare const addValue: <V>(map: Map<string, V> | ReadonlyMap<string, V> | undef
  * @param collisionPolicy What to do if a value is already stored under a key
  * @returns Function
  */
-declare const addValueMutator: <V>(map: Map<string, V>, hasher: ToString<V>, collisionPolicy?: `overwrite` | `skip` | `throw`) => (...values: readonly V[]) => Map<string, V>;
+declare const addValueMutator: <V>(map: Map<string, V>, hasher: ToString$1<V>, collisionPolicy?: `overwrite` | `skip` | `throw`) => (...values: readonly V[]) => Map<string, V>;
 /**
  * Returns a array of entries from a map, sorted by value.
  *
@@ -1026,7 +862,7 @@ declare const sortByValueProperty: <K, V, Z>(map: ReadonlyMap<K, V>, property: s
  * @param comparer Function that determines matching. Should return true if `a` and `b` are considered equal.
  * @returns True if value is found
  */
-declare const hasAnyValue: <K, V>(map: ReadonlyMap<K, V>, value: V, comparer: IsEqual<V>) => boolean;
+declare const hasAnyValue: <K, V>(map: ReadonlyMap<K, V>, value: V, comparer: IsEqual$1<V>) => boolean;
 /**
  * Returns values where `predicate` returns true.
  *
@@ -1373,7 +1209,7 @@ type CompareDataOptions<V> = {
    * Comparison function for values. By default uses
    * JSON.stringify() to compare by value.
    */
-  eq: IsEqualContext$1<V>;
+  eq: IsEqualContext<V>;
   /**
    * If true, inherited fields are also compared.
    * This is necessary for events, for example.
@@ -1533,7 +1369,7 @@ declare function getPaths(object: object | null, onlyLeaves?: boolean): Generato
 declare function getPathsAndData(o: object, onlyLeaves?: boolean, maxDepth?: number, prefix?: string): Generator<PathData<any>>;
 //# sourceMappingURL=pathed.d.ts.map
 //#endregion
-//#region packages/core/src/comparers.d.ts
+//#region ../core/src/comparers.d.ts
 type CompareResult = number;
 type Comparer<V> = (a: V, b: V) => CompareResult;
 /**
@@ -1598,7 +1434,7 @@ declare const comparerInverse: <V>(comparer: Comparer<V>) => Comparer<V>;
 declare const defaultComparer: (x: any, y: any) => CompareResult;
 //# sourceMappingURL=comparers.d.ts.map
 //#endregion
-//#region packages/core/src/continuously.d.ts
+//#region ../core/src/continuously.d.ts
 type HasCompletionRunStates = `idle` | `scheduled` | `running`;
 type HasCompletion = {
   /**
@@ -1655,11 +1491,11 @@ type Continuously = HasCompletion & {
    * Sets the interval speed of loop. Change will take effect on next loop. For it to kick
    * in earlier, call .reset() after changing the value.
    */
-  set interval(interval: Interval$1);
+  set interval(interval: Interval);
   /**
    * Gets the current interval, ie. speed of loop.
    */
-  get interval(): Interval$1;
+  get interval(): Interval;
 };
 type ContinuouslySyncCallback = (
 /**
@@ -1802,10 +1638,10 @@ type ContinuouslyOpts = Readonly<{
  * @returns Instance to control looping.
  * @see Flow.timeout if you want to trigger something once.
  */
-declare const continuously: (callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback, interval?: Interval$1, options?: Partial<ContinuouslyOpts>) => Continuously;
+declare const continuously: (callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback, interval?: Interval, options?: Partial<ContinuouslyOpts>) => Continuously;
 //# sourceMappingURL=continuously.d.ts.map
 //#endregion
-//#region packages/core/src/correlate.d.ts
+//#region ../core/src/correlate.d.ts
 /**
  * Returns the similarity of `a` and `b` to each other,
  * where higher similarity should be a higher number.
@@ -1890,7 +1726,7 @@ declare const align: <V>(similarityFunction: Similarity<V>, lastData: readonly D
 declare const alignById: <V>(fn: Similarity<V>, options?: AlignOpts) => (newData: DataWithId<V>[]) => DataWithId<V>[];
 //# sourceMappingURL=correlate.d.ts.map
 //#endregion
-//#region packages/core/src/default-keyer.d.ts
+//#region ../core/src/default-keyer.d.ts
 /**
  * If values are strings, uses that as the key.
  * Otherwise uses `JSON.stringify`.
@@ -1900,7 +1736,7 @@ declare const alignById: <V>(fn: Similarity<V>, options?: AlignOpts) => (newData
 declare const defaultKeyer: <V>(a: V) => string;
 //# sourceMappingURL=default-keyer.d.ts.map
 //#endregion
-//#region packages/core/src/elapsed.d.ts
+//#region ../core/src/elapsed.d.ts
 type Since = () => number;
 /**
  * Returns elapsed time since the initial call.
@@ -1984,7 +1820,7 @@ declare const elapsedOnce: () => Since;
 declare const elapsedInfinity: () => Since;
 //# sourceMappingURL=elapsed.d.ts.map
 //#endregion
-//#region packages/core/src/filters.d.ts
+//#region ../core/src/filters.d.ts
 /**
  * Returns `v` if `predicate` returns _true_,
  * alternatively returning `skipValue`.
@@ -2004,7 +1840,7 @@ declare const elapsedInfinity: () => Since;
 declare const filterValue: <V>(v: V, predicate: (v: V) => boolean, skipValue: V | undefined) => V | undefined;
 //# sourceMappingURL=filters.d.ts.map
 //#endregion
-//#region packages/core/src/is-equal-test.d.ts
+//#region ../core/src/is-equal-test.d.ts
 /**
  * Wraps the `eq` function, tracing the input data result
  * ```js
@@ -2016,11 +1852,11 @@ declare const filterValue: <V>(v: V, predicate: (v: V) => boolean, skipValue: V 
  * @param eq
  * @returns
  */
-declare const isEqualTrace: <T>(eq: IsEqual<T>) => IsEqual<T>;
+declare const isEqualTrace: <T>(eq: IsEqual$1<T>) => IsEqual$1<T>;
 //# sourceMappingURL=is-equal-test.d.ts.map
 
 //#endregion
-//#region packages/core/src/is-integer.d.ts
+//#region ../core/src/is-integer.d.ts
 /**
  * Returns _true_ if `value` is an integer. Parses string input, but
  * all other data types return _false_.
@@ -2041,7 +1877,7 @@ declare const isEqualTrace: <T>(eq: IsEqual<T>) => IsEqual<T>;
 declare const isInteger: (value: string | number) => boolean;
 //# sourceMappingURL=is-integer.d.ts.map
 //#endregion
-//#region packages/core/src/is-primitive.d.ts
+//#region ../core/src/is-primitive.d.ts
 /**
  * Returns _true_ if `value` is number, string, bigint or boolean.
  * Returns _false_ if `value` is an object, null, undefined
@@ -2062,7 +1898,7 @@ declare function isPrimitiveOrObject(value: any): value is PrimitiveOrObject;
 //# sourceMappingURL=is-primitive.d.ts.map
 
 //#endregion
-//#region packages/core/src/iterable-compare-values-shallow.d.ts
+//#region ../core/src/iterable-compare-values-shallow.d.ts
 /**
  * Compares the values of two iterables, returning a list
  * of items they have in common and those unique in `a` or `b`.
@@ -2092,14 +1928,14 @@ declare const compareIterableValuesShallow: <V>(a: Iterable<V>, b: Iterable<V>, 
 };
 //# sourceMappingURL=iterable-compare-values-shallow.d.ts.map
 //#endregion
-//#region packages/core/src/key-value.d.ts
+//#region ../core/src/key-value.d.ts
 type KeyValueSorter = (data: KeyValue[]) => KeyValue[];
 type KeyValueSortSyles = `value` | `value-reverse` | `key` | `key-reverse`;
 declare const keyValueSorter: (sortStyle: KeyValueSortSyles) => KeyValueSorter;
 //# sourceMappingURL=key-value.d.ts.map
 
 //#endregion
-//#region packages/core/src/interval-type.d.ts
+//#region ../core/src/interval-type.d.ts
 /**
  * Return the millisecond value of an Interval.
  *
@@ -2121,13 +1957,13 @@ declare const keyValueSorter: (sortStyle: KeyValueSortSyles) => KeyValueSorter;
  * @param defaultNumber Default value if `interval` is _undefined_ or invalid
  * @returns Milliseconds
  */
-declare function intervalToMs(interval: Interval | undefined, defaultNumber?: number): number;
+declare function intervalToMs(interval: Interval$1 | undefined, defaultNumber?: number): number;
 /**
  * Returns _true_ if `interval` matches the {@link Interval} type.
  * @param interval
  * @returns _True_ if `interval` is an {@link Interval}.
  */
-declare function isInterval(interval: number | Interval | undefined): interval is Interval;
+declare function isInterval(interval: number | Interval$1 | undefined): interval is Interval$1;
 /**
  * Returns a human-readable representation
  * of some elapsed milliseconds
@@ -2142,10 +1978,10 @@ declare function isInterval(interval: number | Interval | undefined): interval i
  * @param rounding Rounding (default: 2)
  * @returns
  */
-declare const elapsedToHumanString: (millisOrFunction: number | (() => number) | Interval, rounding?: number) => string;
+declare const elapsedToHumanString: (millisOrFunction: number | (() => number) | Interval$1, rounding?: number) => string;
 //# sourceMappingURL=interval-type.d.ts.map
 //#endregion
-//#region packages/core/src/to-string.d.ts
+//#region ../core/src/to-string.d.ts
 /**
  * Returns _true_ if `value` is a Map type
  * @param value
@@ -2173,7 +2009,7 @@ declare const toStringDefault: <V>(itemToMakeStringFor: V) => string;
 declare const defaultToString: (value: null | boolean | string | object) => string;
 //# sourceMappingURL=to-string.d.ts.map
 //#endregion
-//#region packages/core/src/track-unique.d.ts
+//#region ../core/src/track-unique.d.ts
 type TrackUnique<T> = (value: T) => boolean;
 /**
  * Tracks unique values. Returns _true_ if value is unique.
@@ -2201,7 +2037,7 @@ type TrackUnique<T> = (value: T) => boolean;
  * Return function throws an error if `value` is null or undefined.
  * @returns
  */
-declare const unique: <T>(toString?: ToString$1<T>) => TrackUnique<T>;
+declare const unique: <T>(toString?: ToString<T>) => TrackUnique<T>;
 /**
  * Tracks unique object instances. Returns _true_ if value is unique.
  * Alternatively: {@link unique} to track by value.
@@ -2209,7 +2045,7 @@ declare const unique: <T>(toString?: ToString$1<T>) => TrackUnique<T>;
 declare const uniqueInstances: <T>() => TrackUnique<T>;
 //# sourceMappingURL=track-unique.d.ts.map
 //#endregion
-//#region packages/core/src/platform.d.ts
+//#region ../core/src/platform.d.ts
 /**
  * Returns _true_ if it seems like the code is running on iOS (iPad/iPhone)
  * @returns
@@ -2217,16 +2053,16 @@ declare const uniqueInstances: <T>() => TrackUnique<T>;
 declare const runningiOS: () => boolean;
 //# sourceMappingURL=platform.d.ts.map
 //#endregion
-//#region packages/core/src/promise-from-event.d.ts
+//#region ../core/src/promise-from-event.d.ts
 declare const promiseFromEvent: (target: EventTarget, name: string) => Promise<any>;
 //# sourceMappingURL=promise-from-event.d.ts.map
 
 //#endregion
-//#region packages/core/src/types-reactive.d.ts
+//#region ../core/src/types-reactive.d.ts
 /**
  * A reactive that does not have an initial value
  */
-type ReactiveNonInitial<V> = Reactive<V> & {
+type ReactiveNonInitial$1<V> = Reactive<V> & {
   last(): V | undefined;
 };
 /**
@@ -2295,7 +2131,7 @@ type Reactive<V> = {
 };
 //# sourceMappingURL=types-reactive.d.ts.map
 //#endregion
-//#region packages/core/src/reactive-core.d.ts
+//#region ../core/src/reactive-core.d.ts
 /**
  * Returns _true_ if `rx` is a Reactive
  * @param rx
@@ -2312,13 +2148,13 @@ declare const isReactive: <V>(rx: object) => rx is Reactive<V>;
 declare const hasLast: <V>(rx: object) => rx is ReactiveInitial<V>;
 //# sourceMappingURL=reactive-core.d.ts.map
 //#endregion
-//#region packages/core/src/resolve-core.d.ts
+//#region ../core/src/resolve-core.d.ts
 /**
  * Something that can resolve to a value
  */
-type ResolveToValueSync<V> = BasicType$1 | ReactiveNonInitial<V> | Generator<V> | IterableIterator<V> | ((args: any) => V);
+type ResolveToValueSync<V> = BasicType | ReactiveNonInitial$1<V> | Generator<V> | IterableIterator<V> | ((args: any) => V);
 type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V> | ((args: any) => Promise<V>);
-type ResolveToValue<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
+type ResolveToValue$1<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
 /**
  * Resolves `r` to a value, where `r` is:
  * * primitive value
@@ -2342,14 +2178,14 @@ type ResolveToValue<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
  * @param args
  * @returns
  */
-declare function resolve<V extends BasicType$1>(r: ResolveToValue<V>, ...args: any): Promise<V>;
+declare function resolve<V extends BasicType>(r: ResolveToValue$1<V>, ...args: any): Promise<V>;
 /**
  * For a given input `r`, attempts to 'resolve' it. See {@link resolve} for details.
  * @param r
  * @param args
  * @returns
  */
-declare function resolveSync<V extends BasicType$1>(r: ResolveToValueSync<V>, ...args: any): V;
+declare function resolveSync<V extends BasicType>(r: ResolveToValueSync<V>, ...args: any): V;
 /**
  * Resolves a value as per {@link resolve}, however
  * If an error is thrown or the resolution results in _undefined_
@@ -2371,20 +2207,20 @@ declare function resolveSync<V extends BasicType$1>(r: ResolveToValueSync<V>, ..
  * @param args
  * @returns
  */
-declare function resolveWithFallback<T extends BasicType$1>(p: ResolveToValue<T>, fallback: ResolveFallbackOpts<T>, ...args: any): Promise<T>;
-declare function resolveWithFallbackSync<T extends BasicType$1>(p: ResolveToValueSync<T>, fallback: ResolveFallbackOpts<T>, ...args: any): T;
+declare function resolveWithFallback<T extends BasicType>(p: ResolveToValue$1<T>, fallback: ResolveFallbackOpts<T>, ...args: any): Promise<T>;
+declare function resolveWithFallbackSync<T extends BasicType>(p: ResolveToValueSync<T>, fallback: ResolveFallbackOpts<T>, ...args: any): T;
 type ResolveFallbackOpts<T> = {
   value: T;
   overrideWithLast?: boolean;
 };
 //# sourceMappingURL=resolve-core.d.ts.map
 //#endregion
-//#region packages/core/src/resolve-fields.d.ts
+//#region ../core/src/resolve-fields.d.ts
 /**
  * An object that can be 'resolved'.
  * @see {@link resolveFields}
  */
-type ResolvedObject<T extends Record<string, ResolveToValue$1<any>>> = { [K in keyof T]: T[K] extends number ? number : T[K] extends string ? string : T[K] extends boolean ? boolean : T[K] extends bigint ? bigint : T[K] extends (() => Promise<any>) ? Awaited<ReturnType<T[K]>> : T[K] extends (() => any) ? ReturnType<T[K]> : T[K] extends ReactiveNonInitial$1<infer V> ? V : T[K] extends Generator<infer V> ? V : T[K] extends AsyncGenerator<infer V> ? V : T[K] extends IterableIterator<infer V> ? V : T[K] extends AsyncIterableIterator<infer V> ? V : T[K] extends (infer V)[] ? V : T[K] extends object ? T[K] : never };
+type ResolvedObject<T extends Record<string, ResolveToValue<any>>> = { [K in keyof T]: T[K] extends number ? number : T[K] extends string ? string : T[K] extends boolean ? boolean : T[K] extends bigint ? bigint : T[K] extends (() => Promise<any>) ? Awaited<ReturnType<T[K]>> : T[K] extends (() => any) ? ReturnType<T[K]> : T[K] extends ReactiveNonInitial<infer V> ? V : T[K] extends Generator<infer V> ? V : T[K] extends AsyncGenerator<infer V> ? V : T[K] extends IterableIterator<infer V> ? V : T[K] extends AsyncIterableIterator<infer V> ? V : T[K] extends (infer V)[] ? V : T[K] extends object ? T[K] : never };
 /**
  * Returns a copy of `object`, with the same properties. For each property
  * that has a basic value (string, number, boolean, object), the value is set
@@ -2422,14 +2258,14 @@ type ResolvedObject<T extends Record<string, ResolveToValue$1<any>>> = { [K in k
  * @param object
  * @returns
  */
-declare function resolveFields<T extends Record<string, ResolveToValue$1<any>>>(object: T): Promise<ResolvedObject<T>>;
+declare function resolveFields<T extends Record<string, ResolveToValue<any>>>(object: T): Promise<ResolvedObject<T>>;
 /**
  * 'Resolves' all the fields of `object` in a synchronous manner.
  * Uses {@link resolveSync} under-the-hood
  * @param object
  * @returns
  */
-declare function resolveFieldsSync<T extends Record<string, ResolveToValue$1<any>>>(object: T): ResolvedObject<T>;
+declare function resolveFieldsSync<T extends Record<string, ResolveToValue<any>>>(object: T): ResolvedObject<T>;
 /**
  * Returns a function that resolves `object`.
  *
@@ -2439,8 +2275,8 @@ declare function resolveFieldsSync<T extends Record<string, ResolveToValue$1<any
  */
 //# sourceMappingURL=resolve-fields.d.ts.map
 //#endregion
-//#region packages/core/src/sleep.d.ts
-type SleepOpts<V> = Interval & Partial<{
+//#region ../core/src/sleep.d.ts
+type SleepOpts<V> = Interval$1 & Partial<{
   readonly signal: AbortSignal;
   readonly value: V;
 }>;
@@ -2496,10 +2332,10 @@ declare const sleep: <V>(optsOrMillis: SleepOpts<V>) => Promise<V | undefined>;
  * @param predicate
  * @param checkInterval
  */
-declare const sleepWhile: (predicate: () => boolean, checkInterval?: Interval) => Promise<void>;
+declare const sleepWhile: (predicate: () => boolean, checkInterval?: Interval$1) => Promise<void>;
 //# sourceMappingURL=sleep.d.ts.map
 //#endregion
-//#region packages/core/src/types-array.d.ts
+//#region ../core/src/types-array.d.ts
 /**
  * Functions which modify an array
  */
@@ -2517,5 +2353,5 @@ type FixedLengthArray<T extends any[]> = Pick<T, Exclude<keyof T, ArrayLengthMut
 //# sourceMappingURL=types-array.d.ts.map
 
 //#endregion
-export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, BasicType, ChangeKind, ChangeRecord, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, FixedLengthArray, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval, IsEqual, IsEqualContext, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOpts, ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString, TrackUnique, index_d_exports$1 as Trackers, Unsubscriber, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
+export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, BasicType$1 as BasicType, ChangeKind, ChangeRecord, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, FixedLengthArray, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval$1 as Interval, IsEqual$1 as IsEqual, IsEqualContext$1 as IsEqualContext, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial$1 as ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOpts, ResolveToValue$1 as ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString$1 as ToString, TrackUnique, index_d_exports$1 as Trackers, Unsubscriber, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=core.d.ts.map

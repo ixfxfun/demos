@@ -1,20 +1,436 @@
-import { RecursivePartial } from "@ixfx/core";
-import { ElementResizeLogic } from "@ixfx/dom";
-import { SimpleEventEmitter } from "@ixfx/events";
-import * as _ixfx_geometry0 from "@ixfx/geometry";
-import { Angle, Arcs, Beziers, Circles, Ellipses, Grids, Lines, Paths, Points, Polar, Rects, ScaleBy, Triangles } from "@ixfx/geometry";
-import { RandomSource } from "@ixfx/random";
-import { Point } from "@ixfx/geometry/point";
-import { Rect, RectPositioned } from "@ixfx/geometry/rect";
-import * as _ixfx_geometry_grid0 from "@ixfx/geometry/grid";
-import { Grid } from "@ixfx/geometry/grid";
-import { CirclePositioned } from "@ixfx/geometry/circle";
-import { Line } from "@ixfx/geometry/line";
-import * as C from "colorizr";
-import Colorizr from "colorizr";
-import { IStackImmutable } from "@ixfx/collections/stack";
+import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { Point, Rect, RectPositioned } from "./rect-types-d5I5ouwR.js";
+import { RandomSource } from "./types-DFWrctU4.js";
+import { Grid, GridCellAccessor, GridCellSetter, GridReadable, GridWritable } from "./types-Bzjzk4dE.js";
+import { Path } from "./path-type-WKYt1VfQ.js";
 
-//#region packages/visual/src/colour/types.d.ts
+//#region ../geometry/dist/src/circle/circle-type.d.ts
+/**
+ * A circle
+ */
+type Circle = {
+  readonly radius: number;
+};
+/**
+ * A {@link Circle} with position
+ */
+type CirclePositioned = Point & Circle;
+//#endregion
+//#region ../geometry/dist/src/line/line-type.d.ts
+/**
+ * A line, which consists of an `a` and `b` {@link Point}.
+ */
+type Line = {
+  readonly a: Point;
+  readonly b: Point;
+};
+/**
+ * A PolyLine, consisting of more than one line.
+ */
+//#endregion
+//#region ../geometry/dist/src/triangle/triangle-type.d.ts
+type Triangle = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly c: Point;
+};
+//#endregion
+//#region ../geometry/dist/src/polar/types.d.ts
+/**
+ * A polar ray is a line in polar coordinates
+ * It consists of an angle (in radians) with a given offset and length.
+ */
+type PolarRay = Readonly<{
+  /**
+   * Angle of ray
+   */
+  angleRadian: number;
+  /**
+   * Starting point of a ray, defined as an
+   * offset from the polar origin.
+   */
+  offset: number;
+  /**
+   * Length of ray
+   */
+  length: number;
+  origin?: Point;
+}>;
+//#endregion
+//#region ../collections/dist/src/stack/IStack.d.ts
+/**
+ * Stack (immutable)
+ *
+ * @example Overview
+ * ```js
+ * stack.push(item); // Return a new stack with item(s) added
+ * stack.pop();      // Return a new stack with top-most item removed (ie. newest)
+ * stack.peek;       // Return what is at the top of the stack or undefined if empty
+ * stack.isEmpty;
+ * stack.isFull;
+ * stack.length;     // How many items in stack
+ * stack.data;       // Get the underlying array
+ * ```
+ *
+ * @example
+ * ```js
+ * let sanga = new Stack();
+ * sanga = sanga.push(`bread`, `tomato`, `cheese`);
+ * sanga.peek;  // `cheese`
+ * sanga = sanga.pop(); // removes `cheese`
+ * sanga.peek;  // `tomato`
+ * const sangaAlt = sanga.push(`lettuce`, `cheese`); // sanga stays [`bread`, `tomato`], while sangaAlt is [`bread`, `tomato`, `lettuce`, `cheese`]
+ * ```
+ *
+ * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
+ * @class Stack
+ * @typeParam V - Type of stored items
+ */
+interface IStack<V> {
+  /**
+   * Enumerates stack from bottom-to-top
+   *
+   */
+  forEach(fn: (v: V) => void): void;
+  /**
+   * Enumerates stack from top-to-bottom
+   * @param fn
+   */
+  forEachFromTop(fn: (v: V) => void): void;
+  get data(): readonly V[];
+  /**
+   * _True_ if stack is empty
+   */
+  get isEmpty(): boolean;
+  /**
+   * _True_ if stack is at its capacity. _False_ if not, or if there is no capacity.
+   */
+  get isFull(): boolean;
+  /**
+   * Get the item at the top of the stack without removing it (like `pop` would do)
+   * @returns Item at the top of the stack, or _undefined_ if empty.
+   */
+  get peek(): V | undefined;
+  /**
+   * Number of items in stack
+   */
+  get length(): number;
+}
+//# sourceMappingURL=IStack.d.ts.map
+//#endregion
+//#region ../collections/dist/src/stack/IStackImmutable.d.ts
+interface IStackImmutable<V> extends IStack<V> {
+  push(...toAdd: readonly V[]): IStackImmutable<V>;
+  pop(): IStackImmutable<V>;
+}
+//# sourceMappingURL=IStackImmutable.d.ts.map
+//#endregion
+//#region ../geometry/dist/src/arc/arc-type.d.ts
+/**
+ * Arc, defined by radius, start and end point in radians and direction
+ */
+type Arc = {
+  /**
+   * Radius of arc
+   */
+  readonly radius: number;
+  /**
+   * Start radian
+   */
+  readonly startRadian: number;
+  /**
+   * End radian
+   */
+  readonly endRadian: number;
+  /**
+   * If true, arc runs in clockwise direction
+   */
+  readonly clockwise: boolean;
+};
+/**
+ * An {@link Arc} that also has a center position, given in x, y
+ */
+type ArcPositioned = Point & Arc;
+/**
+ * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
+ */
+//#endregion
+//#region ../geometry/dist/src/bezier/bezier-type.d.ts
+type QuadraticBezier = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly quadratic: Point;
+};
+type CubicBezier = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly cubic1: Point;
+  readonly cubic2: Point;
+};
+//#endregion
+//#region ../geometry/dist/src/ellipse.d.ts
+/**
+ * An ellipse
+ */
+type Ellipse = {
+  readonly radiusX: number;
+  readonly radiusY: number;
+  /**
+   * Rotation, in radians
+   */
+  readonly rotation?: number;
+  readonly startAngle?: number;
+  readonly endAngle?: number;
+};
+/**
+ * A {@link Ellipse} with position
+ */
+type EllipsePositioned = Point & Ellipse;
+//#endregion
+//#region ../geometry/dist/src/angles.d.ts
+
+type Angle = {
+  value: number;
+  unit: `deg` | `rad` | `turn` | `grad`;
+};
+/**
+ * Parses CSS-style angle strings. By default assumes degrees.
+ *
+ * ```js
+ * angleParse(`100`);     // { value: 100, unit: `deg` }
+ * angleParse(100);       // { value: 100, unit: `deg` }
+ * angleParse(`100deg`);   // { value: 100, unit: `deg` }
+ *
+ * // More exotic units:
+ * angleParse(`100rad`);  // { value: 100, unit: `rad` }
+ * angleParse(`100turn`); // { value: 100, unit: `turn` }
+ * angleParse(`100grad`); // { value: 100, unit: `grad` }
+ * ```
+ *
+ * Once parsed in this format, use {@link angleConvert} to convert to
+ * a different unit.
+ * @param value
+ * @returns
+ */
+//#endregion
+//#region ../geometry/dist/src/scaler.d.ts
+/**
+ * A scale function that takes an input value to scale.
+ * Input can be in the form of `{ x, y }` or two number parameters.
+ *
+ * ```js
+ * scale(10, 20);
+ * scale({ x:10, y:20 });
+ * ```
+ *
+ * Output range can be specified as a `{ width, height }` or two number parameters.
+ * If omitted, the default range
+ * is used.
+ *
+ * ```js
+ * // Scale 10,20 with range w:800 h:600
+ * scale(10, 20, 800, 600);
+ * scale({x:10, y:20}, 800, 600);
+ * scale({x:10, y:20}, {width: 800, height: 600});
+ * ```
+ */
+type Scaler = (a: number | Point, b?: number | Rect, c?: number | Rect, d?: number) => Point;
+/**
+ * A scaler than can convert to a from an output range
+ */
+
+type ScaleBy = `both` | `min` | `max` | `width` | `height`;
+/**
+ * Returns a set of scaler functions, to convert to and from ranges.
+ *
+ * ```js
+ * const scaler = Scaler.scaler(`both`, {width:window.innerWidth, height:window.innerHeight});
+ * // Assuming screen of 800x400...
+ * scaler.abs(400,200);          // Yields { x:0.5, y:0.5 }
+ * scaler.abs({ x:400, y:200 }); // Yields { x:0.5, y:0.5 }
+ *
+ * scaler.rel(0.5, 0.5);         // Yields: { x:400, y:200 }
+ * scaler.rel({ x:0.5, y:0.5 }); // Yields: { x:400, y:200 }
+ * ```
+ *
+ * If no default range is provided, it must be given each time the scale function is used.
+ *
+ * ```js
+ * const scaler = Scaler.scaler(`both`);
+ *
+ * scaler.abs(400, 200, 800, 400);
+ * scaler.abs(400, 200, { width: 800, height: 400 });
+ * scaler.abs({ x:400, y: 200}, { width: 800, height: 400 });
+ * scaler.abs({ x:400, y: 200}, 800, 400);
+ * // All are the same, yielding { x:0.5, y:0.5 }
+ *
+ * scaler.abs(400, 200); // Throws an exception because there is no scale
+ * ```
+ * @param scaleBy Dimension to scale by
+ * @param defaultRect Default range
+ * @returns
+ */
+//#endregion
+//#region ../dom/dist/src/element-sizing.d.ts
+/**
+ * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
+ * * height: use height of parent, set width based on original aspect ratio of element. Assumes parent has a determined height.
+ * * both: use height & width of parent, so the element adopts the ratio of the parent. Be sure that parent has a width and height set.
+ * * min: use the smallest dimension of parent
+ * * max: use the largest dimension of parent
+ */
+type ElementResizeLogic = `width` | `height` | `both` | `none` | `min` | `max`;
+/**
+ * Options
+ */
+//#endregion
+//#region ../../node_modules/.pnpm/colorizr@3.0.7/node_modules/colorizr/dist/index.d.mts
+type ColorType = 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb';
+type Alpha = number;
+type Amount = number;
+type Degrees = number;
+type HEX = `#${string}`;
+interface HSL {
+  h: number;
+  s: number;
+  l: number;
+  alpha?: Alpha;
+}
+interface LAB {
+  l: number;
+  a: number;
+  b: number;
+  alpha?: Alpha;
+}
+interface LCH {
+  l: number;
+  c: number;
+  h: number;
+  alpha?: Alpha;
+}
+interface RGB {
+  r: number;
+  g: number;
+  b: number;
+  alpha?: Alpha;
+}
+interface Analysis {
+  brightnessDifference: number;
+  colorDifference: number;
+  compliant: number;
+  contrast: number;
+  largeAA: boolean;
+  largeAAA: boolean;
+  normalAA: boolean;
+  normalAAA: boolean;
+}
+interface ColorizrOptions {
+  /**
+   * Output color format.
+   *
+   * If not specified, the output will use the same format as the input color.
+   */
+  format?: ColorType;
+}
+declare class Colorizr {
+  alpha: Alpha;
+  hex: HEX;
+  hsl: HSL;
+  oklab: LAB;
+  oklch: LCH;
+  rgb: RGB;
+  type: ColorType;
+  constructor(color: string | HSL | LAB | LCH | RGB, options?: ColorizrOptions);
+  /**
+   * Get css string
+   */
+  get css(): string;
+  /**
+   * Get the red value
+   */
+  get red(): number;
+  /**
+   * Get the green value
+   */
+  get green(): number;
+  /**
+   * Get the blue value
+   */
+  get blue(): number;
+  /**
+   * Get the hue value
+   */
+  get hue(): number;
+  /**
+   * Get the saturation value
+   */
+  get saturation(): number;
+  /**
+   * Get the lightness value
+   */
+  get lightness(): number;
+  /**
+   * Get the luminance value
+   */
+  get luminance(): number;
+  /**
+   * Get the chroma value
+   */
+  get chroma(): number;
+  get opacity(): number;
+  /**
+   * Get the contrasted color
+   */
+  get textColor(): string;
+  private get selectedColor();
+  brightnessDifference(input: string): number;
+  colorDifference(input: string): number;
+  /**
+   * Test 2 colors for compliance
+   */
+  compare(input: string): Analysis;
+  contrast(input: string): number;
+  format(type: ColorType, precision?: number): string;
+  /**
+   * Increase lightness
+   */
+  lighten(amount: Amount): string;
+  /**
+   * Decrease lightness
+   */
+  darken(amount: Amount): string;
+  /**
+   * Increase saturation
+   */
+  saturate(amount: Amount): string;
+  /**
+   * Decrease saturation
+   */
+  desaturate(amount: Amount): string;
+  /**
+   * Invert color
+   */
+  invert(): string;
+  /**
+   * Add opacity to the color.
+   */
+  opacify(alpha?: Alpha): string;
+  /**
+   * Rotate color
+   */
+  rotate(degrees: Degrees): string;
+  /**
+   * Make the color more transparent
+   */
+  transparentize(alpha?: Alpha): string;
+}
+
+/**
+ * Get the brightness difference between 2 colors.
+ */
+//#endregion
+//#region ../visual/src/colour/types.d.ts
 type HslBase = {
   /**
    * Hue
@@ -162,7 +578,7 @@ type ParsingOptions<T> = Partial<{
 }>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/visual/src/canvas-helper.d.ts
+//#region ../visual/src/canvas-helper.d.ts
 type CanvasEvents = {
   /**
    * Fired when canvas is resized
@@ -384,15 +800,15 @@ declare class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * toRelative({ x: 400, y: 300 }); // { x: 0.5, y: 0.5 }
    * ```
    */
-  get toRelative(): _ixfx_geometry0.Scaler;
+  get toRelative(): Scaler;
   /**
    * Returns a scaler for points based on width & height
    */
-  get toAbsoluteFixed(): _ixfx_geometry0.Scaler;
+  get toAbsoluteFixed(): Scaler;
   /**
    * Returns a scaler for points based on width & height
    */
-  get toRelativeFixed(): _ixfx_geometry0.Scaler;
+  get toRelativeFixed(): Scaler;
   get logicalCenter(): {
     x: number;
     y: number;
@@ -409,7 +825,7 @@ declare class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   * toAbsolute({ x: 0.5, y: 0.5 });  // { x: 400, y: 300}
   * ```
   */
-  get toAbsolute(): _ixfx_geometry0.Scaler;
+  get toAbsolute(): Scaler;
   /**
    * Gets the center coordinate of the canvas
    */
@@ -446,14 +862,14 @@ declare class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    */
   getWritableBuffer(): {
     grid: Grid;
-    get: _ixfx_geometry_grid0.GridCellAccessor<Rgb8Bit>;
-    set: _ixfx_geometry_grid0.GridCellSetter<Rgb>;
+    get: GridCellAccessor<Rgb8Bit>;
+    set: GridCellSetter<Rgb>;
     flip: () => void;
   };
 }
 //# sourceMappingURL=canvas-helper.d.ts.map
 //#endregion
-//#region packages/visual/src/pointer-visualise.d.ts
+//#region ../visual/src/pointer-visualise.d.ts
 type Opts = {
   readonly touchRadius?: number;
   readonly mouseRadius?: number;
@@ -485,7 +901,7 @@ type Opts = {
 declare const pointerVisualise: (elOrQuery: HTMLElement | string, options?: Opts) => void;
 //# sourceMappingURL=pointer-visualise.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/types.d.ts
+//#region ../visual/src/svg/types.d.ts
 type MarkerOpts = StrokeOpts & DrawingOpts$1 & {
   readonly id: string;
   readonly markerWidth?: number;
@@ -566,7 +982,7 @@ type TextPathDrawingOpts = TextDrawingOpts & {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/apply.d.ts
+//#region ../visual/src/svg/apply.d.ts
 /**
  * Applies drawing options to given SVG element.
  * Applies: fillStyle
@@ -576,7 +992,7 @@ type TextPathDrawingOpts = TextDrawingOpts & {
 declare const applyOpts: (elem: SVGElement, opts: DrawingOpts$1) => void;
 //# sourceMappingURL=apply.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/bounds.d.ts
+//#region ../visual/src/svg/bounds.d.ts
 /**
  * Get the bounds of an SVG element (determined by its width/height attribs)
  * @param svg
@@ -591,7 +1007,7 @@ declare const getBounds: (svg: SVGElement) => Rect;
 declare const setBounds: (svg: SVGElement, bounds: Rect) => void;
 //# sourceMappingURL=bounds.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/create.d.ts
+//#region ../visual/src/svg/create.d.ts
 /**
  * Creates an element of `type` and with `id` (if specified)
  * @param type Element type, eg `circle`
@@ -689,7 +1105,7 @@ declare const line$1: (line: Line, parent: SVGElement, opts?: LineDrawingOpts, q
  * @returns
  */
 declare const lineUpdate: (lineEl: SVGLineElement, line: Line, opts?: LineDrawingOpts) => SVGLineElement;
-declare const polarRayUpdate: (lineEl: SVGLineElement, ray: Polar.PolarRay, opts?: LineDrawingOpts) => SVGLineElement;
+declare const polarRayUpdate: (lineEl: SVGLineElement, ray: PolarRay, opts?: LineDrawingOpts) => SVGLineElement;
 /**
  * Updates an existing SVGTextPathElement instance with text and drawing options
  * @param el
@@ -744,17 +1160,17 @@ declare const text: (text: string, parent: SVGElement, pos?: Point, opts?: TextD
 declare const grid$1: (parent: SVGElement, center: Point, spacing: number, width: number, height: number, opts?: LineDrawingOpts) => SVGGElement;
 //# sourceMappingURL=elements.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/geometry.d.ts
+//#region ../visual/src/svg/geometry.d.ts
 /**
  * Returns a Line type from an SVGLineElement
  * @param el SVG Line Element
  * @returns
  */
 declare const lineFromSvgLine: (el: SVGLineElement) => Line;
-declare const polarRayFromSvgLine: (el: SVGLineElement, origin: Point) => Polar.PolarRay;
+declare const polarRayFromSvgLine: (el: SVGLineElement, origin: Point) => PolarRay;
 //# sourceMappingURL=geometry.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/helper.d.ts
+//#region ../visual/src/svg/helper.d.ts
 /**
  * Helper to make SVG elements with a common parent.
  *
@@ -842,13 +1258,13 @@ type SvgHelper = {
 declare const makeHelper$1: (parent: SVGElement, parentOpts?: DrawingOpts$1 & StrokeOpts) => SvgHelper;
 //# sourceMappingURL=helper.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/markers.d.ts
+//#region ../visual/src/svg/markers.d.ts
 declare const createMarker: (id: string, opts: MarkerOpts, childCreator?: () => SVGElement) => SVGMarkerElement;
 declare const markerPrebuilt: (elem: SVGElement | null, opts: MarkerOpts, _context: DrawingOpts$1) => string;
 //# sourceMappingURL=markers.d.ts.map
 
 //#endregion
-//#region packages/visual/src/svg/path.d.ts
+//#region ../visual/src/svg/path.d.ts
 /**
  * Applies path drawing options to given element
  * Applies: markerEnd, markerStart, markerMid
@@ -858,7 +1274,7 @@ declare const markerPrebuilt: (elem: SVGElement | null, opts: MarkerOpts, _conte
 declare const applyPathOpts: (elem: SVGElement, opts: PathDrawingOpts) => void;
 //# sourceMappingURL=path.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/remove.d.ts
+//#region ../visual/src/svg/remove.d.ts
 /**
  * Removes an SVG element from a parent
  * @param parent Parent
@@ -873,7 +1289,7 @@ declare const remove: <V extends SVGElement>(parent: SVGElement, queryOrExisting
 declare const clear: (parent: SVGElement) => void;
 //# sourceMappingURL=remove.d.ts.map
 //#endregion
-//#region packages/visual/src/svg/stroke.d.ts
+//#region ../visual/src/svg/stroke.d.ts
 /**
  * Applies drawing options to given SVG element.
  * Applies: strokeStyle, strokeWidth, strokeDash, strokeLineCap
@@ -885,8 +1301,289 @@ declare const applyStrokeOpts: (elem: SVGElement, opts: StrokeOpts) => void;
 declare namespace index_d_exports$2 {
   export { CircleDrawingOpts, DrawingOpts$1 as DrawingOpts, elements_d_exports as Elements, LineDrawingOpts, MarkerDrawingOpts, MarkerOpts, PathDrawingOpts, StrokeOpts, SvgHelper, TextDrawingOpts, TextPathDrawingOpts, applyOpts, applyPathOpts, applyStrokeOpts, clear, createEl, createMarker, createOrResolve, getBounds, lineFromSvgLine, makeHelper$1 as makeHelper, markerPrebuilt, polarRayFromSvgLine, remove, setBounds };
 }
+declare namespace drawing_d_exports {
+  export { CanvasContextQuery, ConnectedPointsOptions, DotOpts, DrawingOpts, DrawingStack, HorizAlign, LineOpts, RectOpts, StackOp, VertAlign, arc, bezier, circle, connectedPoints, copyToImg, dot, drawingStack, ellipse, getContext, line, lineThroughPoints, makeHelper, paths, pointLabels, rect, textBlock, textBlockAligned, textHeight, textRect, textWidth, translatePoint, triangle };
+}
+type CanvasContextQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+/**
+ * Gets a 2d drawing context from canvas element or query, or throws an error
+ * @param canvasElementContextOrQuery Canvas element reference or DOM query
+ * @returns Drawing context.
+ */
+declare const getContext: (canvasElementContextOrQuery: CanvasContextQuery) => CanvasRenderingContext2D;
+/**
+ * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
+ * @param ctxOrCanvasEl Drawing context or canvs element reference
+ * @param canvasBounds Bounds of drawing (optional). Used for limiting `textBlock`
+ * @returns
+ */
+declare const makeHelper: (ctxOrCanvasEl: CanvasContextQuery, canvasBounds?: Rect) => {
+  ctx: CanvasRenderingContext2D;
+  paths(pathsToDraw: Path[] | readonly Path[], opts?: DrawingOpts): void;
+  line(lineToDraw: Line | Line[], opts?: DrawingOpts): void;
+  rect(rectsToDraw: Rect | Rect[] | RectPositioned | RectPositioned[], opts?: RectOpts): void;
+  bezier(bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts): void;
+  connectedPoints(pointsToDraw: Point[], opts?: DrawingOpts & Partial<ConnectedPointsOptions>): void;
+  pointLabels(pointsToDraw: Point[], opts?: DrawingOpts): void;
+  dot(dotPosition: Point | Point[], opts?: DotOpts): void;
+  circle(circlesToDraw: CirclePositioned | CirclePositioned[], opts: DrawingOpts): void;
+  arc(arcsToDraw: ArcPositioned | ArcPositioned[], opts: DrawingOpts): void;
+  textBlock(lines: string[], opts: DrawingOpts & {
+    anchor: Point;
+    anchorPadding?: number;
+    bounds?: RectPositioned;
+  }): void;
+};
+/**
+ * Drawing options
+ */
+type DrawingOpts = {
+  /**
+   * Stroke style
+   */
+  readonly strokeStyle?: string;
+  /**
+   * Fill style
+   */
+  readonly fillStyle?: string;
+  /**
+   * If true, diagnostic helpers will be drawn
+   */
+  readonly debug?: boolean;
+};
+type LineOpts = {
+  readonly lineWidth?: number;
+  readonly lineCap?: CanvasLineCap;
+  readonly lineJoin?: CanvasLineJoin;
+};
+/**
+ * Draws one or more arcs.
+ * @param ctx
+ * @param arcs
+ * @param opts
+ */
+declare const arc: (ctx: CanvasRenderingContext2D, arcs: ArcPositioned | readonly ArcPositioned[], opts?: DrawingOpts) => void;
+/**
+ * A drawing stack operation
+ */
+type StackOp = (ctx: CanvasRenderingContext2D) => void;
+/**
+ * A drawing stack (immutable)
+ */
+type DrawingStack = {
+  /**
+   * Push a new drawing op
+   * @param ops Operation to add
+   * @returns stack with added op
+   */
+  push(...ops: readonly StackOp[]): DrawingStack;
+  /**
+   * Pops an operatiomn
+   * @returns Drawing stack with item popped
+   */
+  pop(): DrawingStack;
+  /**
+   * Applies drawing stack
+   */
+  apply(): DrawingStack;
+};
+/**
+ * Creates and returns an immutable drawing stack for a context
+ * @param ctx Context
+ * @param stk Initial stack operations
+ * @returns
+ */
+declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: IStackImmutable<StackOp>) => DrawingStack;
+/**
+ * Draws a curved line through a set of points
+ * @param ctx
+ * @param points
+ * @param opts
+ */
+declare const lineThroughPoints: (ctx: CanvasRenderingContext2D, points: readonly Point[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more circles. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
+ *
+ * ```js
+ * // Draw a circle with radius of 10 at 0,0
+ * circle(ctx, {radius:10});
+ *
+ * // Draw a circle of radius 10 at 100,100
+ * circle(ctx, {radius: 10, x: 100, y: 100});
+ *
+ * // Draw two blue outlined circles
+ * circle(ctx, [ {radius: 5}, {radius: 10} ], {strokeStyle:`blue`});
+ * ```
+ * @param ctx Drawing context
+ * @param circlesToDraw Circle(s) to draw
+ * @param opts Drawing options
+ */
+declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: CirclePositioned | readonly CirclePositioned[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more ellipses. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
+ * @param ctx
+ * @param ellipsesToDraw
+ * @param opts
+ */
+declare const ellipse: (ctx: CanvasRenderingContext2D, ellipsesToDraw: EllipsePositioned | readonly EllipsePositioned[], opts?: DrawingOpts) => void;
+/**
+ * Draws one or more paths.
+ * supported paths are quadratic beziers and lines.
+ * @param ctx
+ * @param pathsToDraw
+ * @param opts
+ */
+declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Path[] | Path, opts?: {
+  readonly strokeStyle?: string;
+  readonly debug?: boolean;
+}) => void;
+type ConnectedPointsOptions = {
+  readonly lineWidth: number;
+  readonly loop: boolean;
+  readonly fillStyle: string;
+  readonly strokeStyle: string;
+};
+/**
+ * Draws a line between all the given points.
+ * If a fillStyle is specified, it will be filled.
+ *
+ * See also:
+ * * {@link line}: Draw one or more lines
+ *
+ * @param ctx
+ * @param pts
+ */
+declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: readonly Point[], opts?: Partial<ConnectedPointsOptions>) => void;
+/**
+ * Draws labels for a set of points
+ * @param ctx
+ * @param pts Points to draw
+ * @param opts
+ * @param labels Labels for points
+ */
+declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: readonly Point[], opts?: {
+  readonly fillStyle?: string;
+}, labels?: readonly string[]) => void;
+/**
+ * Returns `point` with the canvas's translation matrix applied
+ * @param ctx
+ * @param point
+ * @returns
+ */
+declare const translatePoint: (ctx: CanvasRenderingContext2D, point: Point) => Point;
+/**
+ * Creates a new HTML IMG element with a snapshot of the
+ * canvas. Element will need to be inserted into the document.
+ *
+ * ```
+ * const myCanvas = document.getElementById('someCanvas');
+ * const el = copyToImg(myCanvas);
+ * document.getElementById('images').appendChild(el);
+ * ```
+ * @param canvasEl
+ * @returns
+ */
+declare const copyToImg: (canvasEl: HTMLCanvasElement) => HTMLImageElement;
+type DotOpts = DrawingOpts & {
+  readonly radius?: number;
+  readonly stroke?: boolean;
+  readonly filled?: boolean;
+  readonly strokeWidth?: number;
+};
+/**
+ * Draws filled circle(s) at provided point(s)
+ * @param ctx
+ * @param pos
+ * @param opts
+ */
+declare const dot: (ctx: CanvasRenderingContext2D, pos: Point | (Point | CirclePositioned)[] | CirclePositioned, opts?: DotOpts) => void;
+/**
+ * Draws a cubic or quadratic bezier
+ * @param ctx
+ * @param bezierToDraw
+ * @param opts
+ */
+declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts) => void;
+/**
+ * Draws one or more lines.
+ *
+ * Each line is drawn independently, ie it's not assumed lines are connected.
+ *
+ * See also:
+ * * {@link connectedPoints}: Draw a series of connected points
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const line: (ctx: CanvasRenderingContext2D, toDraw: Line | readonly Line[], opts?: LineOpts & DrawingOpts) => void;
+/**
+ * Draws one or more triangles
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const triangle: (ctx: CanvasRenderingContext2D, toDraw: Triangle | readonly Triangle[], opts?: DrawingOpts & {
+  readonly filled?: boolean;
+}) => void;
+type RectOpts = DrawingOpts & Readonly<Partial<{
+  stroke: boolean;
+  filled: boolean;
+  strokeWidth: number;
+  /**
+   * If true, diagonals are drawn
+   */
+  crossed: boolean;
+}>>;
+/**
+ * Draws one or more rectangles.
+ *
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+declare const rect: (ctx: CanvasRenderingContext2D, toDraw: Rect | Rect[] | RectPositioned | RectPositioned[], opts?: RectOpts) => void;
+/**
+ * Returns the width of `text`. Rounds number up to nearest multiple if provided. If
+ * text is empty or undefined, 0 is returned.
+ * @param ctx
+ * @param text
+ * @param widthMultiple
+ * @returns
+ */
+declare const textWidth: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => number;
+declare const textRect: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => Rect;
+declare const textHeight: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number) => number;
+/**
+ * Draws a block of text. Each array item is considered a line.
+ * @param ctx
+ * @param lines
+ * @param opts
+ */
+declare const textBlock: (ctx: CanvasRenderingContext2D, lines: readonly string[], opts: DrawingOpts & {
+  readonly anchor: Point;
+  readonly align?: `top` | `center`;
+  readonly anchorPadding?: number;
+  readonly bounds?: RectPositioned;
+}) => void;
+type HorizAlign = `left` | `right` | `center`;
+type VertAlign = `top` | `center` | `bottom`;
+/**
+ * Draws an aligned text block
+ */
+declare const textBlockAligned: (ctx: CanvasRenderingContext2D, text: readonly string[] | string, opts: DrawingOpts & {
+  readonly bounds: RectPositioned;
+  readonly horiz?: HorizAlign;
+  readonly vert?: VertAlign;
+}) => void;
+//# sourceMappingURL=drawing.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/conversion.d.ts
+//#region ../visual/src/types.d.ts
+type DrawingHelper = ReturnType<typeof makeHelper>;
+//# sourceMappingURL=types.d.ts.map
+//#endregion
+//#region ../visual/src/colour/conversion.d.ts
 type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
 declare function convert<T extends ConvertDestinations>(colour: Colourish, destination: T): T extends "oklch-absolute" ? OkLchAbsolute : T extends "oklch-scalar" ? OkLchScalar : T extends "srgb-8bit" ? Rgb8Bit : T extends "srgb-scalar" ? RgbScalar : T extends "hsl-scalar" ? HslScalar : T extends "hsl-absolute" ? HslAbsolute : never;
 /**
@@ -924,7 +1621,7 @@ declare function rgbToHsl(rgb: Rgb, scalarResult: true): HslScalar;
 declare function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute;
 //# sourceMappingURL=conversion.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/css-colours.d.ts
+//#region ../visual/src/colour/css-colours.d.ts
 /**
  * Converts from some kind of colour that is legal in CSS
  * into a structured Colour type.
@@ -1100,7 +1797,7 @@ declare const cssDefinedHexColours: {
 };
 //# sourceMappingURL=css-colours.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/generate.d.ts
+//#region ../visual/src/colour/generate.d.ts
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
  * It's useful for generating perceptually different shades as the index increments.
@@ -1133,7 +1830,7 @@ declare const goldenAngleColour: (index: number, saturation?: number, lightness?
 declare const randomHue: (rand?: RandomSource) => number;
 //# sourceMappingURL=generate.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/guards.d.ts
+//#region ../visual/src/colour/guards.d.ts
 declare const isHsl: (v: any) => v is Hsl;
 declare const isRgb: (v: any) => v is Rgb;
 /**
@@ -1154,7 +1851,7 @@ declare const isOkLch: (v: any) => v is OkLch;
 declare const isColourish: (v: any) => v is Colourish;
 //# sourceMappingURL=guards.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/math.d.ts
+//#region ../visual/src/colour/math.d.ts
 declare function multiplyOpacity<T extends Colourish>(colourish: T, amount: number): T extends string ? string : T extends Hsl ? Hsl : T extends OkLch ? OkLch : T extends Rgb ? Rgb : never;
 /**
  * Does a computation with the opacity of a colour, returning colour string
@@ -1175,7 +1872,7 @@ declare function withOpacity$3<T extends Colourish>(colourish: T, fn: (scalarOpa
 declare function setOpacity<T extends Colourish>(colourish: T, amount: number): T extends string ? string : T extends Hsl ? Hsl : T extends OkLch ? OkLch : T extends Rgb ? Rgb : never;
 //# sourceMappingURL=math.d.ts.map
 //#endregion
-//#region packages/visual/src/colour/interpolate.d.ts
+//#region ../visual/src/colour/interpolate.d.ts
 /**
  * Returns a CSS `linear-gradient` with stops corresponding to the given list of `colours`.
  * ```js
@@ -1223,6 +1920,22 @@ type CreateStepsOptions = Partial<{
   direction: `longer` | `shorter`;
   exclusive: boolean;
 }>;
+/**
+ * Creates discrete colour steps between two colours.
+ *
+ * Start and end colours are included (and counted as a step) unless `exclusive` is set to _true_
+ *
+ * ```js
+ * // Array of five HslScalar
+ * createSteps(`red`,`blue`, { steps: 5 });
+ * ```
+ *
+ * Defaults to the oklch colour space, 5 steps and non-exclusive.
+ * @param a Start colour
+ * @param b End colour
+ * @param options
+ * @returns
+ */
 declare function createSteps<T extends CreateStepsOptions>(a: Colourish | string, b: Colourish, options: T): T extends {
   space: `oklch`;
 } ? OkLchScalar[] : T extends {
@@ -1331,14 +2044,14 @@ declare function parseCssHslFunction(value: string): Hsl;
  * @param hsl HSL colour
  * @returns
  */
-declare function toLibraryRgb(hsl: Hsl | string): C.RGB;
+declare function toLibraryRgb(hsl: Hsl | string): RGB;
 //# sourceMappingURL=hsl.d.ts.map
 declare namespace oklch_d_exports {
   export { OKLCH_CHROMA_MAX, absolute, fromCss$1 as fromCss, fromHexString$1 as fromHexString, fromLibrary, generateScalar, guard$1 as guard, interpolator$1 as interpolator, scalar$1 as scalar, toAbsolute, toCssString$1 as toCssString, toScalar$1 as toScalar, withOpacity$1 as withOpacity };
 }
 declare const OKLCH_CHROMA_MAX = 0.4;
 declare const guard$1: (lch: OkLch) => void;
-declare function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options: T): T extends {
+declare function fromLibrary<T extends ParsingOptions<OkLch>>(lch: LCH, options: T): T extends {
   scalar: true;
 } ? OkLchScalar : OkLchAbsolute;
 declare const fromHexString$1: (hexString: string, options?: ParsingOptions<OkLch>) => OkLch;
@@ -1466,289 +2179,11 @@ declare const interpolator: (colourA: Rgb | string, colourB: Rgb | string) => (a
  * @param rgb
  * @returns
  */
-declare function toLibraryHsl(rgb: Rgb | string): C.HSL;
+declare function toLibraryHsl(rgb: Rgb | string): HSL;
 //# sourceMappingURL=srgb.d.ts.map
 declare namespace index_d_exports {
   export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, isColourish, isHsl, isOkLch, isRgb, multiplyOpacity, randomHue, resolveCss, rgbToHsl, scale, setOpacity, toColour, toCssColour, toLibraryColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$3 as withOpacity };
 }
-declare namespace drawing_d_exports {
-  export { CanvasContextQuery, ConnectedPointsOptions, DotOpts, DrawingHelper, DrawingOpts, DrawingStack, HorizAlign, LineOpts, RectOpts, StackOp, VertAlign, arc, bezier, circle, connectedPoints, copyToImg, dot, drawingStack, ellipse, getContext, line, lineThroughPoints, makeHelper, paths, pointLabels, rect, textBlock, textBlockAligned, textHeight, textRect, textWidth, translatePoint, triangle };
-}
-type CanvasContextQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
-/**
- * Gets a 2d drawing context from canvas element or query, or throws an error
- * @param canvasElementContextOrQuery Canvas element reference or DOM query
- * @returns Drawing context.
- */
-declare const getContext: (canvasElementContextOrQuery: CanvasContextQuery) => CanvasRenderingContext2D;
-type DrawingHelper = ReturnType<typeof makeHelper>;
-/**
- * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
- * @param ctxOrCanvasEl Drawing context or canvs element reference
- * @param canvasBounds Bounds of drawing (optional). Used for limiting `textBlock`
- * @returns
- */
-declare const makeHelper: (ctxOrCanvasEl: CanvasContextQuery, canvasBounds?: Rects.Rect) => {
-  ctx: CanvasRenderingContext2D;
-  paths(pathsToDraw: Paths.Path[] | readonly Paths.Path[], opts?: DrawingOpts): void;
-  line(lineToDraw: Lines.Line | Lines.Line[], opts?: DrawingOpts): void;
-  rect(rectsToDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: RectOpts): void;
-  bezier(bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier, opts?: DrawingOpts): void;
-  connectedPoints(pointsToDraw: Points.Point[], opts?: DrawingOpts & Partial<ConnectedPointsOptions>): void;
-  pointLabels(pointsToDraw: Points.Point[], opts?: DrawingOpts): void;
-  dot(dotPosition: Points.Point | Points.Point[], opts?: DotOpts): void;
-  circle(circlesToDraw: Circles.CirclePositioned | Circles.CirclePositioned[], opts: DrawingOpts): void;
-  arc(arcsToDraw: Arcs.ArcPositioned | Arcs.ArcPositioned[], opts: DrawingOpts): void;
-  textBlock(lines: string[], opts: DrawingOpts & {
-    anchor: Points.Point;
-    anchorPadding?: number;
-    bounds?: Rects.RectPositioned;
-  }): void;
-};
-/**
- * Drawing options
- */
-type DrawingOpts = {
-  /**
-   * Stroke style
-   */
-  readonly strokeStyle?: string;
-  /**
-   * Fill style
-   */
-  readonly fillStyle?: string;
-  /**
-   * If true, diagnostic helpers will be drawn
-   */
-  readonly debug?: boolean;
-};
-type LineOpts = {
-  readonly lineWidth?: number;
-  readonly lineCap?: CanvasLineCap;
-  readonly lineJoin?: CanvasLineJoin;
-};
-/**
- * Draws one or more arcs.
- * @param ctx
- * @param arcs
- * @param opts
- */
-declare const arc: (ctx: CanvasRenderingContext2D, arcs: Arcs.ArcPositioned | readonly Arcs.ArcPositioned[], opts?: DrawingOpts) => void;
-/**
- * A drawing stack operation
- */
-type StackOp = (ctx: CanvasRenderingContext2D) => void;
-/**
- * A drawing stack (immutable)
- */
-type DrawingStack = {
-  /**
-   * Push a new drawing op
-   * @param ops Operation to add
-   * @returns stack with added op
-   */
-  push(...ops: readonly StackOp[]): DrawingStack;
-  /**
-   * Pops an operatiomn
-   * @returns Drawing stack with item popped
-   */
-  pop(): DrawingStack;
-  /**
-   * Applies drawing stack
-   */
-  apply(): DrawingStack;
-};
-/**
- * Creates and returns an immutable drawing stack for a context
- * @param ctx Context
- * @param stk Initial stack operations
- * @returns
- */
-declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: IStackImmutable<StackOp>) => DrawingStack;
-/**
- * Draws a curved line through a set of points
- * @param ctx
- * @param points
- * @param opts
- */
-declare const lineThroughPoints: (ctx: CanvasRenderingContext2D, points: readonly Points.Point[], opts?: DrawingOpts) => void;
-/**
- * Draws one or more circles. Will draw outline/fill depending on
- * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
- *
- * ```js
- * // Draw a circle with radius of 10 at 0,0
- * circle(ctx, {radius:10});
- *
- * // Draw a circle of radius 10 at 100,100
- * circle(ctx, {radius: 10, x: 100, y: 100});
- *
- * // Draw two blue outlined circles
- * circle(ctx, [ {radius: 5}, {radius: 10} ], {strokeStyle:`blue`});
- * ```
- * @param ctx Drawing context
- * @param circlesToDraw Circle(s) to draw
- * @param opts Drawing options
- */
-declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: Circles.CirclePositioned | readonly Circles.CirclePositioned[], opts?: DrawingOpts) => void;
-/**
- * Draws one or more ellipses. Will draw outline/fill depending on
- * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
- * @param ctx
- * @param ellipsesToDraw
- * @param opts
- */
-declare const ellipse: (ctx: CanvasRenderingContext2D, ellipsesToDraw: Ellipses.EllipsePositioned | readonly Ellipses.EllipsePositioned[], opts?: DrawingOpts) => void;
-/**
- * Draws one or more paths.
- * supported paths are quadratic beziers and lines.
- * @param ctx
- * @param pathsToDraw
- * @param opts
- */
-declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths.Path[] | Paths.Path, opts?: {
-  readonly strokeStyle?: string;
-  readonly debug?: boolean;
-}) => void;
-type ConnectedPointsOptions = {
-  readonly lineWidth: number;
-  readonly loop: boolean;
-  readonly fillStyle: string;
-  readonly strokeStyle: string;
-};
-/**
- * Draws a line between all the given points.
- * If a fillStyle is specified, it will be filled.
- *
- * See also:
- * * {@link line}: Draw one or more lines
- *
- * @param ctx
- * @param pts
- */
-declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts?: Partial<ConnectedPointsOptions>) => void;
-/**
- * Draws labels for a set of points
- * @param ctx
- * @param pts Points to draw
- * @param opts
- * @param labels Labels for points
- */
-declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts?: {
-  readonly fillStyle?: string;
-}, labels?: readonly string[]) => void;
-/**
- * Returns `point` with the canvas's translation matrix applied
- * @param ctx
- * @param point
- * @returns
- */
-declare const translatePoint: (ctx: CanvasRenderingContext2D, point: Points.Point) => Points.Point;
-/**
- * Creates a new HTML IMG element with a snapshot of the
- * canvas. Element will need to be inserted into the document.
- *
- * ```
- * const myCanvas = document.getElementById('someCanvas');
- * const el = copyToImg(myCanvas);
- * document.getElementById('images').appendChild(el);
- * ```
- * @param canvasEl
- * @returns
- */
-declare const copyToImg: (canvasEl: HTMLCanvasElement) => HTMLImageElement;
-type DotOpts = DrawingOpts & {
-  readonly radius?: number;
-  readonly stroke?: boolean;
-  readonly filled?: boolean;
-  readonly strokeWidth?: number;
-};
-/**
- * Draws filled circle(s) at provided point(s)
- * @param ctx
- * @param pos
- * @param opts
- */
-declare const dot: (ctx: CanvasRenderingContext2D, pos: Points.Point | (Points.Point | Circles.CirclePositioned)[] | Circles.CirclePositioned, opts?: DotOpts) => void;
-/**
- * Draws a cubic or quadratic bezier
- * @param ctx
- * @param bezierToDraw
- * @param opts
- */
-declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier, opts?: DrawingOpts) => void;
-/**
- * Draws one or more lines.
- *
- * Each line is drawn independently, ie it's not assumed lines are connected.
- *
- * See also:
- * * {@link connectedPoints}: Draw a series of connected points
- * @param ctx
- * @param toDraw
- * @param opts
- */
-declare const line: (ctx: CanvasRenderingContext2D, toDraw: Lines.Line | readonly Lines.Line[], opts?: LineOpts & DrawingOpts) => void;
-/**
- * Draws one or more triangles
- * @param ctx
- * @param toDraw
- * @param opts
- */
-declare const triangle: (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triangle | readonly Triangles.Triangle[], opts?: DrawingOpts & {
-  readonly filled?: boolean;
-}) => void;
-type RectOpts = DrawingOpts & Readonly<Partial<{
-  stroke: boolean;
-  filled: boolean;
-  strokeWidth: number;
-  /**
-   * If true, diagonals are drawn
-   */
-  crossed: boolean;
-}>>;
-/**
- * Draws one or more rectangles.
- *
- * @param ctx
- * @param toDraw
- * @param opts
- */
-declare const rect: (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: RectOpts) => void;
-/**
- * Returns the width of `text`. Rounds number up to nearest multiple if provided. If
- * text is empty or undefined, 0 is returned.
- * @param ctx
- * @param text
- * @param widthMultiple
- * @returns
- */
-declare const textWidth: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => number;
-declare const textRect: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number, widthMultiple?: number) => Rects.Rect;
-declare const textHeight: (ctx: CanvasRenderingContext2D, text?: string | null, padding?: number) => number;
-/**
- * Draws a block of text. Each array item is considered a line.
- * @param ctx
- * @param lines
- * @param opts
- */
-declare const textBlock: (ctx: CanvasRenderingContext2D, lines: readonly string[], opts: DrawingOpts & {
-  readonly anchor: Points.Point;
-  readonly align?: `top` | `center`;
-  readonly anchorPadding?: number;
-  readonly bounds?: Rects.RectPositioned;
-}) => void;
-type HorizAlign = `left` | `right` | `center`;
-type VertAlign = `top` | `center` | `bottom`;
-/**
- * Draws an aligned text block
- */
-declare const textBlockAligned: (ctx: CanvasRenderingContext2D, text: readonly string[] | string, opts: DrawingOpts & {
-  readonly bounds: Rects.RectPositioned;
-  readonly horiz?: HorizAlign;
-  readonly vert?: VertAlign;
-}) => void;
-//# sourceMappingURL=drawing.d.ts.map
 declare namespace image_data_grid_d_exports {
   export { accessor, byColumn, byRow, grid, setter, wrap };
 }
@@ -1757,7 +2192,7 @@ declare namespace image_data_grid_d_exports {
  * @param image ImageData
  * @returns Grid
  */
-declare const grid: (image: ImageData) => Grids.Grid;
+declare const grid: (image: ImageData) => Grid;
 /**
  * Returns an object that allows get/set grid semantics on the underlying `image` data.
  * Uses 8-bit sRGB values, meaning 0..255 range for red, green, blue & opacity.
@@ -1779,19 +2214,19 @@ declare const grid: (image: ImageData) => Grids.Grid;
  * @param image
  * @returns
  */
-declare const wrap: (image: ImageData) => Grids.GridWritable<Rgb8Bit> & Grids.GridReadable<Rgb8Bit>;
+declare const wrap: (image: ImageData) => GridWritable<Rgb8Bit> & GridReadable<Rgb8Bit>;
 /**
  * Returns a function to access pixel values by x,y
  * @param image
  * @returns
  */
-declare const accessor: (image: ImageData) => Grids.GridCellAccessor<Rgb8Bit>;
+declare const accessor: (image: ImageData) => GridCellAccessor<Rgb8Bit>;
 /**
  * Returns a function that sets pixel values
  * @param image
  * @returns
  */
-declare const setter: (image: ImageData) => Grids.GridCellSetter<Rgb>;
+declare const setter: (image: ImageData) => GridCellSetter<Rgb>;
 /**
  * Yields pixels of an image row by row
  * @param image
@@ -1862,7 +2297,7 @@ type BipolarView = (x: number, y: number) => void;
 declare const init: (elementQuery: string, options?: BipolarViewOptions) => BipolarView;
 //# sourceMappingURL=bipolar-view.d.ts.map
 //#endregion
-//#region packages/visual/src/plot/types.d.ts
+//#region ../visual/src/plot/types.d.ts
 type TextStyle = {
   font: string;
   colour: string;
@@ -1889,7 +2324,7 @@ type SeriesMeta = {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/visual/src/plot/cartesian.d.ts
+//#region ../visual/src/plot/cartesian.d.ts
 type PointMinMax = {
   min: Point;
   max: Point;
@@ -1981,7 +2416,7 @@ declare const computeAxisMark: (mm: PointMinMax, increments: number, major: numb
 };
 //# sourceMappingURL=cartesian.d.ts.map
 //#endregion
-//#region packages/visual/src/plot/DataSet.d.ts
+//#region ../visual/src/plot/DataSet.d.ts
 declare class DataSet<TValue, TSeriesMeta> {
   #private;
   lastChange: any;
@@ -2000,7 +2435,7 @@ declare class DataSet<TValue, TSeriesMeta> {
 }
 //# sourceMappingURL=DataSet.d.ts.map
 //#endregion
-//#region packages/visual/src/canvas-region.d.ts
+//#region ../visual/src/canvas-region.d.ts
 type CanvasRegionSpecRelativePositioned = {
   relativePositioned: RectPositioned;
   scale?: `independent`;
@@ -2189,7 +2624,7 @@ declare class CanvasRegion {
 }
 //# sourceMappingURL=canvas-region.d.ts.map
 //#endregion
-//#region packages/visual/src/plot/cartesian-canvas-plot.d.ts
+//#region ../visual/src/plot/cartesian-canvas-plot.d.ts
 type InsertOptions = {
   region?: CanvasRegionSpec;
   /**
@@ -2290,7 +2725,7 @@ declare class CartesianCanvasPlot {
    * @param point
    * @returns
    */
-  pointToValue(point: Point, _source: `screen`): Points.Point;
+  pointToValue(point: Point, _source: `screen`): Point;
   getDefaultMeta(): SeriesMeta;
   draw(): void;
   /**
@@ -2455,5 +2890,5 @@ declare const manualCapture: (sourceVideoEl: HTMLVideoElement, opts?: ManualCapt
 //# sourceMappingURL=video.d.ts.map
 
 //#endregion
-export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Plot, index_d_exports$2 as Svg, video_d_exports as Video, pointerVisualise };
+export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, DrawingHelper, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Plot, index_d_exports$2 as Svg, video_d_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.d.ts.map

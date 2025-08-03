@@ -1,4 +1,4 @@
-//#region packages/numbers/src/apply-to-values.d.ts
+//#region ../numbers/src/apply-to-values.d.ts
 /**
  * Apples `fn` to every key of `obj` which is numeric.
  * ```js
@@ -19,7 +19,7 @@ declare const applyToValues: <T extends Record<string, any>>(object: T, apply: (
 //# sourceMappingURL=apply-to-values.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/average-weighted.d.ts
+//#region ../numbers/src/average-weighted.d.ts
 /**
  * Computes an average of an array with a set of weights applied.
  *
@@ -56,7 +56,7 @@ declare const applyToValues: <T extends Record<string, any>>(object: T, apply: (
 declare const averageWeighted: (data: number[] | readonly number[], weightings: number[] | readonly number[] | ((value: number) => number)) => number;
 //# sourceMappingURL=average-weighted.d.ts.map
 //#endregion
-//#region packages/numbers/src/clamp.d.ts
+//#region ../numbers/src/clamp.d.ts
 /**
  * Clamps a value between min and max (both inclusive)
  * Defaults to a 0-1 range, useful for percentages.
@@ -130,7 +130,7 @@ declare const clampIndex: (v: number, arrayOrLength: number | readonly any[]) =>
 declare const maxAbs: (...values: number[]) => number;
 //# sourceMappingURL=clamp.d.ts.map
 //#endregion
-//#region packages/numbers/src/count.d.ts
+//#region ../numbers/src/count.d.ts
 /**
  * Yields `amount` integers, counting by one from zero. If a negative amount is used,
  * count decreases. If `offset` is provided, this is added to the return result.
@@ -167,7 +167,7 @@ declare const maxAbs: (...values: number[]) => number;
 declare function count(amount: number, offset?: number): Generator<number, void, void>;
 //# sourceMappingURL=count.d.ts.map
 //#endregion
-//#region packages/numbers/src/difference.d.ts
+//#region ../numbers/src/difference.d.ts
 type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `absolute`;
 /**
  * Returns the difference from the `initial` value. Defaults to absolute difference.
@@ -255,7 +255,7 @@ declare const differenceFromFixed: (initial: number, kind?: DifferenceKind) => (
 declare const differenceFromLast: (kind?: DifferenceKind, initialValue?: number) => (v: number) => number;
 //# sourceMappingURL=difference.d.ts.map
 //#endregion
-//#region packages/numbers/src/filter.d.ts
+//#region ../numbers/src/filter.d.ts
 /**
  * Filters an iterator of values, only yielding
  * those that are valid numbers
@@ -301,7 +301,7 @@ declare const thresholdAtLeast: (threshold: number) => (v: number) => boolean;
 declare const rangeInclusive: (min: number, max: number) => (v: number) => boolean;
 //# sourceMappingURL=filter.d.ts.map
 //#endregion
-//#region packages/numbers/src/flip.d.ts
+//#region ../numbers/src/flip.d.ts
 /**
  * Flips a percentage-scale number: `1 - v`.
  *
@@ -319,7 +319,7 @@ declare const rangeInclusive: (min: number, max: number) => (v: number) => boole
 declare const flip: (v: number | (() => number)) => number;
 //# sourceMappingURL=flip.d.ts.map
 //#endregion
-//#region packages/numbers/src/generate.d.ts
+//#region ../numbers/src/generate.d.ts
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
  * If `end` is provided, generator stops when reached.
@@ -387,7 +387,7 @@ declare const numericRange: (interval: number, start?: number, end?: number, rep
 declare const numericPercent: (interval?: number, repeating?: boolean, start?: number, end?: number) => Generator<number, void, unknown>;
 //# sourceMappingURL=generate.d.ts.map
 //#endregion
-//#region packages/numbers/src/guard.d.ts
+//#region ../numbers/src/guard.d.ts
 /**
  * Returns true if `possibleNumber` is a number and not NaN
  * @param possibleNumber
@@ -397,7 +397,7 @@ declare const isValid: (possibleNumber: unknown) => boolean;
 //# sourceMappingURL=guard.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/is-approx.d.ts
+//#region ../numbers/src/is-approx.d.ts
 /**
  * Returns a function that checks if a value is within range of a base value
  * ```js
@@ -451,7 +451,7 @@ declare function isApprox(rangePercent: number, baseValue: number, value: number
 declare const isCloseToAny: (allowedRangeAbsolute: number, ...targets: number[]) => (...values: number[]) => boolean;
 //# sourceMappingURL=is-approx.d.ts.map
 //#endregion
-//#region packages/numbers/src/types.d.ts
+//#region ../numbers/src/types.d.ts
 type NumbersComputeResult = {
   /**
    * Tally of number of items
@@ -638,7 +638,7 @@ declare const clamp$1: (bipolarValue: number) => number;
 declare const towardZero: (bipolarValue: number, amount: number) => number;
 //# sourceMappingURL=bipolar.d.ts.map
 //#endregion
-//#region packages/numbers/src/interpolate.d.ts
+//#region ../numbers/src/interpolate.d.ts
 /**
  * Interpolation options.
  *
@@ -767,7 +767,7 @@ declare const interpolatorStepped: (incrementAmount: number, a?: number, b?: num
 declare const interpolateAngle: (amount: number, aRadians: number, bRadians: number, options?: Partial<BasicInterpolateOptions>) => number;
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/numbers/src/linear-space.d.ts
+//#region ../numbers/src/linear-space.d.ts
 /**
  * Generates a `step`-length series of values between `start` and `end` (inclusive).
  * Each value will be equally spaced.
@@ -791,7 +791,7 @@ declare const interpolateAngle: (amount: number, aRadians: number, bRadians: num
 declare function linearSpace(start: number, end: number, steps: number, precision?: number): IterableIterator<number>;
 //# sourceMappingURL=linear-space.d.ts.map
 //#endregion
-//#region packages/numbers/src/moving-average.d.ts
+//#region ../numbers/src/moving-average.d.ts
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
  * previous samples. Less accurate, but uses less system resources.
@@ -929,7 +929,7 @@ declare const stream: (minDefault?: number, maxDefault?: number) => (v: number) 
 declare const array: (values: readonly number[], minForced?: number, maxForced?: number) => number[];
 //# sourceMappingURL=normalise.d.ts.map
 //#endregion
-//#region packages/numbers/src/number-array-compute.d.ts
+//#region ../numbers/src/number-array-compute.d.ts
 /**
  * Calculate the min, max, total, average and count of input array `data`.
  * ```js
@@ -943,7 +943,7 @@ declare const numberArrayCompute: (data: number[] | readonly number[], opts?: Nu
 //# sourceMappingURL=number-array-compute.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/numeric-arrays.d.ts
+//#region ../numbers/src/numeric-arrays.d.ts
 /**
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  *
@@ -1099,7 +1099,7 @@ declare const totalFast: (data: readonly number[] | Float32Array) => number;
 declare const minFast: (data: readonly number[] | Float32Array) => number;
 //# sourceMappingURL=numeric-arrays.d.ts.map
 //#endregion
-//#region packages/numbers/src/proportion.d.ts
+//#region ../numbers/src/proportion.d.ts
 /**
  * Scales a percentage-scale number, ie: `v * t`.
  *
@@ -1116,7 +1116,7 @@ declare const proportion: (v: number | (() => number), t: number | (() => number
 //# sourceMappingURL=proportion.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/quantise.d.ts
+//#region ../numbers/src/quantise.d.ts
 /**
  * Rounds `v` by `every`. Middle values are rounded up by default.
  *
@@ -1142,13 +1142,13 @@ declare const proportion: (v: number | (() => number), t: number | (() => number
 declare const quantiseEvery: (v: number, every: number, middleRoundsUp?: boolean) => number;
 //# sourceMappingURL=quantise.d.ts.map
 //#endregion
-//#region packages/numbers/src/round.d.ts
+//#region ../numbers/src/round.d.ts
 declare function round(decimalPlaces: number, v: number, roundUp?: boolean): number;
 declare function round(decimalPlaces: number, roundUp?: boolean): (v: number) => number;
 //# sourceMappingURL=round.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/scale.d.ts
+//#region ../numbers/src/scale.d.ts
 /**
  * Scales `v` from an input range to an output range (aka `map`)
  *
@@ -1283,7 +1283,7 @@ declare const scalerPercent: (outMin: number, outMax: number) => (v: number) => 
 declare const scalerTwoWay: (inMin: number, inMax: number, outMin?: number, outMax?: number, clamped?: boolean, easing?: (v: number) => number) => NumberScalerTwoWay;
 //# sourceMappingURL=scale.d.ts.map
 //#endregion
-//#region packages/numbers/src/softmax.d.ts
+//#region ../numbers/src/softmax.d.ts
 /**
  * Via: https://gist.github.com/cyphunk/6c255fa05dd30e69f438a930faeb53fe
  * @param logits
@@ -1293,7 +1293,7 @@ declare const softmax: (logits: number[]) => number[];
 //# sourceMappingURL=softmax.d.ts.map
 
 //#endregion
-//#region packages/numbers/src/wrap.d.ts
+//#region ../numbers/src/wrap.d.ts
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
  *

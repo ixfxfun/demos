@@ -1,8 +1,9 @@
-import { __export, __reExport } from "./chunk-Cn1u12Og.js";
-import { IWithEntries, Interval, IsEqual, ToString } from "@ixfx/core";
-import { SimpleEventEmitter } from "@ixfx/events";
+import { IsEqual } from "./is-equal-aUE7iVHd.js";
+import { IWithEntries, Interval, ToString } from "./types-BEAJ_GOH.js";
+import { GetOrGenerate, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-DpHdi7xH.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
 
-//#region packages/collections/src/circular-array.d.ts
+//#region ../collections/src/circular-array.d.ts
 interface ICircularArray<V> extends Array<V> {
   /**
    * Returns true if the array has filled to capacity and is now
@@ -62,7 +63,7 @@ declare class CircularArray<V> extends Array {
 }
 //# sourceMappingURL=circular-array.d.ts.map
 //#endregion
-//#region packages/collections/src/tree/types.d.ts
+//#region ../collections/src/tree/types.d.ts
 /**
  * A labelled single value or array of values
  */
@@ -249,7 +250,7 @@ type WrappedNode<T> = TraversableTree<T> & {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/collections/src/tree/compare.d.ts
+//#region ../collections/src/tree/compare.d.ts
 type DiffAnnotation<T> = {
   /**
    * In the case of changes, this is old value
@@ -282,7 +283,7 @@ type DiffNode<T> = TreeNode<DiffAnnotation<T>> & {
 declare const compare$1: <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq?: IsEqual<T>, parent?: DiffNode<T>) => DiffNode<T>;
 //# sourceMappingURL=compare.d.ts.map
 declare namespace tree_mutable_d_exports {
-  export { add, addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, childrenValues, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, findParentsValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, parentsValues, queryByValue, queryParentsValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
+  export { add, addValue$1 as addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, childrenValues, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, findParentsValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, parentsValues, queryByValue, queryParentsValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
 }
 /**
  * Compares two nodes.
@@ -459,7 +460,7 @@ declare const hasParent$1: <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T
  */
 declare const computeMaxDepth: <T>(node: TreeNode<T>) => number;
 declare const add: <T>(child: TreeNode<T>, parent: TreeNode<T>) => void;
-declare const addValue: <T>(value: T | undefined, parent: TreeNode<T>) => TreeNode<T>;
+declare const addValue$1: <T>(value: T | undefined, parent: TreeNode<T>) => TreeNode<T>;
 /**
  * Creates the root for a tree, with an optional `value`.
  * Use {@link rootWrapped} if you want a more object-oriented mode of access.
@@ -1109,7 +1110,7 @@ declare const isTreeNode: (node: any) => node is TreeNode<any>;
 declare const isTraversable: (node: any) => node is TraversableTree<any>;
 //# sourceMappingURL=index.d.ts.map
 //#endregion
-//#region packages/collections/src/types.d.ts
+//#region ../collections/src/types.d.ts
 /**
  * Key-value pairs in an array
  * @see {@link ObjectKeys}
@@ -1138,7 +1139,7 @@ type TableRow<V> = TableValue<V>[];
 //# sourceMappingURL=types.d.ts.map
 
 //#endregion
-//#region packages/collections/src/stack/IStack.d.ts
+//#region ../collections/src/stack/IStack.d.ts
 /**
  * Stack (immutable)
  *
@@ -1199,7 +1200,7 @@ interface IStack<V> {
 }
 //# sourceMappingURL=IStack.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/IStackMutable.d.ts
+//#region ../collections/src/stack/IStackMutable.d.ts
 /**
  * Stack (mutable)
  *
@@ -1242,14 +1243,14 @@ interface IStackMutable<V> extends IStack<V> {
 }
 //# sourceMappingURL=IStackMutable.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/IStackImmutable.d.ts
+//#region ../collections/src/stack/IStackImmutable.d.ts
 interface IStackImmutable<V> extends IStack<V> {
   push(...toAdd: readonly V[]): IStackImmutable<V>;
   pop(): IStackImmutable<V>;
 }
 //# sourceMappingURL=IStackImmutable.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/Types.d.ts
+//#region ../collections/src/stack/Types.d.ts
 type StackDiscardPolicy = `older` | `newer` | `additions`;
 type StackOpts = {
   readonly debug?: boolean;
@@ -1258,7 +1259,7 @@ type StackOpts = {
 };
 //# sourceMappingURL=Types.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/StackImmutable.d.ts
+//#region ../collections/src/stack/StackImmutable.d.ts
 declare class StackImmutable<V> implements IStackImmutable<V> {
   private readonly opts;
   readonly data: ReadonlyArray<V>;
@@ -1298,7 +1299,7 @@ declare class StackImmutable<V> implements IStackImmutable<V> {
 declare const immutable$3: <V>(options?: StackOpts, ...startingItems: ReadonlyArray<V>) => IStackImmutable<V>;
 //# sourceMappingURL=StackImmutable.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/StackMutable.d.ts
+//#region ../collections/src/stack/StackMutable.d.ts
 /**
  * Creates a stack. Mutable. Use {@link StackImmutable} for an immutable alternative.
  *
@@ -1361,7 +1362,7 @@ declare class StackMutable<V> implements IStackMutable<V> {
 declare const mutable$3: <V>(opts?: StackOpts, ...startingItems: readonly V[]) => IStackMutable<V>;
 //# sourceMappingURL=StackMutable.d.ts.map
 //#endregion
-//#region packages/collections/src/stack/StackFns.d.ts
+//#region ../collections/src/stack/StackFns.d.ts
 declare const trimStack: <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
 declare const push: <V>(opts: StackOpts, stack: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
 declare const pop: <V>(opts: StackOpts, stack: ReadonlyArray<V>) => ReadonlyArray<V>;
@@ -1381,7 +1382,7 @@ declare namespace index_d_exports$4 {
   export { IStack, IStackImmutable, IStackMutable, StackDiscardPolicy, StackImmutable, StackMutable, StackOpts, immutable$3 as immutable, isEmpty$1 as isEmpty, isFull$1 as isFull, mutable$3 as mutable, peek$1 as peek, pop, push, trimStack };
 }
 //#endregion
-//#region packages/collections/src/set/Types.d.ts
+//#region ../collections/src/set/Types.d.ts
 type ValueSetEventMap<V> = {
   readonly add: {
     readonly value: V;
@@ -1393,7 +1394,7 @@ type ValueSetEventMap<V> = {
 //# sourceMappingURL=Types.d.ts.map
 
 //#endregion
-//#region packages/collections/src/set/ISetMutable.d.ts
+//#region ../collections/src/set/ISetMutable.d.ts
 /**
  * A Set which stores unique items determined by their value, rather
  * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Mutable.
@@ -1494,7 +1495,7 @@ interface ISetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
 }
 //# sourceMappingURL=ISetMutable.d.ts.map
 //#endregion
-//#region packages/collections/src/set/set-mutable.d.ts
+//#region ../collections/src/set/set-mutable.d.ts
 /**
  * Creates a {@link ISetMutable}.
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
@@ -1550,7 +1551,7 @@ declare class SetStringMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>
 }
 //# sourceMappingURL=set-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/set/ISet.d.ts
+//#region ../collections/src/set/ISet.d.ts
 interface ISet<V> {
   has(v: V): boolean;
   get size(): number;
@@ -1563,7 +1564,7 @@ interface ISet<V> {
 //# sourceMappingURL=ISet.d.ts.map
 
 //#endregion
-//#region packages/collections/src/set/ISetImmutable.d.ts
+//#region ../collections/src/set/ISetImmutable.d.ts
 /**
  * A Set which stores unique items determined by their value, rather
  * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Immutable.
@@ -1621,7 +1622,7 @@ interface ISetImmutable<V> extends ISet<V> {
 }
 //# sourceMappingURL=ISetImmutable.d.ts.map
 //#endregion
-//#region packages/collections/src/set/SetImmutable.d.ts
+//#region ../collections/src/set/SetImmutable.d.ts
 declare class SetStringImmutable<V> implements ISetImmutable<V> {
   private store;
   private keyString;
@@ -1643,7 +1644,7 @@ declare const immutable$2: <V>(keyString?: ToString<V>) => ISetImmutable<V>;
 //# sourceMappingURL=SetImmutable.d.ts.map
 
 //#endregion
-//#region packages/collections/src/set/massive-set.d.ts
+//#region ../collections/src/set/massive-set.d.ts
 /**
  * MassiveSet supports semantics similar to Set, but without the
  * limitation on how much data is stored.
@@ -1703,7 +1704,7 @@ declare namespace index_d_exports$3 {
   export { ISetImmutable, ISetMutable, MassiveSet, SetStringImmutable, SetStringMutable, ValueSetEventMap, immutable$2 as immutable, mutable$2 as mutable };
 }
 //#endregion
-//#region packages/collections/src/queue/iqueue-mutable.d.ts
+//#region ../collections/src/queue/iqueue-mutable.d.ts
 type QueueMutableEvents<V> = {
   /**
    * Data has been added
@@ -1813,7 +1814,7 @@ interface IQueueMutable<V> {
 }
 //# sourceMappingURL=iqueue-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/ipriority-queue-mutable.d.ts
+//#region ../collections/src/queue/ipriority-queue-mutable.d.ts
 /**
  * A prioritised item in queue
  */
@@ -1849,7 +1850,7 @@ interface IPriorityQueueMutable<V> extends IQueueMutable<PriorityItem<V>> {
 }
 //# sourceMappingURL=ipriority-queue-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/iqueue-immutable.d.ts
+//#region ../collections/src/queue/iqueue-immutable.d.ts
 /**
  * Queue (immutable). See also {@link QueueMutable}.
  *
@@ -1915,7 +1916,7 @@ interface IQueueImmutable<V> {
 }
 //# sourceMappingURL=iqueue-immutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/queue-types.d.ts
+//#region ../collections/src/queue/queue-types.d.ts
 type QueueDiscardPolicy = `older` | `newer` | `additions`;
 /**
  * Queue options.
@@ -1950,7 +1951,7 @@ type QueueOpts<V> = {
 //# sourceMappingURL=queue-types.d.ts.map
 
 //#endregion
-//#region packages/collections/src/queue/queue-mutable.d.ts
+//#region ../collections/src/queue/queue-mutable.d.ts
 /**
  * Mutable queue that fires events when manipulated.
  *
@@ -2030,7 +2031,7 @@ declare class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> 
 declare function mutable$1<V>(options?: QueueOpts<V>, ...startingItems: readonly V[]): IQueueMutableWithEvents<V>;
 //# sourceMappingURL=queue-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/priority-mutable.d.ts
+//#region ../collections/src/queue/priority-mutable.d.ts
 /**
  * Simple priority queue implementation.
  * Higher numbers mean higher priority.
@@ -2071,7 +2072,7 @@ declare class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implement
 declare function priority<V>(opts?: QueueOpts<PriorityItem<V>>): IPriorityQueueMutable<V>;
 //# sourceMappingURL=priority-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/queue-immutable.d.ts
+//#region ../collections/src/queue/queue-immutable.d.ts
 declare class QueueImmutable<V> implements IQueueImmutable<V> {
   #private;
   readonly opts: QueueOpts<V>;
@@ -2115,7 +2116,7 @@ declare class QueueImmutable<V> implements IQueueImmutable<V> {
 declare const immutable$1: <V>(options?: QueueOpts<V>, ...startingItems: readonly V[]) => IQueueImmutable<V>;
 //# sourceMappingURL=queue-immutable.d.ts.map
 //#endregion
-//#region packages/collections/src/queue/queue-fns.d.ts
+//#region ../collections/src/queue/queue-fns.d.ts
 declare const debug: (opts: QueueOpts<any>, message: string) => void;
 declare const trimQueue: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>, toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
 /**
@@ -2145,7 +2146,7 @@ declare namespace index_d_exports$2 {
   export { IPriorityQueueMutable, IQueueImmutable, IQueueMutable, IQueueMutableWithEvents, PriorityItem, PriorityMutable, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueMutableEvents, QueueOpts, debug, dequeue, enqueue, immutable$1 as immutable, isEmpty, isFull, mutable$1 as mutable, peek, priority, trimQueue };
 }
 //#endregion
-//#region packages/collections/src/map/expiring-map.d.ts
+//#region ../collections/src/map/expiring-map.d.ts
 /**
  * Expiring map options
  */
@@ -2357,7 +2358,7 @@ declare class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, 
 }
 //# sourceMappingURL=expiring-map.d.ts.map
 //#endregion
-//#region packages/collections/src/map/imap-of.d.ts
+//#region ../collections/src/map/imap-of.d.ts
 interface IMapOf<V> {
   /**
    * Iterates over all keys
@@ -2414,7 +2415,7 @@ interface IMapOf<V> {
 }
 //# sourceMappingURL=imap-of.d.ts.map
 //#endregion
-//#region packages/collections/src/map/imap-of-mutable.d.ts
+//#region ../collections/src/map/imap-of-mutable.d.ts
 interface IMapOfMutable<V> extends IMapOf<V> {
   /**
    * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
@@ -2457,7 +2458,7 @@ interface IMapOfMutable<V> extends IMapOf<V> {
 }
 //# sourceMappingURL=imap-of-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-simple-base.d.ts
+//#region ../collections/src/map/map-of-simple-base.d.ts
 declare class MapOfSimpleBase<V> {
   protected map: Map<string, readonly V[]>;
   protected readonly groupBy: any;
@@ -2543,7 +2544,7 @@ declare class MapOfSimpleBase<V> {
 }
 //# sourceMappingURL=map-of-simple-base.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-simple-mutable.d.ts
+//#region ../collections/src/map/map-of-simple-mutable.d.ts
 /**
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
@@ -2628,7 +2629,7 @@ declare class MapOfSimpleMutable<V> extends MapOfSimpleBase<V> implements IMapOf
 declare const ofSimpleMutable: <V>(groupBy?: (value: V) => string, valueEq?: IsEqual<V>) => IMapOfMutable<V>;
 //# sourceMappingURL=map-of-simple-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/imap-base.d.ts
+//#region ../collections/src/map/imap-base.d.ts
 interface IMapBase<K, V> {
   /**
    * Gets an item by key
@@ -2666,7 +2667,7 @@ interface IMapBase<K, V> {
 }
 //# sourceMappingURL=imap-base.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map.d.ts
+//#region ../collections/src/map/map.d.ts
 /**
  * An immutable map. Rather than changing the map, functions like `add` and `delete`
  * return a new map reference which must be captured.
@@ -2760,7 +2761,7 @@ interface IMapImmutable<K, V> extends IMapBase<K, V> {
 declare const immutable: <K, V>(dataOrMap?: ReadonlyMap<K, V> | EitherKey<K, V>) => IMapImmutable<K, V>;
 //# sourceMappingURL=map.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-mutable.d.ts
+//#region ../collections/src/map/map-mutable.d.ts
 /**
  * A mutable map.
  *
@@ -2822,7 +2823,7 @@ interface IMapMutable<K, V> extends IMapBase<K, V> {
 declare const mutable: <K, V>(...data: EitherKey<K, V>) => IMapMutable<K, V>;
 //# sourceMappingURL=map-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/imap-of-mutable-extended.d.ts
+//#region ../collections/src/map/imap-of-mutable-extended.d.ts
 /**
  * Events from mapArray
  */
@@ -2920,7 +2921,7 @@ interface IMapOfMutableExtended<V, M> extends SimpleEventEmitter<MapArrayEvents<
 }
 //# sourceMappingURL=imap-of-mutable-extended.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-array-mutable.d.ts
+//#region ../collections/src/map/map-of-array-mutable.d.ts
 /**
  * Map of array options
  */
@@ -2965,7 +2966,7 @@ declare const ofArrayMutable: <V>(options?: MapArrayOpts<V>) => IMapOfMutableExt
 //# sourceMappingURL=map-of-array-mutable.d.ts.map
 
 //#endregion
-//#region packages/collections/src/map/imap-of-immutable.d.ts
+//#region ../collections/src/map/imap-of-immutable.d.ts
 /**
  * Like a `Map` but multiple values can be stored for each key. Immutable.
  * Duplicate values can be added to the same or even a several keys.
@@ -3050,7 +3051,7 @@ interface IMapOfImmutable<V> extends IMapOf<V> {
 }
 //# sourceMappingURL=imap-of-immutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-simple.d.ts
+//#region ../collections/src/map/map-of-simple.d.ts
 /**
  * Simple immutable MapOf
  */
@@ -3084,7 +3085,7 @@ declare class MapOfSimple<V> extends MapOfSimpleBase<V> implements IMapOf<V>, IM
 declare const ofSimple: <V>(groupBy?: ToString<V>, valueEq?: IsEqual<V>) => IMapOfImmutable<V>;
 //# sourceMappingURL=map-of-simple.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-multi-impl.d.ts
+//#region ../collections/src/map/map-of-multi-impl.d.ts
 /**
  * @internal
  */
@@ -3143,7 +3144,7 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
 }
 //# sourceMappingURL=map-of-multi-impl.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-multi-fns.d.ts
+//#region ../collections/src/map/map-multi-fns.d.ts
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
  *
@@ -3189,7 +3190,7 @@ declare const lengthMax: <V>(map: IMapOf<V>) => number;
 declare const firstEntryByValue: <K, V>(map: IWithEntries<K, Iterable<V>>, value: V, isEqual?: IsEqual<V>) => readonly [key: K, value: Iterable<V>] | undefined;
 //# sourceMappingURL=map-multi-fns.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-multi.d.ts
+//#region ../collections/src/map/map-multi.d.ts
 /**
  * @private
  */
@@ -3224,7 +3225,7 @@ type MapSetOpts<V> = MapMultiOpts<V> & {
 };
 //# sourceMappingURL=map-multi.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-set-mutable.d.ts
+//#region ../collections/src/map/map-of-set-mutable.d.ts
 /**
  * Returns a {@link IMapOfMutableExtended} that uses a set to hold values.
  * This means that only unique values are stored under each key. By default it
@@ -3255,7 +3256,7 @@ type MapSetOpts<V> = MapMultiOpts<V> & {
 declare const ofSetMutable: <V>(options?: MapSetOpts<V>) => IMapOfMutableExtended<V, ReadonlyMap<string, V>>;
 //# sourceMappingURL=map-of-set-mutable.d.ts.map
 //#endregion
-//#region packages/collections/src/map/map-of-circular-mutable.d.ts
+//#region ../collections/src/map/map-of-circular-mutable.d.ts
 type MapCircularOpts<V> = MapMultiOpts<V> & {
   readonly capacity: number;
 };
@@ -3282,7 +3283,7 @@ declare const ofCircularMutable: <V>(options: MapCircularOpts<V>) => IMapOfMutab
 //# sourceMappingURL=map-of-circular-mutable.d.ts.map
 
 //#endregion
-//#region packages/collections/src/map/number-map.d.ts
+//#region ../collections/src/map/number-map.d.ts
 /**
  * Simple map for numbers.
  *
@@ -3331,13 +3332,10 @@ declare class NumberMap<K> extends Map<K, number> {
 }
 //# sourceMappingURL=number-map.d.ts.map
 declare namespace index_d_exports$1 {
-  export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapOfSimpleMutable, MapSetOpts, MultiValue, NumberMap, create as expiringMap, firstEntry, firstEntryByValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple, ofSimpleMutable };
+  export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, GetOrGenerate, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapOfSimpleMutable, MapSetOpts, MergeReconcile, MultiValue, NumberMap, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, create as expiringMap, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, firstEntry, firstEntryByValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mapToArray, mapToObjectTransform, mergeByKey, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple, ofSimpleMutable, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue };
 }
-import * as import___ixfx_core_maps from "@ixfx/core/maps";
-__reExport(index_d_exports$1, import___ixfx_core_maps);
-
 //#endregion
-//#region packages/collections/src/table.d.ts
+//#region ../collections/src/table.d.ts
 /**
  * Stores values in a table of rows (vertical) and columns (horizontal)
  */

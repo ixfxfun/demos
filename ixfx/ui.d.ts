@@ -1,13 +1,190 @@
-import * as _ixfx_core0 from "@ixfx/core";
-import { Interval, Pathed } from "@ixfx/core";
-import * as Rx from "@ixfx/rx";
-import { Reactive, ReactiveInitial, ReactiveNonInitial, ReactiveWritable } from "@ixfx/rx";
-import { Colour } from "@ixfx/visual";
-import { HslScalar } from "@ixfx/visual/colour";
-import { EventSourceOptions } from "@ixfx/rx/from";
+import { PathDataChange } from "./pathed-DGKJECMt.js";
+import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
+import "./is-equal-aUE7iVHd.js";
+import { Interval } from "./types-BEAJ_GOH.js";
+import "./types-CePLSdIj.js";
 
-//#region packages/ui/src/rx/browser-resize.d.ts
+//#region ../visual/dist/src/colour/types.d.ts
+type HslBase = {
+  /**
+   * Hue
+   */
+  h: number;
+  /**
+   * Saturation
+   */
+  s: number;
+  /**
+   * Lightness
+   */
+  l: number;
+  /**
+   * Opacity
+   */
+  opacity?: number;
+  space?: `hsl`;
+};
+/**
+ * Scalar values use 0..1 for each field
+ */
+type HslScalar = HslBase & {
+  unit: `scalar`;
+};
+/**
+ * Absolute values use hue:0..360, all other fields 0..100
+ */
 
+//#endregion
+//#region ../rx/dist/src/from/types.d.ts
+
+type EventSourceOptions = {
+  /**
+   * If true, behaves like Source.object where event
+   * properties are compared and source only
+   * emits where there is a change.
+   *
+   * Default: _false_
+   */
+  diff?: boolean;
+  lazy?: Lazy;
+  /**
+   * If true, log messages are emitted
+   * when event handlers are added/removed
+   */
+  debugLifecycle?: boolean;
+  /**
+   * If true, log messages are emitted
+   * when the source event fires
+   */
+  debugFiring?: boolean;
+};
+//#endregion
+//#region ../rx/dist/src/types.d.ts
+
+type SignalKinds = `done` | `warn`;
+type Passed<V> = {
+  value: V | undefined;
+  signal?: SignalKinds;
+  context?: string;
+};
+/**
+ * Laziness
+ * * start: only begins on first subscriber. Keeps running even when there are no subscribers
+ * * very: only begins on first subscriber. Stops looping if there are no subscribers
+ * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
+ */
+type Lazy = `initial` | `never` | `very`;
+/**
+ * A Reactive
+ */
+type Reactive<V> = {
+  /**
+   * Subscribes to a reactive. Receives
+   * data as well as signals. Use `onValue` if you
+   * just care about values.
+   *
+   * Return result unsubscribes.
+   *
+   * ```js
+   * const unsub = someReactive.on(msg => {
+   *    // Do something with msg.value
+   * });
+   *
+   * unsub(); // Unsubscribe
+   * ```
+   * @param handler
+   */
+  on(handler: (value: Passed<V>) => void): Unsubscriber;
+  /**
+   * Subscribes to a reactive's values.
+   * Returns a function that unsubscribes.
+   * @param handler
+   */
+  onValue(handler: (value: V) => void): Unsubscriber;
+  /**
+   * Disposes the reactive, providing a reason for debug tracing
+   * @param reason
+   */
+  dispose(reason: string): void;
+  /**
+   * Returns _true_ if Reactive is disposed
+   */
+  isDisposed(): boolean;
+  /**
+   * Optional 'set' to write a value. Use {@link ReactiveWritable} if you want this non-optional
+   * @param value
+   */
+  set?(value: V): void;
+};
+/**
+ * A reactive that can be 'pinged' to produce a value.
+ *
+ * Use {@link isPingable} to check if a reactive is pingable.
+ *
+ * Pingable reactives are returned from
+ * * interpolate
+ * * computeWithPrevious
+ * * valueToPing
+ */
+
+type Unsubscriber = () => void;
+type ReactiveNonInitial<V> = Reactive<V> & {
+  last(): V | undefined;
+};
+/**
+ * A stream that can be written to
+ */
+type ReactiveWritable<TIn, TOut = TIn> = Reactive<TOut> & {
+  /**
+   * Sets a value
+   * @param value Value to write
+   */
+  set(value: TIn): void;
+};
+type ReactiveInitial<V> = Reactive<V> & {
+  last(): V;
+};
+type ObjectFieldHandler = {
+  value: any;
+  fieldName: string;
+  pattern: string;
+};
+type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
+  /**
+   * Notifies when the value of `fieldName` is changed.
+   *
+   * Use the returned function to unsubscribe.
+   * @param fieldName
+   * @param handler
+   */
+  onField(fieldName: string, handler: (result: ObjectFieldHandler) => void): () => void;
+  /**
+   * Notifies of which field(s) were changed.
+   * If you just care about the whole, changed data use the `value` event.
+   *
+   * Use the returned function to unsubscribe.
+   * @param changes
+   */
+  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
+  /**
+   * Updates the reactive with some partial key-value pairs.
+   * Keys omitted are left the same as the current value.
+   * @param changedPart
+   * @returns Returns new value
+   */
+  update(changedPart: RecursivePartial<V>): V;
+  /**
+   * Updates a particular field by its path
+   * @param field
+   * @param value
+   */
+  updateField(field: string, value: any): void;
+};
+/**
+ * A reactive stream which can be read and written to
+ */
+//#endregion
+//#region ../ui/src/rx/browser-resize.d.ts
 /**
  * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.
  *
@@ -21,19 +198,19 @@ import { EventSourceOptions } from "@ixfx/rx/from";
  * @param interval Tiemout before event gets triggered
  * @returns
  */
-declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => Rx.Reactive<ResizeObserverEntry[]>;
+declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => Reactive<ResizeObserverEntry[]>;
 /**
  * Returns an Reactive for window resize. Default 100ms debounce.
  * @param elapsed
  * @returns
  */
-declare const windowResize: (elapsed?: Interval) => Rx.Reactive<{
+declare const windowResize: (elapsed?: Interval) => Reactive<{
   innerWidth: number;
   innerHeight: number;
 }>;
 //# sourceMappingURL=browser-resize.d.ts.map
 //#endregion
-//#region packages/ui/src/rx/browser-theme-change.d.ts
+//#region ../ui/src/rx/browser-theme-change.d.ts
 /**
  * Observe when a class changes on a target element, by default the document.
  * Useful for tracking theme changes.
@@ -45,10 +222,10 @@ declare const windowResize: (elapsed?: Interval) => Rx.Reactive<{
  * });
  * ```
  */
-declare const cssClassChange: (target?: HTMLElement) => Rx.Reactive<MutationRecord[]>;
+declare const cssClassChange: (target?: HTMLElement) => Reactive<MutationRecord[]>;
 //# sourceMappingURL=browser-theme-change.d.ts.map
 //#endregion
-//#region packages/ui/src/rx/colour.d.ts
+//#region ../ui/src/rx/colour.d.ts
 type ReactiveColour = ReactiveWritable<HslScalar> & {
   setHsl: (hsl: HslScalar) => void;
 };
@@ -56,7 +233,7 @@ declare function colour(initialValue: HslScalar): ReactiveColour & ReactiveIniti
 declare function colour(): ReactiveColour & ReactiveNonInitial<HslScalar>;
 //# sourceMappingURL=colour.d.ts.map
 //#endregion
-//#region packages/ui/src/rx/dom-types.d.ts
+//#region ../ui/src/rx/dom-types.d.ts
 type DomBindValueTarget = {
   /**
    * If _true_ `innerHTML` is set (a shortcut for elField:`innerHTML`)
@@ -184,7 +361,7 @@ type DomNumberInputValueOptions = DomValueOptions & {
 };
 //# sourceMappingURL=dom-types.d.ts.map
 //#endregion
-//#region packages/ui/src/rx/dom-source.d.ts
+//#region ../ui/src/rx/dom-source.d.ts
 /**
  * Reactive getting/setting of values to a HTML INPUT element.
  *
@@ -198,7 +375,7 @@ type DomNumberInputValueOptions = DomValueOptions & {
  * @returns
  */
 declare function domNumberInputValue(targetOrQuery: HTMLInputElement | string, options?: Partial<DomNumberInputValueOptions>): ReactiveInitial<number> & ReactiveWritable<number>;
-declare function domHslInputValue(targetOrQuery: HTMLInputElement | string, options?: Partial<DomValueOptions>): ReactiveInitial<Colour.HslScalar> & Reactive<Colour.HslScalar> & ReactiveWritable<Colour.HslScalar>;
+declare function domHslInputValue(targetOrQuery: HTMLInputElement | string, options?: Partial<DomValueOptions>): ReactiveInitial<HslScalar> & Reactive<HslScalar> & ReactiveWritable<HslScalar>;
 /**
  * A stream of values when the a HTMLInputElement changes. Eg a <input type="range">
  * ```js
@@ -279,18 +456,18 @@ declare function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormE
 } & ReactiveInitial<T> & ReactiveWritable<T>;
 //# sourceMappingURL=dom-source.d.ts.map
 //#endregion
-//#region packages/ui/src/rx/dom.d.ts
+//#region ../ui/src/rx/dom.d.ts
 /**
  * Reactive stream of array of elements that match `query`.
  * @param query
  * @returns
  */
-declare function fromDomQuery(query: string): Rx.Reactive<HTMLElement[]> & {
+declare function fromDomQuery(query: string): Reactive<HTMLElement[]> & {
   set(value: HTMLElement[]): void;
 } & {
-  onField(fieldName: string, handler: (result: Rx.ObjectFieldHandler) => void): () => void;
-  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
-  update(changedPart: (_ixfx_core0.RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
+  onField(fieldName: string, handler: (result: ObjectFieldHandler) => void): () => void;
+  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
+  update(changedPart: (RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
   updateField(field: string, value: any): void;
 } & {
   last(): HTMLElement[];
@@ -304,7 +481,7 @@ declare function fromDomQuery(query: string): Rx.Reactive<HTMLElement[]> & {
  * @param source
  * @param bindOpts
  */
-declare const bindText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
+declare const bindText: <TSource>(source: Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
 /**
  * Updates an element's `value` (as well as the 'value' attribute) when the source value changes.s
  * @param source
@@ -312,7 +489,7 @@ declare const bindText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: strin
  * @param bindOpts
  * @returns
  */
-declare const bindValueText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
+declare const bindValueText: <TSource>(source: Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts?: Partial<DomBindSourceValue<TSource, string>>) => PipeDomBinding;
 /**
  * Updates an element's `innerHTML` when the source value changes
  * ```js
@@ -325,7 +502,7 @@ declare const bindValueText: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: 
  * @param bindOpts
  * @returns
  */
-declare const bindHtml: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: DomBindSourceValue<TSource, string>) => PipeDomBinding;
+declare const bindHtml: <TSource>(source: Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts?: DomBindSourceValue<TSource, string>) => PipeDomBinding;
 /**
  * Shortcut to bind to an elements attribute
  * @param elOrQuery
@@ -406,7 +583,7 @@ declare const bindHtml: <TSource>(source: Rx.Reactive<TSource>, elOrQuery: strin
  * @param source Source of data
  * @param binds Bindings
  */
-declare const bindElement: <TSource, TDestination>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: (DomBindSourceValue<TSource, TDestination> & DomBindValueTarget)[]) => PipeDomBinding;
+declare const bindElement: <TSource, TDestination>(source: Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: (DomBindSourceValue<TSource, TDestination> & DomBindValueTarget)[]) => PipeDomBinding;
 /**
  * Binds `source` to one or more element(s). One or more bindings for the same source
  * can be provided.
@@ -438,7 +615,7 @@ declare const bindElement: <TSource, TDestination>(source: Rx.Reactive<TSource>,
  * @param bindsUnresolvedElements
  * @returns
  */
-declare const bind: <TSource, TDestination>(source: Rx.Reactive<TSource>, ...bindsUnresolvedElements: DomBindUnresolvedSource<TSource, TDestination>[]) => PipeDomBinding;
+declare const bind: <TSource, TDestination>(source: Reactive<TSource>, ...bindsUnresolvedElements: DomBindUnresolvedSource<TSource, TDestination>[]) => PipeDomBinding;
 /**
  * Calls `updater` whenever `source` produces a value. Useful when several fields from a value
  * are needed to update an element.
@@ -461,7 +638,7 @@ declare const bind: <TSource, TDestination>(source: Rx.Reactive<TSource>, ...bin
  * @param updater
  * @returns
  */
-declare const bindUpdate: <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElement, updater: (v: V, el: HTMLElement) => void) => PipeDomBinding;
+declare const bindUpdate: <V>(source: Reactive<V>, elOrQuery: string | HTMLElement, updater: (v: V, el: HTMLElement) => void) => PipeDomBinding;
 /**
  * Updates a HTML element based on diffs on an object.
  * ```js
@@ -495,7 +672,7 @@ declare const bindUpdate: <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLEl
  * @param opts
  * @returns
  */
-declare const bindDiffUpdate: <V>(source: Rx.ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: Pathed.PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
+declare const bindDiffUpdate: <V>(source: ReactiveDiff<V>, elOrQuery: string | HTMLElement | null, updater: (diffs: PathDataChange<any>[], el: HTMLElement) => void, opts?: Partial<BindUpdateOpts<V>>) => PipeDomBinding & {
   refresh: () => void;
 };
 /**
@@ -526,10 +703,10 @@ declare const bindDiffUpdate: <V>(source: Rx.ReactiveDiff<V>, elOrQuery: string 
  * @param source
  * @param options
  */
-declare const elements: <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & Rx.ReactiveInitial<T>), options: Partial<ElementsOptions>) => void;
+declare const elements: <T>(source: ReactiveDiff<T> | (ReactiveDiff<T> & ReactiveInitial<T>), options: Partial<ElementsOptions>) => void;
 declare function win(): {
   dispose: (reason?: string) => void;
-  size: Rx.Reactive<{
+  size: Reactive<{
     lazy: string;
     transform: () => {
       width: number;
@@ -544,7 +721,7 @@ declare function win(): {
       };
     };
   };
-  pointer: Rx.Reactive<{
+  pointer: Reactive<{
     lazy: string;
     transform: (args: Event | undefined) => {
       x: number;

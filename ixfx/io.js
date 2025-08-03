@@ -1,21 +1,602 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./src-Bo4oKRxs.js";
-import "./records-qkLbe1PW.js";
-import "./is-primitive-BD8Wwhed.js";
-import { intervalToMs } from "./interval-type-Bu6U9yES.js";
-import { continuously } from "./basic-BcTIVreK.js";
-import { SimpleEventEmitter, indexOfCharCode, omitChars, splitByLength } from "./src-IqHxJtRK.js";
-import "./key-value-DZNL5nwk.js";
-import "./dist-sNLZPlTa.js";
-import { getErrorMessage } from "./resolve-core-ibINXx_1.js";
-import { max, maxFast, numberArrayCompute } from "./src-LtkApSyv.js";
-import { QueueMutable, StateMachineWithEvents, eventRace, init, retryFunction, retryTask, to, waitFor } from "./src-D8qEf6yn.js";
-import { resolveEl } from "./src-ZzsKvmqI.js";
-import "./src-CKv6-Ox5.js";
-import { number, shortGuid, string } from "./bezier-DS5b_ULE.js";
-import { manualCapture } from "./src-DjDwoI6o.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./numbers-C359_5A6.js";
+import "./to-string-Dg1sJUf1.js";
+import "./is-equal-edylSnsn.js";
+import { continuously } from "./continuously-CFHq8KyU.js";
+import { elapsedSince } from "./elapsed-DEWYfvwx.js";
+import { indexOfCharCode, omitChars, splitByLength } from "./text-UM1t_CE6.js";
+import { elapsedToHumanString, intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { resolveLogOption } from "./logger-Dv7_G_bd.js";
+import { getErrorMessage } from "./error-message-B6EPesrV.js";
+import { sleep } from "./sleep-C2hKDgCi.js";
+import "./is-equal-y9du2FWU.js";
+import "./unique-GmJPtLE_.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import { max, maxFast, minFast, totalFast } from "./numeric-arrays-DwffyOZ3.js";
+import { numberArrayCompute } from "./number-array-compute-CL2ixuue.js";
+import { shortGuid } from "./guid-DI4_KKcE.js";
+import { TrackerBase } from "./tracker-base-DcT12hen.js";
+import "./queue-fns-C19iGLvT.js";
+import { QueueMutable } from "./queue-mutable-Bcwm-_Hi.js";
+import { init, to } from "./state-machine-BUeoIwqN.js";
+import { StateMachineWithEvents } from "./with-events-B6wswWSq.js";
+import { resolveEl } from "./resolve-el-BdUlUJGi.js";
 
-//#region packages/io/src/codec.ts
+//#region ../random/dist/src/string.js
+/**
+* Returns a string of random letters and numbers of a given `length`.
+*
+* ```js
+* string();  // Random string of length 5
+* string(4); // eg. `4afd`
+* ```
+* @param lengthOrOptions Length of random string, or options.
+* @returns Random string
+*/
+const string = (lengthOrOptions = 5) => {
+	const options = typeof lengthOrOptions === `number` ? { length: lengthOrOptions } : lengthOrOptions;
+	const calculate = options.source ?? Math.random;
+	const length = options.length ?? 5;
+	let returnValue = ``;
+	while (returnValue.length < length) returnValue += calculate().toString(36).slice(2);
+	return returnValue.substring(0, length);
+};
+
+//#endregion
+//#region ../trackers/dist/src/primitive-tracker.js
+var PrimitiveTracker = class extends TrackerBase {
+	values;
+	timestamps;
+	constructor(opts) {
+		super(opts);
+		this.values = [];
+		this.timestamps = [];
+	}
+	/**
+	* Reduces size of value store to `limit`. Returns
+	* number of remaining items
+	* @param limit
+	*/
+	trimStore(limit) {
+		if (limit >= this.values.length) return this.values.length;
+		this.values = this.values.slice(-limit);
+		this.timestamps = this.timestamps.slice(-limit);
+		return this.values.length;
+	}
+	onTrimmed(reason) {}
+	get last() {
+		return this.values.at(-1);
+	}
+	get initial() {
+		return this.values.at(0);
+	}
+	/**
+	* Returns number of recorded values (this can include the initial value)
+	*/
+	get size() {
+		return this.values.length;
+	}
+	/**
+	* Returns the elapsed time, in milliseconds since the instance was created
+	*/
+	get elapsed() {
+		if (this.values.length < 0) throw new Error(`No values seen yet`);
+		return Date.now() - this.timestamps[0];
+	}
+	onReset() {
+		this.values = [];
+		this.timestamps = [];
+	}
+	/**
+	* Tracks a value
+	*/
+	filterData(rawValues) {
+		const lastValue = rawValues.at(-1);
+		const last = {
+			value: lastValue,
+			at: performance.now()
+		};
+		const values = rawValues.map((value) => ({
+			at: performance.now(),
+			value
+		}));
+		if (this.storeIntermediate) {
+			this.values.push(...rawValues);
+			this.timestamps.push(...values.map((v) => v.at));
+		} else switch (this.values.length) {
+			case 0: {
+				this.values.push(last.value);
+				this.timestamps.push(last.at);
+				break;
+			}
+			case 2: {
+				this.values[1] = last.value;
+				this.timestamps[1] = last.at;
+				break;
+			}
+			case 1: {
+				this.values.push(last.value);
+				this.timestamps.push(last.at);
+				break;
+			}
+		}
+		return values;
+	}
+};
+
+//#endregion
+//#region ../trackers/dist/src/number-tracker.js
+var NumberTracker = class extends PrimitiveTracker {
+	total = 0;
+	min = Number.MAX_SAFE_INTEGER;
+	max = Number.MIN_SAFE_INTEGER;
+	get avg() {
+		return this.total / this.seenCount;
+	}
+	/**
+	* Difference between last value and initial.
+	* Eg. if last value was 10 and initial value was 5, 5 is returned (10 - 5)
+	* If either of those is missing, undefined is returned
+	*/
+	difference() {
+		if (this.last === void 0) return;
+		if (this.initial === void 0) return;
+		return this.last - this.initial;
+	}
+	/**
+	* Relative difference between last value and initial.
+	* Eg if last value was 10 and initial value was 5, 2 is returned (200%)
+	*/
+	relativeDifference() {
+		if (this.last === void 0) return;
+		if (this.initial === void 0) return;
+		return this.last / this.initial;
+	}
+	onReset() {
+		this.min = Number.MAX_SAFE_INTEGER;
+		this.max = Number.MIN_SAFE_INTEGER;
+		this.total = 0;
+		super.onReset();
+	}
+	/**
+	* When trimmed, recomputes to set total/min/max to be based on
+	* current values.
+	* @param reason
+	*/
+	onTrimmed(reason) {
+		this.min = minFast(this.values);
+		this.max = maxFast(this.values);
+		this.total = totalFast(this.values);
+	}
+	computeResults(values) {
+		if (values.some((v) => Number.isNaN(v))) throw new Error(`Cannot add NaN`);
+		const numbers = values.map((value) => value.value);
+		this.total = numbers.reduce((accumulator, v) => accumulator + v, this.total);
+		this.min = Math.min(...numbers, this.min);
+		this.max = Math.max(...numbers, this.max);
+		const r = {
+			max: this.max,
+			min: this.min,
+			total: this.total,
+			avg: this.avg
+		};
+		return r;
+	}
+	getMinMaxAvg() {
+		return {
+			min: this.min,
+			max: this.max,
+			avg: this.avg
+		};
+	}
+};
+/**
+* Keeps track of the total, min, max and avg in a stream of values. By default values
+* are not stored.
+*
+* Usage:
+*
+* ```js
+* import { number } from '@ixfx/trackers.js';
+*
+* const t = number();
+* t.seen(10);
+*
+* t.avg / t.min/ t.max
+* t.initial; // initial value
+* t.size;    // number of seen values
+* t.elapsed; // milliseconds since intialisation
+* t.last;    // last value
+* ```
+*
+* To get `{ avg, min, max, total }`
+* ```
+* t.getMinMax()
+* ```
+*
+* Use `t.reset()` to clear everything.
+*
+* Trackers can automatically reset after a given number of samples
+* ```
+* // reset after 100 samples
+* const t = number({ resetAfterSamples: 100 });
+* ```
+*
+* To store values, use the `storeIntermediate` option:
+*
+* ```js
+* const t = number({ storeIntermediate: true });
+* ```
+*
+* Difference between last value and initial value:
+* ```js
+* t.relativeDifference();
+* ```
+*
+* Get raw data (if it is being stored):
+* ```js
+* t.values; // array of numbers
+* t.timestampes; // array of millisecond times, indexes correspond to t.values
+* ```
+*/
+const number = (opts = {}) => new NumberTracker(opts);
+
+//#endregion
+//#region ../flow/dist/src/event-race.js
+/**
+* Subscribes to events on `target`, returning the event data
+* from the first event that fires.
+*
+* By default waits a maximum of 1 minute.
+*
+* Automatically unsubscribes on success or failure (ie. timeout)
+*
+* ```js
+* // Event will be data from either event, whichever fires first
+* // Exception is thrown if neither fires within 1 second
+* const event = await eventRace(document.body, [`pointermove`, `pointerdown`], { timeout: 1000 });
+* ```
+* @param target Event source
+* @param eventNames Event name(s)
+* @param options Options
+* @returns
+*/
+const eventRace = (target, eventNames, options = {}) => {
+	const intervalMs = options.timeoutMs ?? 601e3;
+	const signal = options.signal;
+	let triggered = false;
+	let disposed = false;
+	let timeout;
+	const promise = new Promise((resolve, reject) => {
+		const onEvent = (event) => {
+			if (`type` in event) if (eventNames.includes(event.type)) {
+				triggered = true;
+				resolve(event);
+				dispose();
+			} else console.warn(`eventRace: Got event '${event.type}' that is not in race list`);
+			else {
+				console.warn(`eventRace: Event data does not have expected 'type' field`);
+				console.log(event);
+			}
+		};
+		for (const name of eventNames) target.addEventListener(name, onEvent);
+		const dispose = () => {
+			if (disposed) return;
+			if (timeout !== void 0) clearTimeout(timeout);
+			timeout = void 0;
+			disposed = true;
+			for (const name of eventNames) target.removeEventListener(name, onEvent);
+		};
+		timeout = setTimeout(() => {
+			if (triggered || disposed) return;
+			dispose();
+			reject(/* @__PURE__ */ new Error(`eventRace: Events not fired within interval. Events: ${JSON.stringify(eventNames)} Interval: ${intervalMs}`));
+		}, intervalMs);
+		signal?.addEventListener(`abort`, () => {
+			if (triggered || disposed) return;
+			dispose();
+			reject(/* @__PURE__ */ new Error(`Abort signal received ${signal.reason}`));
+		});
+	});
+	return promise;
+};
+
+//#endregion
+//#region ../flow/dist/src/retry.js
+/**
+* Generates an expoential backoff series of values
+* ```js
+* // Default: start at 1, power 1.1
+* for (const v of backoffGenerator()) {
+*  // v: numeric value
+* }
+* ```
+*
+* By default the generator runs forever. Use either
+* `limitAttempts` or `limitValue` to stop it when it produces a
+* given quantity of values, or when the value itself reaches a threshold.
+*
+* For example:
+* ```js
+* // `values` will have five values in it
+* const values = [...backoffGenerator({ limitAttempts: 5 })];
+* // Keep generating values until max is reached
+* const values = [...backoffGenerator({ limitValue: 1000 })];
+* ```
+*
+* Options:
+* * startAt: start value
+* * limitAttempts: cap the number of values to generate
+* * limitValue: cap the maximum calculated value
+* * power: power value (default 1.1)
+*
+* @param options
+* @returns
+*/
+function* backoffGenerator(options = {}) {
+	const startAt = options.startAt ?? 1;
+	let limitAttempts = options.limitAttempts ?? Number.MAX_SAFE_INTEGER;
+	const limitValue = options.limitValue;
+	const power = options.power ?? 1.1;
+	let value = startAt;
+	resultThrow(integerTest(limitAttempts, `aboveZero`, `limitAttempts`), numberTest(startAt, ``, `startAt`), numberTest(limitAttempts, ``, `limitAttempts`), () => limitValue !== void 0 ? numberTest(limitValue, ``, `limitValue`) : void 0, numberTest(power, ``, `power`));
+	while (limitAttempts > 0) {
+		if (limitValue && value >= limitValue) return;
+		limitAttempts--;
+		yield value;
+		value += Math.pow(value, power);
+	}
+}
+/**
+* Keeps calling `callback` until it returns something other than _undefined_.
+* There is an exponentially-increasing delay between each retry attempt.
+*
+* If `callback` throws an exception, the retry is cancelled, bubbling the exception.
+*
+* ```js
+* // A function that only works some of the time
+* const flakyFn = async () => {
+*  // do the thing
+*  if (Math.random() > 0.9) return true; // success
+*  return; // fake failure
+* };
+*
+* // Retry it up to five times,
+* // starting with 1000ms interval
+* const result = await retryFunction(flakyFn, {
+*  limitAttempts: 5
+* });
+*
+* if (result.success) {
+*  // Yay
+* } else {
+*  console.log(`Failed after ${result.attempts} attempts. Elapsed: ${result.elapsed}`);
+*  console.log(result.message);
+* }
+* ```
+*
+* An `AbortSignal` can be used to cancel process.
+* ```js
+* const abort = new AbortController();
+* const result = await retryFunction(cb, { signal: abort.signal });
+*
+* // Somewhere else...
+* abort('Cancel!'); // Trigger abort
+* ```
+* @param callback Function to run
+* @param options Options
+* @returns
+*/
+const retryFunction = (callback, options = {}) => {
+	const task = { async probe() {
+		try {
+			const v = await callback();
+			if (v === void 0) return {
+				value: options.taskValueFallback,
+				error: `Fallback`,
+				success: false
+			};
+			return {
+				value: v,
+				success: true
+			};
+		} catch (error) {
+			return {
+				success: false,
+				error
+			};
+		}
+	} };
+	return retryTask(task, options);
+};
+/**
+* Keeps trying to run `task`.
+*
+* ```js
+* const task = (attempts) => {
+*  // attempts is number of times it has been retried
+*
+*  if (Math.random() > 0.5) {
+*    // Return a succesful result
+*    return { success: true }
+*  } else {
+*  }
+*
+* }
+* const t = await retryTask(task, opts);
+* ```
+* @param task
+* @param opts
+* @returns
+*/
+const retryTask = async (task, opts = {}) => {
+	const signal = opts.abort;
+	const log = resolveLogOption(opts.log);
+	const predelayMs = opts.predelayMs ?? 0;
+	const startedAt = elapsedSince();
+	let attempts = 0;
+	const initialValue = opts.startAt ?? 1e3;
+	const limitAttempts = opts.limitAttempts ?? Number.MAX_SAFE_INTEGER;
+	const backoffGen = backoffGenerator({
+		...opts,
+		startAt: initialValue,
+		limitAttempts
+	});
+	if (initialValue <= 0) throw new Error(`Param 'initialValue' must be above zero`);
+	if (predelayMs > 0) try {
+		await sleep({
+			millis: predelayMs,
+			signal
+		});
+	} catch (error) {
+		return {
+			success: false,
+			attempts,
+			value: opts.taskValueFallback,
+			elapsed: startedAt(),
+			message: getErrorMessage(error)
+		};
+	}
+	for (const t of backoffGen) {
+		attempts++;
+		const result = await task.probe(attempts);
+		if (result.success) return {
+			success: result.success,
+			value: result.value,
+			attempts,
+			elapsed: startedAt()
+		};
+		log({ msg: `retry attempts: ${attempts.toString()} t: ${elapsedToHumanString(t)}` });
+		if (attempts >= limitAttempts) break;
+		try {
+			await sleep({
+				millis: t,
+				signal
+			});
+		} catch (error) {
+			return {
+				success: false,
+				attempts,
+				value: opts.taskValueFallback,
+				message: getErrorMessage(error),
+				elapsed: startedAt()
+			};
+		}
+	}
+	return {
+		message: `Giving up after ${attempts.toString()} attempts.`,
+		success: false,
+		attempts,
+		value: opts.taskValueFallback,
+		elapsed: startedAt()
+	};
+};
+
+//#endregion
+//#region ../flow/dist/src/wait-for.js
+/**
+* Helper function for calling code that should fail after a timeout.
+* In short, it allows you to signal when the function succeeded, to cancel it, or
+* to be notified if it was canceled or completes.
+*
+* It does not execute or track the outcome of execution itself. Rather it's a bit
+* of machinery that needs to be steered by your own logic.
+*
+* `waitFor` takes a timeout, and two lifecycle functions, `onAborted` and `onComplete`.
+* `onAborted` is called if the timeout has elapsed. `onComplete` will run on either success or failure.
+*
+* ```js
+* waitFor(1000,
+* (error) => {
+*  // Failed
+* },
+* (success) => {
+*  if (success) {
+*    // Succeeded
+*  }
+* });
+* ```
+*
+* When calling `waitFor` you get back a function to signal success or failure:
+* ```js
+* const done = waitFor(1000, onAborted, onComplete);
+* done();          // No parameters signals success
+* done('failed');  // A string parameter indicates failure
+* ```
+*
+* @example Compact
+* ```js
+* const done = waitFor(1000,
+*  (reason) => {
+*    console.log(`Aborted: ${reason}`);
+*  });
+*
+* try {
+*  runSomethingThatMightScrewUp();
+*  done(); // Signal it succeeded
+* } catch (e) {
+*  done(e); // Signal there was an error
+* }
+* ```
+*
+* @example Verbose
+* ```js
+* // This function is called by `waitFor` if it was cancelled
+* const onAborted = (reason:string) => {
+*  // 'reason' is a string describing why it has aborted.
+*  // ie: due to timeout or because done() was called with an error
+* };
+*
+* // This function is called by `waitFor` if it completed
+* const onComplete = (success:boolean) => {
+*  // Called if we were aborted or finished succesfully.
+*  // onComplete will be called after onAborted, if it was an error case
+* }
+*
+* // If done() is not called after 1000, onAborted will be called
+* // if done() is called or there was a timeout, onComplete is called
+* const done = waitFor(1000, onAborted, onComplete);
+*
+* // Signal completed successfully (thus calling onComplete(true))
+* done();
+*
+* // Signal there was an error (thus calling onAborted and onComplete(false))
+* done(`Some error`);
+* ```
+*
+* The completion handler is useful for removing event handlers.
+*
+
+* @param timeoutMs
+* @param onAborted
+* @param onComplete
+* @returns
+*/
+const waitFor = (timeoutMs, onAborted, onComplete) => {
+	let t;
+	let success = false;
+	const done = (error) => {
+		if (t !== void 0) {
+			window.clearTimeout(t);
+			t = void 0;
+		}
+		if (error) onAborted(error);
+		else success = true;
+		if (onComplete !== void 0) onComplete(success);
+	};
+	t = globalThis.setTimeout(() => {
+		t = void 0;
+		try {
+			onAborted(`Timeout after ${timeoutMs}ms`);
+		} finally {
+			if (onComplete !== void 0) onComplete(success);
+		}
+	}, timeoutMs);
+	return done;
+};
+
+//#endregion
+//#region ../io/src/codec.ts
 /**
 * Handles utf-8 text encoding/decoding
 */
@@ -41,7 +622,7 @@ var Codec = class {
 };
 
 //#endregion
-//#region packages/io/src/string-receive-buffer.ts
+//#region ../io/src/string-receive-buffer.ts
 /**
 * Receives text
 */
@@ -98,7 +679,7 @@ var StringReceiveBuffer = class {
 };
 
 //#endregion
-//#region packages/io/src/string-write-buffer.ts
+//#region ../io/src/string-write-buffer.ts
 /**
 * Buffers a queue of strings.
 *
@@ -230,7 +811,7 @@ var StringWriteBuffer = class {
 };
 
 //#endregion
-//#region packages/io/src/generic-state-transitions.ts
+//#region ../io/src/generic-state-transitions.ts
 const genericStateTransitionsInstance = Object.freeze({
 	ready: `connecting`,
 	connecting: [`connected`, `closed`],
@@ -239,7 +820,7 @@ const genericStateTransitionsInstance = Object.freeze({
 });
 
 //#endregion
-//#region packages/io/src/ble-device.ts
+//#region ../io/src/ble-device.ts
 var BleDevice = class extends SimpleEventEmitter {
 	states;
 	codec;
@@ -361,7 +942,7 @@ var BleDevice = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/io/src/nordic-ble-device.ts
+//#region ../io/src/nordic-ble-device.ts
 var nordic_ble_device_exports = {};
 __export(nordic_ble_device_exports, {
 	NordicBleDevice: () => NordicBleDevice,
@@ -386,7 +967,7 @@ var NordicBleDevice = class extends BleDevice {
 };
 
 //#endregion
-//#region packages/io/src/audio/visualiser.ts
+//#region ../io/src/audio/visualiser.ts
 var AudioVisualiser = class {
 	freqMaxRange = 200;
 	audio;
@@ -591,7 +1172,7 @@ var AudioVisualiser = class {
 };
 
 //#endregion
-//#region packages/io/src/audio/analyser.ts
+//#region ../io/src/audio/analyser.ts
 /**
 * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link analyserPeakLevel} if you want sound level, or {@link analyserFrequency} if you just want FFT results.
 *
@@ -837,7 +1418,7 @@ var AudioAnalyser = class {
 };
 
 //#endregion
-//#region packages/io/src/audio/from-audio-element.ts
+//#region ../io/src/audio/from-audio-element.ts
 /**
 * Scans page for <AUDIO> elements and creates playable controllers for them.
 * It uses the element's 'id' attribute as a way of fetching one later.
@@ -900,7 +1481,7 @@ function createFromAudioElement(audioElementOrQuery, filterType = `lowpass`) {
 }
 
 //#endregion
-//#region packages/io/src/audio/from-oscillator.ts
+//#region ../io/src/audio/from-oscillator.ts
 /**
 * Initialise audio with an oscillator source
 * @param oscillatorOptions
@@ -932,7 +1513,7 @@ function createOscillator(oscillatorOptions = {}) {
 }
 
 //#endregion
-//#region packages/io/src/audio/index.ts
+//#region ../io/src/audio/index.ts
 var audio_exports = {};
 __export(audio_exports, {
 	AudioAnalyser: () => AudioAnalyser,
@@ -946,7 +1527,7 @@ __export(audio_exports, {
 });
 
 //#endregion
-//#region packages/io/src/espruino-ble-device.ts
+//#region ../io/src/espruino-ble-device.ts
 /**
 * An Espruino BLE-connection
 *
@@ -1055,7 +1636,7 @@ var EspruinoBleDevice = class extends NordicBleDevice {
 };
 
 //#endregion
-//#region packages/io/src/json-device.ts
+//#region ../io/src/json-device.ts
 var JsonDevice = class extends SimpleEventEmitter {
 	states;
 	codec;
@@ -1145,7 +1726,7 @@ var JsonDevice = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/io/src/serial.ts
+//#region ../io/src/serial.ts
 var serial_exports = {};
 __export(serial_exports, { Device: () => Device });
 /**
@@ -1255,7 +1836,7 @@ var Device = class extends JsonDevice {
 };
 
 //#endregion
-//#region packages/io/src/espruino-serial-device.ts
+//#region ../io/src/espruino-serial-device.ts
 var EspruinoSerialDevice = class extends Device {
 	evalTimeoutMs;
 	evalReplyBluetooth = false;
@@ -1325,7 +1906,7 @@ var EspruinoSerialDevice = class extends Device {
 };
 
 //#endregion
-//#region packages/io/src/espruino.ts
+//#region ../io/src/espruino.ts
 var espruino_exports = {};
 __export(espruino_exports, {
 	EspruinoBleDevice: () => EspruinoBleDevice,
@@ -1556,7 +2137,7 @@ const deviceEval = async (code, opts = {}, device, evalReplyPrefix, debug, warn)
 };
 
 //#endregion
-//#region packages/io/src/camera.ts
+//#region ../io/src/camera.ts
 var camera_exports = {};
 __export(camera_exports, {
 	dumpDevices: () => dumpDevices,
@@ -1744,7 +2325,7 @@ const startWithVideoEl$1 = async (videoEl, constraints = {}) => {
 };
 
 //#endregion
-//#region packages/io/src/video-file.ts
+//#region ../io/src/video-file.ts
 var video_file_exports = {};
 __export(video_file_exports, { start: () => start });
 /**
@@ -1811,7 +2392,47 @@ const startWithVideoEl = async (videoEl, file) => {
 };
 
 //#endregion
-//#region packages/io/src/frame-processor.ts
+//#region ../visual/dist/src/video.js
+const manualCapture = (sourceVideoEl, opts = {}) => {
+	const showCanvas = opts.showCanvas ?? false;
+	const w = sourceVideoEl.videoWidth;
+	const h = sourceVideoEl.videoHeight;
+	const definedCanvasEl = opts.canvasEl !== void 0;
+	let canvasEl = opts.canvasEl;
+	if (!canvasEl) {
+		canvasEl = document.createElement(`CANVAS`);
+		canvasEl.classList.add(`ixfx-capture`);
+		document.body.append(canvasEl);
+		if (!showCanvas) canvasEl.style.display = `none`;
+	}
+	canvasEl.width = w;
+	canvasEl.height = h;
+	const capture = () => {
+		let c$1;
+		if (!c$1) c$1 = canvasEl.getContext(`2d`, { willReadFrequently: true });
+		if (!c$1) throw new Error(`Could not create graphics context`);
+		c$1.drawImage(sourceVideoEl, 0, 0, w, h);
+		const pixels = c$1.getImageData(0, 0, w, h);
+		pixels.currentTime = sourceVideoEl.currentTime;
+		if (opts.postCaptureDraw) opts.postCaptureDraw(c$1, w, h);
+		return pixels;
+	};
+	const dispose = () => {
+		if (definedCanvasEl) return;
+		try {
+			canvasEl.remove();
+		} catch (_) {}
+	};
+	const c = {
+		canvasEl,
+		capture,
+		dispose
+	};
+	return c;
+};
+
+//#endregion
+//#region ../io/src/frame-processor.ts
 /**
 * Frame Processor
 * Simplifies grabbing frames from a camera or video file.
@@ -2016,7 +2637,7 @@ var FrameProcessor = class {
 };
 
 //#endregion
-//#region packages/io/src/reconnecting-web-socket.ts
+//#region ../io/src/reconnecting-web-socket.ts
 /**
 * Maintains a web socket connection. Connects automatically.
 * 

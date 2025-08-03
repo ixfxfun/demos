@@ -1,4 +1,4 @@
-//#region packages/random/src/types.d.ts
+//#region ../random/src/types.d.ts
 /**
  * A random source.
  *
@@ -39,7 +39,7 @@ type GenerateRandomOptions = RandomNumberOptions & Readonly<{
 }>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/random/src/arrays.d.ts
+//#region ../random/src/arrays.d.ts
 /**
  * Returns a random array index.
  *
@@ -134,7 +134,7 @@ declare const randomElementWeightedSource: <V>(array: ArrayLike<V>, weightings: 
 declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: RandomSource) => V[];
 //# sourceMappingURL=arrays.d.ts.map
 //#endregion
-//#region packages/random/src/chance.d.ts
+//#region ../random/src/chance.d.ts
 /**
  * Chance of returning `a` or `b`, based on threshold `p`.
  *
@@ -157,7 +157,7 @@ declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: RandomSource) => 
 declare const chance: <T>(p: number | (() => number), a: T | (() => T), b: T | (() => T), randomSource?: RandomSource) => T;
 //# sourceMappingURL=chance.d.ts.map
 //#endregion
-//#region packages/random/src/float-source.d.ts
+//#region ../random/src/float-source.d.ts
 /**
  * Source for random bipolar values
  * ```js
@@ -244,7 +244,7 @@ declare const floatSource: (maxOrOptions?: (number | RandomNumberOptions)) => Ra
 declare const float: (maxOrOptions?: (number | RandomNumberOptions)) => number;
 //# sourceMappingURL=float-source.d.ts.map
 //#endregion
-//#region packages/random/src/gaussian.d.ts
+//#region ../random/src/gaussian.d.ts
 /**
  * Returns a random number with gaussian (ie. bell-curved) distribution
  *
@@ -291,7 +291,7 @@ declare const gaussian: (skew?: number) => number;
 declare const gaussianSource: (skew?: number) => RandomSource;
 //# sourceMappingURL=gaussian.d.ts.map
 //#endregion
-//#region packages/random/src/guid.d.ts
+//#region ../random/src/guid.d.ts
 /**
  * Generates a six-digit roughly unique id
  * ```js
@@ -306,7 +306,7 @@ declare const shortGuid: (options?: Readonly<{
 //# sourceMappingURL=guid.d.ts.map
 
 //#endregion
-//#region packages/random/src/integer.d.ts
+//#region ../random/src/integer.d.ts
 /**
  * Returns a function that produces a random integer between `max` (exclusive) and 0 (inclusive)
  * Use {@link integer} if you want a random number directly.
@@ -401,7 +401,7 @@ declare const integer: (maxOrOptions: number | RandomNumberOptions) => number;
 declare function integerUniqueGen(maxOrOptions: number | GenerateRandomOptions): IterableIterator<number>;
 //# sourceMappingURL=integer.d.ts.map
 //#endregion
-//#region packages/random/src/non-zero.d.ts
+//#region ../random/src/non-zero.d.ts
 /**
  * Keeps generating a random number until
  * it's not 0
@@ -412,7 +412,7 @@ declare const calculateNonZero: (source?: RandomSource) => number;
 //# sourceMappingURL=non-zero.d.ts.map
 
 //#endregion
-//#region packages/random/src/seeded.d.ts
+//#region ../random/src/seeded.d.ts
 /**
  * Reproducible random values using the Merseene Twister algorithm.
  * With the same seed value, it produces the same series of random values.
@@ -444,7 +444,7 @@ declare function mersenneTwister(seed?: number | undefined): {
 };
 //# sourceMappingURL=seeded.d.ts.map
 //#endregion
-//#region packages/random/src/string.d.ts
+//#region ../random/src/string.d.ts
 /**
  * Returns a string of random letters and numbers of a given `length`.
  *
@@ -459,7 +459,7 @@ declare const string: (lengthOrOptions?: number | StringOptions) => string;
 //# sourceMappingURL=string.d.ts.map
 
 //#endregion
-//#region packages/random/src/time.d.ts
+//#region ../random/src/time.d.ts
 /**
  * Returns a random number of minutes, with a unit of milliseconds.
  *
@@ -566,7 +566,7 @@ declare const secondsMsSource: (maxSecondsOrOptions: number | RandomNumberOption
 declare const secondsMs: (maxSecondsOrOptions: number | RandomNumberOptions) => number;
 //# sourceMappingURL=time.d.ts.map
 //#endregion
-//#region packages/random/src/weighted-index.d.ts
+//#region ../random/src/weighted-index.d.ts
 /**
 * Returns a random number from 0..weightings.length, distributed by the weighting values.
 *
@@ -582,7 +582,7 @@ declare const weightedIndex: (weightings: Array<number>, rand?: RandomSource) =>
 //# sourceMappingURL=weighted-index.d.ts.map
 
 //#endregion
-//#region packages/random/src/weighted-integer.d.ts
+//#region ../random/src/weighted-integer.d.ts
 /**
  * Random integer, weighted according to an easing function.
  * Number will be inclusive of `min` and below `max`.
@@ -635,7 +635,7 @@ declare const weightedIntegerSource: (options: WeightedOptions) => RandomSource;
 declare const weightedInteger: (options: WeightedOptions) => number;
 //# sourceMappingURL=weighted-integer.d.ts.map
 //#endregion
-//#region packages/random/src/weighted.d.ts
+//#region ../random/src/weighted.d.ts
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
  * See @ixfx/modulation.weighted to use a named easing function.

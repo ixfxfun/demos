@@ -1,14 +1,96 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-Bo4oKRxs.js";
-import "./is-primitive-BD8Wwhed.js";
-import { elapsedToHumanString, intervalToMs } from "./interval-type-Bu6U9yES.js";
-import { continuously, defaultComparer, elapsedInfinity, elapsedSince, sleep } from "./basic-BcTIVreK.js";
-import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
-import { getErrorMessage, logSet, resolve, resolveLogOption, resolveSync } from "./resolve-core-ibINXx_1.js";
-import { clamp$1 as clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-LtkApSyv.js";
-import { mutable$1 as mutable, rateMinimum } from "./src-D8qEf6yn.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./numbers-C359_5A6.js";
+import "./arrays-yH_qBmt0.js";
+import "./to-string-Dg1sJUf1.js";
+import { defaultComparer } from "./comparers-BtlnApnB.js";
+import "./is-equal-edylSnsn.js";
+import { continuously } from "./continuously-CFHq8KyU.js";
+import { elapsedInfinity, elapsedSince } from "./elapsed-DEWYfvwx.js";
+import { elapsedToHumanString, intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { resolve, resolveSync } from "./resolve-core-cAVLLopl.js";
+import { logSet, resolveLogOption } from "./logger-Dv7_G_bd.js";
+import { getErrorMessage } from "./error-message-B6EPesrV.js";
+import { sleep } from "./sleep-C2hKDgCi.js";
+import "./is-equal-y9du2FWU.js";
+import { unique } from "./unique-GmJPtLE_.js";
+import { randomElement, shuffle } from "./random-DXqMnVbO.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import "./numeric-arrays-DwffyOZ3.js";
+import { clamp } from "./clamp-BXRKKkSg.js";
+import { movingAverageLight } from "./moving-average-BpnIcIs9.js";
+import { timeout } from "./timeout-CUZsKULj.js";
+import "./queue-fns-C19iGLvT.js";
+import { mutable } from "./queue-mutable-Bcwm-_Hi.js";
 
-//#region packages/flow/src/behaviour-tree.ts
+//#region ../flow/dist/src/rate-minimum.js
+/**
+* Ensures that `whatToCall` is executed with a given tempo.
+*
+* ```js
+* const rm = rateMinimum({
+*  fallback: () => {
+*    return Math.random();
+*  },
+*  whatToCall: (value:number) => {
+*    console.log(value);
+*  },
+*  interval: { secs: 10 }
+* });
+*
+* // Invokes `whatToCall`, resetting timeout
+* rm(10);
+*
+* // If we don't call rm() before 'interval' has elapsed,
+* // 'fallback' will be invoked
+* ```
+*
+* A practical use for this is to update calculations based on firing of events
+* as well as when they don't fire. For example user input.
+*
+* ```js
+* // Average distances
+* const average = movingAverageLight();
+* const rm = rateMinimum({
+*  interval: { secs: 1 },
+*  whatToCall: (distance: number) => {
+*    average(distance);
+*  },
+*  // If there are no pointermove events, distance is 0
+*  fallback() {
+*    return 0;
+*  }
+* })
+*
+* // Report total movemeent
+* document.addEventListener(`pointermove`, event => {
+*  rm(event.movementX + event.movementY);
+* });
+* ```
+*
+* @param options
+* @returns
+*/
+const rateMinimum$1 = (options) => {
+	let disposed = false;
+	const t = timeout(() => {
+		if (disposed) return;
+		t.start();
+		options.whatToCall(options.fallback());
+	}, options.interval);
+	if (options.abort) options.abort.addEventListener(`abort`, (_) => {
+		disposed = true;
+		t.cancel();
+	});
+	t.start();
+	return (args) => {
+		if (disposed) throw new Error(`AbortSignal has been fired`);
+		t.start();
+		options.whatToCall(args);
+	};
+};
+
+//#endregion
+//#region ../flow/src/behaviour-tree.ts
 const getName = (t, defaultValue = ``) => {
 	if (typeof t === `object` && `name` in t && t.name !== void 0) return t.name;
 	return defaultValue;
@@ -44,7 +126,7 @@ function* entries(n) {
 }
 
 //#endregion
-//#region packages/flow/src/delay.ts
+//#region ../flow/src/delay.ts
 /**
 * Pauses execution for interval after which the asynchronous `callback` is executed and awaited.
 * Must be called with `await` if you want the pause effect.
@@ -220,8 +302,8 @@ async function* delayAnimationLoop() {
 *
 * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
 */
-async function* delayLoop(timeout$1) {
-	const timeoutMs = intervalToMs(timeout$1);
+async function* delayLoop(timeout$2) {
+	const timeoutMs = intervalToMs(timeout$2);
 	if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
 	if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);
 	if (timeoutMs === 0) return yield* delayAnimationLoop();
@@ -246,7 +328,7 @@ async function* delayLoop(timeout$1) {
 }
 
 //#endregion
-//#region packages/flow/src/timeout.ts
+//#region ../flow/src/timeout.ts
 /**
 * Returns a {@link Timeout} that can be triggered, cancelled and reset. Use {@link continuously} for interval-
 * based loops.
@@ -294,7 +376,7 @@ async function* delayLoop(timeout$1) {
 * @param interval
 * @returns {@link Timeout}
 */
-const timeout = (callback, interval) => {
+const timeout$1 = (callback, interval) => {
 	if (callback === void 0) throw new Error(`callback parameter is undefined`);
 	const intervalMs = intervalToMs(interval);
 	resultThrow(integerTest(intervalMs, `aboveZero`, `interval`));
@@ -363,7 +445,7 @@ const timeout = (callback, interval) => {
 };
 
 //#endregion
-//#region packages/flow/src/debounce.ts
+//#region ../flow/src/debounce.ts
 /**
 * Returns a debounce function which acts to filter calls to a given function `fn`.
 *
@@ -427,14 +509,14 @@ const timeout = (callback, interval) => {
 * @returns Debounce function
 */
 const debounce = (callback, interval) => {
-	const t = timeout(callback, interval);
+	const t = timeout$1(callback, interval);
 	return (...args) => {
 		t.start(void 0, args);
 	};
 };
 
 //#endregion
-//#region packages/flow/src/dispatch-list.ts
+//#region ../flow/src/dispatch-list.ts
 /**
 * Maintains a list of listeners to receive data
 * 
@@ -514,7 +596,7 @@ var DispatchList = class {
 };
 
 //#endregion
-//#region packages/flow/src/every.ts
+//#region ../flow/src/every.ts
 /**
 * Returns true for every _n_th call, eg 2 for every second call.
 *
@@ -555,7 +637,7 @@ const everyNth = (nth, callback) => {
 };
 
 //#endregion
-//#region packages/flow/src/execute.ts
+//#region ../flow/src/execute.ts
 /**
 * Runs a series of async expressions, returning the results.
 * Use {@link runSingle} if it's only a single result you care about.
@@ -663,7 +745,7 @@ const runSingle = async (expressions, opts = {}, args) => {
 };
 
 //#endregion
-//#region packages/flow/src/event-race.ts
+//#region ../flow/src/event-race.ts
 /**
 * Subscribes to events on `target`, returning the event data
 * from the first event that fires.
@@ -687,7 +769,7 @@ const eventRace = (target, eventNames, options = {}) => {
 	const signal = options.signal;
 	let triggered = false;
 	let disposed = false;
-	let timeout$1;
+	let timeout$2;
 	const promise = new Promise((resolve$1, reject) => {
 		const onEvent = (event) => {
 			if (`type` in event) if (eventNames.includes(event.type)) {
@@ -703,12 +785,12 @@ const eventRace = (target, eventNames, options = {}) => {
 		for (const name of eventNames) target.addEventListener(name, onEvent);
 		const dispose = () => {
 			if (disposed) return;
-			if (timeout$1 !== void 0) clearTimeout(timeout$1);
-			timeout$1 = void 0;
+			if (timeout$2 !== void 0) clearTimeout(timeout$2);
+			timeout$2 = void 0;
 			disposed = true;
 			for (const name of eventNames) target.removeEventListener(name, onEvent);
 		};
-		timeout$1 = setTimeout(() => {
+		timeout$2 = setTimeout(() => {
 			if (triggered || disposed) return;
 			dispose();
 			reject(/* @__PURE__ */ new Error(`eventRace: Events not fired within interval. Events: ${JSON.stringify(eventNames)} Interval: ${intervalMs}`));
@@ -723,7 +805,7 @@ const eventRace = (target, eventNames, options = {}) => {
 };
 
 //#endregion
-//#region packages/flow/src/moving-average.ts
+//#region ../flow/src/moving-average.ts
 /**
 * Uses the same algorithm as {@link movingAverageLight}, but adds values automatically if
 * nothing has been manually added.
@@ -747,7 +829,7 @@ const eventRace = (target, eventNames, options = {}) => {
 */
 const movingAverageTimed = (options) => {
 	const average = movingAverageLight();
-	const rm = rateMinimum({
+	const rm = rateMinimum$1({
 		...options,
 		whatToCall: (distance) => {
 			average(distance);
@@ -763,7 +845,7 @@ const movingAverageTimed = (options) => {
 };
 
 //#endregion
-//#region packages/flow/src/pool.ts
+//#region ../flow/src/pool.ts
 /**
 * A use of a pool resource
 *
@@ -1267,7 +1349,7 @@ var Pool = class {
 const create = (options = {}) => new Pool(options);
 
 //#endregion
-//#region packages/flow/src/promise-with-resolvers.ts
+//#region ../flow/src/promise-with-resolvers.ts
 /**
 * Creates a new Promise, returning the promise
 * along with its resolve and reject functions.
@@ -1301,7 +1383,7 @@ function promiseWithResolvers() {
 }
 
 //#endregion
-//#region packages/flow/src/rate-minimum.ts
+//#region ../flow/src/rate-minimum.ts
 /**
 * Ensures that `whatToCall` is executed with a given tempo.
 * 
@@ -1349,9 +1431,9 @@ function promiseWithResolvers() {
 * @param options 
 * @returns 
 */
-const rateMinimum$1 = (options) => {
+const rateMinimum = (options) => {
 	let disposed = false;
-	const t = timeout(() => {
+	const t = timeout$1(() => {
 		if (disposed) return;
 		t.start();
 		options.whatToCall(options.fallback());
@@ -1369,7 +1451,7 @@ const rateMinimum$1 = (options) => {
 };
 
 //#endregion
-//#region packages/flow/src/repeat.ts
+//#region ../flow/src/repeat.ts
 /**
 * Generates values from `produce` with a time delay.
 * `produce` can be a simple function that returns a value, an async function, or a generator.
@@ -1650,7 +1732,7 @@ function* repeatSync(produce, opts) {
 */
 
 //#endregion
-//#region packages/flow/src/req-resp-match.ts
+//#region ../flow/src/req-resp-match.ts
 /**
 * Matches responses with requests, expiring requests if they do not get a response in a timely manner.
 * 
@@ -1864,7 +1946,7 @@ var RequestResponseMatch = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/flow/src/retry.ts
+//#region ../flow/src/retry.ts
 /**
 * Generates an expoential backoff series of values
 * ```js
@@ -2055,7 +2137,7 @@ const retryTask = async (task, opts = {}) => {
 };
 
 //#endregion
-//#region packages/flow/src/run-once.ts
+//#region ../flow/src/run-once.ts
 /**
 * Runs a function once
 *
@@ -2082,7 +2164,7 @@ const runOnce = (onRun) => {
 };
 
 //#endregion
-//#region packages/flow/src/sync-wait.ts
+//#region ../flow/src/sync-wait.ts
 /**
 * Simple synchronisation. Supports only a single signal/waiter.
 * Expects one or more calls to .signal() for .forSignal() to resolve
@@ -2175,7 +2257,7 @@ var SyncWait = class {
 };
 
 //#endregion
-//#region packages/flow/src/task-queue-mutable.ts
+//#region ../flow/src/task-queue-mutable.ts
 /**
 * Simple task queue. Each task is awaited and run
 * in turn.
@@ -2277,7 +2359,7 @@ var TaskQueueMutable = class TaskQueueMutable extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/flow/src/throttle.ts
+//#region ../flow/src/throttle.ts
 /***
 * Throttles a function. Callback only allowed to run after minimum of `intervalMinMs`.
 *
@@ -2317,7 +2399,7 @@ const throttle = (callback, intervalMinMs) => {
 };
 
 //#endregion
-//#region packages/flow/src/timer.ts
+//#region ../flow/src/timer.ts
 /**
 * A function that returns _true_ when an interval has elapsed
 *
@@ -2657,7 +2739,7 @@ const timerWithFunction = (fn, timer) => {
 };
 
 //#endregion
-//#region packages/flow/src/update-outdated.ts
+//#region ../flow/src/update-outdated.ts
 /**
 * Calls the async `fn` to generate a value if there is no prior value or
 * `interval` has elapsed since value was last generated.
@@ -2715,7 +2797,7 @@ const updateOutdated = (fn, interval, updateFail = `slow`) => {
 };
 
 //#endregion
-//#region packages/flow/src/wait-for-value.ts
+//#region ../flow/src/wait-for-value.ts
 /**
 * Queue of a single item, only once, allows for simple synchronisation.
 * 
@@ -2785,7 +2867,7 @@ var WaitForValue = class {
 const singleItem = () => new WaitForValue();
 
 //#endregion
-//#region packages/flow/src/wait-for.ts
+//#region ../flow/src/wait-for.ts
 /**
 * Helper function for calling code that should fail after a timeout.
 * In short, it allows you to signal when the function succeeded, to cancel it, or
@@ -2888,7 +2970,7 @@ const waitFor = (timeoutMs, onAborted, onComplete) => {
 };
 
 //#endregion
-//#region packages/flow/src/state-machine/state-machine.ts
+//#region ../flow/src/state-machine/state-machine.ts
 /**
 * Clones machine state
 * @param toClone
@@ -2902,7 +2984,8 @@ const cloneState = (toClone) => {
 	});
 };
 /**
-* Initialises a state machine
+* Initialises a state machine. [Read more in the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
+* 
 * ```js
 * const desc = {
 *  pants: ['shoes','socks'],
@@ -3162,10 +3245,12 @@ const fromListBidirectional = (...states) => {
 };
 
 //#endregion
-//#region packages/flow/src/state-machine/driver.ts
+//#region ../flow/src/state-machine/driver.ts
 /**
 * Drives a state machine.
 *
+* [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/driver/)
+* 
 * Uses a 'handlers' structure to determine when to change
 * state and actions to take.
 * 
@@ -3300,7 +3385,7 @@ async function driver(machine, handlersOrOpts) {
 }
 
 //#endregion
-//#region packages/flow/src/state-machine/with-events.ts
+//#region ../flow/src/state-machine/with-events.ts
 /**
 * A state machine that fires events when state changes.
 * 
@@ -3445,7 +3530,7 @@ var StateMachineWithEvents = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/flow/src/state-machine/index.ts
+//#region ../flow/src/state-machine/index.ts
 var state_machine_exports = {};
 __export(state_machine_exports, {
 	StateMachineWithEvents: () => StateMachineWithEvents,
@@ -3467,5 +3552,5 @@ __export(state_machine_exports, {
 });
 
 //#endregion
-export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum$1 as rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout$1 as timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
 //# sourceMappingURL=flow.js.map

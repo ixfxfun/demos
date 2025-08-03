@@ -1,12 +1,249 @@
-import { Continuously, Interval } from "@ixfx/core";
-import { ISimpleEventEmitter, SimpleEventEmitter } from "@ixfx/events";
-import { Video } from "@ixfx/visual";
-import { Point } from "@ixfx/geometry/point";
-import { Rect } from "@ixfx/geometry/rect";
-import { StateChangeEvent, StateChangeEvent as StateChangeEvent$1, StateMachineWithEvents, Transitions } from "@ixfx/flow/state-machine";
-import { QueueMutable } from "@ixfx/collections/queue";
+import { IsEqual } from "./is-equal-aUE7iVHd.js";
+import { Interval } from "./types-BEAJ_GOH.js";
+import { Continuously } from "./continuously-xAy8Jw7t.js";
+import { ISimpleEventEmitter, SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { Point, Rect } from "./rect-types-d5I5ouwR.js";
+import { IQueueMutable, QueueMutableEvents } from "./iqueue-mutable-DvKBPw5h.js";
 
-//#region packages/io/src/codec.d.ts
+//#region ../collections/dist/src/queue/queue-types.d.ts
+type QueueDiscardPolicy = `older` | `newer` | `additions`;
+/**
+ * Queue options.
+ *
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
+ * ```
+ */
+type QueueOpts<V> = {
+  readonly eq?: IsEqual<V>;
+  /**
+   * @private
+   */
+  readonly debug?: boolean;
+  /**
+   * Capcity limit
+   */
+  readonly capacity?: number;
+  /**
+   * Default is `additions`, meaning new items are discarded.
+   *
+   * `older`: Removes items front of the queue (ie older items are discarded)
+   *
+   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded)
+   *
+   * `additions`: Only adds new items that there are room for (ie. brand new items are discarded)
+   *
+   */
+  readonly discardPolicy?: QueueDiscardPolicy;
+};
+//# sourceMappingURL=queue-types.d.ts.map
+
+//#endregion
+//#region ../collections/dist/src/queue/queue-mutable.d.ts
+/**
+ * Mutable queue that fires events when manipulated.
+ *
+ * Queues are useful if you want to treat 'older' or 'newer'
+ * items differently. _Enqueing_ adds items at the back of the queue, while
+ * _dequeing_ removes items from the front (ie. the oldest).
+ *
+ * ```js
+ * const q = Queues.mutable();       // Create
+ * q.enqueue(`a`, `b`);     // Add two strings
+ * const front = q.dequeue();  // `a` is at the front of queue (oldest)
+ * ```
+ *
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
+ * ```
+ *
+ * Events can be used to monitor data flows.
+ * * 'enqueue': fires when item(s) are added
+ * * 'dequeue': fires when an item is dequeued from front
+ * * 'removed': fires when an item is dequeued, queue is cleared or .removeWhere is used to trim queue
+ *
+ * Each of the event handlers return the state of the queue as the 'finalData'
+ * field.
+ *
+ * ```js
+ * q.addEventListener(`enqueue`, e => {
+ *  // e.added, e.finalData
+ * });
+ * q.addEventListener(`removed`, e => {
+ *  // e.removed, e.finalData
+ * });
+ * q.addEventListener(`dequeue`, e=> {
+ *  // e.removed, e.finalData
+ * })
+ * ```
+ * @typeParam V - Data type of items
+ */
+declare class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
+  readonly options: QueueOpts<V>;
+  data: readonly V[];
+  eq: IsEqual<V>;
+  constructor(opts?: QueueOpts<V>, data?: readonly V[]);
+  clear(): void;
+  /**
+   * Called when all data is cleared
+   */
+  protected onClear(): void;
+  at(index: number): V;
+  enqueue(...toAdd: readonly V[]): number;
+  protected onEnqueue(result: readonly V[], attemptedToAdd: readonly V[]): void;
+  dequeue(): V | undefined;
+  protected onRemoved(removed: readonly V[], finalData: readonly V[]): void;
+  /**
+   * Removes values that match `predicate`.
+   * @param predicate
+   * @returns Returns number of items removed.
+   */
+  removeWhere(predicate: (item: V) => boolean): number;
+  /**
+  * Return a copy of the array
+  * @returns
+  */
+  toArray(): V[];
+  get isEmpty(): boolean;
+  get isFull(): boolean;
+  get length(): number;
+  get peek(): V | undefined;
+}
+/**
+ * Creates a new QueueMutable
+ * @param options
+ * @param startingItems
+ * @returns
+ */
+//#endregion
+//#region ../flow/dist/src/state-machine/types.d.ts
+
+type TransitionCondition<V extends Transitions> = {
+  readonly hasPriorState: readonly StateNames<V>[];
+  readonly isInState: StateNames<V>;
+};
+type StateTargetStrict<V extends Transitions> = {
+  readonly state: StateNames<V> | null;
+  readonly preconditions?: readonly TransitionCondition<V>[];
+};
+/**
+ * Possible state transitions, or _null_ if final state.
+ */
+type StateTarget<V extends Transitions> = string | string[] | readonly string[] | null | StateTargetStrict<V>;
+/**
+ * Maps state to allowable next states
+ */
+type Transitions = {
+  readonly [key: string]: StateTarget<Transitions>;
+};
+/**
+ * List of possible states
+ */
+type StateNames<V extends Transitions> = keyof V & string;
+//#endregion
+//#region ../flow/dist/src/state-machine/with-events.d.ts
+type StateChangeEvent<V extends Transitions> = {
+  readonly newState: StateNames<V>;
+  readonly priorState: StateNames<V>;
+};
+type StopEvent<V extends Transitions> = {
+  readonly state: StateNames<V>;
+};
+type StateMachineEventMap<V extends Transitions> = {
+  readonly change: StateChangeEvent<V>;
+  readonly stop: StopEvent<V>;
+};
+type StateMachineWithEventsOptions<V extends Transitions> = {
+  readonly debug?: boolean;
+  readonly initial?: StateNames<V>;
+};
+/**
+ * A state machine that fires events when state changes.
+ *
+ * ```js
+ * const transitions = StateMachine.fromList(`a`, `b`, `c`);
+ * const m = new StateMachineWithEvents(transitions);
+ * m.addEventListener(`change`, event => {
+ *  console.log(`${event.priorState} -> ${event.newState}`);
+ * });
+ * m.addEventListener(`stop`, event => {
+ *  console.log(`State machine has reached final state`);
+ * });
+ * ```
+ */
+declare class StateMachineWithEvents<V extends Transitions> extends SimpleEventEmitter<StateMachineEventMap<V>> {
+  #private;
+  /**
+   * Create a state machine with initial state, description and options
+   * @param m Machine description
+   * @param opts Options for machine (defaults to `{debug:false}`)
+   */
+  constructor(m: V, opts?: StateMachineWithEventsOptions<V>);
+  /**
+   * Return a list of possible states from current state.
+   *
+   * If list is empty, no states are possible. Otherwise lists
+   * possible states, including 'null' for terminal
+   */
+  get statesPossible(): readonly (StateNames<V> | null)[];
+  /**
+   * Return a list of all defined states
+   */
+  get statesDefined(): readonly StateNames<V>[];
+  /**
+   * Moves to the next state if possible. If multiple states are possible, it will use the first.
+   * If machine is finalised, no error is thrown and null is returned.
+   *
+   * @returns {(string|null)} Returns new state, or null if machine is finalised
+   */
+  next(): string | null;
+  /**
+   * Returns _true_ if state machine is in its final state
+   *
+   * @returns
+   */
+  get isDone(): boolean;
+  /**
+   * Resets machine to initial state
+   */
+  reset(): void;
+  /**
+   * Throws if it's not valid to transition to `newState`
+   * @param newState
+   * @returns
+   */
+  validateTransition(newState: StateNames<V>): void;
+  /**
+   * Returns _true_ if `newState` is valid transition from current state.
+   * Use {@link validateTransition} if you want an explanation for the _false_ results.
+   * @param newState
+   * @returns
+   */
+  isValid(newState: StateNames<V>): boolean;
+  /**
+   * Gets or sets state. Throws an error if an invalid transition is attempted.
+   * Use `isValid()` to check validity without changing.
+   *
+   * If `newState` is the same as current state, the request is ignored silently.
+   */
+  set state(newState: StateNames<V>);
+  get state(): string;
+  /**
+   * Returns timestamp when state was last changed.
+   * See also `elapsed`
+   */
+  get changedAt(): number;
+  /**
+   * Returns milliseconds elapsed since last state change.
+   * See also `changedAt`
+   */
+  get elapsed(): number;
+}
+//# sourceMappingURL=with-events.d.ts.map
+//#endregion
+//#region ../io/src/codec.d.ts
 /**
  * Handles utf-8 text encoding/decoding
  */
@@ -28,7 +265,7 @@ declare class Codec {
 }
 //# sourceMappingURL=codec.d.ts.map
 //#endregion
-//#region packages/io/src/string-receive-buffer.d.ts
+//#region ../io/src/string-receive-buffer.d.ts
 /**
  * Receives text
  */
@@ -47,7 +284,7 @@ declare class StringReceiveBuffer {
 }
 //# sourceMappingURL=string-receive-buffer.d.ts.map
 //#endregion
-//#region packages/io/src/string-write-buffer.d.ts
+//#region ../io/src/string-write-buffer.d.ts
 type Opts = {
   readonly chunkSize?: number;
   readonly interval?: Interval;
@@ -138,7 +375,7 @@ declare class StringWriteBuffer {
 }
 //# sourceMappingURL=string-write-buffer.d.ts.map
 //#endregion
-//#region packages/io/src/generic-state-transitions.d.ts
+//#region ../io/src/generic-state-transitions.d.ts
 declare const genericStateTransitionsInstance: Readonly<{
   ready: "connecting";
   connecting: string[];
@@ -147,13 +384,13 @@ declare const genericStateTransitionsInstance: Readonly<{
 }>;
 //# sourceMappingURL=generic-state-transitions.d.ts.map
 //#endregion
-//#region packages/io/src/types.d.ts
+//#region ../io/src/types.d.ts
 type IoDataEvent = {
   readonly data: string;
 };
 type IoEvents<StateMachineTransitions extends Transitions> = {
   readonly data: IoDataEvent;
-  readonly change: StateChangeEvent$1<StateMachineTransitions>;
+  readonly change: StateChangeEvent<StateMachineTransitions>;
 };
 type GenericStateTransitions = Readonly<typeof genericStateTransitionsInstance>;
 type BleDeviceOptions = {
@@ -168,7 +405,7 @@ type BleDeviceOptions = {
 type FrameProcessorSources = `` | `camera` | `video`;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/io/src/ble-device.d.ts
+//#region ../io/src/ble-device.d.ts
 declare class BleDevice extends SimpleEventEmitter<IoEvents<GenericStateTransitions>> {
   private device;
   private config;
@@ -216,7 +453,7 @@ declare class NordicBleDevice extends BleDevice {
 }
 //# sourceMappingURL=nordic-ble-device.d.ts.map
 //#endregion
-//#region packages/io/src/audio/visualiser.d.ts
+//#region ../io/src/audio/visualiser.d.ts
 declare class AudioVisualiser {
   freqMaxRange: number;
   audio: AudioAnalyser;
@@ -244,7 +481,7 @@ declare class AudioVisualiser {
 }
 //# sourceMappingURL=visualiser.d.ts.map
 //#endregion
-//#region packages/io/src/audio/analyser.d.ts
+//#region ../io/src/audio/analyser.d.ts
 /**
  * Options for audio processing
  *
@@ -402,7 +639,7 @@ declare class AudioAnalyser {
 }
 //# sourceMappingURL=analyser.d.ts.map
 //#endregion
-//#region packages/io/src/audio/types.d.ts
+//#region ../io/src/audio/types.d.ts
 type AudioOscillatorOptions = {
   type: OscillatorType;
   frequency: number;
@@ -423,7 +660,7 @@ type BasicAudioOscillator = BasicAudio & {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/io/src/audio/from-audio-element.d.ts
+//#region ../io/src/audio/from-audio-element.d.ts
 /**
  * Scans page for <AUDIO> elements and creates playable controllers for them.
  * It uses the element's 'id' attribute as a way of fetching one later.
@@ -458,7 +695,7 @@ declare class AudioElements {
 declare function createFromAudioElement(audioElementOrQuery: HTMLMediaElement | string, filterType?: BiquadFilterType): BasicAudioElement;
 //# sourceMappingURL=from-audio-element.d.ts.map
 //#endregion
-//#region packages/io/src/audio/from-oscillator.d.ts
+//#region ../io/src/audio/from-oscillator.d.ts
 /**
  * Initialise audio with an oscillator source
  * @param oscillatorOptions
@@ -470,7 +707,7 @@ declare namespace index_d_exports {
   export { AudioAnalyser, AudioElements, AudioOscillatorOptions, AudioVisualiser, BasicAudio, BasicAudioElement, BasicAudioOscillator, DataAnalyser, Opts$1 as Opts, analyserBasic, analyserFrequency, analyserPeakLevel, createFromAudioElement, createOscillator };
 }
 //#endregion
-//#region packages/io/src/espruino-ble-device.d.ts
+//#region ../io/src/espruino-ble-device.d.ts
 /**
  * An Espruino BLE-connection
  *
@@ -567,7 +804,7 @@ declare class EspruinoBleDevice extends NordicBleDevice {
 }
 //# sourceMappingURL=espruino-ble-device.d.ts.map
 //#endregion
-//#region packages/io/src/json-device.d.ts
+//#region ../io/src/json-device.d.ts
 /**
  * Options for JsonDevice
  */
@@ -609,7 +846,7 @@ type JsonDeviceEvents = {
   /**
    * State changed
    */
-  readonly change: StateChangeEvent$1<GenericStateTransitions>;
+  readonly change: StateChangeEvent<GenericStateTransitions>;
 };
 declare abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   states: StateMachineWithEvents<GenericStateTransitions>;
@@ -708,7 +945,7 @@ declare class Device extends JsonDevice {
   onConnectAttempt(): Promise<void>;
 }
 //#endregion
-//#region packages/io/src/espruino-serial-device.d.ts
+//#region ../io/src/espruino-serial-device.d.ts
 type EspruinoSerialDeviceOpts = SerialOpts & {
   readonly evalTimeoutMs?: number;
 };
@@ -1146,7 +1383,14 @@ type StartResult = {
 declare const start: (file: File) => Promise<StartResult>;
 //# sourceMappingURL=video-file.d.ts.map
 //#endregion
-//#region packages/io/src/frame-processor.d.ts
+//#region ../visual/dist/src/video.d.ts
+type ManualCapturer = {
+  capture(): ImageData;
+  readonly canvasEl: HTMLCanvasElement;
+  dispose(): void;
+};
+//#endregion
+//#region ../io/src/frame-processor.d.ts
 /**
  * Frame procesor options
  */
@@ -1232,7 +1476,7 @@ declare class FrameProcessor {
    * Returns the current capturer instance
    * @returns
    */
-  getCapturer(): Video.ManualCapturer | undefined;
+  getCapturer(): ManualCapturer | undefined;
   /**
    * Grab frames from a video camera source and initialises
    * frame processor.
@@ -1272,7 +1516,7 @@ declare class FrameProcessor {
 }
 //# sourceMappingURL=frame-processor.d.ts.map
 //#endregion
-//#region packages/io/src/reconnecting-web-socket.d.ts
+//#region ../io/src/reconnecting-web-socket.d.ts
 type ReconnectingWebsocket = {
   /**
    * Sends data

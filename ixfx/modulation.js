@@ -1,17 +1,1033 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-Bo4oKRxs.js";
-import "./is-primitive-BD8Wwhed.js";
-import { intervalToMs } from "./interval-type-Bu6U9yES.js";
-import "./basic-BcTIVreK.js";
-import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
-import "./key-value-DZNL5nwk.js";
-import { resolveWithFallbackSync } from "./resolve-core-ibINXx_1.js";
-import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-LtkApSyv.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-D8qEf6yn.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-CKv6-Ox5.js";
-import { float, floatSource } from "./bezier-DS5b_ULE.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
+import { stringTest } from "./string-BeUdcb0y.js";
+import "./elapsed-DEWYfvwx.js";
+import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { resolve, resolveWithFallbackSync } from "./resolve-core-cAVLLopl.js";
+import "./error-message-B6EPesrV.js";
+import { sleep } from "./sleep-C2hKDgCi.js";
+import "./is-equal-y9du2FWU.js";
+import "./unique-GmJPtLE_.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import { clamp } from "./clamp-BXRKKkSg.js";
+import { wrap } from "./wrap-CbW4pe4i.js";
+import { interpolate, interpolateAngle } from "./interpolate-BoOK0bgP.js";
+import { scale } from "./scale-DHjtm9T-.js";
+import { Empty, Unit, guard, guard$1, guardDim, isPoint, isPoint3d, multiply, multiplyScalar, subtract } from "./multiply-C6BAKtKA.js";
+import { angleRadian, clampMagnitude, distance, divide, interpolate as interpolate$1, isCubicBezier, isQuadraticBezier, normalise, sum, toCartesian } from "./guard-DPX_PMKU.js";
+import "./state-machine-BUeoIwqN.js";
+import { StateMachineWithEvents } from "./with-events-B6wswWSq.js";
+import { Bezier } from "./bezier-C-OUPtNe.js";
 
-//#region packages/modulation/src/source/ticks.ts
+//#region ../guards/dist/src/function.js
+const functionTest = (value, parameterName = `?`) => {
+	if (value === void 0) return {
+		success: false,
+		error: `Param '${parameterName}' is undefined. Expected: function.`
+	};
+	if (value === null) return {
+		success: false,
+		error: `Param '${parameterName}' is null. Expected: function.`
+	};
+	if (typeof value !== `function`) return {
+		success: false,
+		error: `Param '${parameterName}' is type '${typeof value}'. Expected: function`
+	};
+	return {
+		success: true,
+		value
+	};
+};
+
+//#endregion
+//#region ../geometry/dist/src/rect/edges.js
+/**
+* Returns a point on the edge of rectangle
+* ```js
+* const r1 = {x: 10, y: 10, width: 100, height: 50};
+* Rects.getEdgeX(r1, `right`);  // Yields: 110
+* Rects.getEdgeX(r1, `bottom`); // Yields: 10
+*
+* const r2 = {width: 100, height: 50};
+* Rects.getEdgeX(r2, `right`);  // Yields: 100
+* Rects.getEdgeX(r2, `bottom`); // Yields: 0
+* ```
+* @param rect
+* @param edge Which edge: right, left, bottom, top
+* @returns
+*/
+const getEdgeX = (rect, edge) => {
+	guard(rect);
+	switch (edge) {
+		case `top`: return isPoint(rect) ? rect.x : 0;
+		case `bottom`: return isPoint(rect) ? rect.x : 0;
+		case `left`: return isPoint(rect) ? rect.y : 0;
+		case `right`: return isPoint(rect) ? rect.x + rect.width : rect.width;
+	}
+};
+/**
+* Returns a point on the edge of rectangle
+*
+* ```js
+* const r1 = {x: 10, y: 10, width: 100, height: 50};
+* Rects.getEdgeY(r1, `right`);  // Yields: 10
+* Rects.getEdgeY(r1, `bottom`); // Yields: 60
+*
+* const r2 = {width: 100, height: 50};
+* Rects.getEdgeY(r2, `right`);  // Yields: 0
+* Rects.getEdgeY(r2, `bottom`); // Yields: 50
+* ```
+* @param rect
+* @param edge Which edge: right, left, bottom, top
+* @returns
+*/
+const getEdgeY = (rect, edge) => {
+	guard(rect);
+	switch (edge) {
+		case `top`: return isPoint(rect) ? rect.y : 0;
+		case `bottom`: return isPoint(rect) ? rect.y + rect.height : rect.height;
+		case `left`: return isPoint(rect) ? rect.y : 0;
+		case `right`: return isPoint(rect) ? rect.y : 0;
+	}
+};
+
+//#endregion
+//#region ../geometry/dist/src/rect/from-top-left.js
+/**
+* Creates a rectangle from its top-left coordinate, a width and height.
+*
+* ```js
+* // Rectangle at 50,50 with width of 100, height of 200.
+* const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
+* ```
+* @param origin
+* @param width
+* @param height
+* @returns
+*/
+const fromTopLeft = (origin, width, height) => {
+	guardDim(width, `width`);
+	guardDim(height, `height`);
+	guard$1(origin, `origin`);
+	return {
+		x: origin.x,
+		y: origin.y,
+		width,
+		height
+	};
+};
+
+//#endregion
+//#region ../random/dist/src/float-source.js
+/**
+* Returns a function that produces random float values.
+* Use {@link float} to produce a valued directly.
+*
+* Random float between `max` (exclusive) and 0 (inclusive). Max is 1 if unspecified.
+*
+*
+* ```js
+* // Random number between 0..1 (but not including 1)
+* // (this would be identical to Math.random())
+* const r = floatSource();
+* r(); // Execute to produce random value
+*
+* // Random float between 0..100 (but not including 100)
+* const v = floatSource(100)();
+* ```
+*
+* Options can be used:
+* ```js
+* // Random float between 20..40 (possibly including 20, but always lower than 40)
+* const r = floatSource({ min: 20, max: 40 });
+* ```
+* @param maxOrOptions Maximum value (exclusive) or options
+* @returns Random number
+*/
+const floatSource = (maxOrOptions = 1) => {
+	const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
+	let max = options.max ?? 1;
+	let min = options.min ?? 0;
+	const source = options.source ?? Math.random;
+	resultThrow(numberTest(min, ``, `min`), numberTest(max, ``, `max`));
+	if (!options.min && max < 0) {
+		min = max;
+		max = 0;
+	}
+	if (min > max) throw new Error(`Min is greater than max. Min: ${min.toString()} max: ${max.toString()}`);
+	return () => source() * (max - min) + min;
+};
+/**
+* Returns a random float between `max` (exclusive) and 0 (inclusive).
+*
+* Max is 1 if unspecified.
+* Use {@link floatSource} to get a function that produces values. This is used internally.
+*
+* ```js
+* // Random number between 0..1 (but not including 1)
+* // (this would be identical to Math.random())
+* const v = float();
+* // Random float between 0..100 (but not including 100)
+* const v = float(100);
+* ```
+*
+* Options can be used:
+* ```js
+* // Random float between 20..40 (possibly including 20, but always lower than 40)
+* const v = float({ min: 20, max: 40 });
+* ```
+* @param maxOrOptions Maximum value (exclusive) or options
+* @returns Random number
+*/
+const float = (maxOrOptions = 1) => floatSource(maxOrOptions)();
+
+//#endregion
+//#region ../geometry/dist/src/point/abs.js
+/**
+* Returns a point with Math.abs applied to x,y and z if present.
+* ```js
+* Points.abs({ x:1,  y:1  }); // { x: 1, y: 1 }
+* Points.abs({ x:-1, y:1  }); // { x: 1, y: 1 }
+* Points.abs({ x:-1, y:-1 }); // { x: 1, y: 1 }
+* ```
+* @param pt
+* @returns
+*/
+function abs(pt) {
+	if (isPoint3d(pt)) return Object.freeze({
+		...pt,
+		x: Math.abs(pt.x),
+		y: Math.abs(pt.y),
+		z: Math.abs(pt.z)
+	});
+	else if (isPoint(pt)) return Object.freeze({
+		...pt,
+		x: Math.abs(pt.x),
+		y: Math.abs(pt.y)
+	});
+	else throw new TypeError(`Param 'pt' is not a point`);
+}
+
+//#endregion
+//#region ../geometry/dist/src/point/compare.js
+/**
+* Returns -2 if both x & y of a is less than b
+* Returns -1 if either x/y of a is less than b
+*
+* Returns 2 if both x & y of a is greater than b
+* Returns 1 if either x/y of a is greater than b's x/y
+*
+* Returns 0 if x/y of a and b are equal
+* @param a
+* @param b
+* @returns
+*/
+const compare = (a, b) => {
+	if (a.x < b.x && a.y < b.y) return -2;
+	if (a.x > b.x && a.y > b.y) return 2;
+	if (a.x < b.x || a.y < b.y) return -1;
+	if (a.x > b.x || a.y > b.y) return 1;
+	if (a.x === b.x && a.x === b.y) return 0;
+	return NaN;
+};
+
+//#endregion
+//#region ../geometry/dist/src/point/interpolate.js
+/**
+* Returns a relative point between two points.
+*
+* ```js
+* interpolate(0.5, { x:0, y:0 }, { x:10, y:10 }); // Halfway { x, y }
+* ```
+*
+* Alias for Lines.interpolate(amount, a, b);
+*
+* @param amount Relative amount, 0-1
+* @param a
+* @param b
+* @param allowOverflow If true, length of line can be exceeded for `amount` of below 0 and above `1`.
+* @returns {@link Point}
+*/
+const interpolate$3 = (amount, a, b, allowOverflow = false) => interpolate$1(amount, a, b, allowOverflow);
+
+//#endregion
+//#region ../geometry/dist/src/point/invert.js
+/**
+* Inverts one or more axis of a point
+* ```js
+* invert({x:10, y:10}); // Yields: {x:-10, y:-10}
+* invert({x:10, y:10}, `x`); // Yields: {x:-10, y:10}
+* ```
+* @param pt Point to invert
+* @param what Which axis. If unspecified, both axies are inverted
+* @returns
+*/
+const invert = (pt, what = `both`) => {
+	switch (what) {
+		case `both`: return isPoint3d(pt) ? Object.freeze({
+			...pt,
+			x: pt.x * -1,
+			y: pt.y * -1,
+			z: pt.z * -1
+		}) : Object.freeze({
+			...pt,
+			x: pt.x * -1,
+			y: pt.y * -1
+		});
+		case `x`: return Object.freeze({
+			...pt,
+			x: pt.x * -1
+		});
+		case `y`: return Object.freeze({
+			...pt,
+			y: pt.y * -1
+		});
+		case `z`: if (isPoint3d(pt)) return Object.freeze({
+			...pt,
+			z: pt.z * -1
+		});
+		else throw new Error(`pt parameter is missing z`);
+		default: throw new Error(`Unknown what parameter. Expecting 'both', 'x' or 'y'`);
+	}
+};
+
+//#endregion
+//#region ../geometry/dist/src/point/pipeline.js
+/**
+* Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+* ```js
+* const p = Points.pipelineApply(somePoint, Points.normalise, Points.invert);
+* ```
+*
+* If you want to make a reusable pipeline of functions, consider {@link pipeline} instead.
+* @param point
+* @param pipelineFns
+* @returns
+*/
+const pipelineApply = (point, ...pipelineFns) => pipeline(...pipelineFns)(point);
+/**
+* Returns a pipeline function that takes a point to be transformed through a series of functions
+* ```js
+* // Create pipeline
+* const p = Points.pipeline(Points.normalise, Points.invert);
+*
+* // Now run it on `somePoint`.
+* // First we normalised, and then invert
+* const changedPoint = p(somePoint);
+* ```
+*
+* If you don't want to create a pipeline, use {@link pipelineApply}.
+* @param pipeline Pipeline of functions
+* @returns
+*/
+const pipeline = (...pipeline$1) => (pt) => pipeline$1.reduce((previous, current) => current(previous), pt);
+
+//#endregion
+//#region ../flow/dist/src/repeat.js
+/**
+* Generates values from `produce` with a time delay.
+* `produce` can be a simple function that returns a value, an async function, or a generator.
+* If `produce` returns _undefined_, generator exits.
+*
+* @example
+* Produce a random number every 500ms
+* ```js
+* const randomGenerator = repeat(() => Math.random(), 500);
+* for await (const r of randomGenerator) {
+*  // Random value every 1 second
+*  // Warning: does not end by itself, a `break` statement is needed
+* }
+* ```
+*
+* @example
+* Return values from a generator every 500ms
+* ```js
+* import { repeat } from '@ixfx/flow.js'
+* import { count } from '@ixfx/numbers.js'
+* for await (const v of repeat(count(10), { fixed: 1000 })) {
+*  // Do something with `v`
+* }
+* ```
+*
+* Options allow either fixed interval (wait this long between iterations), or a minimum interval (wait at least this long). The latter is useful if `produce` takes some time - it will only wait the remaining time or not at all.
+*
+* If the AbortSignal is triggered, an exception will be thrown, stopping iteration.
+*
+* @see {@link continuously}: loop that runs at a constant speed. Able to be started and stopped
+* @see {@link repeat}: run a function a certain number of times, collecting results
+*
+* @param produce Function/generator to use
+* @param opts
+* @typeParam T - Data type
+* @returns Returns value of `produce` function
+*/
+async function* repeat(produce, opts) {
+	const signal = opts.signal ?? void 0;
+	const delayWhen = opts.delayWhen ?? `before`;
+	const count = opts.count ?? void 0;
+	const allowUndefined = opts.allowUndefined ?? false;
+	const minIntervalMs = opts.delayMinimum ? intervalToMs(opts.delayMinimum) : void 0;
+	const whileFunction = opts.while;
+	let cancelled = false;
+	let sleepMs = intervalToMs(opts.delay, intervalToMs(opts.delayMinimum, 0));
+	let started = performance.now();
+	const doDelay = async () => {
+		const elapsed$1 = performance.now() - started;
+		if (typeof minIntervalMs !== `undefined`) sleepMs = Math.max(0, minIntervalMs - elapsed$1);
+		if (sleepMs) await sleep({
+			millis: sleepMs,
+			signal
+		});
+		started = performance.now();
+		if (signal?.aborted) throw new Error(`Signal aborted ${signal.reason}`);
+	};
+	if (Array.isArray(produce)) produce = produce.values();
+	if (opts.onStart) opts.onStart();
+	let errored = true;
+	let loopedTimes = 0;
+	try {
+		while (!cancelled) {
+			loopedTimes++;
+			if (delayWhen === `before` || delayWhen === `both`) await doDelay();
+			const result = await resolve(produce);
+			if (typeof result === `undefined` && !allowUndefined) cancelled = true;
+			else {
+				yield result;
+				if (delayWhen === `after` || delayWhen === `both`) await doDelay();
+				if (count !== void 0 && loopedTimes >= count) cancelled = true;
+			}
+			if (whileFunction) {
+				if (!whileFunction(loopedTimes)) cancelled = true;
+			}
+		}
+		errored = false;
+	} finally {
+		cancelled = true;
+		if (opts.onComplete) opts.onComplete(errored);
+	}
+}
+/**
+* Logic for continuing repeats
+*/
+/**
+* Calls and waits for the async function `fn` repeatedly, yielding each result asynchronously.
+* Use {@link repeat} if `fn` does not need to be awaited.
+*
+* ```js
+* // Eg. iterate
+* const r = Flow.repeat(5, async () => Math.random());
+* for await (const v of r) {
+*
+* }
+* // Eg read into array
+* const results = await Array.fromAsync(Flow.repeatAwait(5, async () => Math.random()));
+* ```
+*
+* The number of repeats is determined by the first parameter. If it's a:
+* - number: how many times to repeat
+* - function: it gets called before each repeat, if it returns _false_ repeating stops.
+*
+* Using a fixed number of repeats:
+* ```js
+* // Calls - and waits - for Flow.sleep(1) 5 times
+* await Flow.repeatAwait(5, async () => {
+*    // some kind of async function where we can use await
+*    // eg. sleep for 1s
+*    await Flow.sleep(1);
+* });
+* ```
+*
+* Using a function to dynamically determine number of repeats. The function gets
+* passed the number of repeats so far as well as the number of values produced. This
+* is count of non-undefined results from `cb` that is being repeated.
+*
+* ```js
+* async function task() {
+*  // do something
+* }
+*
+* await Flow.repeatAwait(
+*  (repeats, valuesProduced) => {
+*    // Logic for deciding whether to repeat or not
+*    if (repeats > 5) return false; // Stop repeating
+*  },
+*  task
+* );
+* ```
+*
+* In the above cases we're not using the return value from `fn`. This would look like:
+* ```js
+* const g = Flow.repeatAwait(5, async () => Math.random);
+* for await (const v of g) {
+*  // Loops 5 times, v is the return value of calling `fn` (Math.random)
+* }
+* ```
+* @param countOrPredicate Number of times to repeat, or a function that returns _false_ to stop the loop.
+* @param fn Function to execute. Asynchronous functions will be awited
+* @typeParam V - Return type of repeating function
+* @returns Asynchronous generator of `fn` results.
+*/
+/**
+* Calls `fn` repeatedly, yielding each result.
+* Use {@link repeatAwait} if `fn` is asynchronous and you want to wait for it.
+*
+* The number of repeats is determined by the first parameter. If it's a:
+* - number: how many times to repeat
+* - function: it gets called before each repeat, if it returns _false_ repeating stops.
+*
+* Example: using a fixed number of repeats
+* ```js
+* // Results will be an array with five random numbers
+* const results = [...repeat(5, () => Math.random())];
+*
+* // Or as an generator (note also the simpler expression form)
+* for (const result of repeat(5, Math.random)) {
+* }
+* ```
+*
+* Example: Using a function to dynamically determine number of repeats
+* ```js
+* function task() {
+* }
+*
+* Flow.repeat(
+*  (repeats, valuesProduced) => {
+*    if (repeats > 5) return false; // Stop repeating
+*  },
+*  task
+* );
+* ```
+*
+* In the above cases we're not using the return value from `fn`. To do so,
+* this would look like:
+* ```js
+* const g = Flow.repeat(5, () => Math.random);
+* for (const v of g) {
+*  // Loops 5 times, v is the return value of calling `fn` (Math.random)
+* }
+* ```
+*
+* Alternatives:
+* * {@link Flow.forEach | Flow.forEach} - if you don't need return values
+* * {@link Flow.interval} - if you want to repeatedly call something with an interval between
+* @param countOrPredicate Numnber of repeats, or a function that returns _false_ for when to stop.
+* @param fn Function to execute. Asynchronous functions will be awited
+* @typeParam V - Return type of repeating function
+* @returns Asynchronous generator of `fn` results.
+*/
+/**
+* Calls `fn` until `predicate` returns _false_. Awaits result of `fn` each time.
+* Yields result of `fn` asynchronously
+* @param predicate
+* @param fn
+* @typeParam V - Return type of repeating function
+*/
+/**
+* Calls `fn` until `predicate` returns _false_. Yields result of `fn`.
+* @param predicate Determiner for whether repeating continues
+* @param fn Function to call
+* @typeParam V - Return type of repeating function
+*/
+/**
+* Calls `fn`, `count` number of times, waiting for the result of `fn`.
+* Yields result of `fn` asynchronously
+* @param count Number of times to run
+* @param fn Function to run
+* @typeParam V - Return type of repeating function
+*/
+/**
+* Calls `fn`, `count` times. Assumes a synchronous function. Yields result of `fn`.
+*
+* Note that if `fn` returns _undefined_ repeats will stop.
+* @typeParam V - Return type of repeating function
+* @param count Number of times to run
+* @param fn Function to run
+*/
+/**
+* Repeatedly calls `fn`, reducing via `reduce`.
+*
+* ```js
+* repeatReduce(10, () => 1, (acc, v) => acc + v);
+* // Yields: 10
+*
+* // Multiplies random values against each other 10 times
+* repeatReduce(10, Math.random, (acc, v) => acc * v);
+* // Yields a single number
+* ```
+* @param countOrPredicate Number of times to run, or function to keep running
+* @param fn Function to call
+* @param initial Initial value
+* @param reduce Function to reduce value
+* @typeParam V - Return type of repeating function
+* @returns Final result
+*/
+
+//#endregion
+//#region ../flow/dist/src/timer.js
+/**
+* Returns a function that returns the percentage of timer completion.
+* Starts when return function is first invoked.
+*
+* ```js
+* const timer = Flow.ofTotal(1000);
+*
+* // Call timer() to find out the completion
+* timer(); // Returns 0..1
+* ```
+*
+* Note that timer can exceed 1 (100%). To cap it:
+* ```js
+* Flow.ofTotal(1000, { clampValue: true });
+* ```
+*
+* Takes an {@link Interval} for more expressive time:
+* ```js
+* const timer = Flow.ofTotal({ mins: 4 });
+* ```
+*
+* Is a simple wrapper around {@link relative}.
+* @param duration
+* @see {@link ofTotalTicks} - Use ticks instead of time
+* @see {@link hasElapsed} - Simple _true/false_ if interval has elapsed
+* @returns
+*/
+function ofTotal(duration, opts = {}) {
+	const totalMs = intervalToMs(duration);
+	if (!totalMs) throw new Error(`Param 'duration' not valid`);
+	const timerOpts = {
+		...opts,
+		timer: elapsedMillisecondsAbsolute()
+	};
+	let t;
+	return () => {
+		t ??= relative(totalMs, timerOpts);
+		return t.elapsed;
+	};
+}
+/**
+* Returns a function that returns the percentage (0..1) of timer completion.
+* Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
+*
+* ```js
+* const timer = Flow.ofTotalTicks(1000);
+* timer(); // Returns 0..1
+* ```
+*
+* Note that timer can exceed 1 (100%). To cap it:
+* ```js
+* Flow.ofTotalTicks(1000, { clampValue: true });
+* ```
+*
+* This is a a simple wrapper around {@link relative}.
+* @see {@link ofTotal}
+* @see {@link hasElapsed}: Simple _true/false_ if interval has elapsed
+* @param totalTicks
+* @returns
+*/
+function ofTotalTicks(totalTicks, opts = {}) {
+	const timerOpts = {
+		...opts,
+		timer: elapsedTicksAbsolute()
+	};
+	let t;
+	return () => {
+		t ??= relative(totalTicks, timerOpts);
+		return t.elapsed;
+	};
+}
+/**
+* Returns a {@link ModulationTimer} that is always at 100%.
+* Opposite: {@link timerNeverDone}.
+* @returns
+*/
+const timerAlwaysDone = () => ({
+	elapsed: 1,
+	isDone: true,
+	reset() {},
+	mod(amt) {}
+});
+/**
+* Returns a {@link ModulationTimer} that is always at 0%.
+* Opposite: {@link timerAlwaysDone}.
+* @returns
+*/
+const timerNeverDone = () => ({
+	elapsed: 0,
+	isDone: false,
+	reset() {},
+	mod() {}
+});
+/**
+* Wraps a timer, returning a relative elapsed value based on
+* a given total. ie. percentage complete toward a total value.
+* This is useful because other parts of code don't need to know
+* about the absolute time values, you get a nice relative completion number.
+*
+* If no timer is specified, a milliseconds-based timer is used.
+*
+* ```js
+* const t = relative(1000);
+* t.elapsed;   // returns % completion (0...1)
+* ```
+* It can also use a tick based timer
+* ```js
+* // Timer that is 'done' at 100 ticks
+* const t = relative(100, { timer: ticksElapsedTimer() });
+* ```
+*
+* Additional fields/methods on the timer instance
+* ```js
+* t.isDone;  // _true_ if .elapsed has reached (or exceeded) 1
+* t.reset(); // start from zero again
+* ```
+*
+* Options:
+* * timer: timer to use. If not specified, `elapsedMillisecondsAbsolute()` is used.
+* * clampValue: if _true_, return value is clamped to 0..1 (default: _false_)
+* * wrapValue: if _true_, return value wraps around continously from 0..1..0 etc. (default: _false_)
+*
+* Note that `clampValue` and `wrapValue` are mutually exclusive: only one can be _true_, but both can be _false_.
+*
+* With options
+* ```js
+* // Total duration of 1000 ticks
+* const t = Timer.relative(1000, { timer: ticksElapsedTimer(); clampValue:true });
+* ```
+*
+* If `total` is Infinity, a 'always completed; timer is returned. Use a value of `NaN` for a
+* timer that always returns 0.
+* @private
+* @param total Total (of milliseconds or ticks, depending on timer source)
+* @param options Options
+* @returns Timer
+*/
+const relative = (total, options = {}) => {
+	if (!Number.isFinite(total)) return timerAlwaysDone();
+	else if (Number.isNaN(total)) return timerNeverDone();
+	const clampValue = options.clampValue ?? false;
+	const wrapValue = options.wrapValue ?? false;
+	if (clampValue && wrapValue) throw new Error(`clampValue and wrapValue cannot both be enabled`);
+	let modulationAmount = 1;
+	const timer = options.timer ?? elapsedMillisecondsAbsolute();
+	let lastValue = 0;
+	const computeElapsed = (value) => {
+		lastValue = value;
+		let v = value / (total * modulationAmount);
+		if (clampValue) v = clamp(v);
+		else if (wrapValue && v >= 1) v = v % 1;
+		return v;
+	};
+	return {
+		mod(amt) {
+			modulationAmount = amt;
+		},
+		get isDone() {
+			return computeElapsed(lastValue) >= 1;
+		},
+		get elapsed() {
+			return computeElapsed(timer.elapsed);
+		},
+		reset: () => {
+			timer.reset();
+		}
+	};
+};
+/**
+* A timer based on frequency: cycles per unit of time. These timers return a number from
+* 0..1 indicating position with a cycle.
+*
+* In practice, timers are used to 'drive' something like an Oscillator.
+*
+* By default it uses elapsed clock time as a basis for frequency. ie., cycles per second.
+*
+* It returns a `ModulationTimer`, which allows for a modulation amount to be continually applied
+* to the calculation of the 'position' within a cycle.
+*
+* @example Prints around 0/0.5 each second, as timer is half a cycle per second
+* ```js
+* const t = frequencyTimer(0.5);
+* setInterval(() => {
+*  console.log(t.elapsed);
+* }, 1000);
+* ```
+* @param frequency Cycles
+* @param options Options for timer
+* @returns
+*/
+const frequencyTimer = (frequency, options = {}) => {
+	const timer = options.timer ?? elapsedMillisecondsAbsolute();
+	const cyclesPerSecond = frequency / 1e3;
+	let modulationAmount = 1;
+	const computeElapsed = () => {
+		const v = timer.elapsed * (cyclesPerSecond * modulationAmount);
+		const f = v - Math.floor(v);
+		if (f < 0) throw new Error(`Unexpected cycle fraction less than 0. Elapsed: ${v} f: ${f}`);
+		if (f > 1) throw new Error(`Unexpected cycle fraction more than 1. Elapsed: ${v} f: ${f}`);
+		return f;
+	};
+	return {
+		mod: (amt) => {
+			modulationAmount = amt;
+		},
+		reset: () => {
+			timer.reset();
+		},
+		get isDone() {
+			return computeElapsed() >= 1;
+		},
+		get elapsed() {
+			return computeElapsed();
+		}
+	};
+};
+/**
+* A timer that uses clock time. Start time is from the point of invocation.
+*
+* ```js
+* const t = elapsedMillisecondsAbsolute();
+* t.reset(); // reset start
+* t.elapsed; // milliseconds since start
+* ```
+* @returns {Timer}
+* @see {ticksElapsedTimer}
+*/
+const elapsedMillisecondsAbsolute = () => {
+	let start = performance.now();
+	return {
+		reset: () => {
+			start = performance.now();
+		},
+		get elapsed() {
+			return performance.now() - start;
+		}
+	};
+};
+/**
+* A timer that progresses with each call to `elapsed`.
+*
+* The first call to elapsed will return 1.
+*
+* ```js
+* const timer = elapsedTicksAbsolute();
+* timer.reset(); // Reset to 0
+* timer.elapsed; // Number of ticks (and also increment ticks)
+* timer.peek;    // Number of ticks (without incrementing)
+* ```
+*
+* Like other {@link Timer} functions, returns with a `isDone` field,
+* but this will always return _true_.
+* @returns {Timer}
+* @see {elapsedMillisecondsAbsolute}
+*/
+const elapsedTicksAbsolute = () => {
+	let start = 0;
+	return {
+		reset: () => {
+			start = 0;
+		},
+		get peek() {
+			return start;
+		},
+		get elapsed() {
+			return ++start;
+		}
+	};
+};
+/**
+* Wraps `timer`, computing a value based on its elapsed value.
+* `fn` creates this value.
+*
+* ```js
+* const t = timerWithFunction(v=>v/2, relativeTimer(1000));
+* t.compute();
+* ```
+*
+* In the above case, `relativeTimer(1000)` creates a timer that goes
+* from 0..1 over one second. `fn` will divide that value by 2, so
+* `t.compute()` will yield values 0..0.5.
+*
+* @param fn
+* @param timer
+* @returns
+*/
+const timerWithFunction = (fn, timer) => {
+	if (typeof fn !== `function`) throw new Error(`Param 'fn' should be a function. Got: ${typeof fn}`);
+	let startCount = 1;
+	return {
+		get elapsed() {
+			return timer.elapsed;
+		},
+		get isDone() {
+			return timer.isDone;
+		},
+		get runState() {
+			if (timer.isDone) return `idle`;
+			return `scheduled`;
+		},
+		get startCount() {
+			return startCount;
+		},
+		get startCountTotal() {
+			return startCount;
+		},
+		compute: () => {
+			const elapsed$1 = timer.elapsed;
+			return fn(elapsed$1);
+		},
+		reset: () => {
+			timer.reset();
+			startCount++;
+		}
+	};
+};
+
+//#endregion
+//#region ../geometry/dist/src/bezier/index.js
+/**
+* Returns a new quadratic bezier with specified bend amount
+*
+* @param {QuadraticBezier} b Curve
+* @param {number} [bend=0] Bend amount, from -1 to 1
+* @returns {QuadraticBezier}
+*/
+/**
+* Creates a simple quadratic bezier with a specified amount of 'bend'.
+* Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
+*
+* Use {@link interpolator} to calculate a point along the curve.
+* @param {Point} start Start of curve
+* @param {Point} end End of curve
+* @param {number} [bend=0] Bend amount, -1 to 1
+* @returns {QuadraticBezier}
+*/
+const quadraticSimple = (start, end, bend = 0) => {
+	if (Number.isNaN(bend)) throw new Error(`bend is NaN`);
+	if (bend < -1 || bend > 1) throw new Error(`Expects bend range of -1 to 1`);
+	const middle = interpolate$1(.5, start, end);
+	let target = middle;
+	if (end.y < start.y) target = bend > 0 ? {
+		x: Math.min(start.x, end.x),
+		y: Math.min(start.y, end.y)
+	} : {
+		x: Math.max(start.x, end.x),
+		y: Math.max(start.y, end.y)
+	};
+	else target = bend > 0 ? {
+		x: Math.max(start.x, end.x),
+		y: Math.min(start.y, end.y)
+	} : {
+		x: Math.min(start.x, end.x),
+		y: Math.max(start.y, end.y)
+	};
+	const handle = interpolate$1(Math.abs(bend), middle, target);
+	return quadratic(start, end, handle);
+};
+/**
+* Returns a relative point on a simple quadratic
+* @param start Start
+* @param end  End
+* @param bend Bend (-1 to 1)
+* @param amt Amount
+* @returns Point
+*/
+/**
+* Interpolate cubic or quadratic bezier
+* ```js
+* const i = interpolator(myBezier);
+*
+* // Get point at 50%
+* i(0.5); // { x, y }
+* ```
+* @param q
+* @returns
+*/
+const interpolator = (q) => {
+	const bzr = isCubicBezier(q) ? new Bezier(q.a.x, q.a.y, q.cubic1.x, q.cubic1.y, q.cubic2.x, q.cubic2.y, q.b.x, q.b.y) : new Bezier(q.a, q.quadratic, q.b);
+	return (amount) => bzr.compute(amount);
+};
+const quadraticToSvgString = (start, end, handle) => [`M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`];
+const toPath = (cubicOrQuadratic) => {
+	if (isCubicBezier(cubicOrQuadratic)) return cubicToPath(cubicOrQuadratic);
+	else if (isQuadraticBezier(cubicOrQuadratic)) return quadratictoPath(cubicOrQuadratic);
+	else throw new Error(`Unknown bezier type`);
+};
+const cubic = (start, end, cubic1, cubic2) => ({
+	a: Object.freeze(start),
+	b: Object.freeze(end),
+	cubic1: Object.freeze(cubic1),
+	cubic2: Object.freeze(cubic2)
+});
+const cubicToPath = (cubic$1) => {
+	const { a, cubic1, cubic2, b } = cubic$1;
+	const bzr = new Bezier(a, cubic1, cubic2, b);
+	return Object.freeze({
+		...cubic$1,
+		length: () => bzr.length(),
+		interpolate: (t) => bzr.compute(t),
+		nearest: (_) => {
+			throw new Error(`not implemented`);
+		},
+		bbox: () => {
+			const { x, y } = bzr.bbox();
+			const xSize = x.size;
+			const ySize = y.size;
+			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			return fromTopLeft({
+				x: x.min,
+				y: y.min
+			}, xSize, ySize);
+		},
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		toSvgString: () => [`brrup`],
+		kind: `bezier/cubic`
+	});
+};
+const quadratic = (start, end, handle) => ({
+	a: Object.freeze(start),
+	b: Object.freeze(end),
+	quadratic: Object.freeze(handle)
+});
+const quadratictoPath = (quadraticBezier) => {
+	const { a, b, quadratic: quadratic$1 } = quadraticBezier;
+	const bzr = new Bezier(a, quadratic$1, b);
+	return Object.freeze({
+		...quadraticBezier,
+		length: () => bzr.length(),
+		interpolate: (t) => bzr.compute(t),
+		nearest: (_) => {
+			throw new Error(`not implemented`);
+		},
+		bbox: () => {
+			const { x, y } = bzr.bbox();
+			const xSize = x.size;
+			const ySize = y.size;
+			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			return fromTopLeft({
+				x: x.min,
+				y: y.min
+			}, xSize, ySize);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		toString: () => bzr.toString(),
+		toSvgString: () => quadraticToSvgString(a, b, quadratic$1),
+		kind: `bezier/quadratic`
+	});
+};
+
+//#endregion
+//#region ../modulation/src/source/ticks.ts
 /**
 * Returns a function which cycles between 0..1 (inclusive of 0 and 1).
 * `totalTicks` is how many ticks it takes to get to 1. Since we want an inclusive 0 & 1,
@@ -64,7 +1080,7 @@ function ticks$2(totalTicks, options = {}) {
 }
 
 //#endregion
-//#region packages/modulation/src/source/time.ts
+//#region ../modulation/src/source/time.ts
 /**
 * Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
 * using different units for time.
@@ -139,7 +1155,7 @@ function hertz(hz, options = {}) {
 }
 
 //#endregion
-//#region packages/modulation/src/source/per-second.ts
+//#region ../modulation/src/source/per-second.ts
 /**
 * Returns a proportion of `amount` depending on elapsed time.
 * Cumulatively, `amount` is yielded every second.
@@ -210,7 +1226,7 @@ const perMinute = (amount, options = {}) => {
 };
 
 //#endregion
-//#region packages/modulation/src/source/index.ts
+//#region ../modulation/src/source/index.ts
 var source_exports = {};
 __export(source_exports, {
 	bpm: () => bpm,
@@ -222,7 +1238,7 @@ __export(source_exports, {
 });
 
 //#endregion
-//#region packages/modulation/src/oscillator.ts
+//#region ../modulation/src/oscillator.ts
 var oscillator_exports = {};
 __export(oscillator_exports, {
 	saw: () => saw,
@@ -333,7 +1349,7 @@ function* square(timerOrFreq) {
 }
 
 //#endregion
-//#region packages/modulation/src/gaussian.ts
+//#region ../modulation/src/gaussian.ts
 const pow$1 = Math.pow;
 const gaussianA = 1 / Math.sqrt(2 * Math.PI);
 /**
@@ -363,7 +1379,7 @@ const gaussian = (standardDeviation = .4) => {
 };
 
 //#endregion
-//#region packages/modulation/src/easing/easings-named.ts
+//#region ../modulation/src/easing/easings-named.ts
 var easings_named_exports = {};
 __export(easings_named_exports, {
 	arch: () => arch,
@@ -466,7 +1482,7 @@ const elasticInOut = (x) => {
 const bounceInOut = (x) => x < .5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;
 
 //#endregion
-//#region packages/modulation/src/easing/line.ts
+//#region ../modulation/src/easing/line.ts
 /**
 * Interpolates points along a line.
 * By default it's a straight line, so use `bend` to make a non-linear curve.
@@ -479,12 +1495,12 @@ const line = (bend = 0, warp = 0) => {
 		x: scale(bend, -1, 1, 0, max),
 		y: scale(bend, -1, 1, max, 0)
 	};
-	let cubicA = interpolate$1(Math.abs(bend), Empty, cubicB);
-	if (bend !== 0 && warp > 0) if (bend > 0) cubicA = interpolate$1(warp, cubicA, {
+	let cubicA = interpolate$3(Math.abs(bend), Empty, cubicB);
+	if (bend !== 0 && warp > 0) if (bend > 0) cubicA = interpolate$3(warp, cubicA, {
 		x: 0,
 		y: cubicB.x * 2
 	});
-	else cubicA = interpolate$1(warp, cubicA, {
+	else cubicA = interpolate$3(warp, cubicA, {
 		x: cubicB.y * 2,
 		y: 0
 	});
@@ -494,7 +1510,7 @@ const line = (bend = 0, warp = 0) => {
 };
 
 //#endregion
-//#region packages/modulation/src/modulator-timed.ts
+//#region ../modulation/src/modulator-timed.ts
 /**
 * Produce values over time. When the modulate function is complete, the final
 * value continues to return. Timer starts when return function is first invoked.
@@ -617,7 +1633,7 @@ const tickModulator = (fn, durationTicks) => {
 };
 
 //#endregion
-//#region packages/modulation/src/easing/index.ts
+//#region ../modulation/src/easing/index.ts
 var easing_exports = {};
 __export(easing_exports, {
 	Named: () => easings_named_exports,
@@ -803,7 +1819,7 @@ function* getEasingNames() {
 }
 
 //#endregion
-//#region packages/modulation/src/envelope/Types.ts
+//#region ../modulation/src/envelope/Types.ts
 const adsrStateTransitions = Object.freeze({
 	attack: [`decay`, `release`],
 	decay: [`sustain`, `release`],
@@ -813,7 +1829,7 @@ const adsrStateTransitions = Object.freeze({
 });
 
 //#endregion
-//#region packages/modulation/src/envelope/AdsrBase.ts
+//#region ../modulation/src/envelope/AdsrBase.ts
 const defaultAdsrTimingOpts = Object.freeze({
 	attackDuration: 600,
 	decayDuration: 200,
@@ -1009,7 +2025,7 @@ var AdsrBase = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/modulation/src/envelope/Adsr.ts
+//#region ../modulation/src/envelope/Adsr.ts
 const defaultAdsrOpts = Object.freeze({
 	attackBend: -1,
 	decayBend: -.3,
@@ -1238,7 +2254,7 @@ var Adsr = class extends AdsrBase {
 };
 
 //#endregion
-//#region packages/modulation/src/envelope/index.ts
+//#region ../modulation/src/envelope/index.ts
 var envelope_exports = {};
 __export(envelope_exports, {
 	Adsr: () => Adsr,
@@ -1327,7 +2343,7 @@ async function* adsrIterable(opts) {
 }
 
 //#endregion
-//#region packages/modulation/src/forces.ts
+//#region ../modulation/src/forces.ts
 var forces_exports = {};
 __export(forces_exports, {
 	accelerationForce: () => accelerationForce,
@@ -1342,7 +2358,7 @@ __export(forces_exports, {
 	computePositionFromVelocity: () => computePositionFromVelocity,
 	computeVelocity: () => computeVelocity,
 	constrainBounce: () => constrainBounce,
-	guard: () => guard,
+	guard: () => guard$2,
 	magnitudeForce: () => magnitudeForce,
 	nullForce: () => nullForce,
 	orientationForce: () => orientationForce,
@@ -1356,7 +2372,7 @@ __export(forces_exports, {
 * @param t
 * @param name
 */
-const guard = (t, name = `t`) => {
+const guard$2 = (t, name = `t`) => {
 	if (t === void 0) throw new Error(`Parameter ${name} is undefined. Expected ForceAffected`);
 	if (t === null) throw new Error(`Parameter ${name} is null. Expected ForceAffected`);
 	if (typeof t !== `object`) throw new TypeError(`Parameter ${name} is type ${typeof t}. Expected object of shape ForceAffected`);
@@ -1928,7 +2944,7 @@ const orientationForce = (interpolationAmt = .5) => {
 };
 
 //#endregion
-//#region packages/modulation/src/cubic-bezier.ts
+//#region ../modulation/src/cubic-bezier.ts
 /**
 * Creates an easing function using a simple cubic bezier defined by two points.
 *
@@ -1954,7 +2970,7 @@ const cubicBezierShape = (b, d) => (t) => {
 };
 
 //#endregion
-//#region packages/modulation/src/drift.ts
+//#region ../modulation/src/drift.ts
 /**
 * WIP
 * Returns a {@link Drifter} that moves a value over time.
@@ -1990,11 +3006,11 @@ const drift = (driftAmtPerMs) => {
 };
 
 //#endregion
-//#region packages/modulation/src/util/pi-pi.ts
+//#region ../modulation/src/util/pi-pi.ts
 const piPi = Math.PI * 2;
 
 //#endregion
-//#region packages/modulation/src/interpolate.ts
+//#region ../modulation/src/interpolate.ts
 /**
 * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
 *
@@ -2180,7 +3196,7 @@ const interpolatorInterval = (duration, a = 0, b = 1, options) => {
 };
 
 //#endregion
-//#region packages/modulation/src/jitter.ts
+//#region ../modulation/src/jitter.ts
 /**
 * Returns a {@link Jitterer} that works with absolute values,
 * ie. values outside of 0..1 range.
@@ -2301,7 +3317,7 @@ const jitter = (options = {}) => {
 };
 
 //#endregion
-//#region packages/modulation/src/mix.ts
+//#region ../modulation/src/mix.ts
 /**
 * Mixes in modulation. This is used when you want to
 * fold in a controllable amount of modulation.
@@ -2375,7 +3391,7 @@ const crossfade = (a, b) => {
 };
 
 //#endregion
-//#region packages/modulation/src/no-op.ts
+//#region ../modulation/src/no-op.ts
 /**
 * A 'no-op' function. Returns the input value without modification.
 * Useful for when some default is needed
@@ -2385,7 +3401,7 @@ const crossfade = (a, b) => {
 const noop = (v) => v;
 
 //#endregion
-//#region packages/modulation/src/ping-pong.ts
+//#region ../modulation/src/ping-pong.ts
 /**
 * Continually loops up and down between 0 and 1 by a specified interval.
 * Looping returns start value, and is inclusive of 0 and 1.
@@ -2488,7 +3504,7 @@ const pingPong = function* (interval, lower, upper, start, rounding) {
 };
 
 //#endregion
-//#region packages/modulation/src/spring.ts
+//#region ../modulation/src/spring.ts
 /**
 * Produces values according to rough spring physics.
 * å
@@ -2618,7 +3634,7 @@ const springShape = (opts = {}) => {
 };
 
 //#endregion
-//#region packages/modulation/src/timing-source-factory.ts
+//#region ../modulation/src/timing-source-factory.ts
 /**
 * A factory function for creating a timing source. It returns
 * a function which creates a designated timer.
@@ -2656,7 +3672,7 @@ const timingSourceFactory = (source, duration, options = {}) => {
 };
 
 //#endregion
-//#region packages/modulation/src/waveforms.ts
+//#region ../modulation/src/waveforms.ts
 /**
 * Returns a function that shapes a 0..1 value as a 
 * triangle waveform.
@@ -2826,7 +3842,7 @@ function waveFromSource(sourceFunction, shaperFunction, invert$1 = false) {
 }
 
 //#endregion
-//#region packages/modulation/src/weighted-average.ts
+//#region ../modulation/src/weighted-average.ts
 /**
 * Weighted average
 * 
@@ -2840,7 +3856,7 @@ const weightedAverage = (currentValue, targetValue, slowDownFactor) => {
 };
 
 //#endregion
-//#region packages/modulation/src/weighted-random.ts
+//#region ../modulation/src/weighted-random.ts
 /***
 * Returns a random number, 0..1, weighted by a given easing function.
 * Default easing is `quadIn`, which skews towards zero.

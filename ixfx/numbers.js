@@ -1,8 +1,48 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, numberTest, resultThrow } from "./src-Bo4oKRxs.js";
-import { interpolate, scale, scaler, zip } from "./src-LtkApSyv.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
+import "./arrays-yH_qBmt0.js";
+import "./is-equal-y9du2FWU.js";
+import { containsIdenticalValues } from "./equality-Bufi-LTm.js";
+import "./clamp-BXRKKkSg.js";
+import "./wrap-CbW4pe4i.js";
+import { interpolate } from "./interpolate-BoOK0bgP.js";
+import { scale, scaler } from "./scale-DHjtm9T-.js";
 
-//#region packages/numbers/src/apply-to-values.ts
+//#region ../arrays/dist/src/zip.js
+/**
+* Zip combines the elements of two or more arrays based on their index.
+*
+* ```js
+* const a = [1,2,3];
+* const b = [`red`, `blue`, `green`];
+*
+* const c = Arrays.zip(a, b);
+* // Yields:
+* // [
+* //   [1, `red`],
+* //   [2, `blue`],
+* //   [3, `green`]
+* // ]
+* ```
+*
+* Typically the arrays you zip together are all about the same logical item. Eg, in the above example
+* perhaps `a` is size and `b` is colour. So thing #1 (at array index 0) is a red thing of size 1. Before
+* zipping we'd access it by `a[0]` and `b[0]`. After zipping, we'd have c[0], which is array of [1, `red`].
+* @param arrays
+* @returns Zipped together array
+*/
+const zip = (...arrays) => {
+	if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
+	const lengths = arrays.map((a) => a.length);
+	if (!containsIdenticalValues(lengths)) throw new Error(`Arrays must be of same length`);
+	const returnValue = [];
+	const length = lengths[0];
+	for (let index = 0; index < length; index++) returnValue.push(arrays.map((a) => a[index]));
+	return returnValue;
+};
+
+//#endregion
+//#region ../numbers/src/apply-to-values.ts
 /**
 * Apples `fn` to every key of `obj` which is numeric.
 * ```js
@@ -27,7 +67,7 @@ const applyToValues = (object, apply) => {
 };
 
 //#endregion
-//#region packages/numbers/src/numeric-arrays.ts
+//#region ../numbers/src/numeric-arrays.ts
 /**
 * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
 *
@@ -226,7 +266,7 @@ const minFast = (data) => {
 };
 
 //#endregion
-//#region packages/numbers/src/average-weighted.ts
+//#region ../numbers/src/average-weighted.ts
 /**
 * Computes an average of an array with a set of weights applied.
 *
@@ -268,7 +308,7 @@ const averageWeighted = (data, weightings) => {
 };
 
 //#endregion
-//#region packages/numbers/src/clamp.ts
+//#region ../numbers/src/clamp.ts
 /**
 * Clamps a value between min and max (both inclusive)
 * Defaults to a 0-1 range, useful for percentages.
@@ -376,7 +416,7 @@ const maxAbs = (...values) => {
 };
 
 //#endregion
-//#region packages/numbers/src/count.ts
+//#region ../numbers/src/count.ts
 /**
 * Yields `amount` integers, counting by one from zero. If a negative amount is used,
 * count decreases. If `offset` is provided, this is added to the return result.
@@ -420,7 +460,7 @@ function* count(amount, offset = 0) {
 }
 
 //#endregion
-//#region packages/numbers/src/difference.ts
+//#region ../numbers/src/difference.ts
 /**
 * Returns the difference from the `initial` value. Defaults to absolute difference.
 * ```js
@@ -525,7 +565,7 @@ const differenceFrom = (kind = `absolute`, value, from) => {
 };
 
 //#endregion
-//#region packages/numbers/src/guard.ts
+//#region ../numbers/src/guard.ts
 /**
 * Returns true if `possibleNumber` is a number and not NaN
 * @param possibleNumber
@@ -538,7 +578,7 @@ const isValid = (possibleNumber) => {
 };
 
 //#endregion
-//#region packages/numbers/src/filter.ts
+//#region ../numbers/src/filter.ts
 /**
 * Filters an iterator of values, only yielding
 * those that are valid numbers
@@ -594,7 +634,7 @@ const rangeInclusive = (min$1, max$1) => {
 };
 
 //#endregion
-//#region packages/numbers/src/flip.ts
+//#region ../numbers/src/flip.ts
 /**
 * Flips a percentage-scale number: `1 - v`.
 *
@@ -616,7 +656,7 @@ const flip = (v) => {
 };
 
 //#endregion
-//#region packages/numbers/src/generate.ts
+//#region ../numbers/src/generate.ts
 /**
 * Generates a range of numbers, starting from `start` and counting by `interval`.
 * If `end` is provided, generator stops when reached.
@@ -715,7 +755,7 @@ const numericPercent = function(interval = .01, repeating = false, start = 0, en
 };
 
 //#endregion
-//#region packages/numbers/src/round.ts
+//#region ../numbers/src/round.ts
 /**
 * Rounds a number.
 *
@@ -749,7 +789,7 @@ function round(a, b, roundUp) {
 }
 
 //#endregion
-//#region packages/numbers/src/is-approx.ts
+//#region ../numbers/src/is-approx.ts
 /**
 * Checks if a value is within range of a base value
 * 
@@ -821,7 +861,7 @@ const isCloseToAny = (allowedRangeAbsolute, ...targets) => {
 };
 
 //#endregion
-//#region packages/numbers/src/bipolar.ts
+//#region ../numbers/src/bipolar.ts
 var bipolar_exports = {};
 __export(bipolar_exports, {
 	clamp: () => clamp$1,
@@ -1021,7 +1061,7 @@ const towardZero = (bipolarValue, amount) => {
 };
 
 //#endregion
-//#region packages/numbers/src/wrap.ts
+//#region ../numbers/src/wrap.ts
 /**
 * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
 *
@@ -1150,11 +1190,11 @@ const wrapRange = (min$1, max$1, fn, a, b) => {
 };
 
 //#endregion
-//#region packages/numbers/src/pi-pi.ts
+//#region ../numbers/src/pi-pi.ts
 const piPi = Math.PI * 2;
 
 //#endregion
-//#region packages/numbers/src/interpolate.ts
+//#region ../numbers/src/interpolate.ts
 /**
 * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
 *
@@ -1294,7 +1334,7 @@ const interpolateAngle = (amount, aRadians, bRadians, options) => {
 };
 
 //#endregion
-//#region packages/numbers/src/linear-space.ts
+//#region ../numbers/src/linear-space.ts
 /**
 * Generates a `step`-length series of values between `start` and `end` (inclusive).
 * Each value will be equally spaced.
@@ -1328,7 +1368,7 @@ function* linearSpace(start, end, steps, precision) {
 }
 
 //#endregion
-//#region packages/numbers/src/util/queue-mutable.ts
+//#region ../numbers/src/util/queue-mutable.ts
 var BasicQueueMutable = class {
 	#store = [];
 	enqueue(data) {
@@ -1346,7 +1386,7 @@ var BasicQueueMutable = class {
 };
 
 //#endregion
-//#region packages/numbers/src/moving-average.ts
+//#region ../numbers/src/moving-average.ts
 const PiPi = Math.PI * 2;
 /**
 * A moving average calculator (exponential weighted moving average) which does not keep track of
@@ -1469,7 +1509,7 @@ const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1) => 
 };
 
 //#endregion
-//#region packages/numbers/src/scale.ts
+//#region ../numbers/src/scale.ts
 /**
 * Scales `v` from an input range to an output range (aka `map`)
 *
@@ -1638,7 +1678,7 @@ const scalerTwoWay = (inMin, inMax, outMin = 0, outMax = 1, clamped = false, eas
 };
 
 //#endregion
-//#region packages/numbers/src/number-array-compute.ts
+//#region ../numbers/src/number-array-compute.ts
 /**
 * Calculate the min, max, total, average and count of input array `data`.
 * ```js
@@ -1684,7 +1724,7 @@ const numberArrayCompute = (data, opts = {}) => {
 };
 
 //#endregion
-//#region packages/numbers/src/normalise.ts
+//#region ../numbers/src/normalise.ts
 var normalise_exports = {};
 __export(normalise_exports, {
 	array: () => array,
@@ -1768,7 +1808,7 @@ const array = (values, minForced, maxForced) => {
 };
 
 //#endregion
-//#region packages/numbers/src/proportion.ts
+//#region ../numbers/src/proportion.ts
 /**
 * Scales a percentage-scale number, ie: `v * t`.
 * 
@@ -1789,7 +1829,7 @@ const proportion = (v, t) => {
 };
 
 //#endregion
-//#region packages/numbers/src/quantise.ts
+//#region ../numbers/src/quantise.ts
 /**
 * Rounds `v` by `every`. Middle values are rounded up by default.
 *
@@ -1832,7 +1872,7 @@ const quantiseEvery = (v, every, middleRoundsUp = true) => {
 };
 
 //#endregion
-//#region packages/numbers/src/softmax.ts
+//#region ../numbers/src/softmax.ts
 /**
 * Via: https://gist.github.com/cyphunk/6c255fa05dd30e69f438a930faeb53fe
 * @param logits 

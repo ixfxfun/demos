@@ -1,4 +1,4 @@
-//#region packages/events/src/map-of.ts
+//#region ../events/src/map-of.ts
 var MapOfSimple = class {
 	#store = /* @__PURE__ */ new Map();
 	/**
@@ -66,7 +66,7 @@ var MapOfSimple = class {
 };
 
 //#endregion
-//#region packages/events/src/simple-event-emitter.ts
+//#region ../events/src/simple-event-emitter.ts
 var SimpleEventEmitter = class {
 	#listeners = new MapOfSimple();
 	#disposed = false;

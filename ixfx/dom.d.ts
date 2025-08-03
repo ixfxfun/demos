@@ -1,11 +1,9 @@
-import { Interval } from "@ixfx/core";
-import { Points, Rects } from "@ixfx/geometry";
-import { Result } from "@ixfx/guards";
-import { Point } from "@ixfx/geometry/point";
-import { Rect, RectPositioned } from "@ixfx/geometry/rect";
-import { GridCardinalDirection } from "@ixfx/geometry/grid";
+import { Interval } from "./types-BEAJ_GOH.js";
+import { Result } from "./types-CePLSdIj.js";
+import { Point, Point3d, Rect, RectPositioned } from "./rect-types-d5I5ouwR.js";
+import { GridCardinalDirection } from "./types-Bzjzk4dE.js";
 
-//#region packages/dom/src/data-table.d.ts
+//#region ../dom/src/data-table.d.ts
 declare namespace data_table_d_exports {
   export { DataFormatter, DataTable, DataTableOpts, FormattingOptions, NumberFormattingOptions, fromList, fromObject };
 }
@@ -363,7 +361,7 @@ type SelectHandler = {
 declare const select: (domQueryOrEl: string | HTMLSelectElement, onChanged?: (currentValue: string) => void, options?: SelectOpts) => SelectHandler;
 //# sourceMappingURL=forms.d.ts.map
 //#endregion
-//#region packages/dom/src/css-variables.d.ts
+//#region ../dom/src/css-variables.d.ts
 /**
  * CSS Variable
  */
@@ -533,7 +531,7 @@ declare function setCssVariables<T extends Record<string, string | number>>(vari
 declare function getCssVariablesFromStyles<T extends string | number>(styles: CSSStyleDeclaration, name: string, fallback: T): T;
 //# sourceMappingURL=css-variables.d.ts.map
 //#endregion
-//#region packages/dom/src/resolve-el.d.ts
+//#region ../dom/src/resolve-el.d.ts
 /**
  * Resolves either a string or HTML element to an element.
  * Useful when an argument is either an HTML element or query.
@@ -573,7 +571,7 @@ type QueryOrElements = string | Element[] | HTMLElement[] | HTMLElement | Elemen
 declare const resolveEls: (selectors: QueryOrElements) => HTMLElement[];
 //# sourceMappingURL=resolve-el.d.ts.map
 //#endregion
-//#region packages/dom/src/css.d.ts
+//#region ../dom/src/css.d.ts
 type ComputedPixelsMap<T extends readonly (keyof CSSStyleDeclaration)[]> = Record<T[number], number>;
 /**
  * Returns the value of `getBoundingClientRect` plus the width of all the borders
@@ -637,7 +635,7 @@ declare const setCssToggle: (selectors: QueryOrElements, cssClass: string) => vo
 declare const setCssDisplay: (selectors: QueryOrElements, value: string) => void;
 //# sourceMappingURL=css.d.ts.map
 //#endregion
-//#region packages/dom/src/data-display.d.ts
+//#region ../dom/src/data-display.d.ts
 type DataDisplayOptions = FormattingOptions & {
   theme?: `dark` | `light`;
 };
@@ -663,7 +661,7 @@ declare class DataDisplay {
 }
 //# sourceMappingURL=data-display.d.ts.map
 //#endregion
-//#region packages/dom/src/el.d.ts
+//#region ../dom/src/el.d.ts
 /**
  * Wraps an element (or set of elements) with handy functions
  * for manipulation.
@@ -734,7 +732,7 @@ declare const el: (selectors: QueryOrElements) => WrappedElement;
 declare const elRequery: (selectors: string) => WrappedElement;
 //# sourceMappingURL=el.d.ts.map
 //#endregion
-//#region packages/dom/src/element-sizing.d.ts
+//#region ../dom/src/element-sizing.d.ts
 /**
  * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
  * * height: use height of parent, set width based on original aspect ratio of element. Assumes parent has a determined height.
@@ -751,13 +749,13 @@ type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
    * @defaultValue 'none'
    */
   stretch?: ElementResizeLogic;
-  naturalSize?: Rects.Rect;
+  naturalSize?: Rect;
   /**
    * If not specified, the element's parent is used
    */
   containerEl?: HTMLElement | string;
-  onSizeChanging: (size: Rects.Rect, el: T) => void;
-  onSizeDone?: (size: Rects.Rect, el: T) => void;
+  onSizeChanging: (size: Rect, el: T) => void;
+  onSizeDone?: (size: Rect, el: T) => void;
   debounceTimeout?: Interval;
 };
 /**
@@ -787,21 +785,21 @@ declare class ElementSizer<T extends HTMLElement | SVGElement> {
    * @param svg
    * @returns
    */
-  static svgViewport(svg: SVGElement, onSizeSet?: (size: Rects.Rect) => void): ElementSizer<SVGElement>;
+  static svgViewport(svg: SVGElement, onSizeSet?: (size: Rect) => void): ElementSizer<SVGElement>;
   /**
    * Sets the 'natural' size of an element.
    * This can also be specified when creating ElementSizer.
    * @param size
    */
   setNaturalSize(size: Rect): void;
-  get naturalSize(): Rects.Rect;
-  get viewport(): Rects.RectPositioned;
-  set size(size: Rects.Rect);
-  get size(): Rects.Rect;
+  get naturalSize(): Rect;
+  get viewport(): RectPositioned;
+  set size(size: Rect);
+  get size(): Rect;
 }
 //# sourceMappingURL=element-sizing.d.ts.map
 //#endregion
-//#region packages/dom/src/error-handler.d.ts
+//#region ../dom/src/error-handler.d.ts
 /**
  * Creates an error handler to show errors on-screen.
  * This is useful when testing on mobile devices that lack access to the console.
@@ -824,7 +822,7 @@ declare const defaultErrorHandler: () => {
 };
 //# sourceMappingURL=error-handler.d.ts.map
 //#endregion
-//#region packages/dom/src/log.d.ts
+//#region ../dom/src/log.d.ts
 type LogOpts = {
   readonly reverse?: boolean;
   readonly capacity?: number;
@@ -875,7 +873,7 @@ type Log = {
 declare const log: (domQueryOrElement: HTMLElement | string, opts?: LogOpts) => Log;
 //# sourceMappingURL=log.d.ts.map
 //#endregion
-//#region packages/dom/src/inline-console.d.ts
+//#region ../dom/src/inline-console.d.ts
 type InlineConsoleOptions = LogOpts & Partial<{
   /**
    * If true, styling is not applied
@@ -904,7 +902,7 @@ type InlineConsoleOptions = LogOpts & Partial<{
 declare const inlineConsole: (options?: InlineConsoleOptions) => void;
 //# sourceMappingURL=inline-console.d.ts.map
 //#endregion
-//#region packages/dom/src/query.d.ts
+//#region ../dom/src/query.d.ts
 type ElementQueryOptions = {
   /**
    * If true, elements are only returned once, even if that match several queries
@@ -923,7 +921,7 @@ type ElementQueryOptions = {
 declare function query(queryOrElement: string | HTMLElement | (string | HTMLElement)[] | AsyncGenerator<string | HTMLElement>, options?: Partial<ElementQueryOptions>): AsyncGenerator<HTMLElement>;
 //# sourceMappingURL=query.d.ts.map
 //#endregion
-//#region packages/dom/src/set-property.d.ts
+//#region ../dom/src/set-property.d.ts
 declare function setText(selectors: QueryOrElements): (value: any) => string;
 declare function setText(selectors: QueryOrElements, value?: any): string;
 declare function setHtml(selectors: QueryOrElements): (value: any) => string;
@@ -932,11 +930,11 @@ declare function setProperty(property: string, selectors: QueryOrElements): (val
 declare function setProperty(property: string, selectors: QueryOrElements, value: any): string;
 //# sourceMappingURL=set-property.d.ts.map
 //#endregion
-//#region packages/dom/src/shadow-dom.d.ts
+//#region ../dom/src/shadow-dom.d.ts
 declare const addShadowCss: (parentEl: Readonly<HTMLElement>, styles: string) => ShadowRoot;
 //# sourceMappingURL=shadow-dom.d.ts.map
 //#endregion
-//#region packages/dom/src/tabbed-panel.d.ts
+//#region ../dom/src/tabbed-panel.d.ts
 type Panel<TNotifyArgs> = {
   mount: (parentEl: HTMLElement) => void;
   dismount: () => void;
@@ -965,7 +963,7 @@ declare const tabSet: <TNotifyArgs>(options: {
 };
 //# sourceMappingURL=tabbed-panel.d.ts.map
 //#endregion
-//#region packages/dom/src/utility.d.ts
+//#region ../dom/src/utility.d.ts
 type PointSpaces = `viewport` | `screen` | `document`;
 /**
  * Convert an absolute point to relative, in different coordinate spaces.
@@ -1148,7 +1146,7 @@ declare const cycleCssClass: (el: Readonly<HTMLElement>, list: readonly string[]
  * Source: https://zellwk.com/blog/translate-in-javascript
  * @param domQueryOrEl
  */
-declare const getTranslation: (domQueryOrEl: Readonly<string | HTMLElement>) => Points.Point3d;
+declare const getTranslation: (domQueryOrEl: Readonly<string | HTMLElement>) => Point3d;
 /**
  * Creates an element after `sibling`
  * ```

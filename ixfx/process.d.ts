@@ -1,4 +1,4 @@
-//#region packages/process/src/types.d.ts
+//#region ../process/src/types.d.ts
 type Process<TIn, TOut> = (value: TIn) => TOut;
 type ProcessFactory<TIn, TOut> = () => Process<TIn, TOut>;
 type Processors1<T1, T2> = [Process<T1, T2>];
@@ -31,7 +31,7 @@ type RankOptions = {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/process/src/basic.d.ts
+//#region ../process/src/basic.d.ts
 /**
  * Outputs the current largest-seen value
  * @returns
@@ -68,13 +68,13 @@ declare const tally: (countArrayItems: boolean) => Process<any, number>;
 declare function rank<In>(r: RankFunction<In>, options?: Partial<RankOptions>): (value: In) => In | undefined;
 //# sourceMappingURL=basic.d.ts.map
 //#endregion
-//#region packages/process/src/cancel-error.d.ts
+//#region ../process/src/cancel-error.d.ts
 declare class CancelError extends Error {
   constructor(message: any);
 }
 //# sourceMappingURL=cancel-error.d.ts.map
 //#endregion
-//#region packages/process/src/flow.d.ts
+//#region ../process/src/flow.d.ts
 declare function flow<T1, T2>(...processors: [Process<T1, T2>]): (value: T1) => T2;
 declare function flow<T1, T2, T3>(...processors: [Process<T1, T2>, Process<T2, T3>]): (value: T1) => T3;
 declare function flow<T1, T2, T3, T4>(...processors: [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>]): (value: T1) => T4;
@@ -83,7 +83,7 @@ declare function flow<T1, T2, T3, T4, T5, T6>(...processors: [Process<T1, T2>, P
 //# sourceMappingURL=flow.d.ts.map
 
 //#endregion
-//#region packages/process/src/if-undefined.d.ts
+//#region ../process/src/if-undefined.d.ts
 /**
  * Calls a function if the input value is not undefined.
  * Return value from function is passed to next function in flow.
@@ -133,7 +133,7 @@ declare function cancelIfUndefined<TIn>(): (value: TIn | undefined) => TIn;
 declare function ifUndefined<TIn, TOut>(fn: () => TOut): (value: TIn) => TOut | (TIn & ({} | null));
 //# sourceMappingURL=if-undefined.d.ts.map
 //#endregion
-//#region packages/process/src/seen.d.ts
+//#region ../process/src/seen.d.ts
 /**
  * If a value is same as the previous value, _undefined_ is emitted instead.
  *

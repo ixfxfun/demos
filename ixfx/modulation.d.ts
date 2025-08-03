@@ -1,11 +1,12 @@
-import { HasCompletion, Interval } from "@ixfx/core";
-import { SimpleEventEmitter } from "@ixfx/events";
-import * as Flow from "@ixfx/flow";
-import { Paths, Points, Rects } from "@ixfx/geometry";
-import { BasicInterpolateOptions, interpolate } from "@ixfx/numbers";
-import { RandomSource } from "@ixfx/random";
+import { Interval } from "./types-BEAJ_GOH.js";
+import { HasCompletion } from "./continuously-xAy8Jw7t.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { Point, Rect } from "./rect-types-d5I5ouwR.js";
+import { RandomSource } from "./types-DFWrctU4.js";
+import { BasicInterpolateOptions, interpolate } from "./interpolate-DM7lLXIU.js";
+import { Path } from "./path-type-WKYt1VfQ.js";
 
-//#region packages/modulation/src/types.d.ts
+//#region ../modulation/src/types.d.ts
 type ModSettableOptions = {
   /**
    * Starting absolute value of source.
@@ -103,7 +104,7 @@ type SpringOptions = Partial<{
 }>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/modulation/src/source/ticks.d.ts
+//#region ../modulation/src/source/ticks.d.ts
 type TicksModSettableOptions = ModSettableOptions & {
   exclusiveStart: boolean;
   exclusiveEnd: boolean;
@@ -131,7 +132,7 @@ type TicksModSettableOptions = ModSettableOptions & {
 declare function ticks$2(totalTicks: number, options?: Partial<TicksModSettableOptions>): ModSettable;
 //# sourceMappingURL=ticks.d.ts.map
 //#endregion
-//#region packages/modulation/src/source/time.d.ts
+//#region ../modulation/src/source/time.d.ts
 /**
  * Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
  * using different units for time.
@@ -170,7 +171,7 @@ declare function hertz(hz: number, options?: Partial<ModSettableOptions>): ModSe
 //# sourceMappingURL=time.d.ts.map
 
 //#endregion
-//#region packages/modulation/src/source/per-second.d.ts
+//#region ../modulation/src/source/per-second.d.ts
 /**
  * Returns a proportion of `amount` depending on elapsed time.
  * Cumulatively, `amount` is yielded every second.
@@ -232,6 +233,22 @@ declare const perMinute: (amount: number, options?: Partial<{
 declare namespace index_d_exports$2 {
   export { TicksModSettableOptions, bpm, elapsed, hertz, perMinute, perSecond, ticks$2 as ticks };
 }
+//#endregion
+//#region ../flow/dist/src/timer.d.ts
+/**
+ * A timer instance.
+ * {@link CompletionTimer} also contains an 'isDone' field.
+ *
+ * Implementations: {@link elapsedMillisecondsAbsolute}, {@link elapsedTicksAbsolute}, {@link frequencyTimer}
+ */
+type Timer = {
+  reset(): void;
+  get elapsed(): number;
+};
+/**
+ * A {@link Timer} that has a sense of completion, when `isDone` returns _true_.
+ * See {@link relative}
+ */
 declare namespace oscillator_d_exports {
   export { saw, sine, sineBipolar, square, triangle };
 }
@@ -260,12 +277,12 @@ declare namespace oscillator_d_exports {
  * ```
  *
  */
-declare function sine(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+declare function sine(timerOrFreq: Timer | number): Generator<number, void, unknown>;
 /**
  * Bipolar sine (-1 to 1)
  * @param timerOrFreq
  */
-declare function sineBipolar(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+declare function sineBipolar(timerOrFreq: Timer | number): Generator<number, void, unknown>;
 /**
  * Triangle oscillator
  *
@@ -278,7 +295,7 @@ declare function sineBipolar(timerOrFreq: Flow.Timer | number): Generator<number
  * const v = osc.next().value;
  * ```
  */
-declare function triangle(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+declare function triangle(timerOrFreq: Timer | number): Generator<number, void, unknown>;
 /**
  * Saw oscillator
  *
@@ -295,7 +312,7 @@ declare function triangle(timerOrFreq: Flow.Timer | number): Generator<number, v
  * const v = osc.next().value;
  * ```
  */
-declare function saw(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown>;
+declare function saw(timerOrFreq: Timer | number): Generator<number, void, unknown>;
 /**
  * Square oscillator
  *
@@ -310,7 +327,7 @@ declare function saw(timerOrFreq: Flow.Timer | number): Generator<number, void, 
  * osc.next().value;
  * ```
  */
-declare function square(timerOrFreq: Flow.Timer | number): Generator<0 | 1, void, unknown>;
+declare function square(timerOrFreq: Timer | number): Generator<1 | 0, void, unknown>;
 //# sourceMappingURL=oscillator.d.ts.map
 declare namespace easings_named_d_exports {
   export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };
@@ -349,17 +366,17 @@ declare const elasticInOut: (x: number) => number;
 declare const bounceInOut: (x: number) => number;
 //# sourceMappingURL=easings-named.d.ts.map
 //#endregion
-//#region packages/modulation/src/easing/line.d.ts
+//#region ../modulation/src/easing/line.d.ts
 /**
  * Interpolates points along a line.
  * By default it's a straight line, so use `bend` to make a non-linear curve.
  * @param bend -1...1. -1 will pull line up, 1 will push it down.
  * @returns
  */
-declare const line: (bend?: number, warp?: number) => (value: number) => Points.Point;
+declare const line: (bend?: number, warp?: number) => (value: number) => Point;
 //# sourceMappingURL=line.d.ts.map
 //#endregion
-//#region packages/modulation/src/easing/types.d.ts
+//#region ../modulation/src/easing/types.d.ts
 /**
  * Easing name
  */
@@ -497,7 +514,7 @@ declare const get: (easingName: EasingName) => ModFunction;
 declare function getEasingNames(): Iterable<string>;
 //# sourceMappingURL=index.d.ts.map
 //#endregion
-//#region packages/modulation/src/envelope/Types.d.ts
+//#region ../modulation/src/envelope/Types.d.ts
 type EnvelopeOpts = AdsrOpts & AdsrTimingOpts;
 /**
  * Options for the ADSR envelope.
@@ -590,7 +607,7 @@ declare const adsrStateTransitions: Readonly<{
 type AdsrStateTransitions = Readonly<typeof adsrStateTransitions>;
 //# sourceMappingURL=Types.d.ts.map
 //#endregion
-//#region packages/modulation/src/envelope/AdsrBase.d.ts
+//#region ../modulation/src/envelope/AdsrBase.d.ts
 declare const defaultAdsrTimingOpts: Readonly<{
   attackDuration: 600;
   decayDuration: 200;
@@ -659,7 +676,7 @@ declare class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
 }
 //# sourceMappingURL=AdsrBase.d.ts.map
 //#endregion
-//#region packages/modulation/src/envelope/Adsr.d.ts
+//#region ../modulation/src/envelope/Adsr.d.ts
 declare const defaultAdsrOpts: Readonly<{
   attackBend: -1;
   decayBend: -0.3;
@@ -763,9 +780,9 @@ declare class AdsrIterator implements Iterator<number> {
  * ```
  */
 declare class Adsr extends AdsrBase implements Iterable<number> {
-  readonly attackPath: Paths.Path;
-  readonly decayPath: Paths.Path;
-  readonly releasePath: Paths.Path;
+  readonly attackPath: Path;
+  readonly decayPath: Path;
+  readonly releasePath: Path;
   readonly initialLevel: any;
   readonly peakLevel: any;
   readonly releaseLevel: any;
@@ -869,17 +886,17 @@ type ForceAffected = {
   /**
    * Position. Probably best to use relative coordinates
    */
-  readonly position?: Points.Point;
+  readonly position?: Point;
   /**
    * Velocity vector.
    * Probably don't want to assign this yourself, but rather have it computed based on acceleration and applied forces
    */
-  readonly velocity?: Points.Point;
+  readonly velocity?: Point;
   /**
    * Acceleration vector. Most applied forces will alter the acceleration, culminating in a new velocity being set and the
    * acceleraton value zeroed
    */
-  readonly acceleration?: Points.Point;
+  readonly acceleration?: Point;
   /**
    * Mass. The unit is undefined, again best to think of this being on a 0..1 scale. Mass is particularly important
    * for the attraction/repulsion force, but other forces can incorporate mass too.
@@ -898,7 +915,7 @@ type ForceFn = (t: ForceAffected) => ForceAffected;
 /**
  * A vector to apply to acceleration or a force function
  */
-type ForceKind = Points.Point | ForceFn | null;
+type ForceKind = Point | ForceFn | null;
 /**
  * Throws an error if `t` is not of the `ForceAffected` shape.
  * @param t
@@ -932,7 +949,7 @@ declare const guard: (t: ForceAffected, name?: string) => void;
  * @param dampen How much to dampen velocity by. Defaults to 1 meaning there is no damping.
  * @returns A function that can perform bounce logic
  */
-declare const constrainBounce: (bounds?: Rects.Rect, dampen?: number) => (t: ForceAffected) => ForceAffected;
+declare const constrainBounce: (bounds?: Rect, dampen?: number) => (t: ForceAffected) => ForceAffected;
 /**
  * For a given set of attractors, returns a function that a sets acceleration of attractee.
  * Keep note though that this bakes-in the values of the attractor, it won't reflect changes to their state. For dynamic
@@ -1005,7 +1022,7 @@ declare const attractionForce: (attractors: readonly ForceAffected[], gravity: n
 declare const computeAttractionForce: (attractor: ForceAffected, attractee: ForceAffected, gravity: number, distanceRange?: {
   readonly min?: number;
   readonly max?: number;
-}) => Points.Point;
+}) => Point;
 type TargetOpts = {
   /**
    * Acceleration scaling. Defaults to 0.001
@@ -1015,7 +1032,7 @@ type TargetOpts = {
    * If distance is less than this range, don't move.
    * If undefined (default), will try to get an exact position
    */
-  readonly range?: Points.Point;
+  readonly range?: Point;
 };
 /**
  * A force that moves a thing toward `targetPos`.
@@ -1027,7 +1044,7 @@ type TargetOpts = {
  * @param opts
  * @returns
  */
-declare const targetForce: (targetPos: Points.Point, opts?: TargetOpts) => (t: ForceAffected) => ForceAffected;
+declare const targetForce: (targetPos: Point, opts?: TargetOpts) => (t: ForceAffected) => ForceAffected;
 /**
  * Returns `pt` with x and y set to `setpoint` if either's absolute value is below `v`
  * @param pt
@@ -1083,7 +1100,7 @@ declare const apply: (t: ForceAffected, ...accelForces: readonly ForceKind[]) =>
  * @param vector
  * @returns Force function
  */
-declare const accelerationForce: (vector: Points.Point, mass?: MassApplication) => ForceFn;
+declare const accelerationForce: (vector: Point, mass?: MassApplication) => ForceFn;
 /**
  * A force based on the square of the thing's velocity.
  * It's like {@link velocityForce}, but here the velocity has a bigger impact.
@@ -1132,9 +1149,9 @@ declare const angularForce: () => (t: ForceAffected) => Readonly<{
   angle: number;
   angularVelocity: number;
   angularAcceleration: 0;
-  position?: Points.Point;
-  velocity?: Points.Point;
-  acceleration?: Points.Point;
+  position?: Point;
+  velocity?: Point;
+  acceleration?: Point;
   mass?: number;
 }>;
 /**
@@ -1144,9 +1161,9 @@ declare const angularForce: () => (t: ForceAffected) => Readonly<{
  */
 declare const angleFromAccelerationForce: (scaling?: number) => (t: ForceAffected) => Readonly<{
   angularAcceleration: number;
-  position?: Points.Point;
-  velocity?: Points.Point;
-  acceleration?: Points.Point;
+  position?: Point;
+  velocity?: Point;
+  acceleration?: Point;
   mass?: number;
   angularVelocity?: number;
   angle?: number;
@@ -1159,9 +1176,9 @@ declare const angleFromAccelerationForce: (scaling?: number) => (t: ForceAffecte
  */
 declare const angleFromVelocityForce: (interpolateAmt?: number) => (t: ForceAffected) => Readonly<{
   angle: number;
-  position?: Points.Point;
-  velocity?: Points.Point;
-  acceleration?: Points.Point;
+  position?: Point;
+  velocity?: Point;
+  acceleration?: Point;
   mass?: number;
   angularAcceleration?: number;
   angularVelocity?: number;
@@ -1195,7 +1212,7 @@ declare const angleFromVelocityForce: (interpolateAmt?: number) => (t: ForceAffe
  * @param damping Damping factor to apply, so spring slows over time. (default: 0.995)
  * @returns
  */
-declare const springForce: (pinnedAt: Points.Point, restingLength?: number, k?: number, damping?: number) => (t: ForceAffected) => ForceAffected;
+declare const springForce: (pinnedAt: Point, restingLength?: number, k?: number, damping?: number) => (t: ForceAffected) => ForceAffected;
 /**
  * Pendulum force options
  */
@@ -1246,7 +1263,7 @@ type PendulumOpts = {
  * @param opts Options
  * @returns
  */
-declare const pendulumForce: (pinnedAt?: Points.Point, opts?: PendulumOpts) => (t: ForceAffected) => ForceAffected;
+declare const pendulumForce: (pinnedAt?: Point, opts?: PendulumOpts) => (t: ForceAffected) => ForceAffected;
 /**
  * Compute velocity based on acceleration and current velocity
  * @param acceleration Acceleration
@@ -1254,7 +1271,7 @@ declare const pendulumForce: (pinnedAt?: Points.Point, opts?: PendulumOpts) => (
  * @param velocityMax If specified, velocity will be capped at this value
  * @returns
  */
-declare const computeVelocity: (acceleration: Points.Point, velocity: Points.Point, velocityMax?: number) => Points.Point;
+declare const computeVelocity: (acceleration: Point, velocity: Point, velocityMax?: number) => Point;
 /**
  * Returns the acceleration to get from `currentPos` to `targetPos`.
  *
@@ -1277,7 +1294,7 @@ declare const computeVelocity: (acceleration: Points.Point, velocity: Points.Poi
  * @param opts Options
  * @returns
  */
-declare const computeAccelerationToTarget: (targetPos: Points.Point, currentPos: Points.Point, opts?: TargetOpts) => Points.Point | {
+declare const computeAccelerationToTarget: (targetPos: Point, currentPos: Point, opts?: TargetOpts) => Point | {
   readonly x: 0;
   readonly y: 0;
 };
@@ -1287,7 +1304,7 @@ declare const computeAccelerationToTarget: (targetPos: Points.Point, currentPos:
  * @param velocity Velocity vector
  * @returns Point
  */
-declare const computePositionFromVelocity: (position: Points.Point, velocity: Points.Point) => Points.Point;
+declare const computePositionFromVelocity: (position: Point, velocity: Point) => Point;
 /**
  * Compute a position based on distance and angle from origin
  * @param distance Distance from origin
@@ -1295,7 +1312,7 @@ declare const computePositionFromVelocity: (position: Points.Point, velocity: Po
  * @param origin Origin point
  * @returns Point
  */
-declare const computePositionFromAngle: (distance: number, angleRadians: number, origin: Points.Point) => Points.Point;
+declare const computePositionFromAngle: (distance: number, angleRadians: number, origin: Point) => Point;
 /**
  * A force that orients things according to direction of travel.
  *
@@ -1309,7 +1326,7 @@ declare const computePositionFromAngle: (distance: number, angleRadians: number,
 declare const orientationForce: (interpolationAmt?: number) => ForceFn;
 //# sourceMappingURL=forces.d.ts.map
 //#endregion
-//#region packages/modulation/src/cubic-bezier.d.ts
+//#region ../modulation/src/cubic-bezier.d.ts
 /**
  * Creates an easing function using a simple cubic bezier defined by two points.
  *
@@ -1329,7 +1346,7 @@ declare const orientationForce: (interpolationAmt?: number) => ForceFn;
 declare const cubicBezierShape: (b: number, d: number) => ModFunction;
 //# sourceMappingURL=cubic-bezier.d.ts.map
 //#endregion
-//#region packages/modulation/src/drift.d.ts
+//#region ../modulation/src/drift.d.ts
 type Drifter = {
   update(v: number): number;
   reset(): void;
@@ -1353,7 +1370,7 @@ type Drifter = {
 declare const drift: (driftAmtPerMs: number) => Drifter;
 //# sourceMappingURL=drift.d.ts.map
 //#endregion
-//#region packages/modulation/src/gaussian.d.ts
+//#region ../modulation/src/gaussian.d.ts
 /**
  * Returns a roughly gaussian easing function
  * ```js
@@ -1369,7 +1386,7 @@ declare const gaussian: (standardDeviation?: number) => (t: number) => number;
 //# sourceMappingURL=gaussian.d.ts.map
 
 //#endregion
-//#region packages/modulation/src/interpolate.d.ts
+//#region ../modulation/src/interpolate.d.ts
 /**
  * Interpolation options.
  *
@@ -1498,7 +1515,7 @@ declare const interpolateAngle: (amount: number, aRadians: number, bRadians: num
 declare const interpolatorInterval: (duration: Interval, a?: number, b?: number, options?: Partial<InterpolateOptions>) => (retargetB?: number, retargetA?: number) => number;
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/modulation/src/jitter.d.ts
+//#region ../modulation/src/jitter.d.ts
 type JitterOpts = {
   readonly relative?: number;
   readonly absolute?: number;
@@ -1580,7 +1597,7 @@ declare const jitterAbsolute: (options: JitterOpts) => Jitterer;
 declare const jitter: (options?: JitterOpts) => Jitterer;
 //# sourceMappingURL=jitter.d.ts.map
 //#endregion
-//#region packages/modulation/src/mix.d.ts
+//#region ../modulation/src/mix.d.ts
 /**
  * Mixes in modulation. This is used when you want to
  * fold in a controllable amount of modulation.
@@ -1645,7 +1662,7 @@ declare const mixModulators: (balance: number, a: ModFunction, b: ModFunction) =
 declare const crossfade: (a: ModFunction, b: ModFunction) => ModFunction;
 //# sourceMappingURL=mix.d.ts.map
 //#endregion
-//#region packages/modulation/src/modulator-timed.d.ts
+//#region ../modulation/src/modulator-timed.d.ts
 /**
  * Produce values over time. When the modulate function is complete, the final
  * value continues to return. Timer starts when return function is first invoked.
@@ -1736,7 +1753,7 @@ declare const ticks: (fn: ModFunction, totalTicks: number) => () => number;
 declare const tickModulator: (fn: ModFunction, durationTicks: number) => ModulatorTimed;
 //# sourceMappingURL=modulator-timed.d.ts.map
 //#endregion
-//#region packages/modulation/src/no-op.d.ts
+//#region ../modulation/src/no-op.d.ts
 /**
  * A 'no-op' function. Returns the input value without modification.
  * Useful for when some default is needed
@@ -1747,7 +1764,7 @@ declare const noop: ModFunction;
 //# sourceMappingURL=no-op.d.ts.map
 
 //#endregion
-//#region packages/modulation/src/ping-pong.d.ts
+//#region ../modulation/src/ping-pong.d.ts
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.
  * Looping returns start value, and is inclusive of 0 and 1.
@@ -1800,7 +1817,7 @@ declare const pingPongPercent: (interval?: number, lower?: number, upper?: numbe
 declare const pingPong: (interval: number, lower: number, upper: number, start?: number, rounding?: number) => Generator<number, never, unknown>;
 //# sourceMappingURL=ping-pong.d.ts.map
 //#endregion
-//#region packages/modulation/src/spring.d.ts
+//#region ../modulation/src/spring.d.ts
 /**
  * Produces values according to rough spring physics.
  * å
@@ -1836,7 +1853,7 @@ declare const pingPong: (interval: number, lower: number, upper: number, start?:
  * @param opts Options for spring
  * @param timerOrFreq Timer to use, or frequency
  */
-declare function spring(opts?: SpringOptions, timerOrFreq?: Flow.Timer | number): Generator<number, void, unknown>;
+declare function spring(opts?: SpringOptions, timerOrFreq?: Timer | number): Generator<number, void, unknown>;
 /**
  * The same as {@link spring} but instead of a generator we get
  * a value. When the spring is done, 1 is returned instead of undefined.
@@ -1880,7 +1897,7 @@ declare function spring(opts?: SpringOptions, timerOrFreq?: Flow.Timer | number)
  * @param timerOrFreq
  * @returns
  */
-declare function springValue(opts?: SpringOptions, timerOrFreq?: Flow.Timer | number): () => number;
+declare function springValue(opts?: SpringOptions, timerOrFreq?: Timer | number): () => number;
 /**
  * Spring-dynamics modulator.
  * To have spring driven by time or ticks, use {@link spring} or {@link springValue}.
@@ -1891,7 +1908,7 @@ declare function springValue(opts?: SpringOptions, timerOrFreq?: Flow.Timer | nu
 declare const springShape: (opts?: SpringOptions) => ModFunction;
 //# sourceMappingURL=spring.d.ts.map
 //#endregion
-//#region packages/modulation/src/timing-source-factory.d.ts
+//#region ../modulation/src/timing-source-factory.d.ts
 type TimingSources = `elapsed` | `hertz` | `bpm`;
 /**
  * A factory function for creating a timing source. It returns
@@ -1924,7 +1941,7 @@ declare const timingSourceFactory: (source: TimingSources, duration: number, opt
 type TimingSourceFactory = () => ModSettable;
 //# sourceMappingURL=timing-source-factory.d.ts.map
 //#endregion
-//#region packages/modulation/src/waveforms.d.ts
+//#region ../modulation/src/waveforms.d.ts
 /**
  * Function that modulates a wave
  */
@@ -2081,7 +2098,7 @@ type WaveShaperFeedback = {
 declare function waveFromSource(sourceFunction: ModSettable, shaperFunction: ModFunction, invert?: boolean): WaveModulator;
 //# sourceMappingURL=waveforms.d.ts.map
 //#endregion
-//#region packages/modulation/src/weighted-average.d.ts
+//#region ../modulation/src/weighted-average.d.ts
 /**
  * Weighted average
  *
@@ -2093,7 +2110,7 @@ declare function waveFromSource(sourceFunction: ModSettable, shaperFunction: Mod
 declare const weightedAverage: (currentValue: number, targetValue: number, slowDownFactor: number) => number;
 //# sourceMappingURL=weighted-average.d.ts.map
 //#endregion
-//#region packages/modulation/src/weighted-random.d.ts
+//#region ../modulation/src/weighted-random.d.ts
 /**
  * Options for producing weighted distribution
  */

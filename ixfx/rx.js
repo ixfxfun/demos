@@ -1,22 +1,470 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { resultIsError, resultToError, testPlainObjectOrPrimitive } from "./src-Bo4oKRxs.js";
-import { compareArrays, mapObjectShallow } from "./records-qkLbe1PW.js";
-import "./is-primitive-BD8Wwhed.js";
-import { intervalToMs, isEqualContextString, isEqualValueDefault } from "./interval-type-Bu6U9yES.js";
-import { average, continuously, elapsedInterval, max, min, rank, sleep, some, sum, tally, zipKeyValue } from "./basic-BcTIVreK.js";
-import { compareData, getField, updateByPath } from "./src-CLK2Nwul.js";
-import { isAsyncIterable, isIterable, nextWithTimeout, wildcard } from "./src-IqHxJtRK.js";
-import "./is-integer-BwgNgMII.js";
-import "./key-value-DZNL5nwk.js";
-import "./dist-sNLZPlTa.js";
-import { getErrorMessage } from "./resolve-core-ibINXx_1.js";
-import { insertAt, interpolate, remove, shuffle } from "./src-LtkApSyv.js";
-import { DispatchList, QueueMutable, connect, graph, init, timeout, to } from "./src-D8qEf6yn.js";
-import { setProperty } from "./src-ZzsKvmqI.js";
-import "./src-CKv6-Ox5.js";
-import "./bezier-DS5b_ULE.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { resultIsError, resultThrow, resultToError, throwIfFailed } from "./numbers-C359_5A6.js";
+import { arrayIndexTest, arrayTest } from "./arrays-yH_qBmt0.js";
+import "./is-primitive-BDz6cwtd.js";
+import { compareArrays, mapObjectShallow, testPlainObjectOrPrimitive } from "./records-XG4QHVXn.js";
+import "./to-string-Dg1sJUf1.js";
+import "./comparers-BtlnApnB.js";
+import { isEqualContextString, isEqualValueDefault } from "./is-equal-edylSnsn.js";
+import { some, zipKeyValue } from "./maps-a_ogDHUT.js";
+import { compareData, getField, updateByPath } from "./pathed-4cNmhNti.js";
+import { continuously } from "./continuously-CFHq8KyU.js";
+import { elapsedInterval } from "./elapsed-DEWYfvwx.js";
+import { wildcard } from "./text-UM1t_CE6.js";
+import "./is-integer-D1QCbjZ-.js";
+import "./iterable-compare-values-shallow-DOeUS4hy.js";
+import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { getErrorMessage } from "./error-message-B6EPesrV.js";
+import { sleep } from "./sleep-C2hKDgCi.js";
+import { isAsyncIterable, isIterable, nextWithTimeout } from "./src-ibi35IYv.js";
+import "./is-equal-y9du2FWU.js";
+import "./unique-GmJPtLE_.js";
+import { shuffle } from "./random-DXqMnVbO.js";
+import "./simple-event-emitter-BWzQsKia.js";
+import { average, max, min, rank, sum, tally } from "./basic-Igpk8-Sv.js";
+import "./clamp-BXRKKkSg.js";
+import "./wrap-CbW4pe4i.js";
+import { interpolate } from "./interpolate-BoOK0bgP.js";
+import { timeout } from "./timeout-CUZsKULj.js";
+import { DispatchList } from "./dispatch-list-Bz1mgWI4.js";
+import "./queue-fns-C19iGLvT.js";
+import { QueueMutable } from "./queue-mutable-Bcwm-_Hi.js";
+import { init, to } from "./state-machine-BUeoIwqN.js";
+import { resolveEls } from "./resolve-el-BdUlUJGi.js";
 
-//#region packages/rx/src/util.ts
+//#region ../arrays/dist/src/insert-at.js
+/**
+* Inserts `values` at position `index`, shuffling remaining
+* items further down and returning changed result.
+*
+* Does not modify the input array.
+*
+* ```js
+* const data = [ 1, 2, 3 ]
+*
+* // Inserts 20,30,40 at index 1
+* Arrays.insertAt(data, 1, 20, 30, 40);
+*
+* // Yields: 1, 20, 30, 40, 2, 3
+* ```
+* @param data
+* @param index
+* @param values
+* @returns
+*/
+const insertAt = (data, index, ...values) => {
+	throwIfFailed(arrayTest(data, `data`), arrayIndexTest(data, index, `index`));
+	if (index === data.length - 1) return [...data, ...values];
+	if (index === 0) return [...values, ...data];
+	return [
+		...data.slice(0, index),
+		...values,
+		...data.slice(index)
+	];
+};
+
+//#endregion
+//#region ../arrays/dist/src/remove.js
+/**
+* Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
+*
+* ```js
+* const v = [ 100, 20, 50 ];
+* const vv = Arrays.remove(2);
+*
+* Yields:
+*  v: [ 100, 20, 50 ]
+* vv: [ 100, 20 ]
+* ```
+*
+* Consider {@link without} if you want to remove an item by value.
+*
+* Throws an exception if `index` is outside the range of `data` array.
+* @param data Input array
+* @param index Index to remove
+* @typeParam V Type of array
+* @returns
+*/
+const remove = (data, index) => {
+	if (!Array.isArray(data)) throw new TypeError(`'data' parameter should be an array`);
+	resultThrow(arrayIndexTest(data, index, `index`));
+	return [...data.slice(0, index), ...data.slice(index + 1)];
+};
+
+//#endregion
+//#region ../collections/dist/src/map/map-immutable-fns.js
+/**
+* Adds an array o [k,v] to the map, returning a new instance
+* @param map Initial data
+* @param data Data to add
+* @returns New map with data added
+*/
+const addArray = (map, data) => {
+	const x = new Map(map.entries());
+	for (const d of data) {
+		if (d[0] === void 0) throw new Error(`key cannot be undefined`);
+		if (d[1] === void 0) throw new Error(`value cannot be undefined`);
+		x.set(d[0], d[1]);
+	}
+	return x;
+};
+/**
+* Adds objects to the map, returning a new instance
+* @param map Initial data
+* @param data Data to add
+* @returns A new map with data added
+*/
+const addObjects = (map, data) => {
+	const x = new Map(map.entries());
+	for (const d of data) {
+		if (d.key === void 0) throw new Error(`key cannot be undefined`);
+		if (d.value === void 0) throw new Error(`value cannot be undefined`);
+		x.set(d.key, d.value);
+	}
+	return x;
+};
+/**
+* Adds data to a map, returning the new map.
+*
+* Can add items in the form of [key,value] or {key, value}.
+* @example These all produce the same result
+* ```js
+* map.set(`hello`, `samantha`);
+* map.add([`hello`, `samantha`]);
+* map.add({key: `hello`, value: `samantha`})
+* ```
+* @param map Initial data
+* @param data One or more data to add in the form of [key,value] or {key, value}
+* @returns New map with data added
+*/
+const add = (map, ...data) => {
+	if (map === void 0) throw new Error(`map parameter is undefined`);
+	if (data === void 0) throw new Error(`data parameter i.s undefined`);
+	if (data.length === 0) return map;
+	const firstRecord = data[0];
+	const isObject = typeof firstRecord.key !== `undefined` && typeof firstRecord.value !== `undefined`;
+	return isObject ? addObjects(map, data) : addArray(map, data);
+};
+/**
+* Sets data in a copy of the initial map
+* @param map Initial map
+* @param key Key
+* @param value Value to  set
+* @returns New map with data set
+*/
+const set = (map, key, value) => {
+	const x = new Map(map.entries());
+	x.set(key, value);
+	return x;
+};
+/**
+* Delete a key from the map, returning a new map
+* @param map Initial data
+* @param key
+* @returns New map with data deleted
+*/
+const del = (map, key) => {
+	const x = new Map(map.entries());
+	x.delete(key);
+	return x;
+};
+
+//#endregion
+//#region ../collections/dist/src/map/map.js
+/**
+* Returns an {@link IMapImmutable}.
+* Use {@link Maps.mutable} as a mutable alternatve.
+*
+* @example Basic usage
+* ```js
+* // Creating
+* let m = map();
+* // Add
+* m = m.set("name", "sally");
+* // Recall
+* m.get("name");
+* ```
+*
+* @example Enumerating
+* ```js
+* for (const [key, value] of map.entries()) {
+*  console.log(`${key} = ${value}`);
+* }
+* ```
+*
+* @example Overview
+* ```js
+* // Create
+* let m = map();
+* // Add as array or key & value pair
+* m = m.add(["name" , "sally"]);
+* m = m.add({ key: "name", value: "sally" });
+* // Add using the more typical set
+* m = m.set("name", "sally");
+* m.get("name");   // "sally";
+* m.has("age");    // false
+* m.has("name");   // true
+* m.isEmpty;       // false
+* m = m.delete("name");
+* m.entries();     // Iterator of key value pairs
+* ```
+*
+* Since it is immutable, `add()`, `delete()` and `clear()` return a new version with change.
+*
+* @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
+*/
+const immutable = (dataOrMap) => {
+	if (dataOrMap === void 0) return immutable([]);
+	if (Array.isArray(dataOrMap)) return immutable(add(/* @__PURE__ */ new Map(), ...dataOrMap));
+	const data = dataOrMap;
+	return {
+		add: (...itemsToAdd) => {
+			const s = add(data, ...itemsToAdd);
+			return immutable(s);
+		},
+		set: (key, value) => {
+			const s = set(data, key, value);
+			return immutable(s);
+		},
+		get: (key) => data.get(key),
+		delete: (key) => immutable(del(data, key)),
+		clear: () => immutable(),
+		has: (key) => data.has(key),
+		entries: () => data.entries(),
+		values: () => data.values(),
+		isEmpty: () => data.size === 0
+	};
+};
+
+//#endregion
+//#region ../collections/dist/src/graph/directed-graph.js
+/**
+* Create a vertex with given id
+* @param id
+* @returns
+*/
+const createVertex = (id) => {
+	return {
+		id,
+		out: []
+	};
+};
+function graphTest(g, parameterName = `graph`) {
+	if (g === void 0) return {
+		success: false,
+		error: `Param '${parameterName}' is undefined. Expected Graph`
+	};
+	if (g === null) return {
+		success: false,
+		error: `Param '${parameterName}' is null. Expected Graph`
+	};
+	if (typeof g === `object`) {
+		if (!(`vertices` in g)) return {
+			success: false,
+			error: `Param '${parameterName}.vertices' does not exist. Is it a Graph type?`
+		};
+	} else return {
+		success: false,
+		error: `Param '${parameterName} is type '${typeof g}'. Expected an object Graph`
+	};
+	return {
+		success: true,
+		value: g
+	};
+}
+/**
+* Returns _true_ if `vertex` has an outgoing connection to the given vertex.
+* @param graph
+* @param vertex
+* @param outIdOrVertex
+* @returns
+*/
+const hasOut = (graph$1, vertex, outIdOrVertex) => {
+	resultThrow(graphTest(graph$1));
+	const context = resolveVertex(graph$1, vertex);
+	const outId = typeof outIdOrVertex === `string` ? outIdOrVertex : outIdOrVertex.id;
+	return context.out.some((edge) => edge.id === outId);
+};
+/**
+* Gets a vertex by id, creating it if it does not exist.
+* @param graph
+* @param id
+* @returns
+*/
+const getOrCreate = (graph$1, id) => {
+	resultThrow(graphTest(graph$1));
+	const v = graph$1.vertices.get(id);
+	if (v !== void 0) return {
+		graph: graph$1,
+		vertex: v
+	};
+	const vv = createVertex(id);
+	const gg = updateGraphVertex(graph$1, vv);
+	return {
+		graph: gg,
+		vertex: vv
+	};
+};
+/**
+* Updates a vertex by returning a mutated graph
+* @param graph Graph
+* @param vertex Newly changed vertex
+* @returns
+*/
+const updateGraphVertex = (graph$1, vertex) => {
+	resultThrow(graphTest(graph$1));
+	const gr = {
+		...graph$1,
+		vertices: graph$1.vertices.set(vertex.id, vertex)
+	};
+	return gr;
+};
+/**
+* Make a connection between two vertices with a given weight.
+* It returns the new graph as wll as the created edge.
+* @param graph
+* @param from
+* @param to
+* @param weight
+* @returns
+*/
+function connectTo(graph$1, from, to$2, weight) {
+	resultThrow(graphTest(graph$1));
+	const fromResult = getOrCreate(graph$1, from);
+	graph$1 = fromResult.graph;
+	const toResult = getOrCreate(graph$1, to$2);
+	graph$1 = toResult.graph;
+	const edge = {
+		id: to$2,
+		weight
+	};
+	if (!hasOut(graph$1, fromResult.vertex, toResult.vertex)) graph$1 = updateGraphVertex(graph$1, {
+		...fromResult.vertex,
+		out: [...fromResult.vertex.out, edge]
+	});
+	return {
+		graph: graph$1,
+		edge
+	};
+}
+/**
+* Connect from -> to. Same as {@link connectWithEdges}, but this version just returns the graph.
+*
+* By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
+*
+* Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
+* is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
+* @param graph
+* @param options
+* @returns
+*/
+function connect(graph$1, options) {
+	if (typeof graph$1 !== `object`) throw new TypeError(`Param 'graph' is expected to be a DirectedGraph object. Got: ${typeof graph$1}`);
+	if (typeof options !== `object`) throw new TypeError(`Param 'options' is expected to be ConnectOptions object. Got: ${typeof options}`);
+	const result = connectWithEdges(graph$1, options);
+	return result.graph;
+}
+/**
+* Connect from -> to. Same as {@link connect} except you get back the edges as well.
+*
+* By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
+*
+* Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
+* is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
+* @param graph
+* @param options
+* @returns
+*/
+function connectWithEdges(graph$1, options) {
+	resultThrow(graphTest(graph$1));
+	const { to: to$2, weight, from } = options;
+	const bidi = options.bidi ?? false;
+	const toList = Array.isArray(to$2) ? to$2 : [to$2];
+	const edges = [];
+	for (const toSingle of toList) {
+		const result = connectTo(graph$1, from, toSingle, weight);
+		graph$1 = result.graph;
+		edges.push(result.edge);
+	}
+	if (!bidi) return {
+		graph: graph$1,
+		edges
+	};
+	for (const toSingle of toList) {
+		const result = connectTo(graph$1, toSingle, from, weight);
+		graph$1 = result.graph;
+		edges.push(result.edge);
+	}
+	return {
+		graph: graph$1,
+		edges
+	};
+}
+/**
+* Resolves the id or vertex into a Vertex.
+* throws an error if vertex is not found
+* @param graph
+* @param idOrVertex
+* @returns
+*/
+function resolveVertex(graph$1, idOrVertex) {
+	resultThrow(graphTest(graph$1));
+	if (idOrVertex === void 0) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
+	const v = typeof idOrVertex === `string` ? graph$1.vertices.get(idOrVertex) : idOrVertex;
+	if (v === void 0) throw new Error(`Id not found ${idOrVertex}`);
+	return v;
+}
+/**
+* Create a graph
+* ```js
+* let g = graph();
+* ```
+*
+* Can optionally provide initial connections:
+* ```js
+* let g = graph(
+*  { from: `a`, to: `b` },
+*  { from: `b`, to: `c` }
+* )
+* ```
+* @param initialConnections
+* @returns
+*/
+const graph = (...initialConnections) => {
+	let g = { vertices: immutable() };
+	for (const ic of initialConnections) g = connect(g, ic);
+	return g;
+};
+
+//#endregion
+//#region ../dom/dist/src/set-property.js
+/**
+* Sets some property on an element
+*
+* ```js
+* setProperty(`width`, `canvas`, 100); // Set the width property to 100
+* ```
+*
+* If `value` is an object, converts to JSON first.
+* @param property
+* @param selectors
+* @param value
+* @returns
+*/
+function setProperty(property, selectors, value) {
+	let elements = [];
+	const set$1 = (v) => {
+		const typ = typeof v;
+		const vv = typ === `string` || typ === `number` || typ === `boolean` ? v : JSON.stringify(v);
+		if (elements.length === 0) elements = resolveEls(selectors);
+		for (const element of elements) element[property] = vv;
+		return vv;
+	};
+	return value === void 0 ? set$1 : set$1(value);
+}
+
+//#endregion
+//#region ../rx/src/util.ts
 function messageIsSignal(message) {
 	if (message.value !== void 0) return false;
 	if (`signal` in message && message.signal !== void 0) return true;
@@ -124,7 +572,7 @@ function resolveTriggerValue(t) {
 }
 
 //#endregion
-//#region packages/rx/src/from/function.ts
+//#region ../rx/src/from/function.ts
 /**
 * Produces a reactive from the basis of a function. `callback` is executed, with its result emitted via the returned reactive.
 * 
@@ -235,7 +683,7 @@ function func(callback, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/iterator.ts
+//#region ../rx/src/from/iterator.ts
 /**
 * Creates a Reactive from an AsyncGenerator or Generator
 * @param gen 
@@ -356,7 +804,7 @@ function iterator(source, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/resolve-source.ts
+//#region ../rx/src/resolve-source.ts
 /**
 * Resolves various kinds of sources into a Reactive.
 * If `source` is an iterable/generator, it gets wrapped via `generator()`.
@@ -383,7 +831,7 @@ const resolveSource = (source, options = {}) => {
 };
 
 //#endregion
-//#region packages/rx/src/cache.ts
+//#region ../rx/src/cache.ts
 /**
 * Wrapes an input stream to cache values, optionally providing an initial value
 * @param r 
@@ -407,7 +855,7 @@ function cache(r, initialValue) {
 }
 
 //#endregion
-//#region packages/rx/src/init-stream.ts
+//#region ../rx/src/init-stream.ts
 /**
 * Initialise a stream based on an upstream source.
 * Calls initLazyStream under the hood.
@@ -574,7 +1022,7 @@ function initStream(options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/sinks/dom.ts
+//#region ../rx/src/sinks/dom.ts
 /**
 * Values from `input` are set to the textContent/innerHTML of an element.
 * ```js
@@ -604,7 +1052,7 @@ const setHtmlText = (rxOrSource, optionsOrElementOrQuery) => {
 };
 
 //#endregion
-//#region packages/rx/src/to-readable.ts
+//#region ../rx/src/to-readable.ts
 /***
 * Returns a read-only version of `stream`
 */
@@ -616,7 +1064,7 @@ const toReadable = (stream) => ({
 });
 
 //#endregion
-//#region packages/rx/src/ops/annotate.ts
+//#region ../rx/src/ops/annotate.ts
 /**
 * Annotates values from `source`. Output values will be
 * in the form `{ value: TIn, annotation: TAnnotation }`.
@@ -687,7 +1135,7 @@ function annotateWithOp(input, annotatorOp) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/chunk.ts
+//#region ../rx/src/ops/chunk.ts
 /**
 * Queue from `source`, emitting when thresholds are reached. 
 * The resulting Reactive produces arrays.
@@ -740,7 +1188,7 @@ function chunk(source, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/transform.ts
+//#region ../rx/src/ops/transform.ts
 /**
 * Transforms values from `source` using the `transformer` function.
 * @param transformer 
@@ -764,7 +1212,7 @@ function transform(input, transformer, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/clone-from-fields.ts
+//#region ../rx/src/ops/clone-from-fields.ts
 /**
 * Create a new object from input, based on cloning fields rather than a destructured copy.
 * This is useful for event args.
@@ -783,7 +1231,7 @@ const cloneFromFields = (source) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/combine-latest-to-array.ts
+//#region ../rx/src/ops/combine-latest-to-array.ts
 /**
 * Monitors input reactive values, storing values as they happen to an array.
 * Whenever a new value is emitted, the whole array is sent out, containing current
@@ -858,7 +1306,7 @@ function combineLatestToArray(reactiveSources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/object.ts
+//#region ../rx/src/from/object.ts
 /**
 * Creates a Reactive wrapper with the shape of the input object.
 * 
@@ -915,7 +1363,7 @@ function object(initialValue, options = {}) {
 	const fieldChangeEvents = [];
 	let value = initialValue;
 	let disposed = false;
-	const set = (v) => {
+	const set$1 = (v) => {
 		const diff = [...compareData(value ?? {}, v, {
 			...options,
 			includeMissingFromA: true
@@ -1007,13 +1455,13 @@ function object(initialValue, options = {}) {
 			const id = listeners.add(handler);
 			return () => listeners.remove(id);
 		},
-		set,
+		set: set$1,
 		update
 	};
 }
 
 //#endregion
-//#region packages/rx/src/ops/combine-latest-to-object.ts
+//#region ../rx/src/ops/combine-latest-to-object.ts
 /**
 * Monitors input reactive values, storing values as they happen to an object.
 * Whenever a new value is emitted, the whole object is sent out, containing current
@@ -1141,7 +1589,7 @@ function combineLatestToObject(reactiveSources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/compute-with-previous.ts
+//#region ../rx/src/ops/compute-with-previous.ts
 /**
 * When there is a value from `input`, or the reactive is pinged,
 * this reactive emits the result of `fn`.
@@ -1185,7 +1633,7 @@ function computeWithPrevious(input, fn) {
 }
 
 //#endregion
-//#region packages/rx/src/reactives/debounce.ts
+//#region ../rx/src/reactives/debounce.ts
 /**
 * Debounce waits for `elapsed` time after the last received value before emitting it.
 * 
@@ -1222,7 +1670,7 @@ function debounce$1(source, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/debounce.ts
+//#region ../rx/src/ops/debounce.ts
 function debounce(options) {
 	return (source) => {
 		return debounce$1(source, options);
@@ -1230,7 +1678,7 @@ function debounce(options) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/elapsed.ts
+//#region ../rx/src/ops/elapsed.ts
 /**
 * Emits time in milliseconds since last message.
 * If it is the first value, 0 is used.
@@ -1247,7 +1695,7 @@ const elapsed = (input) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/field.ts
+//#region ../rx/src/ops/field.ts
 /**
 * From a source value, yields a field from it. Only works
 * if stream values are objects.
@@ -1274,7 +1722,7 @@ function field(fieldSource, fieldName, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/filter.ts
+//#region ../rx/src/ops/filter.ts
 /**
 * Passes all values where `predicate` function returns _true_.
 */
@@ -1303,7 +1751,7 @@ function drop(input, predicate, options) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/interpolate.ts
+//#region ../rx/src/ops/interpolate.ts
 /**
 * Interpolates to the source value.
 * 
@@ -1336,7 +1784,7 @@ function interpolate$1(input, options = {}) {
 */
 
 //#endregion
-//#region packages/rx/src/ops/math.ts
+//#region ../rx/src/ops/math.ts
 function max$1(input, options) {
 	const p = max();
 	return process(p, `max`, input, options);
@@ -1385,7 +1833,7 @@ function process(processor, annotationField, input, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/pipe.ts
+//#region ../rx/src/ops/pipe.ts
 /**
 * Pipes the output of one stream into another, in order.
 * The stream returned is a new stream which captures the final output.
@@ -1421,7 +1869,7 @@ const pipe = (...streams) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/single-from-array.ts
+//#region ../rx/src/ops/single-from-array.ts
 /**
 * For a stream that emits arrays of values, this op will select a single value.
 * 
@@ -1463,7 +1911,7 @@ function singleFromArray(source, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/split.ts
+//#region ../rx/src/ops/split.ts
 /**
 * Creates a set of streams each of which receives data from `source`.
 * By default these are lazy and dispose if the upstream source closes.
@@ -1508,7 +1956,7 @@ const splitLabelled = (rxOrSource, labels) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/switcher.ts
+//#region ../rx/src/ops/switcher.ts
 /**
 * Switcher generates several output streams, labelled according to the values of `cases`.
 * Values from `source` are fed to the output streams if their associated predicate function returns _true_.
@@ -1572,7 +2020,7 @@ const switcher = (reactiveOrSource, cases, options = {}) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/sync-to-array.ts
+//#region ../rx/src/ops/sync-to-array.ts
 /**
 * Waits for all sources to produce a value, sending the combined results as an array.
 * After sending, it waits again for each source to send at least one value.
@@ -1677,7 +2125,7 @@ function syncToArray(reactiveSources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/sync-to-object.ts
+//#region ../rx/src/ops/sync-to-object.ts
 function syncToObject(reactiveSources, options = {}) {
 	const keys = Object.keys(reactiveSources);
 	const values = Object.values(reactiveSources);
@@ -1689,7 +2137,7 @@ function syncToObject(reactiveSources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/tap.ts
+//#region ../rx/src/ops/tap.ts
 /**
 * 'Taps' the values from 'input', passing them to the 'process' function.
 * Return stream is the input stream, unaffected by what 'process' does.
@@ -1731,7 +2179,7 @@ const tapOps = (input, ...ops) => {
 };
 
 //#endregion
-//#region packages/rx/src/ops/throttle.ts
+//#region ../rx/src/ops/throttle.ts
 /**
 * Only allow a value through if a minimum amount of time has elapsed.
 * since the last value. This effectively slows down a source to a given number
@@ -1773,7 +2221,7 @@ function throttle(throttleSource, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/timeout-value.ts
+//#region ../rx/src/ops/timeout-value.ts
 /**
 * Emits a value if `source` does not emit a value after `interval`
 * has elapsed. This can be useful to reset a reactive to some
@@ -1830,7 +2278,7 @@ function timeoutValue(source, options) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/timeout-ping.ts
+//#region ../rx/src/ops/timeout-ping.ts
 /**
 * Pings a reactive if no value is emitted at after `interval`.
 * Returns `source`.
@@ -1875,7 +2323,7 @@ function timeoutPing(source, options) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/value-to-ping.ts
+//#region ../rx/src/ops/value-to-ping.ts
 /**
 * Pings `target` whenever `source` emits a value. The value itself is ignored, it just
 * acts as a trigger.
@@ -1931,7 +2379,7 @@ function valueToPing(source, target, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/ops/with-value.ts
+//#region ../rx/src/ops/with-value.ts
 /**
 * A reactive where the last value can be read at any time.
 * An initial value must be provided.
@@ -1965,7 +2413,7 @@ function withValue(input, options) {
 }
 
 //#endregion
-//#region packages/rx/src/from/array.ts
+//#region ../rx/src/from/array.ts
 const of = (source, options = {}) => {
 	if (Array.isArray(source)) return array(source, options);
 };
@@ -2044,7 +2492,7 @@ const array = (sourceArray, options = {}) => {
 };
 
 //#endregion
-//#region packages/rx/src/from/array-object.ts
+//#region ../rx/src/from/array-object.ts
 /**
 * Wraps an array object.
 * 
@@ -2059,7 +2507,7 @@ function arrayObject(initialValue = [], options = {}) {
 	const arrayEvent = initStream();
 	let value = initialValue;
 	let disposed = false;
-	const set = (replacement) => {
+	const set$1 = (replacement) => {
 		const diff = compareArrays(value, replacement, eq);
 		value = replacement;
 		setEvent.set([...replacement]);
@@ -2121,17 +2569,17 @@ function arrayObject(initialValue = [], options = {}) {
 		deleteAt,
 		deleteWhere,
 		insertAt: insertAt$1,
-		set
+		set: set$1
 	};
 	return r;
 }
 
 //#endregion
-//#region packages/rx/src/from/boolean.ts
+//#region ../rx/src/from/boolean.ts
 function boolean(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set = (v) => {
+	const set$1 = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -2141,12 +2589,12 @@ function boolean(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set
+		set: set$1
 	};
 }
 
 //#endregion
-//#region packages/rx/src/from/count.ts
+//#region ../rx/src/from/count.ts
 /**
 * Produces an incrementing value. By default starts at 0 and counts
 * forever, incrementing every second.
@@ -2223,7 +2671,7 @@ function count(options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/derived.ts
+//#region ../rx/src/from/derived.ts
 function derived(fn, reactiveSources, options = {}) {
 	const ignoreIdentical = options.ignoreIdentical ?? true;
 	const eq = options.eq ?? isEqualValueDefault;
@@ -2250,7 +2698,7 @@ function derived(fn, reactiveSources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/event.ts
+//#region ../rx/src/from/event.ts
 /**
 * Fired when `eventName` fires on `target`. 
 * 
@@ -2320,16 +2768,16 @@ function event(targetOrQuery, name, initialValue, options = {}) {
 		target.removeEventListener(name, callback);
 		if (debugLifecycle) console.log(`Rx.From.event remove '${name}'`);
 	};
-	const add = () => {
+	const add$1 = () => {
 		if (eventAdded) return;
 		eventAdded = true;
 		target.addEventListener(name, callback);
 		if (debugLifecycle) console.log(`Rx.From.event add '${name}'`);
 	};
-	if (!lazy) add();
+	if (!lazy) add$1();
 	return {
 		last: () => {
-			if (lazy) add();
+			if (lazy) add$1();
 			return rxObject.last();
 		},
 		dispose: (reason) => {
@@ -2342,11 +2790,11 @@ function event(targetOrQuery, name, initialValue, options = {}) {
 			return disposed;
 		},
 		on: (handler) => {
-			if (lazy) add();
+			if (lazy) add$1();
 			return rxObject.on(handler);
 		},
 		onValue: (handler) => {
-			if (lazy) add();
+			if (lazy) add$1();
 			return rxObject.onValue(handler);
 		}
 	};
@@ -2399,7 +2847,7 @@ function eventTrigger(targetOrQuery, name, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/merged.ts
+//#region ../rx/src/from/merged.ts
 /**
 * Returns a stream that merges the output of a list of homogenous streams.
 * Use {@link mergedWithOptions} to specify additional options.
@@ -2434,11 +2882,11 @@ function mergedWithOptions(sources, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/from/number.ts
+//#region ../rx/src/from/number.ts
 function number(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set = (v) => {
+	const set$1 = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -2448,16 +2896,16 @@ function number(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set
+		set: set$1
 	};
 }
 
 //#endregion
-//#region packages/rx/src/types.ts
+//#region ../rx/src/types.ts
 const symbol = Symbol(`Rx`);
 
 //#endregion
-//#region packages/rx/src/from/object-proxy.ts
+//#region ../rx/src/from/object-proxy.ts
 /**
 * Creates a proxy of `target` object (or array), so that regular property setting will be intercepted and output
 * on a {@link Reactive} object as well.
@@ -2558,7 +3006,7 @@ const objectProxySymbol = (target) => {
 };
 
 //#endregion
-//#region packages/rx/src/from/observable.ts
+//#region ../rx/src/from/observable.ts
 /**
 * Creates a RxJs style observable
 * ```js
@@ -2633,11 +3081,11 @@ function observableWritable(init$1) {
 }
 
 //#endregion
-//#region packages/rx/src/from/string.ts
+//#region ../rx/src/from/string.ts
 function string(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set = (v) => {
+	const set$1 = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -2647,12 +3095,12 @@ function string(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set
+		set: set$1
 	};
 }
 
 //#endregion
-//#region packages/rx/src/from/index.ts
+//#region ../rx/src/from/index.ts
 var from_exports = {};
 __export(from_exports, {
 	array: () => array,
@@ -2679,7 +3127,7 @@ __export(from_exports, {
 });
 
 //#endregion
-//#region packages/rx/src/collections/responsive-queue.ts
+//#region ../rx/src/collections/responsive-queue.ts
 /**
 * Changes to `queue` are output as a responsive stream.
 * The stream emits the full data of the queue (first item being the head of the queue)
@@ -2718,22 +3166,22 @@ function asResponsive(queue) {
 	const onEnqueue = (event$1) => {
 		events.set(event$1.finalData);
 	};
-	const set = (data) => {
+	const set$1 = (data) => {
 		queue.enqueue(...data);
 	};
 	return {
 		...events,
-		set
+		set: set$1
 	};
 }
 
 //#endregion
-//#region packages/rx/src/collections/index.ts
+//#region ../rx/src/collections/index.ts
 var collections_exports = {};
 __export(collections_exports, { asResponsive: () => asResponsive });
 
 //#endregion
-//#region packages/rx/src/graph.ts
+//#region ../rx/src/graph.ts
 /**
 * Build a graph of reactive dependencies for `rx`
 * @param _rx 
@@ -2779,7 +3227,7 @@ function prepare(_rx) {
 }
 
 //#endregion
-//#region packages/rx/src/to-array.ts
+//#region ../rx/src/to-array.ts
 /**
 * Reads a set number of values from `source`, returning as an array. May contain
 * empty values if desired values is not reached.
@@ -2865,7 +3313,7 @@ async function toArrayOrThrow(source, options = {}) {
 }
 
 //#endregion
-//#region packages/rx/src/to-generator.ts
+//#region ../rx/src/to-generator.ts
 /**
 * Returns an AsyncGenerator wrapper around Reactive.
 * This allows values to be iterated over using a `for await` loop,
@@ -2937,7 +3385,7 @@ async function* toGenerator(source) {
 }
 
 //#endregion
-//#region packages/rx/src/wrap.ts
+//#region ../rx/src/wrap.ts
 /**
 * Wrap a reactive source to allow for chained
 * function calls.
@@ -3075,7 +3523,7 @@ function wrap(source) {
 }
 
 //#endregion
-//#region packages/rx/src/index.ts
+//#region ../rx/src/index.ts
 function run(source, ...ops) {
 	let s = resolveSource(source);
 	for (const op of ops) s = op(s);

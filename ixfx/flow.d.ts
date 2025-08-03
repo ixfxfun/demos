@@ -1,11 +1,12 @@
-import { BasicType, Comparer, HasCompletion, Interval, ResolveToValue, ResolveToValueSync, sleep } from "@ixfx/core";
-import * as Debug from "@ixfx/debug";
-import { LogOption } from "@ixfx/debug";
-import { SimpleEventEmitter } from "@ixfx/events";
-import { Result } from "@ixfx/guards";
-export * from "@ixfx/core/continuously";
+import { BasicType, Interval } from "./types-BEAJ_GOH.js";
+import { Result } from "./types-CePLSdIj.js";
+import { Comparer } from "./comparers-CnRxdsEs.js";
+import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, OnStartCalled, continuously } from "./continuously-xAy8Jw7t.js";
+import { ResolveToValue, ResolveToValueSync } from "./resolve-core-p1htK_C7.js";
+import { sleep } from "./sleep-h6i9m9g1.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
 
-//#region packages/flow/src/behaviour-tree.d.ts
+//#region ../flow/src/behaviour-tree.d.ts
 type TaskState = `Failed` | `Running` | `Success`;
 type Task = {
   readonly state: TaskState;
@@ -30,7 +31,7 @@ declare function iterateBreadth(t: BtNode, pathPrefix?: string): Generator<Trave
 declare function iterateDepth(t: BtNode, pathPrefix?: string): Generator<Traversal>;
 //# sourceMappingURL=behaviour-tree.d.ts.map
 //#endregion
-//#region packages/flow/src/delay.d.ts
+//#region ../flow/src/delay.d.ts
 /**
  * Delay options
  */
@@ -129,7 +130,7 @@ declare const delay: <V>(callback: () => Promise<V>, optsOrMillis: DelayOpts | n
 declare function delayLoop(timeout: Interval): AsyncGenerator<undefined, void, unknown>;
 //# sourceMappingURL=delay.d.ts.map
 //#endregion
-//#region packages/flow/src/timeout.d.ts
+//#region ../flow/src/timeout.d.ts
 type TimeoutSyncCallback = (elapsedMs?: number, ...args: readonly unknown[]) => void;
 type TimeoutAsyncCallback = (elapsedMs?: number, ...args: readonly unknown[]) => Promise<void>;
 /**
@@ -199,7 +200,7 @@ type Timeout = HasCompletion & {
 declare const timeout: (callback: TimeoutSyncCallback | TimeoutAsyncCallback, interval: Interval) => Timeout;
 //# sourceMappingURL=timeout.d.ts.map
 //#endregion
-//#region packages/flow/src/debounce.d.ts
+//#region ../flow/src/debounce.d.ts
 /**
  * Returns a debounce function which acts to filter calls to a given function `fn`.
  *
@@ -269,7 +270,7 @@ declare const debounce: (callback: TimeoutSyncCallback | TimeoutAsyncCallback, i
 type DebouncedFunction = (...args: readonly unknown[]) => void;
 //# sourceMappingURL=debounce.d.ts.map
 //#endregion
-//#region packages/flow/src/dispatch-list.d.ts
+//#region ../flow/src/dispatch-list.d.ts
 type Dispatch<V> = (value: V) => void;
 /**
  * Maintains a list of listeners to receive data
@@ -325,7 +326,7 @@ declare class DispatchList<V> {
 }
 //# sourceMappingURL=dispatch-list.d.ts.map
 //#endregion
-//#region packages/flow/src/every.d.ts
+//#region ../flow/src/every.d.ts
 /**
  * Returns true for every _n_th call, eg 2 for every second call.
  *
@@ -354,7 +355,7 @@ declare class DispatchList<V> {
 declare const everyNth: <T>(nth: number, callback?: (data: T) => void) => (data: T) => boolean;
 //# sourceMappingURL=every.d.ts.map
 //#endregion
-//#region packages/flow/src/execute.d.ts
+//#region ../flow/src/execute.d.ts
 type ExpressionOrResult<ArgsType, ResultType> = ResultType | ((args: ArgsType | undefined) => Promise<ResultType | undefined> | ResultType | undefined | void);
 type RunOpts<ResultType> = {
   /**
@@ -465,7 +466,7 @@ declare const run: <ArgsType, ResultType>(expressions: ExpressionOrResult<ArgsTy
 declare const runSingle: <ArgsType, ResultType>(expressions: readonly ExpressionOrResult<ArgsType, ResultType>[], opts?: RunSingleOpts<ResultType>, args?: ArgsType) => Promise<ResultType | undefined>;
 //# sourceMappingURL=execute.d.ts.map
 //#endregion
-//#region packages/flow/src/event-race.d.ts
+//#region ../flow/src/event-race.d.ts
 /**
  * Subscribes to events on `target`, returning the event data
  * from the first event that fires.
@@ -490,7 +491,7 @@ declare const eventRace: (target: EventTarget, eventNames: string[], options?: P
 }>) => Promise<Event>;
 //# sourceMappingURL=event-race.d.ts.map
 //#endregion
-//#region packages/flow/src/moving-average.d.ts
+//#region ../flow/src/moving-average.d.ts
 type MovingAverageTimedOptions = Readonly<{
   interval: Interval;
   default?: number;
@@ -520,7 +521,34 @@ type MovingAverageTimedOptions = Readonly<{
 declare const movingAverageTimed: (options: MovingAverageTimedOptions) => (v: number) => number;
 //# sourceMappingURL=moving-average.d.ts.map
 //#endregion
-//#region packages/flow/src/pool.d.ts
+//#region ../debug/dist/src/types.d.ts
+type LogSet = {
+  readonly log: MessageLogger;
+  readonly warn: MessageLogger;
+  readonly error: MessageLogger;
+};
+type MessageLogger = (message: LogMessage | string) => void;
+type LogKind = `info` | `debug` | `error` | `warn`;
+type LogMessage = {
+  readonly kind?: LogKind;
+  readonly msg: any;
+  readonly category?: string;
+};
+//# sourceMappingURL=types.d.ts.map
+
+//#endregion
+//#region ../debug/dist/src/logger.d.ts
+/**
+ * Either a flag for default console logging, or a simple log function
+ */
+type LogOption = boolean | MessageLogger;
+/**
+ * Resolve a LogOption to a function
+ * @param l
+ * @returns
+ */
+//#endregion
+//#region ../flow/src/pool.d.ts
 /**
  * Policy for when the pool is fully used
  */
@@ -729,7 +757,7 @@ declare class Pool<V> {
   readonly fullPolicy: FullPolicy;
   private generateResource?;
   readonly freeResource?: (v: V) => void;
-  readonly log: Debug.LogSet;
+  readonly log: LogSet;
   /**
    * Constructor.
    *
@@ -850,7 +878,7 @@ declare class Pool<V> {
 declare const create: <V>(options?: PoolOptions<V>) => Pool<V>;
 //# sourceMappingURL=pool.d.ts.map
 //#endregion
-//#region packages/flow/src/promise-with-resolvers.d.ts
+//#region ../flow/src/promise-with-resolvers.d.ts
 /**
  * Creates a new Promise, returning the promise
  * along with its resolve and reject functions.
@@ -876,7 +904,7 @@ declare function promiseWithResolvers<T>(): {
 };
 //# sourceMappingURL=promise-with-resolvers.d.ts.map
 //#endregion
-//#region packages/flow/src/rate-minimum.d.ts
+//#region ../flow/src/rate-minimum.d.ts
 type RateMinimumOptions<TInput> = Readonly<{
   whatToCall: (args: TInput) => void;
   fallback: () => TInput;
@@ -933,7 +961,7 @@ type RateMinimumOptions<TInput> = Readonly<{
 declare const rateMinimum: <TInput>(options: RateMinimumOptions<TInput>) => (args: TInput) => void;
 //# sourceMappingURL=rate-minimum.d.ts.map
 //#endregion
-//#region packages/flow/src/repeat.d.ts
+//#region ../flow/src/repeat.d.ts
 type RepeatDelayOpts = RepeatOpts & Readonly<Partial<{
   /**
   * Sleep a fixed period of time regardless of how long each invocation of 'produce' takes
@@ -1197,7 +1225,7 @@ declare function repeatSync<T extends BasicType>(produce: ResolveToValueSync<T> 
  */
 //# sourceMappingURL=repeat.d.ts.map
 //#endregion
-//#region packages/flow/src/req-resp-match.d.ts
+//#region ../flow/src/req-resp-match.d.ts
 type RequestResponseOptions<TRequest, TResp> = {
   timeoutMs: number;
   key: (requestOrResp: TRequest | TResp) => string;
@@ -1309,7 +1337,7 @@ declare class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<R
 }
 //# sourceMappingURL=req-resp-match.d.ts.map
 //#endregion
-//#region packages/flow/src/retry.d.ts
+//#region ../flow/src/retry.d.ts
 /**
  * Result of backoff
  */
@@ -1484,7 +1512,7 @@ declare const retryFunction: <T>(callback: () => Promise<T | undefined>, options
 declare const retryTask: <V>(task: RetryTask<V>, opts?: Partial<RetryOpts<V>>) => Promise<RetryResult<V>>;
 //# sourceMappingURL=retry.d.ts.map
 //#endregion
-//#region packages/flow/src/run-once.d.ts
+//#region ../flow/src/run-once.d.ts
 /**
  * Runs a function once
  *
@@ -1503,7 +1531,7 @@ declare const runOnce: (onRun: () => boolean) => (() => boolean);
 //# sourceMappingURL=run-once.d.ts.map
 
 //#endregion
-//#region packages/flow/src/sync-wait.d.ts
+//#region ../flow/src/sync-wait.d.ts
 /**
  * Simple synchronisation. Supports only a single signal/waiter.
  * Expects one or more calls to .signal() for .forSignal() to resolve
@@ -1553,7 +1581,7 @@ declare class SyncWait {
 }
 //# sourceMappingURL=sync-wait.d.ts.map
 //#endregion
-//#region packages/flow/src/task-queue-mutable.d.ts
+//#region ../flow/src/task-queue-mutable.d.ts
 type AsyncTask = () => Promise<void>;
 type TaskQueueEvents = {
   /**
@@ -1633,7 +1661,7 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
 }
 //# sourceMappingURL=task-queue-mutable.d.ts.map
 //#endregion
-//#region packages/flow/src/throttle.d.ts
+//#region ../flow/src/throttle.d.ts
 /***
  * Throttles a function. Callback only allowed to run after minimum of `intervalMinMs`.
  *
@@ -1663,7 +1691,7 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
 declare const throttle: (callback: (elapsedMs: number, ...args: readonly unknown[]) => void | Promise<unknown>, intervalMinMs: number) => (...args: unknown[]) => Promise<void>;
 //# sourceMappingURL=throttle.d.ts.map
 //#endregion
-//#region packages/flow/src/timer.d.ts
+//#region ../flow/src/timer.d.ts
 /**
  * Creates a timer
  */
@@ -1911,11 +1939,11 @@ declare const timerWithFunction: (fn: ((v: number) => number), timer: Completion
 };
 //# sourceMappingURL=timer.d.ts.map
 //#endregion
-//#region packages/flow/src/types.d.ts
+//#region ../flow/src/types.d.ts
 type AsyncPromiseOrGenerator<V> = (() => Promise<V> | Promise<undefined>) | (() => V | undefined) | Generator<V> | IterableIterator<V> | AsyncIterableIterator<V> | AsyncGenerator<V> | AsyncIterable<V> | Iterable<V>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/flow/src/update-outdated.d.ts
+//#region ../flow/src/update-outdated.d.ts
 type UpdateFailPolicy = `fast` | `slow` | `backoff`;
 /**
  * Calls the async `fn` to generate a value if there is no prior value or
@@ -1954,7 +1982,7 @@ type UpdateFailPolicy = `fast` | `slow` | `backoff`;
 declare const updateOutdated: <V>(fn: (elapsedMs?: number) => Promise<V>, interval: Interval, updateFail?: UpdateFailPolicy) => (() => Promise<V>);
 //# sourceMappingURL=update-outdated.d.ts.map
 //#endregion
-//#region packages/flow/src/wait-for-value.d.ts
+//#region ../flow/src/wait-for-value.d.ts
 /**
  * Queue of a single item, only once, allows for simple synchronisation.
  *
@@ -2011,7 +2039,7 @@ declare const singleItem: <T>() => WaitForValue<T>;
 //# sourceMappingURL=wait-for-value.d.ts.map
 
 //#endregion
-//#region packages/flow/src/wait-for.d.ts
+//#region ../flow/src/wait-for.d.ts
 /**
  * Helper function for calling code that should fail after a timeout.
  * In short, it allows you to signal when the function succeeded, to cancel it, or
@@ -2093,7 +2121,7 @@ declare const singleItem: <T>() => WaitForValue<T>;
 declare const waitFor: (timeoutMs: number, onAborted: (reason: string) => void, onComplete?: (success: boolean) => void) => (error?: string) => void;
 //# sourceMappingURL=wait-for.d.ts.map
 //#endregion
-//#region packages/flow/src/state-machine/types.d.ts
+//#region ../flow/src/state-machine/types.d.ts
 type DriverOptions<V extends Transitions> = {
   readonly handlers: readonly DriverStatesHandler<V>[];
   readonly debug?: LogOption;
@@ -2201,9 +2229,11 @@ type StateHandler = string | StateEvent | null;
 type State = Readonly<Record<string, StateHandler>>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/flow/src/state-machine/driver.d.ts
+//#region ../flow/src/state-machine/driver.d.ts
 /**
  * Drives a state machine.
+ *
+ * [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/driver/)
  *
  * Uses a 'handlers' structure to determine when to change
  * state and actions to take.
@@ -2256,7 +2286,7 @@ type State = Readonly<Record<string, StateHandler>>;
 declare function driver<V extends Transitions>(machine: Machine<V> | Transitions, handlersOrOpts: readonly DriverStatesHandler<V>[] | DriverOptions<V>): Promise<DriverRunner<V>>;
 //# sourceMappingURL=driver.d.ts.map
 //#endregion
-//#region packages/flow/src/state-machine/state-machine.d.ts
+//#region ../flow/src/state-machine/state-machine.d.ts
 /**
  * Clones machine state
  * @param toClone
@@ -2264,7 +2294,8 @@ declare function driver<V extends Transitions>(machine: Machine<V> | Transitions
  */
 declare const cloneState: <V extends Transitions>(toClone: MachineState<V>) => MachineState<V>;
 /**
- * Initialises a state machine
+ * Initialises a state machine. [Read more in the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
+ *
  * ```js
  * const desc = {
  *  pants: ['shoes','socks'],
@@ -2376,7 +2407,7 @@ declare const fromList: (...states: readonly string[]) => Transitions;
 declare const fromListBidirectional: (...states: readonly string[]) => Transitions;
 //# sourceMappingURL=state-machine.d.ts.map
 //#endregion
-//#region packages/flow/src/state-machine/with-events.d.ts
+//#region ../flow/src/state-machine/with-events.d.ts
 type StateChangeEvent<V extends Transitions> = {
   readonly newState: StateNames<V>;
   readonly priorState: StateNames<V>;
@@ -2479,5 +2510,5 @@ declare namespace index_d_exports {
   export { DriverExpressionOrResult, DriverOptions, DriverResult, DriverRunner, DriverStatesHandler, Machine, MachineState, State, StateChangeEvent, StateEvent, StateHandler, StateMachineEventMap, StateMachineWithEvents, StateMachineWithEventsOptions, StateNames, StateTarget, StateTargetStrict, StopEvent, TransitionCondition, TransitionResult, Transitions, TransitionsStrict, cloneState, driver, fromList, fromListBidirectional, init, isDone, isValidTransition, next, normaliseTargets, possible, possibleTargets, reset, to, validateMachine, validateTransition };
 }
 //#endregion
-export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, ModulationTimer, MovingAverageTimedOptions, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, index_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, HasCompletion, HasCompletionRunStates, ModulationTimer, MovingAverageTimedOptions, OnStartCalled, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, index_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
 //# sourceMappingURL=flow.d.ts.map

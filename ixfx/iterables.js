@@ -1,10 +1,22 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, resultThrow } from "./src-Bo4oKRxs.js";
-import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-Bu6U9yES.js";
-import { average, continuously, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-BcTIVreK.js";
-import { isEqual, numberArrayCompute } from "./src-LtkApSyv.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, resultThrow } from "./numbers-C359_5A6.js";
+import "./arrays-yH_qBmt0.js";
+import { toStringDefault } from "./to-string-Dg1sJUf1.js";
+import "./comparers-BtlnApnB.js";
+import { isEqualValueIgnoreOrder } from "./is-equal-edylSnsn.js";
+import { some } from "./maps-a_ogDHUT.js";
+import { continuously } from "./continuously-CFHq8KyU.js";
+import { elapsedSince } from "./elapsed-DEWYfvwx.js";
+import { compareIterableValuesShallow } from "./iterable-compare-values-shallow-DOeUS4hy.js";
+import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import { promiseFromEvent } from "./promise-from-event--N3r1LR5.js";
+import { sleep } from "./sleep-C2hKDgCi.js";
+import "./is-equal-y9du2FWU.js";
+import { isEqual } from "./equality-Bufi-LTm.js";
+import { average, max, min, rank, sum, tally } from "./basic-Igpk8-Sv.js";
+import { numberArrayCompute } from "./number-array-compute-CL2ixuue.js";
 
-//#region packages/iterables/src/guard.ts
+//#region ../iterables/src/guard.ts
 const isAsyncIterable = (v) => {
 	if (typeof v !== `object`) return false;
 	if (v === null) return false;
@@ -17,7 +29,7 @@ const isIterable = (v) => {
 };
 
 //#endregion
-//#region packages/iterables/src/async.ts
+//#region ../iterables/src/async.ts
 var async_exports = {};
 __export(async_exports, {
 	asCallback: () => asCallback$3,
@@ -501,7 +513,7 @@ async function* zip$2(...its) {
 }
 
 //#endregion
-//#region packages/iterables/src/sync/slice.ts
+//#region ../iterables/src/sync/slice.ts
 function* slice$1(it, start = 0, end = Number.POSITIVE_INFINITY) {
 	if (end < start) throw new Error(`Param 'end' should be more than 'start'`);
 	if (start < 0) throw new Error(`Param 'start' should be at least 0`);
@@ -518,14 +530,14 @@ function* slice$1(it, start = 0, end = Number.POSITIVE_INFINITY) {
 }
 
 //#endregion
-//#region packages/iterables/src/sync/reduce.ts
+//#region ../iterables/src/sync/reduce.ts
 function reduce$2(it, f, start) {
 	for (const v of it) start = f(start, v);
 	return start;
 }
 
 //#endregion
-//#region packages/iterables/src/sync.ts
+//#region ../iterables/src/sync.ts
 var sync_exports = {};
 __export(sync_exports, {
 	asCallback: () => asCallback$2,
@@ -923,7 +935,7 @@ function* fromArray$1(array$1) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/utility.ts
+//#region ../iterables/src/chain/utility.ts
 function isGenFactoryNoInput(c) {
 	if (!(`_type` in c)) return false;
 	if (c._type === `GenFactoryNoInput`) return true;
@@ -973,7 +985,7 @@ function resolveToAsyncGen(input) {
 }
 
 //#endregion
-//#region packages/iterables/src/util/dom.ts
+//#region ../iterables/src/util/dom.ts
 function resolveEl(elOrQuery) {
 	if (typeof elOrQuery === `string`) {
 		const el = document.querySelector(elOrQuery);
@@ -984,7 +996,7 @@ function resolveEl(elOrQuery) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/dom.ts
+//#region ../iterables/src/chain/dom.ts
 var dom_exports = {};
 __export(dom_exports, {
 	perValue: () => perValue,
@@ -1088,7 +1100,7 @@ function query(options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/links.ts
+//#region ../iterables/src/chain/links.ts
 var links_exports = {};
 __export(links_exports, {
 	average: () => average$1,
@@ -1495,7 +1507,7 @@ function drop(predicate) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/array.ts
+//#region ../iterables/src/chain/from/array.ts
 /**
 * Creates a chain from an array, reading values at a given interval
 * @param it 
@@ -1515,7 +1527,7 @@ function array(it, delay$1 = 5) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/event.ts
+//#region ../iterables/src/chain/from/event.ts
 /**
 * Create an iterable from an event
 * @param target Event source (eg HTML element)
@@ -1532,7 +1544,7 @@ function event(target, name) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/function.ts
+//#region ../iterables/src/chain/from/function.ts
 /**
 * Produce a value from a callback. When
 * the callback returns _undefined_ it is considered done.
@@ -1576,7 +1588,7 @@ function func(callback) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/iterable.ts
+//#region ../iterables/src/chain/from/iterable.ts
 /**
 * Creates a chain from an interable
 * @param it 
@@ -1592,7 +1604,7 @@ function iterable(it) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/ticks.ts
+//#region ../iterables/src/chain/from/ticks.ts
 /**
 * Generate timestamp values at `interval` rate. By default it runs forever. 
 * Use `loops` or `elapsed` to set upper limit on how long it should run.
@@ -1626,7 +1638,7 @@ function timestamp(options) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/from/index.ts
+//#region ../iterables/src/chain/from/index.ts
 var from_exports = {};
 __export(from_exports, {
 	array: () => array,
@@ -1637,7 +1649,7 @@ __export(from_exports, {
 });
 
 //#endregion
-//#region packages/iterables/src/chain/add-to-array.ts
+//#region ../iterables/src/chain/add-to-array.ts
 /**
 * Adds values to the provided array as they are produced,
 * mutating array.
@@ -1656,7 +1668,7 @@ async function addToArray(array$1, valueToWrap) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/as-array.ts
+//#region ../iterables/src/chain/as-array.ts
 /**
 * Async function that returns the chain as an array of values
 * ```js
@@ -1680,7 +1692,7 @@ async function asArray(valueToWrap, options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/as-callback.ts
+//#region ../iterables/src/chain/as-callback.ts
 /**
 * Calls `callback` whenever the chain/generator produces a value.
 * 
@@ -1710,7 +1722,7 @@ async function asCallback$1(valueToWrap, callback, onDone) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/as-promise.ts
+//#region ../iterables/src/chain/as-promise.ts
 /**
 * Treats the chain/generator as a promise
 * 
@@ -1737,7 +1749,7 @@ function asPromise(valueToWrap) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/as-value.ts
+//#region ../iterables/src/chain/as-value.ts
 /**
 * Returns the most recent value from the chain/generator, or
 * `initialValue` (defaulting to _undefined_) if no value
@@ -1777,7 +1789,7 @@ function asValue(valueToWrap, initialValue) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/combine-latest-to-array.ts
+//#region ../iterables/src/chain/combine-latest-to-array.ts
 /**
 * Monitors sources, storing as they happen to an array.
 * Whenever a new value is emitted, the whole array is sent out, containing current
@@ -1852,7 +1864,7 @@ async function* combineLatestToArray(sources, options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/combine-latest-to-object.ts
+//#region ../iterables/src/chain/combine-latest-to-object.ts
 /**
 * Monitors sources, storing as they happen to an object.
 * Whenever a new value is emitted, the object is sent out, containing current
@@ -1935,7 +1947,7 @@ async function* combineLatestToObject(sources, options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/lazy.ts
+//#region ../iterables/src/chain/lazy.ts
 const getLinkName = (c) => {
 	return c._name ?? c.name;
 };
@@ -2051,7 +2063,7 @@ function lazy() {
 }
 
 //#endregion
-//#region packages/iterables/src/util/queueMutable.ts
+//#region ../iterables/src/util/queueMutable.ts
 var QueueMutable = class {
 	#store = [];
 	enqueue(data) {
@@ -2063,7 +2075,7 @@ var QueueMutable = class {
 };
 
 //#endregion
-//#region packages/iterables/src/chain/merge-flat.ts
+//#region ../iterables/src/chain/merge-flat.ts
 /**
 * Merge values from several sources into one stream, interleaving values.
 * When all streams are complete it finishes.
@@ -2104,7 +2116,7 @@ async function* mergeFlat(...sources) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/run.ts
+//#region ../iterables/src/chain/run.ts
 /**
 * Chain functions together. First argument is the source.
 * `runN` takes any number of chain functions. Use {@link run} if
@@ -2191,7 +2203,7 @@ async function* run(gen, l0, l1, l2, l3, l4, l5) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/prepare.ts
+//#region ../iterables/src/chain/prepare.ts
 /**
 * Prepare a chain, allowing you to provide a source at execution time.
 * ```js
@@ -2216,7 +2228,7 @@ function prepare(...functions) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/single.ts
+//#region ../iterables/src/chain/single.ts
 /**
 * Input a single value to the chain, return a single result
 * 
@@ -2238,7 +2250,7 @@ async function single(f, input) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/sync.ts
+//#region ../iterables/src/chain/sync.ts
 /**
 * Waits for all sources to produce a value, sending the combined results as an array.
 * After sending, it waits again for each source to send at least one value.
@@ -2295,7 +2307,7 @@ async function* syncToArray(sources, options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/chain/index.ts
+//#region ../iterables/src/chain/index.ts
 var chain_exports = {};
 __export(chain_exports, {
 	Dom: () => dom_exports,
@@ -2321,7 +2333,7 @@ __export(chain_exports, {
 });
 
 //#endregion
-//#region packages/iterables/src/compare-values.ts
+//#region ../iterables/src/compare-values.ts
 /**
 * Returns the 'max' of some iterable using the provided scoring function.
 * It only yields a value when iterator finishes.
@@ -2392,7 +2404,7 @@ const hasEqualValuesShallow = (iterableA, iterableB, eq) => {
 };
 
 //#endregion
-//#region packages/iterables/src/controller.ts
+//#region ../iterables/src/controller.ts
 /**
 * Retrieve values from an iterator, passing them to a callback.
 * Allows iterator to be started, paused, or restarted and an optional delay between reading items from iterator.
@@ -2459,7 +2471,7 @@ const iteratorController = (options) => {
 };
 
 //#endregion
-//#region packages/iterables/src/from-event.ts
+//#region ../iterables/src/from-event.ts
 const fromEvent = (eventSource, eventType) => {
 	const pullQueue = [];
 	const pushQueue = [];
@@ -2511,7 +2523,7 @@ const fromEvent = (eventSource, eventType) => {
 };
 
 //#endregion
-//#region packages/iterables/src/numbers-compute.ts
+//#region ../iterables/src/numbers-compute.ts
 /**
 * Returns the min, max, avg and total of the array or iterable.
 * Any values that are invalid are silently skipped over.
@@ -2586,7 +2598,7 @@ function computeAverage(data, options = {}) {
 }
 
 //#endregion
-//#region packages/iterables/src/index.ts
+//#region ../iterables/src/index.ts
 /**
 * Returns a stream of minimum values.
 * 

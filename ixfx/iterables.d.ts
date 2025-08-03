@@ -1,7 +1,9 @@
-import { Interval, IsEqual, RankArrayOptions, RankFunction, RankOptions, SleepOpts, ToString } from "@ixfx/core";
-import { NumbersComputeOptions, NumbersComputeResult } from "@ixfx/numbers";
+import { IsEqual } from "./is-equal-aUE7iVHd.js";
+import { Interval, RankArrayOptions, RankFunction, RankOptions, ToString } from "./types-BEAJ_GOH.js";
+import { SleepOpts } from "./sleep-h6i9m9g1.js";
+import { NumbersComputeOptions, NumbersComputeResult } from "./types-DhvE0DAd.js";
 
-//#region packages/iterables/src/types.d.ts
+//#region ../iterables/src/types.d.ts
 type WithEvents = {
   addEventListener(type: string, callbackfn: any): void;
   removeEventListener(type: string, callbackfn: any): void;
@@ -296,11 +298,11 @@ declare function uniqueByValue$2<T>(input: AsyncIterable<T>, toString?: (value: 
 declare function zip$2<V>(...its: readonly AsyncIterable<V>[]): AsyncGenerator<V[], void, unknown>;
 //# sourceMappingURL=async.d.ts.map
 //#endregion
-//#region packages/iterables/src/sync/slice.d.ts
+//#region ../iterables/src/sync/slice.d.ts
 declare function slice$1<V>(it: Iterable<V>, start?: number, end?: number): Generator<V, void, unknown>;
 //# sourceMappingURL=slice.d.ts.map
 //#endregion
-//#region packages/iterables/src/sync/reduce.d.ts
+//#region ../iterables/src/sync/reduce.d.ts
 declare function reduce$2<V>(it: Iterable<V>, f: (accumulator: V, current: V) => V, start: V): V;
 //# sourceMappingURL=reduce.d.ts.map
 declare namespace sync_d_exports {
@@ -497,7 +499,7 @@ declare function toArray$1<V>(it: Iterable<V>, options?: Partial<ToArrayOptions>
 declare function fromArray$1<V>(array: V[]): Generator<V>;
 //# sourceMappingURL=sync.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/types.d.ts
+//#region ../iterables/src/chain/types.d.ts
 type SyncOptions = {
   /**
    * How to handle when a source completes.
@@ -1017,7 +1019,7 @@ declare function filter$1<In>(predicate: (v: In) => boolean): Link<In, In>;
 declare function drop<In>(predicate: (v: In) => boolean): Link<In, In>;
 //# sourceMappingURL=links.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/from/array.d.ts
+//#region ../iterables/src/chain/from/array.d.ts
 /**
  * Creates a chain from an array, reading values at a given interval
  * @param it
@@ -1027,7 +1029,7 @@ declare function drop<In>(predicate: (v: In) => boolean): Link<In, In>;
 declare function array<Out>(it: Out[], delay?: Interval): GenFactoryNoInput<Out>;
 //# sourceMappingURL=array.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/from/event.d.ts
+//#region ../iterables/src/chain/from/event.d.ts
 /**
  * Create an iterable from an event
  * @param target Event source (eg HTML element)
@@ -1038,7 +1040,7 @@ declare function event<Out>(target: EventTarget, name: string): GenFactoryNoInpu
 //# sourceMappingURL=event.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/from/function.d.ts
+//#region ../iterables/src/chain/from/function.d.ts
 /**
  * Produce a value from a callback. When
  * the callback returns _undefined_ it is considered done.
@@ -1071,7 +1073,7 @@ declare function event<Out>(target: EventTarget, name: string): GenFactoryNoInpu
 declare function func<Out>(callback: () => Promise<Out> | Out): GenFactoryNoInput<Out>;
 //# sourceMappingURL=function.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/from/iterable.d.ts
+//#region ../iterables/src/chain/from/iterable.d.ts
 /**
  * Creates a chain from an interable
  * @param it
@@ -1081,7 +1083,7 @@ declare function iterable<Out>(it: Iterable<Out> | AsyncIterable<Out>): GenFacto
 //# sourceMappingURL=iterable.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/from/ticks.d.ts
+//#region ../iterables/src/chain/from/ticks.d.ts
 /**
  * Generate timestamp values at `interval` rate. By default it runs forever.
  * Use `loops` or `elapsed` to set upper limit on how long it should run.
@@ -1100,7 +1102,7 @@ declare namespace index_d_exports$1 {
   export { array, event, func, iterable, timestamp };
 }
 //#endregion
-//#region packages/iterables/src/chain/add-to-array.d.ts
+//#region ../iterables/src/chain/add-to-array.d.ts
 /**
  * Adds values to the provided array as they are produced,
  * mutating array.
@@ -1117,7 +1119,7 @@ declare function addToArray<Out>(array: Out[], valueToWrap: AsyncGenerator<Out> 
 //# sourceMappingURL=add-to-array.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/as-array.d.ts
+//#region ../iterables/src/chain/as-array.d.ts
 /**
  * Async function that returns the chain as an array of values
  * ```js
@@ -1139,7 +1141,7 @@ declare function asArray<Out>(valueToWrap: AsyncGenerator<Out> | GenFactoryNoInp
 //# sourceMappingURL=as-array.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/as-callback.d.ts
+//#region ../iterables/src/chain/as-callback.d.ts
 /**
  * Calls `callback` whenever the chain/generator produces a value.
  *
@@ -1165,7 +1167,7 @@ declare function asArray<Out>(valueToWrap: AsyncGenerator<Out> | GenFactoryNoInp
 declare function asCallback$1<V>(valueToWrap: GenOrData<V> | GenFactoryNoInput<V>, callback: (v: V) => unknown, onDone?: () => void): Promise<void>;
 //# sourceMappingURL=as-callback.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/as-promise.d.ts
+//#region ../iterables/src/chain/as-promise.d.ts
 /**
  * Treats the chain/generator as a promise
  *
@@ -1183,7 +1185,7 @@ declare function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput
 //# sourceMappingURL=as-promise.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/as-value.d.ts
+//#region ../iterables/src/chain/as-value.d.ts
 /**
  * Returns the most recent value from the chain/generator, or
  * `initialValue` (defaulting to _undefined_) if no value
@@ -1205,7 +1207,7 @@ declare function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput
 declare function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>, initialValue?: V): () => V | undefined;
 //# sourceMappingURL=as-value.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/combine-latest-to-array.d.ts
+//#region ../iterables/src/chain/combine-latest-to-array.d.ts
 /**
  * Monitors sources, storing as they happen to an array.
  * Whenever a new value is emitted, the whole array is sent out, containing current
@@ -1226,7 +1228,7 @@ declare function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V
 declare function combineLatestToArray(sources: (GenOrData<any> | GenFactoryNoInput<any>)[], options?: Partial<CombineLatestOptions>): AsyncGenerator<any[]>;
 //# sourceMappingURL=combine-latest-to-array.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/combine-latest-to-object.d.ts
+//#region ../iterables/src/chain/combine-latest-to-object.d.ts
 /**
  * Monitors sources, storing as they happen to an object.
  * Whenever a new value is emitted, the object is sent out, containing current
@@ -1247,12 +1249,12 @@ declare function combineLatestToArray(sources: (GenOrData<any> | GenFactoryNoInp
 declare function combineLatestToObject<const T extends Record<string, GenOrData<any> | GenFactoryNoInput<any>>>(sources: T, options?: Partial<CombineLatestOptions>): AsyncGenerator<GenValueTypeObject<T>>;
 //# sourceMappingURL=combine-latest-to-object.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/lazy.d.ts
+//#region ../iterables/src/chain/lazy.d.ts
 declare function lazy<In, Out>(): LazyChain<In, Out>;
 //# sourceMappingURL=lazy.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/merge-flat.d.ts
+//#region ../iterables/src/chain/merge-flat.d.ts
 /**
  * Merge values from several sources into one stream, interleaving values.
  * When all streams are complete it finishes.
@@ -1266,7 +1268,7 @@ declare function mergeFlat<Out>(...sources: (GenOrData<any> | GenFactoryNoInput<
 //# sourceMappingURL=merge-flat.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/prepare.d.ts
+//#region ../iterables/src/chain/prepare.d.ts
 /**
  * Prepare a chain, allowing you to provide a source at execution time.
  * ```js
@@ -1287,7 +1289,7 @@ declare function prepare<In, Out>(...functions: Links<In, Out>): (source: GenOrD
 //# sourceMappingURL=prepare.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/chain/run.d.ts
+//#region ../iterables/src/chain/run.d.ts
 /**
  * Chain functions together. First argument is the source.
  * `runN` takes any number of chain functions. Use {@link run} if
@@ -1331,7 +1333,7 @@ declare function run<T1, T2, T3, T4, T5, T6>(gen: GenOrData<T1> | GenFactoryNoIn
 declare function run<T1, T2, T3, T4, T5, T6, T7>(gen: GenOrData<T1> | GenFactoryNoInput<T1>, l0: Link<T1, T2>, l1: Link<T2, T3>, l2: Link<T3, T4>, l3: Link<T4, T5>, l4: Link<T5, T6>, l5: Link<T6, T7>): AsyncGenerator<T7>;
 //# sourceMappingURL=run.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/single.d.ts
+//#region ../iterables/src/chain/single.d.ts
 /**
  * Input a single value to the chain, return a single result
  *
@@ -1350,7 +1352,7 @@ declare function run<T1, T2, T3, T4, T5, T6, T7>(gen: GenOrData<T1> | GenFactory
 declare function single<In, Out>(f: Link<In, Out>, input: In): Promise<Out | undefined>;
 //# sourceMappingURL=single.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/sync.d.ts
+//#region ../iterables/src/chain/sync.d.ts
 /**
  * Waits for all sources to produce a value, sending the combined results as an array.
  * After sending, it waits again for each source to send at least one value.
@@ -1367,7 +1369,7 @@ declare function single<In, Out>(f: Link<In, Out>, input: In): Promise<Out | und
 declare function syncToArray(sources: (GenOrData<any> | GenFactoryNoInput<any>)[], options?: Partial<SyncOptions>): AsyncGenerator<any[]>;
 //# sourceMappingURL=sync.d.ts.map
 //#endregion
-//#region packages/iterables/src/chain/utility.d.ts
+//#region ../iterables/src/chain/utility.d.ts
 declare function isGenFactoryNoInput<Out>(c: any): c is GenFactoryNoInput<Out>;
 /**
  * Resolve the array, data or function to a Generator
@@ -1386,7 +1388,7 @@ declare namespace index_d_exports {
   export { CombineLatestOptions, DelayOptions, dom_d_exports as Dom, index_d_exports$1 as From, Gen, GenFactoryNoInput, GenOrData, GenValueTypeObject, LazyChain, Link, links_d_exports as Links, LinksWithSource, SyncOptions, TickOptions, addToArray, asArray, asCallback$1 as asCallback, asPromise, asValue, combineLatestToArray, combineLatestToObject, isGenFactoryNoInput, lazy, mergeFlat, prepare, resolveToAsyncGen, resolveToGen, run, runN, single, syncToArray };
 }
 //#endregion
-//#region packages/iterables/src/compare-values.d.ts
+//#region ../iterables/src/compare-values.d.ts
 /**
  * Returns the 'max' of some iterable using the provided scoring function.
  * It only yields a value when iterator finishes.
@@ -1432,7 +1434,7 @@ declare const minScore: <V>(iterable: Iterable<V>, scorer: (v: V) => number) => 
 declare const hasEqualValuesShallow: <V>(iterableA: Iterable<V>, iterableB: Iterable<V>, eq?: IsEqual<V>) => boolean;
 //# sourceMappingURL=compare-values.d.ts.map
 //#endregion
-//#region packages/iterables/src/controller.d.ts
+//#region ../iterables/src/controller.d.ts
 type IteratorController = {
   get state(): IteratorControllerState;
   /**
@@ -1472,17 +1474,17 @@ type IteratorController = {
 declare const iteratorController: <T>(options: IteratorControllerOptions<T>) => IteratorController;
 //# sourceMappingURL=controller.d.ts.map
 //#endregion
-//#region packages/iterables/src/from-event.d.ts
+//#region ../iterables/src/from-event.d.ts
 declare const fromEvent: <V>(eventSource: WithEvents, eventType: string) => AsyncIterator<any>;
 //# sourceMappingURL=from-event.d.ts.map
 //#endregion
-//#region packages/iterables/src/guard.d.ts
+//#region ../iterables/src/guard.d.ts
 declare const isAsyncIterable: (v: any) => v is AsyncIterable<any>;
 declare const isIterable: (v: any) => v is Iterable<any>;
 //# sourceMappingURL=guard.d.ts.map
 
 //#endregion
-//#region packages/iterables/src/numbers-compute.d.ts
+//#region ../iterables/src/numbers-compute.d.ts
 /**
  * Returns the min, max, avg and total of the array or iterable.
  * Any values that are invalid are silently skipped over.
@@ -1513,7 +1515,7 @@ declare const numbersCompute: (data: readonly number[] | number[] | Iterable<num
 declare function computeAverage(data: Iterable<number>, options?: NumbersComputeOptions): number;
 //# sourceMappingURL=numbers-compute.d.ts.map
 //#endregion
-//#region packages/iterables/src/index.d.ts
+//#region ../iterables/src/index.d.ts
 declare function min<V>(it: AsyncIterable<V>, gt?: (a: V, b: V) => boolean): AsyncGenerator<V>;
 declare function min<V>(it: Iterable<V>, gt?: (a: V, b: V) => boolean): Generator<V>;
 declare function max<V>(it: AsyncIterable<V>, gt?: (a: V, b: V) => boolean): AsyncGenerator<V>;

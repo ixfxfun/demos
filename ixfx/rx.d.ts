@@ -1,10 +1,13 @@
-import { Interval, IsEqual, IsEqualContext, Pathed, Primitive, RankFunction, RankOptions, RecursivePartial } from "@ixfx/core";
-import { InterpolateOptions } from "@ixfx/modulation";
-import { Processors } from "@ixfx/process";
-import { IQueueMutableWithEvents } from "@ixfx/collections/queue";
-import { ChangeRecord } from "@ixfx/core/records";
+import { ChangeRecord, PathDataChange } from "./pathed-DGKJECMt.js";
+import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
+import { IsEqual, IsEqualContext } from "./is-equal-aUE7iVHd.js";
+import { Interval, Primitive, RankFunction, RankOptions } from "./types-BEAJ_GOH.js";
+import "./types-CePLSdIj.js";
+import "./simple-event-emitter-Dy8H-OK9.js";
+import { BasicInterpolateOptions } from "./interpolate-DM7lLXIU.js";
+import { IQueueMutableWithEvents } from "./iqueue-mutable-DvKBPw5h.js";
 
-//#region packages/rx/src/ops/types.d.ts
+//#region ../rx/src/ops/types.d.ts
 type SyncOptions = {
   /**
    * How to handle when a source completes.
@@ -133,7 +136,7 @@ type OpMathOptions = Partial<InitStreamOptions> & {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/rx/src/from/types.d.ts
+//#region ../rx/src/from/types.d.ts
 type TriggerValue<TTriggerValue> = {
   value: TTriggerValue;
 };
@@ -422,7 +425,7 @@ type DerivedOptions<TResult, T> = {
 } & CombineLatestOptions & UpstreamOptions<T>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/rx/src/sinks/dom.d.ts
+//#region ../rx/src/sinks/dom.d.ts
 type SetHtmlOptionsQuery = {
   query: string;
 };
@@ -448,7 +451,21 @@ type SetHtmlOptions = (SetHtmlOptionsQuery | SetHtmlOptionsElement) & {
 declare const setHtmlText: (rxOrSource: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement) => Unsubscriber;
 //# sourceMappingURL=dom.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/math.d.ts
+//#region ../process/dist/src/types.d.ts
+type Process<TIn, TOut> = (value: TIn) => TOut;
+type Processors1<T1, T2> = [Process<T1, T2>];
+type Processors2<T1, T2, T3> = [Process<T1, T2>, Process<T2, T3>];
+type Processors3<T1, T2, T3, T4> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>];
+type Processors4<T1, T2, T3, T4, T5> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>];
+type Processors5<T1, T2, T3, T4, T5, T6> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6>];
+type Processors<T1, T2, T3, T4, T5, T6> = Processors1<T1, T2> | Processors2<T1, T2, T3> | Processors3<T1, T2, T3, T4> | Processors4<T1, T2, T3, T4, T5> | Processors5<T1, T2, T3, T4, T5, T6>;
+/**
+ * A rank function that compares A and B.
+ * Returns the highest value, 'a' or 'b'.
+ * Returns 'eq' if values are equal
+ */
+//#endregion
+//#region ../rx/src/ops/math.d.ts
 declare function max(input: ReactiveOrSource<any>, options: OpMathOptions): Reactive<number>;
 declare function max(input: ReactiveOrSource<any>, options: OpAsAnnotation & OpMathOptions): Reactive<{
   value: number;
@@ -484,7 +501,7 @@ declare function rank<TIn>(input: ReactiveOrSource<any>, rank: RankFunction<TIn>
 }>;
 //# sourceMappingURL=math.d.ts.map
 //#endregion
-//#region packages/rx/src/types.d.ts
+//#region ../rx/src/types.d.ts
 type CombineLatestOptions = {
   /**
    * If _true_, disposes all the merged sources when the merged reactive closes.
@@ -861,7 +878,7 @@ type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * Use the returned function to unsubscribe.
    * @param changes
    */
-  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
+  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
   /**
    * Updates the reactive with some partial key-value pairs.
    * Keys omitted are left the same as the current value.
@@ -961,7 +978,7 @@ type RxValueTypeRx<T extends Record<string, ReactiveOrSource<any>>> = { [K in ke
 type PrimitiveValueTypeObject<T extends Record<string, Primitive>> = { [K in keyof T]: T[K] extends number ? number | undefined : T[K] extends string ? string | undefined : T[K] extends boolean ? boolean | undefined : T[K] extends bigint ? bigint | undefined : never };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/annotate.d.ts
+//#region ../rx/src/ops/annotate.d.ts
 /**
  * Annotates values from `source`. Output values will be
  * in the form `{ value: TIn, annotation: TAnnotation }`.
@@ -1018,7 +1035,7 @@ declare function annotateWithOp<In, TAnnotation>(input: ReactiveOrSource<In>, an
 }>;
 //# sourceMappingURL=annotate.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/chunk.d.ts
+//#region ../rx/src/ops/chunk.d.ts
 /**
  * Queue from `source`, emitting when thresholds are reached.
  * The resulting Reactive produces arrays.
@@ -1040,7 +1057,7 @@ declare function annotateWithOp<In, TAnnotation>(input: ReactiveOrSource<In>, an
 declare function chunk<V>(source: ReactiveOrSource<V>, options?: Partial<ChunkOptions>): Reactive<V[]>;
 //# sourceMappingURL=chunk.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/clone-from-fields.d.ts
+//#region ../rx/src/ops/clone-from-fields.d.ts
 /**
  * Create a new object from input, based on cloning fields rather than a destructured copy.
  * This is useful for event args.
@@ -1051,7 +1068,7 @@ declare const cloneFromFields: <In>(source: ReactiveOrSource<In>) => Reactive<In
 //# sourceMappingURL=clone-from-fields.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/combine-latest-to-array.d.ts
+//#region ../rx/src/ops/combine-latest-to-array.d.ts
 /**
  * Monitors input reactive values, storing values as they happen to an array.
  * Whenever a new value is emitted, the whole array is sent out, containing current
@@ -1087,7 +1104,7 @@ declare const cloneFromFields: <In>(source: ReactiveOrSource<In>) => Reactive<In
 declare function combineLatestToArray<const T extends readonly ReactiveOrSource<any>[]>(reactiveSources: T, options?: Partial<CombineLatestOptions>): Reactive<RxValueTypes<T>>;
 //# sourceMappingURL=combine-latest-to-array.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/combine-latest-to-object.d.ts
+//#region ../rx/src/ops/combine-latest-to-object.d.ts
 type CombineLatestToObject<T extends Record<string, ReactiveOrSource<any>>> = {
   hasSource: (field: string) => boolean;
   replaceSource: (field: Extract<keyof T, string>, source: ReactiveOrSource<any>) => void;
@@ -1134,7 +1151,7 @@ type CombineLatestToObject<T extends Record<string, ReactiveOrSource<any>>> = {
 declare function combineLatestToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options?: Partial<CombineLatestOptions>): CombineLatestToObject<T>;
 //# sourceMappingURL=combine-latest-to-object.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/compute-with-previous.d.ts
+//#region ../rx/src/ops/compute-with-previous.d.ts
 /**
  * When there is a value from `input`, or the reactive is pinged,
  * this reactive emits the result of `fn`.
@@ -1149,12 +1166,12 @@ declare function combineLatestToObject<const T extends Record<string, ReactiveOr
 declare function computeWithPrevious<TIn>(input: ReactiveOrSource<TIn>, fn: (previous: TIn, current: TIn) => TIn): ReactivePingable<TIn>;
 //# sourceMappingURL=compute-with-previous.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/debounce.d.ts
+//#region ../rx/src/ops/debounce.d.ts
 declare function debounce<V>(options: Partial<DebounceOptions>): ReactiveOp<V, V>;
 //# sourceMappingURL=debounce.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/elapsed.d.ts
+//#region ../rx/src/ops/elapsed.d.ts
 /**
  * Emits time in milliseconds since last message.
  * If it is the first value, 0 is used.
@@ -1165,7 +1182,7 @@ declare const elapsed: <In>(input: ReactiveOrSource<In>) => Reactive<number>;
 //# sourceMappingURL=elapsed.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/field.d.ts
+//#region ../rx/src/ops/field.d.ts
 /**
  * From a source value, yields a field from it. Only works
  * if stream values are objects.
@@ -1177,7 +1194,7 @@ declare const elapsed: <In>(input: ReactiveOrSource<In>) => Reactive<number>;
 declare function field<TIn extends object, TFieldType>(fieldSource: ReactiveOrSource<TIn>, fieldName: keyof TIn, options?: Partial<FieldOptions<TIn, TFieldType>>): Reactive<TFieldType>;
 //# sourceMappingURL=field.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/filter.d.ts
+//#region ../rx/src/ops/filter.d.ts
 /**
  * Passes all values where `predicate` function returns _true_.
  */
@@ -1187,8 +1204,98 @@ declare function filter<In>(input: ReactiveOrSource<In>, predicate: FilterPredic
  */
 declare function drop<In>(input: ReactiveOrSource<In>, predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): Reactive<In>;
 //# sourceMappingURL=filter.d.ts.map
+declare namespace easings_named_d_exports {
+  export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };
+}
+declare const bounceOut: (x: number) => number;
+declare const quintIn: (x: number) => number;
+declare const quintOut: (x: number) => number;
+declare const arch: (x: number) => number;
+declare const smoothstep: (x: number) => number;
+declare const smootherstep: (x: number) => number;
+declare const sineIn: (x: number) => number;
+declare const sineOut: (x: number) => number;
+declare const quadIn: (x: number) => number;
+declare const quadOut: (x: number) => number;
+declare const sineInOut: (x: number) => number;
+declare const quadInOut: (x: number) => number;
+declare const cubicIn: (x: number) => number;
+declare const cubicOut: (x: number) => number;
+declare const quartIn: (x: number) => number;
+declare const quartOut: (x: number) => number;
+declare const expoIn: (x: number) => number;
+declare const expoOut: (x: number) => number;
+declare const quintInOut: (x: number) => number;
+declare const expoInOut: (x: number) => number;
+declare const circIn: (x: number) => number;
+declare const circOut: (x: number) => number;
+declare const backIn: (x: number) => number;
+declare const backOut: (x: number) => number;
+declare const circInOut: (x: number) => number;
+declare const backInOut: (x: number) => number;
+declare const elasticIn: (x: number) => number;
+declare const elasticOut: (x: number) => number;
+declare const bounceIn: (x: number) => number;
+declare const bell: (t: number) => number;
+declare const elasticInOut: (x: number) => number;
+declare const bounceInOut: (x: number) => number;
+//# sourceMappingURL=easings-named.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/interpolate.d.ts
+//#region ../modulation/dist/src/easing/types.d.ts
+/**
+ * Easing name
+ */
+type EasingName = keyof typeof easings_named_d_exports;
+//#endregion
+//#region ../modulation/dist/src/interpolate.d.ts
+/**
+ * Interpolation options.
+ *
+ * Limit: What to do if interpolation amount exceeds 0..1 range
+ * * clamp: lock to A & B (inclusive) Default.
+ * * wrap: wrap from end to start again
+ * * ignore: allow return values outside of A..B range
+ *
+ * Easing: name of easing function for non-linear interpolation
+ *
+ * Transform: name of function to transform `amount` prior to interpolate. This is useful for creating non-linear interpolation results.
+ *
+ * For example:
+ * ```js
+ * // Divide interpolation amount in half
+ * const interpolatorInterval({ mins: 1 }, 10, 100, {
+ *  transform: (amount) => amount * Math.random()
+ * });
+ * ```
+ * In the above example, the results would get more random over time.
+ * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result.
+ *
+ */
+type InterpolateOptions = BasicInterpolateOptions & {
+  easing: EasingName;
+};
+/**
+ * Returns an interpolation function with a fixed interpolation amount. This
+ * function will need the A and B values to interpolate between (ie start and end)
+ *
+ * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
+ *
+ * ```js
+ * import { interpolate } from '@ixfx/numbers.js';
+ *
+ * // Create function
+ * const fn = interpolate(0.1);
+ *
+ * // Later, use to interpolate between a and b
+ * fn(50, 100); // 10% of 50..100 range
+ * ```
+ *
+ * This is useful if you have a fixed interpolation amount, but varying A and B values.
+ * @param amount Interpolation value (0..1 usually)
+ * @param options Options
+ */
+//#endregion
+//#region ../rx/src/ops/interpolate.d.ts
 type OpInterpolateOptions = InterpolateOptions & {
   amount: number;
   /**
@@ -1219,7 +1326,7 @@ declare function interpolate(input: ReactiveOrSource<number>, options?: Partial<
  */
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/pipe.d.ts
+//#region ../rx/src/ops/pipe.d.ts
 /**
  * Pipes the output of one stream into another, in order.
  * The stream returned is a new stream which captures the final output.
@@ -1232,7 +1339,7 @@ declare const pipe: <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>) => R
 //# sourceMappingURL=pipe.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/single-from-array.d.ts
+//#region ../rx/src/ops/single-from-array.d.ts
 /**
  * For a stream that emits arrays of values, this op will select a single value.
  *
@@ -1261,7 +1368,7 @@ declare const pipe: <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>) => R
 declare function singleFromArray<V>(source: ReactiveOrSource<V[]>, options?: Partial<SingleFromArrayOptions<V>>): Reactive<V>;
 //# sourceMappingURL=single-from-array.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/split.d.ts
+//#region ../rx/src/ops/split.d.ts
 /**
  * Creates a set of streams each of which receives data from `source`.
  * By default these are lazy and dispose if the upstream source closes.
@@ -1290,7 +1397,7 @@ declare const splitLabelled: <T, K extends PropertyKey>(rxOrSource: ReactiveOrSo
 //# sourceMappingURL=split.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/switcher.d.ts
+//#region ../rx/src/ops/switcher.d.ts
 /**
  * Switcher generates several output streams, labelled according to the values of `cases`.
  * Values from `source` are fed to the output streams if their associated predicate function returns _true_.
@@ -1333,7 +1440,7 @@ declare const splitLabelled: <T, K extends PropertyKey>(rxOrSource: ReactiveOrSo
 declare const switcher: <TValue, TRec extends Record<string, FilterPredicate<TValue>>, TLabel extends keyof TRec>(reactiveOrSource: ReactiveOrSource<TValue>, cases: TRec, options?: Partial<SwitcherOptions>) => Record<TLabel, Reactive<TValue>>;
 //# sourceMappingURL=switcher.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/sync-to-array.d.ts
+//#region ../rx/src/ops/sync-to-array.d.ts
 /**
  * Waits for all sources to produce a value, sending the combined results as an array.
  * After sending, it waits again for each source to send at least one value.
@@ -1349,12 +1456,12 @@ declare const switcher: <TValue, TRec extends Record<string, FilterPredicate<TVa
 declare function syncToArray<const T extends readonly ReactiveOrSource<any>[]>(reactiveSources: T, options?: Partial<SyncOptions>): Reactive<RxValueTypes<T>>;
 //# sourceMappingURL=sync-to-array.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/sync-to-object.d.ts
+//#region ../rx/src/ops/sync-to-object.d.ts
 declare function syncToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options?: Partial<SyncOptions>): Reactive<RxValueTypeObject<T>>;
 //# sourceMappingURL=sync-to-object.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/tap.d.ts
+//#region ../rx/src/ops/tap.d.ts
 /**
  * 'Taps' the values from 'input', passing them to the 'process' function.
  * Return stream is the input stream, unaffected by what 'process' does.
@@ -1380,7 +1487,7 @@ declare function tapStream<In>(input: ReactiveOrSource<In>, diverged: ReactiveWr
 declare const tapOps: <TIn, TOut>(input: ReactiveOrSource<TIn>, ...ops: ReactiveOp<TIn, TOut>[]) => Reactive<TOut>;
 //# sourceMappingURL=tap.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/throttle.d.ts
+//#region ../rx/src/ops/throttle.d.ts
 /**
  * Only allow a value through if a minimum amount of time has elapsed.
  * since the last value. This effectively slows down a source to a given number
@@ -1404,7 +1511,7 @@ declare function throttle<V>(throttleSource: ReactiveOrSource<V>, options?: Part
 //# sourceMappingURL=throttle.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/timeout-value.d.ts
+//#region ../rx/src/ops/timeout-value.d.ts
 /**
  * Emits a value if `source` does not emit a value after `interval`
  * has elapsed. This can be useful to reset a reactive to some
@@ -1433,7 +1540,7 @@ declare function throttle<V>(throttleSource: ReactiveOrSource<V>, options?: Part
 declare function timeoutValue<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutValueOptions<TTriggerValue>): Reactive<TSource | TTriggerValue>;
 //# sourceMappingURL=timeout-value.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/timeout-ping.d.ts
+//#region ../rx/src/ops/timeout-ping.d.ts
 /**
  * Pings a reactive if no value is emitted at after `interval`.
  * Returns `source`.
@@ -1451,7 +1558,7 @@ declare function timeoutValue<TSource, TTriggerValue>(source: ReactiveOrSource<T
 declare function timeoutPing<TSource>(source: ReactiveOrSource<TSource>, options: TimeoutPingOptions): Reactive<TSource>;
 //# sourceMappingURL=timeout-ping.d.ts.map
 //#endregion
-//#region packages/rx/src/ops/transform.d.ts
+//#region ../rx/src/ops/transform.d.ts
 /**
  * Transforms values from `source` using the `transformer` function.
  * @param transformer
@@ -1461,7 +1568,7 @@ declare function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (v
 //# sourceMappingURL=transform.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/value-to-ping.d.ts
+//#region ../rx/src/ops/value-to-ping.d.ts
 /**
  * Pings `target` whenever `source` emits a value. The value itself is ignored, it just
  * acts as a trigger.
@@ -1476,7 +1583,7 @@ declare function valueToPing<TSource, TTarget>(source: ReactiveOrSource<TSource>
 //# sourceMappingURL=value-to-ping.d.ts.map
 
 //#endregion
-//#region packages/rx/src/ops/with-value.d.ts
+//#region ../rx/src/ops/with-value.d.ts
 /**
  * A reactive where the last value can be read at any time.
  * An initial value must be provided.
@@ -1494,7 +1601,7 @@ declare function valueToPing<TSource, TTarget>(source: ReactiveOrSource<TSource>
 declare function withValue<In>(input: ReactiveOrSource<In>, options: WithValueOptions<In>): ReactiveInitial<In>;
 //# sourceMappingURL=with-value.d.ts.map
 //#endregion
-//#region packages/rx/src/from/array.d.ts
+//#region ../rx/src/from/array.d.ts
 declare const of: <V>(source: V[] | Iterable<V>, options?: Partial<ArrayOptions>) => (Reactive<V> & ReactiveFinite & {
   last(): V;
 }) | undefined;
@@ -1524,7 +1631,7 @@ declare const of: <V>(source: V[] | Iterable<V>, options?: Partial<ArrayOptions>
 declare const array: <V>(sourceArray: V[], options?: Partial<ArrayOptions>) => Reactive<V> & ReactiveFinite & ReactiveInitial<V>;
 //# sourceMappingURL=array.d.ts.map
 //#endregion
-//#region packages/rx/src/from/array-object.d.ts
+//#region ../rx/src/from/array-object.d.ts
 /**
  * Wraps an array object.
  *
@@ -1536,13 +1643,13 @@ declare const array: <V>(sourceArray: V[], options?: Partial<ArrayOptions>) => R
 declare function arrayObject<V>(initialValue?: readonly V[], options?: Partial<ArrayObjectOptions<V>>): ReactiveArray<V> & ReactiveInitial<readonly V[]>;
 //# sourceMappingURL=array-object.d.ts.map
 //#endregion
-//#region packages/rx/src/from/boolean.d.ts
+//#region ../rx/src/from/boolean.d.ts
 declare function boolean(initialValue: boolean): ReactiveWritable<boolean> & ReactiveInitial<boolean>;
 declare function boolean(): ReactiveWritable<boolean> & ReactiveNonInitial<boolean>;
 //# sourceMappingURL=boolean.d.ts.map
 
 //#endregion
-//#region packages/rx/src/from/count.d.ts
+//#region ../rx/src/from/count.d.ts
 /**
  * Produces an incrementing value. By default starts at 0 and counts
  * forever, incrementing every second.
@@ -1583,12 +1690,12 @@ declare function boolean(): ReactiveWritable<boolean> & ReactiveNonInitial<boole
 declare function count(options?: Partial<CountOptions>): ReactiveStream<number>;
 //# sourceMappingURL=count.d.ts.map
 //#endregion
-//#region packages/rx/src/from/derived.d.ts
+//#region ../rx/src/from/derived.d.ts
 declare function derived<TResult, const T extends Record<string, ReactiveOrSource<any>>>(fn: (combined: RxValueTypeObject<T>) => TResult | undefined, reactiveSources: T, options?: Partial<DerivedOptions<TResult, CombineLatestToObject<T>>>): ReactiveNonInitial<TResult>;
 //# sourceMappingURL=derived.d.ts.map
 
 //#endregion
-//#region packages/rx/src/from/event.d.ts
+//#region ../rx/src/from/event.d.ts
 /**
  * Fired when `eventName` fires on `target`.
  *
@@ -1646,7 +1753,7 @@ type TriggerData = {
 declare function eventTrigger(targetOrQuery: EventTarget | null | string, name: string, options?: Partial<EventSourceTriggerOptions>): Reactive<TriggerData>;
 //# sourceMappingURL=event.d.ts.map
 //#endregion
-//#region packages/rx/src/from/function.d.ts
+//#region ../rx/src/from/function.d.ts
 /**
  * Produces a reactive from the basis of a function. `callback` is executed, with its result emitted via the returned reactive.
  *
@@ -1686,7 +1793,7 @@ declare function eventTrigger(targetOrQuery: EventTarget | null | string, name: 
 declare function func<V>(callback: FunctionFunction<V>, options?: Partial<FunctionOptions>): ReactivePingable<V>;
 //# sourceMappingURL=function.d.ts.map
 //#endregion
-//#region packages/rx/src/from/iterator.d.ts
+//#region ../rx/src/from/iterator.d.ts
 /**
  * Creates a Reactive from an AsyncGenerator or Generator
  * @param gen
@@ -1712,7 +1819,7 @@ declare function func<V>(callback: FunctionFunction<V>, options?: Partial<Functi
 declare function iterator<V>(source: IterableIterator<V> | V[] | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V>, options?: Partial<GeneratorOptions>): Reactive<V>;
 //# sourceMappingURL=iterator.d.ts.map
 //#endregion
-//#region packages/rx/src/from/merged.d.ts
+//#region ../rx/src/from/merged.d.ts
 /**
  * Returns a stream that merges the output of a list of homogenous streams.
  * Use {@link mergedWithOptions} to specify additional options.
@@ -1730,17 +1837,17 @@ declare function merged<T>(...sources: Reactive<T>[]): Reactive<T>;
 declare function mergedWithOptions<T>(sources: Reactive<T>[], options?: Partial<InitLazyStreamOptions>): Reactive<T>;
 //# sourceMappingURL=merged.d.ts.map
 //#endregion
-//#region packages/rx/src/from/number.d.ts
+//#region ../rx/src/from/number.d.ts
 declare function number(initialValue: number): ReactiveWritable<number> & ReactiveInitial<number>;
 declare function number(): ReactiveWritable<number> & ReactiveNonInitial<number>;
 //# sourceMappingURL=number.d.ts.map
 //#endregion
-//#region packages/rx/src/from/object.d.ts
+//#region ../rx/src/from/object.d.ts
 declare function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 declare function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
 //# sourceMappingURL=object.d.ts.map
 //#endregion
-//#region packages/rx/src/from/object-proxy.d.ts
+//#region ../rx/src/from/object-proxy.d.ts
 type ReactiveProxied<V> = V & {
   [symbol]: ReactiveDiff<V> & ReactiveInitial<V>;
 };
@@ -1809,7 +1916,7 @@ declare const arrayProxy: <V, T extends V[]>(target: T) => {
 declare const objectProxySymbol: <V extends object>(target: V) => ReactiveProxied<V>;
 //# sourceMappingURL=object-proxy.d.ts.map
 //#endregion
-//#region packages/rx/src/from/observable.d.ts
+//#region ../rx/src/from/observable.d.ts
 /**
  * Creates a RxJs style observable
  * ```js
@@ -1858,7 +1965,7 @@ declare function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>)
 declare function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined): ReactiveWritable<V> & Reactive<V>;
 //# sourceMappingURL=observable.d.ts.map
 //#endregion
-//#region packages/rx/src/from/string.d.ts
+//#region ../rx/src/from/string.d.ts
 declare function string(initialValue: string): ReactiveWritable<string> & ReactiveInitial<string>;
 declare function string(): ReactiveWritable<string> & ReactiveNonInitial<string>;
 //# sourceMappingURL=string.d.ts.map
@@ -1866,7 +1973,7 @@ declare namespace index_d_exports$1 {
   export { ArrayObjectOptions, ArrayOptions, CountOptions, DerivedFunction, DerivedOptions, EventPluckedFieldOptions, EventPluckedFieldOptions2, EventSourceOptions, EventSourceTriggerOptions, FunctionFunction, FunctionOptions, GeneratorOptions, ObjectOptions, PingedFunctionFunction, PingedFunctionOptions, ReactiveProxied, TimeoutPingOptions, TimeoutValueOptions, Trigger, TriggerData, TriggerFunction, TriggerGenerator, TriggerValue, ValueToPingOptions, array, arrayObject, arrayProxy, boolean, count, derived, event, eventField, eventTrigger, func, iterator, merged, mergedWithOptions, number, object, objectProxy, objectProxySymbol, observable, observableWritable, of, string };
 }
 //#endregion
-//#region packages/rx/src/collections/responsive-queue.d.ts
+//#region ../rx/src/collections/responsive-queue.d.ts
 /**
  * Changes to `queue` are output as a responsive stream.
  * The stream emits the full data of the queue (first item being the head of the queue)
@@ -1899,7 +2006,7 @@ declare namespace index_d_exports {
   export { asResponsive };
 }
 //#endregion
-//#region packages/rx/src/graph.d.ts
+//#region ../rx/src/graph.d.ts
 /**
  * Build a graph of reactive dependencies for `rx`
  * @param _rx
@@ -1908,7 +2015,7 @@ declare function prepare<V extends Record<string, any>>(_rx: V): Reactive<V>;
 //# sourceMappingURL=graph.d.ts.map
 
 //#endregion
-//#region packages/rx/src/to-array.d.ts
+//#region ../rx/src/to-array.d.ts
 /**
  * Reads a set number of values from `source`, returning as an array. May contain
  * empty values if desired values is not reached.
@@ -1954,7 +2061,7 @@ declare function toArrayOrThrow<V>(source: ReactiveOrSource<V>, options?: Partia
 //# sourceMappingURL=to-array.d.ts.map
 
 //#endregion
-//#region packages/rx/src/to-generator.d.ts
+//#region ../rx/src/to-generator.d.ts
 /**
  * Returns an AsyncGenerator wrapper around Reactive.
  * This allows values to be iterated over using a `for await` loop,
@@ -2006,7 +2113,7 @@ declare function toArrayOrThrow<V>(source: ReactiveOrSource<V>, options?: Partia
 declare function toGenerator<V>(source: ReactiveOrSource<V>): AsyncGenerator<V>;
 //# sourceMappingURL=to-generator.d.ts.map
 //#endregion
-//#region packages/rx/src/util.d.ts
+//#region ../rx/src/util.d.ts
 declare function messageIsSignal<V>(message: Passed<V> | PassedSignal): message is PassedSignal;
 declare function messageIsDoneSignal<V>(message: Passed<V> | PassedSignal): boolean;
 /**
@@ -2058,7 +2165,7 @@ type ResolveTriggerDone = [undefined, true];
 declare function resolveTriggerValue<V>(t: Trigger<V>): ResolveTriggerDone | ResolveTriggerValue<V>;
 //# sourceMappingURL=util.d.ts.map
 //#endregion
-//#region packages/rx/src/wrap.d.ts
+//#region ../rx/src/wrap.d.ts
 /**
  * Wrap a reactive source to allow for chained
  * function calls.
@@ -2081,7 +2188,7 @@ declare function resolveTriggerValue<V>(t: Trigger<V>): ResolveTriggerDone | Res
 declare function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn>;
 //# sourceMappingURL=wrap.d.ts.map
 //#endregion
-//#region packages/rx/src/resolve-source.d.ts
+//#region ../rx/src/resolve-source.d.ts
 type ResolveSourceOptions = {
   /**
    * Options when creating a reactive from a generator
@@ -2105,7 +2212,7 @@ type ResolveSourceOptions = {
 declare const resolveSource: <V>(source: ReactiveOrSource<V>, options?: Partial<ResolveSourceOptions>) => Reactive<V>;
 //# sourceMappingURL=resolve-source.d.ts.map
 //#endregion
-//#region packages/rx/src/cache.d.ts
+//#region ../rx/src/cache.d.ts
 /**
  * A stream that caches its last value
  */
@@ -2135,7 +2242,7 @@ type CacheStreamInitial<T> = CacheStream<T> & {
 declare function cache<TValue, RT extends Reactive<TValue>>(r: RT, initialValue: TValue): CacheStreamInitial<TValue> & RT;
 //# sourceMappingURL=cache.d.ts.map
 //#endregion
-//#region packages/rx/src/init-stream.d.ts
+//#region ../rx/src/init-stream.d.ts
 /**
  * Initialise a stream based on an upstream source.
  * Calls initLazyStream under the hood.
@@ -2181,7 +2288,7 @@ declare function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStre
 declare function initStream<V>(options?: Partial<InitStreamOptions>): ReactiveStream<V>;
 //# sourceMappingURL=init-stream.d.ts.map
 //#endregion
-//#region packages/rx/src/index.d.ts
+//#region ../rx/src/index.d.ts
 declare function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: ReactiveOp<any, any>[]): Reactive<any>;
 declare function writable<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: ReactiveOp<any, any>[]): ReactiveWritable<TIn, TOut>;
 /**

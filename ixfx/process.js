@@ -1,4 +1,4 @@
-//#region packages/process/src/basic.ts
+//#region ../process/src/basic.ts
 /**
 * Outputs the current largest-seen value
 * @returns 
@@ -109,7 +109,7 @@ function rank(r, options = {}) {
 }
 
 //#endregion
-//#region packages/process/src/cancel-error.ts
+//#region ../process/src/cancel-error.ts
 var CancelError = class extends Error {
 	constructor(message) {
 		super(message);
@@ -118,7 +118,7 @@ var CancelError = class extends Error {
 };
 
 //#endregion
-//#region packages/process/src/flow.ts
+//#region ../process/src/flow.ts
 /**
 * Creates a flow of data processors (up to 5 are supported).
 * The flow is encapsulated in a function that accepts an input value an returns an output.
@@ -149,7 +149,7 @@ function flow(...processors) {
 }
 
 //#endregion
-//#region packages/process/src/if-undefined.ts
+//#region ../process/src/if-undefined.ts
 /**
 * Calls a function if the input value is not undefined.
 * Return value from function is passed to next function in flow.
@@ -215,7 +215,7 @@ function ifUndefined(fn) {
 }
 
 //#endregion
-//#region packages/process/src/util.ts
+//#region ../process/src/util.ts
 /**
 * Default comparer function is equiv to checking `a === b`.
 * Use {@link isEqualValueDefault} to compare by value, via comparing JSON string representation.
@@ -227,7 +227,7 @@ const isEqualDefault = (a, b) => a === b;
 const toStringDefault = (itemToMakeStringFor) => typeof itemToMakeStringFor === `string` ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor);
 
 //#endregion
-//#region packages/process/src/seen.ts
+//#region ../process/src/seen.ts
 /**
 * If a value is same as the previous value, _undefined_ is emitted instead.
 * 

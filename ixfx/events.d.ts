@@ -1,4 +1,4 @@
-//#region packages/events/src/types.d.ts
+//#region ../events/src/types.d.ts
 type Listener<Events> = (event: unknown, sender: ISimpleEventEmitter<Events>) => void;
 type ISimpleEventEmitter<Events> = {
   addEventListener<K extends keyof Events>(type: K, listener: (event: Events[K], sender: ISimpleEventEmitter<Events>) => void): void;
@@ -6,7 +6,7 @@ type ISimpleEventEmitter<Events> = {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/events/src/simple-event-emitter.d.ts
+//#region ../events/src/simple-event-emitter.d.ts
 declare class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   #private;
   dispose(): void;

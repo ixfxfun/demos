@@ -1,6 +1,7 @@
-import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow, throwIfFailed } from "./src-Bo4oKRxs.js";
+import { integerTest, numberTest, resultThrow, throwIfFailed } from "./numbers-C359_5A6.js";
+import { arrayIndexTest, arrayTest } from "./arrays-yH_qBmt0.js";
 
-//#region packages/arrays/src/cycle.ts
+//#region ../arrays/src/cycle.ts
 /**
 * Returns a function that cycles through the contents of an array. By default starts at index 0.
 * 
@@ -69,7 +70,7 @@ const cycle = (options) => {
 };
 
 //#endregion
-//#region packages/arrays/src/at-wrap.ts
+//#region ../arrays/src/at-wrap.ts
 /**
 * Similar to Javascript's in-built Array.at function, but allows offsets
 * to wrap.
@@ -100,7 +101,7 @@ const atWrap = (array, index) => {
 };
 
 //#endregion
-//#region packages/arrays/src/chunks.ts
+//#region ../arrays/src/chunks.ts
 function chunks(array, size) {
 	throwIfFailed(integerTest(size, "aboveZero", `size`), arrayTest(array, `array`));
 	const output = [];
@@ -109,14 +110,14 @@ function chunks(array, size) {
 }
 
 //#endregion
-//#region packages/arrays/src/util/to-string.ts
+//#region ../arrays/src/util/to-string.ts
 /**
 * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
 */
 const toStringDefault = (itemToMakeStringFor) => typeof itemToMakeStringFor === `string` ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor);
 
 //#endregion
-//#region packages/arrays/src/util/is-equal.ts
+//#region ../arrays/src/util/is-equal.ts
 /**
 * If input is a string, it is returned.
 * Otherwise, it returns the result of JSON.stringify() with fields ordered.
@@ -154,7 +155,7 @@ const isEqualValueDefault = (a, b) => {
 };
 
 //#endregion
-//#region packages/arrays/src/contains.ts
+//#region ../arrays/src/contains.ts
 /**
 * Returns _true_ if all value in `needles` is contained in `haystack`.
 * 
@@ -232,7 +233,7 @@ const containsDuplicateInstances = (array) => {
 };
 
 //#endregion
-//#region packages/arrays/src/ensure-length.ts
+//#region ../arrays/src/ensure-length.ts
 /**
 * Returns a copy of an array with specified length - padded or truncated as needed.
 *
@@ -288,7 +289,7 @@ function ensureLength(data, length, expand = `undefined`) {
 }
 
 //#endregion
-//#region packages/arrays/src/equality.ts
+//#region ../arrays/src/equality.ts
 /**
 * Returns _true_ if the two arrays have the same items at same indexes. 
 * 
@@ -356,7 +357,7 @@ const containsIdenticalValues = (array, equality) => {
 };
 
 //#endregion
-//#region packages/arrays/src/filter.ts
+//#region ../arrays/src/filter.ts
 /**
 * Returns two separate arrays of everything that `filter` returns _true_,
 * and everything it returns _false_ on. 
@@ -406,7 +407,7 @@ function* filterBetween(array, predicate, startIndex, endIndex) {
 }
 
 //#endregion
-//#region packages/arrays/src/flatten.ts
+//#region ../arrays/src/flatten.ts
 /**
 * Returns a 'flattened' copy of array, un-nesting arrays one level
 * ```js
@@ -419,7 +420,7 @@ function* filterBetween(array, predicate, startIndex, endIndex) {
 const flatten = (array) => [...array].flat();
 
 //#endregion
-//#region packages/arrays/src/frequency.ts
+//#region ../arrays/src/frequency.ts
 /**
 * Computes the frequency of values by a grouping function.
 * 
@@ -452,7 +453,7 @@ const frequencyByGroup = (groupBy$1, data) => {
 };
 
 //#endregion
-//#region packages/arrays/src/group-by.ts
+//#region ../arrays/src/group-by.ts
 /**
 * Groups data by a function `grouper`, returning data as a map with string
 * keys and array values. Multiple values can be assigned to the same group.
@@ -501,7 +502,7 @@ const groupBy = (array, grouper) => {
 };
 
 //#endregion
-//#region packages/arrays/src/unique.ts
+//#region ../arrays/src/unique.ts
 /**
 * Combines the values of one or more arrays, removing duplicates.
 * ```js
@@ -575,7 +576,7 @@ const unique = (arrays, toString = toStringDefault) => {
 };
 
 //#endregion
-//#region packages/arrays/src/insert-at.ts
+//#region ../arrays/src/insert-at.ts
 /**
 * Inserts `values` at position `index`, shuffling remaining
 * items further down and returning changed result.
@@ -607,7 +608,7 @@ const insertAt = (data, index, ...values) => {
 };
 
 //#endregion
-//#region packages/arrays/src/interleave.ts
+//#region ../arrays/src/interleave.ts
 /**
 * Returns an interleaving of two or more arrays. All arrays must be the same length.
 *
@@ -632,7 +633,7 @@ const interleave = (...arrays) => {
 };
 
 //#endregion
-//#region packages/arrays/src/intersection.ts
+//#region ../arrays/src/intersection.ts
 /**
 * Returns the _intersection_ of two arrays: the elements that are in common.
 * 
@@ -650,7 +651,7 @@ const interleave = (...arrays) => {
 const intersection = (arrayA, arrayB, equality = isEqualDefault) => arrayA.filter((valueFromA) => arrayB.some((valueFromB) => equality(valueFromA, valueFromB)));
 
 //#endregion
-//#region packages/arrays/src/merge-by-key.ts
+//#region ../arrays/src/merge-by-key.ts
 /**
 * Merges arrays left to right, using the provided
 * `reconcile` function to choose a winner when keys overlap.
@@ -705,7 +706,7 @@ const mergeByKey = (keyFunction, reconcile, ...arrays) => {
 };
 
 //#endregion
-//#region packages/arrays/src/pairwise.ts
+//#region ../arrays/src/pairwise.ts
 /**
 * Yields pairs made up of overlapping items from the input array.
 * 
@@ -755,7 +756,7 @@ const pairwiseReduce = (array, reducer, initial) => {
 };
 
 //#endregion
-//#region packages/arrays/src/random.ts
+//#region ../arrays/src/random.ts
 /**
 * Returns a shuffled copy of the input array.
 * @example
@@ -824,7 +825,7 @@ const randomElement = (array, rand = Math.random) => {
 const randomIndex = (array, rand = Math.random) => Math.floor(rand() * array.length);
 
 //#endregion
-//#region packages/arrays/src/remove.ts
+//#region ../arrays/src/remove.ts
 /**
 * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
 *
@@ -852,7 +853,7 @@ const remove = (data, index) => {
 };
 
 //#endregion
-//#region packages/arrays/src/sample.ts
+//#region ../arrays/src/sample.ts
 /**
 * Samples values from an array. 
 * 
@@ -894,7 +895,7 @@ const sample = (array, amount) => {
 };
 
 //#endregion
-//#region packages/arrays/src/sort.ts
+//#region ../arrays/src/sort.ts
 /**
 * Sorts an array of objects in ascending order
 * by the given property name, assuming it is a number.
@@ -957,7 +958,7 @@ const sortByProperty = (data, propertyName, comparer) => [...data].sort((a, b) =
 });
 
 //#endregion
-//#region packages/arrays/src/until.ts
+//#region ../arrays/src/until.ts
 /**
 * Yields all items in the input array for as long as `predicate` returns true.
 *
@@ -997,7 +998,7 @@ function* until(data, predicate, initial) {
 }
 
 //#endregion
-//#region packages/arrays/src/without.ts
+//#region ../arrays/src/without.ts
 /**
 * Returns a copy of an input array with _undefined_ values removed.
 * @param data 
@@ -1056,7 +1057,7 @@ const without = (sourceArray, toRemove, comparer = isEqualDefault) => {
 };
 
 //#endregion
-//#region packages/arrays/src/zip.ts
+//#region ../arrays/src/zip.ts
 /**
 * Zip combines the elements of two or more arrays based on their index.
 *

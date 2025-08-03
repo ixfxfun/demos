@@ -1,4 +1,4 @@
-//#region packages/arrays/src/cycle.d.ts
+//#region ../arrays/src/cycle.d.ts
 /**
  * Returns a function that cycles through the contents of an array. By default starts at index 0.
  *
@@ -38,7 +38,7 @@ declare const cycle: <T>(options: readonly T[] | T[]) => {
 };
 //# sourceMappingURL=cycle.d.ts.map
 //#endregion
-//#region packages/arrays/src/at-wrap.d.ts
+//#region ../arrays/src/at-wrap.d.ts
 /**
  * Similar to Javascript's in-built Array.at function, but allows offsets
  * to wrap.
@@ -64,7 +64,7 @@ declare const cycle: <T>(options: readonly T[] | T[]) => {
 declare const atWrap: <V>(array: V[], index: number) => V;
 //# sourceMappingURL=at-wrap.d.ts.map
 //#endregion
-//#region packages/arrays/src/chunks.d.ts
+//#region ../arrays/src/chunks.d.ts
 /**
  * Return `array` broken up into chunks of `size` values
  *
@@ -80,7 +80,7 @@ declare function chunks<V>(array: readonly V[], size: number): V[][];
 //# sourceMappingURL=chunks.d.ts.map
 
 //#endregion
-//#region packages/arrays/src/contains.d.ts
+//#region ../arrays/src/contains.d.ts
 /**
  * Returns _true_ if all value in `needles` is contained in `haystack`.
  *
@@ -130,12 +130,12 @@ declare const containsDuplicateValues: <V>(data: Iterable<V>, keyFunction?: (ite
 declare const containsDuplicateInstances: <V>(array: V[] | readonly V[]) => boolean;
 //# sourceMappingURL=contains.d.ts.map
 //#endregion
-//#region packages/arrays/src/ensure-length.d.ts
+//#region ../arrays/src/ensure-length.d.ts
 declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand: `repeat` | `first` | `last`): (V)[];
 declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand?: `undefined`): (V | undefined)[];
 //# sourceMappingURL=ensure-length.d.ts.map
 //#endregion
-//#region packages/arrays/src/util/is-equal.d.ts
+//#region ../arrays/src/util/is-equal.d.ts
 /**
  * Function that returns true if `a` and `b` are considered equal
  */
@@ -154,7 +154,7 @@ type IsEqual<T> = (a: T, b: T) => boolean;
  */
 
 //#endregion
-//#region packages/arrays/src/equality.d.ts
+//#region ../arrays/src/equality.d.ts
 /**
  * Returns _true_ if the two arrays have the same items at same indexes.
  *
@@ -209,7 +209,7 @@ declare const isEqual: <V>(arrayA: V[], arrayB: V[], equality?: (a: V, b: V) => 
 declare const containsIdenticalValues: <V>(array: readonly V[] | V[], equality?: IsEqual<V>) => boolean;
 //# sourceMappingURL=equality.d.ts.map
 //#endregion
-//#region packages/arrays/src/filter.d.ts
+//#region ../arrays/src/filter.d.ts
 /**
  * Returns two separate arrays of everything that `filter` returns _true_,
  * and everything it returns _false_ on.
@@ -246,7 +246,7 @@ declare const filterAB: <V>(data: readonly V[], filter: (a: V) => boolean) => [a
 declare function filterBetween<V>(array: readonly V[] | V[], predicate: (value: V, index: number, array: readonly V[] | V[]) => boolean, startIndex?: number, endIndex?: number): Generator<V>;
 //# sourceMappingURL=filter.d.ts.map
 //#endregion
-//#region packages/arrays/src/flatten.d.ts
+//#region ../arrays/src/flatten.d.ts
 /**
  * Returns a 'flattened' copy of array, un-nesting arrays one level
  * ```js
@@ -260,7 +260,7 @@ declare const flatten: (array: ReadonlyArray<any> | Array<any>) => Array<any>;
 //# sourceMappingURL=flatten.d.ts.map
 
 //#endregion
-//#region packages/arrays/src/frequency.d.ts
+//#region ../arrays/src/frequency.d.ts
 /**
  * Computes the frequency of values by a grouping function.
  *
@@ -282,7 +282,7 @@ declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy
 //# sourceMappingURL=frequency.d.ts.map
 
 //#endregion
-//#region packages/arrays/src/group-by.d.ts
+//#region ../arrays/src/group-by.d.ts
 /**
  * Groups data by a function `grouper`, returning data as a map with string
  * keys and array values. Multiple values can be assigned to the same group.
@@ -319,7 +319,7 @@ declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy
 declare const groupBy: <K, V>(array: Iterable<V>, grouper: (item: V) => K) => Map<K, V[]>;
 //# sourceMappingURL=group-by.d.ts.map
 //#endregion
-//#region packages/arrays/src/unique.d.ts
+//#region ../arrays/src/unique.d.ts
 /**
  * Combines the values of one or more arrays, removing duplicates.
  * ```js
@@ -373,7 +373,7 @@ declare const uniqueDeep: <V>(arrays: V[][] | V[] | readonly V[] | readonly (rea
 declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], toString?: <V_1>(itemToMakeStringFor: V_1) => string) => V[];
 //# sourceMappingURL=unique.d.ts.map
 //#endregion
-//#region packages/arrays/src/insert-at.d.ts
+//#region ../arrays/src/insert-at.d.ts
 /**
  * Inserts `values` at position `index`, shuffling remaining
  * items further down and returning changed result.
@@ -396,7 +396,7 @@ declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonl
 declare const insertAt: <V>(data: readonly V[] | V[], index: number, ...values: V[]) => V[];
 //# sourceMappingURL=insert-at.d.ts.map
 //#endregion
-//#region packages/arrays/src/interleave.d.ts
+//#region ../arrays/src/interleave.d.ts
 /**
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  *
@@ -413,7 +413,7 @@ declare const insertAt: <V>(data: readonly V[] | V[], index: number, ...values: 
 declare const interleave: <V>(...arrays: readonly (readonly V[])[] | V[][]) => V[];
 //# sourceMappingURL=interleave.d.ts.map
 //#endregion
-//#region packages/arrays/src/intersection.d.ts
+//#region ../arrays/src/intersection.d.ts
 /**
  * Returns the _intersection_ of two arrays: the elements that are in common.
  *
@@ -431,7 +431,7 @@ declare const interleave: <V>(...arrays: readonly (readonly V[])[] | V[][]) => V
 declare const intersection: <V>(arrayA: readonly V[] | V[], arrayB: readonly V[] | V[], equality?: IsEqual<V>) => V[];
 //# sourceMappingURL=intersection.d.ts.map
 //#endregion
-//#region packages/arrays/src/types.d.ts
+//#region ../arrays/src/types.d.ts
 /**
  * Returns a result of a merged into b.
  * B is always the 'newer' data that takes
@@ -439,7 +439,7 @@ declare const intersection: <V>(arrayA: readonly V[] | V[], arrayB: readonly V[]
  */
 type MergeReconcile<V> = (a: V, b: V) => V;
 //#endregion
-//#region packages/arrays/src/merge-by-key.d.ts
+//#region ../arrays/src/merge-by-key.d.ts
 /**
  * Merges arrays left to right, using the provided
  * `reconcile` function to choose a winner when keys overlap.
@@ -484,7 +484,7 @@ type MergeReconcile<V> = (a: V, b: V) => V;
 declare const mergeByKey: <V>(keyFunction: (value: V) => string, reconcile: MergeReconcile<V>, ...arrays: readonly (readonly V[])[]) => V[];
 //# sourceMappingURL=merge-by-key.d.ts.map
 //#endregion
-//#region packages/arrays/src/pairwise.d.ts
+//#region ../arrays/src/pairwise.d.ts
 /**
  * Yields pairs made up of overlapping items from the input array.
  *
@@ -525,7 +525,7 @@ declare function pairwise<T>(values: T[]): Generator<T[], void, unknown>;
 declare const pairwiseReduce: <V, X>(array: readonly V[], reducer: (accumulator: X, a: V, b: V) => X, initial: X) => X;
 //# sourceMappingURL=pairwise.d.ts.map
 //#endregion
-//#region packages/arrays/src/random.d.ts
+//#region ../arrays/src/random.d.ts
 /**
  * Returns a shuffled copy of the input array.
  * @example
@@ -583,7 +583,7 @@ declare const randomElement: <V>(array: ArrayLike<V>, rand?: () => number) => V;
 declare const randomIndex: <V>(array: ArrayLike<V>, rand?: () => number) => number;
 //# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region packages/arrays/src/remove.d.ts
+//#region ../arrays/src/remove.d.ts
 /**
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  *
@@ -608,7 +608,7 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
 //# sourceMappingURL=remove.d.ts.map
 
 //#endregion
-//#region packages/arrays/src/sample.d.ts
+//#region ../arrays/src/sample.d.ts
 /**
  * Samples values from an array.
  *
@@ -638,7 +638,7 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
 declare const sample: <V>(array: ArrayLike<V>, amount: number) => V[];
 //# sourceMappingURL=sample.d.ts.map
 //#endregion
-//#region packages/arrays/src/sort.d.ts
+//#region ../arrays/src/sort.d.ts
 /**
  * Sorts an array of objects in ascending order
  * by the given property name, assuming it is a number.
@@ -685,7 +685,7 @@ declare const sortByNumericProperty: <V, K extends keyof V>(data: readonly V[] |
 declare const sortByProperty: <V, K extends keyof V>(data: readonly V[] | V[], propertyName: K, comparer?: (a: any, b: any) => number) => V[];
 //# sourceMappingURL=sort.d.ts.map
 //#endregion
-//#region packages/arrays/src/until.d.ts
+//#region ../arrays/src/until.d.ts
 /**
  * Yields all items in the input array, stopping when `predicate` returns _true_.
  *
@@ -711,7 +711,7 @@ declare function until<V>(data: readonly V[] | V[], predicate: (v: V) => boolean
 declare function until<V, A>(data: readonly V[] | V[], predicate: (v: V, accumulator: A) => readonly [stop: boolean, acc: A], initial: A): Generator<V>;
 //# sourceMappingURL=until.d.ts.map
 //#endregion
-//#region packages/arrays/src/without.d.ts
+//#region ../arrays/src/without.d.ts
 /**
  * Returns a copy of an input array with _undefined_ values removed.
  * @param data
@@ -762,7 +762,7 @@ declare const withoutUndefined: <V>(data: readonly V[] | V[]) => V[];
 declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], comparer?: IsEqual<V>) => V[];
 //# sourceMappingURL=without.d.ts.map
 //#endregion
-//#region packages/arrays/src/zip.d.ts
+//#region ../arrays/src/zip.d.ts
 /**
  * Zip combines the elements of two or more arrays based on their index.
  *

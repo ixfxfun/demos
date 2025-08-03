@@ -1,1057 +1,197 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./src-Bo4oKRxs.js";
-import "./is-primitive-BD8Wwhed.js";
-import "./interval-type-Bu6U9yES.js";
-import { zipKeyValue } from "./basic-BcTIVreK.js";
-import "./src-IqHxJtRK.js";
-import "./key-value-DZNL5nwk.js";
-import "./resolve-core-ibINXx_1.js";
-import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-LtkApSyv.js";
-import { mutable } from "./src-D8qEf6yn.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DS5b_ULE.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, percentTest, resultThrow } from "./numbers-C359_5A6.js";
+import { arrayTest } from "./arrays-yH_qBmt0.js";
+import "./to-string-Dg1sJUf1.js";
+import "./comparers-BtlnApnB.js";
+import "./is-equal-edylSnsn.js";
+import { zipKeyValue } from "./maps-a_ogDHUT.js";
+import { defaultKeyer } from "./default-keyer-CnxB2rd_.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import { dotProduct, minFast, minIndex } from "./numeric-arrays-DwffyOZ3.js";
+import { clamp, clampIndex } from "./clamp-BXRKKkSg.js";
+import { round } from "./round-DuQ_VRis.js";
+import { wrap } from "./wrap-CbW4pe4i.js";
+import { movingAverageLight } from "./moving-average-BpnIcIs9.js";
+import { scale } from "./scale-DHjtm9T-.js";
+import { ObjectTracker, TrackedValueMap, quantiseEvery } from "./tracked-value-BgYnLxEF.js";
+import "./tracker-base-DcT12hen.js";
+import { Bezier } from "./bezier-C-OUPtNe.js";
 
-//#region packages/geometry/src/point/guard.ts
+//#region ../arrays/dist/src/sort.js
 /**
-* Returns true if xy (and z, if present) are _null_.
-* @param p
-* @returns
-*/
-const isNull = (p) => {
-	if (isPoint3d(p)) {
-		if (p.z !== null) return false;
-	}
-	return p.x === null && p.y === null;
-};
-/***
-* Returns true if either x, y, z isNaN.
-*/
-const isNaN$1 = (p) => {
-	if (isPoint3d(p)) {
-		if (!Number.isNaN(p.z)) return false;
-	}
-	return Number.isNaN(p.x) || Number.isNaN(p.y);
-};
-/**
-* Throws an error if point is invalid
-* @param p
-* @param name
-*/
-function guard$1(p, name = `Point`) {
-	if (p === void 0) throw new Error(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p === null) throw new Error(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p.x === void 0) throw new Error(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p.y === void 0) throw new Error(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (typeof p.x !== `number`) throw new TypeError(`'${name}.x' must be a number. Got ${typeof p.x}`);
-	if (typeof p.y !== `number`) throw new TypeError(`'${name}.y' must be a number. Got ${typeof p.y}`);
-	if (p.z !== void 0) {
-		if (typeof p.z !== `number`) throw new TypeError(`${name}.z must be a number. Got: ${typeof p.z}`);
-		if (Number.isNaN(p.z)) throw new Error(`'${name}.z' is NaN. Got: ${JSON.stringify(p)}`);
-	}
-	if (p.x === null) throw new Error(`'${name}.x' is null`);
-	if (p.y === null) throw new Error(`'${name}.y' is null`);
-	if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
-	if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
-}
-/**
-* Throws if parameter is not a valid point, or either x or y is 0
-* @param pt
-* @returns
-*/
-const guardNonZeroPoint = (pt, name = `pt`) => {
-	guard$1(pt, name);
-	resultThrow(numberTest(pt.x, `nonZero`, `${name}.x`), numberTest(pt.y, `nonZero`, `${name}.y`), () => {
-		if (typeof pt.z !== `undefined`) return numberTest(pt.z, `nonZero`, `${name}.z`);
-	});
-	return true;
-};
-/**
-* Returns _true_ if `p` has x & y properties.
-* Returns _false_ if `p` is undefined, null or does not contain properties.
-* Use {@link isPoint3d} to check further check for `z`.
-* @param p 
-* @returns 
-*/
-function isPoint(p) {
-	if (p === void 0) return false;
-	if (p === null) return false;
-	if (p.x === void 0) return false;
-	if (p.y === void 0) return false;
-	return true;
-}
-/**
-* Returns _true_ if `p` has x, y, & z properties.
-* Returns _false_ if `p` is undefined, null or does not contain properties.
-* @param p 
-* @returns 
-*/
-const isPoint3d = (p) => {
-	if (p === void 0) return false;
-	if (p === null) return false;
-	if (p.x === void 0) return false;
-	if (p.y === void 0) return false;
-	if (p.z === void 0) return false;
-	return true;
-};
-/**
-* Returns true if both xy (and z, if present) are 0.
-* Use `Points.Empty` to return an empty point.
-* @param p
-* @returns
-*/
-const isEmpty = (p) => {
-	if (isPoint3d(p)) {
-		if (p.z !== 0) return false;
-	}
-	return p.x === 0 && p.y === 0;
-};
-/**
-* Returns true if point is a placeholder, where xy (and z, if present)
-* are `NaN`.
-*
-* Use Points.Placeholder to return a placeholder point.
-* @param p
-* @returns
-*/
-const isPlaceholder = (p) => {
-	if (isPoint3d(p)) {
-		if (!Number.isNaN(p.z)) return false;
-	}
-	return Number.isNaN(p.x) && Number.isNaN(p.y);
-};
-
-//#endregion
-//#region packages/geometry/src/line/from-points.ts
-/**
-* Returns a line from two points
-* 
-* ```js
-* // Line from 0,1 to 10,15
-* const line = Lines.fromPoints( { x:0, y:1 }, { x:10, y:15 });
-* // line is: { a: { x: 0, y: 1}, b: { x: 10, y: 15 } };
-* ```
-* @param a Start point
-* @param b End point
-* @returns 
-*/
-const fromPoints$1 = (a, b) => {
-	guard$1(a, `a`);
-	guard$1(b, `b`);
-	a = Object.freeze({ ...a });
-	b = Object.freeze({ ...b });
-	return Object.freeze({
-		a,
-		b
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/line/join-points-to-lines.ts
-/**
-* Returns an array of lines that connects provided points. Note that line is not closed.
-* 
-* Eg, if points a,b,c are provided, two lines are provided: a->b and b->c.
-* 
-* ```js
-* const lines = Lines.joinPointsToLines(ptA, ptB, ptC);
-* // lines is an array of, well, lines
-* ```
-* @param points 
-* @returns 
-*/
-const joinPointsToLines = (...points) => {
-	const lines = [];
-	let start = points[0];
-	for (let index = 1; index < points.length; index++) {
-		lines.push(fromPoints$1(start, points[index]));
-		start = points[index];
-	}
-	return lines;
-};
-
-//#endregion
-//#region packages/geometry/src/line/guard.ts
-/**
-* Returns true if `p` is a valid line, containing `a` and `b` Points.
-* ```js
-* Lines.isLine(l);
-* ```
-* @param p Value to check
-* @returns True if a valid line.
-*/
-const isLine = (p) => {
-	if (p === void 0) return false;
-	if (p.a === void 0) return false;
-	if (p.b === void 0) return false;
-	if (!isPoint(p.a)) return false;
-	if (!isPoint(p.b)) return false;
-	return true;
-};
-/**
-* Returns true if `p` is a {@link PolyLine}, ie. an array of {@link Line}s.
-* Validates all items in array.
-* @param p 
-* @returns
-*/
-const isPolyLine = (p) => {
-	if (!Array.isArray(p)) return false;
-	const valid = !p.some((v) => !isLine(v));
-	return valid;
-};
-/**
-* Throws an exception if:
-* * line is undefined
-* * a or b parameters are missing
-* 
-* Does not validate points
-* @param line 
-* @param name 
-*/
-const guard$5 = (line, name = `line`) => {
-	if (line === void 0) throw new Error(`${name} undefined`);
-	if (line.a === void 0) throw new Error(`${name}.a undefined. Expected {a:Point, b:Point}. Got: ${JSON.stringify(line)}`);
-	if (line.b === void 0) throw new Error(`${name}.b undefined. Expected {a:Point, b:Point} Got: ${JSON.stringify(line)}`);
-};
-
-//#endregion
-//#region packages/geometry/src/line/get-points-parameter.ts
-/**
-* Returns [a,b] points from either a line parameter, or two points.
-* It additionally applies the guardPoint function to ensure validity.
-* This supports function overloading.
-* @ignore
-* @param aOrLine 
-* @param b 
-* @returns 
-*/
-const getPointParameter$1 = (aOrLine, b) => {
-	let a;
-	if (isLine(aOrLine)) {
-		b = aOrLine.b;
-		a = aOrLine.a;
-	} else {
-		a = aOrLine;
-		if (b === void 0) throw new Error(`Since first parameter is not a line, two points are expected. Got a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
-	}
-	guard$1(a, `a`);
-	guard$1(a, `b`);
-	return [a, b];
-};
-
-//#endregion
-//#region packages/geometry/src/line/length.ts
-/**
-* Returns length of line, polyline or between two points
-* 
-* @param aOrLine Point A, line or polyline (array of lines)
-* @param pointB Point B, if first parameter is a point
-* @returns Length (total accumulated length for arrays)
-*/
-function length(aOrLine, pointB) {
-	if (isPolyLine(aOrLine)) {
-		const sum$4 = aOrLine.reduce((accumulator, v) => length(v) + accumulator, 0);
-		return sum$4;
-	}
-	if (aOrLine === void 0) throw new TypeError(`Parameter 'aOrLine' is undefined`);
-	const [a, b] = getPointParameter$1(aOrLine, pointB);
-	const x = b.x - a.x;
-	const y = b.y - a.y;
-	if (a.z !== void 0 && b.z !== void 0) {
-		const z = b.z - a.z;
-		return Math.hypot(x, y, z);
-	} else return Math.hypot(x, y);
-}
-
-//#endregion
-//#region packages/geometry/src/line/reverse.ts
-/**
-* Reverses a line.
-* ````js
-* const a = { x: 10, y: 20 };
-* const b = { x: 100, y: 200 };
-* const line = reverse({ a, b });
-* // { a: { x: 100, y: 200 }, b: { x: 10, y: 20 } }
-* ```
-* @param line 
-* @returns 
-*/
-function reverse(line) {
-	guard$5(line, `line`);
-	return {
-		a: line.b,
-		b: line.a
-	};
-}
-
-//#endregion
-//#region packages/geometry/src/line/interpolate.ts
-/**
-* Calculates a point in-between a line's start and end points.
-* 
-* @param amount Interpolation amount
-* @param aOrLine Line, or first point
-* @param pointBOrAllowOverflow Second point (if needed) or allowOverflow.
-* @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line.
-* @returns 
-*/
-function interpolate$1(amount, aOrLine, pointBOrAllowOverflow, allowOverflow) {
-	if (typeof pointBOrAllowOverflow === `boolean`) {
-		allowOverflow = pointBOrAllowOverflow;
-		pointBOrAllowOverflow = void 0;
-	}
-	if (!allowOverflow) resultThrow(percentTest(amount, `amount`));
-	else resultThrow(numberTest(amount, ``, `amount`));
-	const [a, b] = getPointParameter$1(aOrLine, pointBOrAllowOverflow);
-	const d = length(a, b);
-	const d2 = d * (1 - amount);
-	if (d === 0 && d2 === 0) return Object.freeze({ ...b });
-	const x = b.x - d2 * (b.x - a.x) / d;
-	const y = b.y - d2 * (b.y - a.y) / d;
-	return Object.freeze({
-		...b,
-		x,
-		y
-	});
-}
-/**
-* Returns the point along a line from its start (A)
-* @param line Line
-* @param distance Distance
-* @param fromA If _true_ (default) returns from A. Use _false_ to calculate from end
-* @returns 
-*/
-function pointAtDistance(line, distance$2, fromA$2 = true) {
-	if (!fromA$2) line = reverse(line);
-	const dx = line.b.x - line.a.x;
-	const dy = line.b.y - line.a.y;
-	const theta = Math.atan2(dy, dx);
-	const xp = distance$2 * Math.cos(theta);
-	const yp = distance$2 * Math.sin(theta);
-	return {
-		x: xp + line.a.x,
-		y: yp + line.a.y
-	};
-}
-
-//#endregion
-//#region packages/geometry/src/line/angles.ts
-const directionVector = (line) => ({
-	x: line.b.x - line.a.x,
-	y: line.b.y - line.a.y
-});
-const directionVectorNormalised = (line) => {
-	const l = length(line);
-	const v = directionVector(line);
-	return {
-		x: v.x / l,
-		y: v.y / l
-	};
-};
-/**
-* Returns a parallel line to `line` at `distance`.
-* 
-* ```js
-* const l = Lines.parallel(line, 10);
-* ```
-* @param line
-* @param distance 
-*/
-const parallel = (line, distance$2) => {
-	const dv = directionVector(line);
-	const dvn = directionVectorNormalised(line);
-	const a = {
-		x: line.a.x - dvn.y * distance$2,
-		y: line.a.y + dvn.x * distance$2
-	};
-	return {
-		a,
-		b: {
-			x: a.x + dv.x,
-			y: a.y + dv.y
-		}
-	};
-};
-/**
-* Returns a point perpendicular to `line` at a specified `distance`. Use negative
-* distances for the other side of line.
-* ```
-* // Project a point 100 units away from line, at its midpoint.
-* const pt = Lines.perpendicularPoint(line, 100, 0.5);
-* ```
-* @param line Line
-* @param distance Distance from line. Use negatives to flip side
-* @param amount Relative place on line to project point from. 0 projects from A, 0.5 from the middle, 1 from B.
-*/
-const perpendicularPoint = (line, distance$2, amount = 0) => {
-	const origin = interpolate$1(amount, line);
-	const dvn = directionVectorNormalised(line);
-	return {
-		x: origin.x - dvn.y * distance$2,
-		y: origin.y + dvn.x * distance$2
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/line/midpoint.ts
-/**
-* Returns the mid-point of a line (same as `interpolate` with an amount of 0.5)
-* 
-* ```js
-* Lines.midpoint(line); // Returns {x, y}
-* ```
-* @param aOrLine 
-* @param pointB 
-* @returns 
-*/
-const midpoint = (aOrLine, pointB) => {
-	const [a, b] = getPointParameter$1(aOrLine, pointB);
-	return interpolate$1(.5, a, b);
-};
-
-//#endregion
-//#region packages/geometry/src/rect/guard.ts
-/**
-* Throws an error if the dimensions of the rectangle are undefined, NaN or negative.
-* @param d 
-* @param name 
-*/
-const guardDim = (d, name = `Dimension`) => {
-	if (d === void 0) throw new Error(`${name} is undefined`);
-	if (Number.isNaN(d)) throw new Error(`${name} is NaN`);
-	if (d < 0) throw new Error(`${name} cannot be negative`);
-};
-/**
-* Throws an error if rectangle is missing fields or they
-* are not valid.
-* 
-* Checks:
-* * `width` and `height` must be defined on `rect`
-* * dimensions (w & h) must not be NaN
-* * dimensions (w & h) must not be negative
-* 
-* If `rect` has x,y, this value is checked as well.
-* @param rect
-* @param name
-*/
-const guard$3 = (rect, name = `rect`) => {
-	if (rect === void 0) throw new Error(`{$name} undefined`);
-	if (isPositioned$1(rect)) guard$1(rect, name);
-	guardDim(rect.width, name + `.width`);
-	guardDim(rect.height, name + `.height`);
-};
-/**
-* Returns a positioned rect or if it's not possible, throws an error.
-* 
-* If `rect` does not have a position, `origin` is used.
-* If `rect` is positioned and `origin` is provided, returned result uses `origin` as x,y instead.
-* ```js
-* // Returns input because it's positioned
-* getRectPositioned({ x:1, y:2, width:10, height:20 });
-* 
-* // Returns { x:1, y:2, width:10, height:20 }
-* getRectPositioned({ width:10, height:20 }, { x:1, y:2 });
-*  
-* // Throws, because we have no point
-* getRectPositioned({width:10,height:20})
-* ```
-* @param rect 
-* @param origin 
-* @returns 
-*/
-const getRectPositioned = (rect, origin) => {
-	guard$3(rect);
-	if (isPositioned$1(rect) && origin === void 0) return rect;
-	if (origin === void 0) throw new Error(`Unpositioned rect needs origin parameter`);
-	return Object.freeze({
-		...rect,
-		...origin
-	});
-};
-/**
-* Throws an error if `rect` is does not have a position, or
-* is an invalid rectangle
-* @param rect 
-* @param name 
-*/
-const guardPositioned = (rect, name = `rect`) => {
-	if (!isPositioned$1(rect)) throw new Error(`Expected ${name} to have x,y`);
-	guard$3(rect, name);
-};
-/**
-* Returns _true_ if `rect` has width and height values of 0.
-* Use Rects.Empty or Rects.EmptyPositioned to generate an empty rectangle.
-* @param rect 
-* @returns 
-*/
-const isEmpty$3 = (rect) => rect.width === 0 && rect.height === 0;
-/**
-* Returns _true_ if `rect` is a placeholder, with both width and height values of NaN.
-* Use Rects.Placeholder or Rects.PlaceholderPositioned to generate a placeholder.
-* @param rect 
-* @returns 
-*/
-const isPlaceholder$3 = (rect) => Number.isNaN(rect.width) && Number.isNaN(rect.height);
-/**
-* Returns _true_ if `rect` has position (x,y) fields.
-* @param rect Point, Rect or RectPositiond
-* @returns
-*/
-const isPositioned$1 = (rect) => rect.x !== void 0 && rect.y !== void 0;
-/**
-* Returns _true_ if `rect` has width and height fields.
-* @param rect
-* @returns
-*/
-const isRect = (rect) => {
-	if (rect === void 0) return false;
-	if (rect.width === void 0) return false;
-	if (rect.height === void 0) return false;
-	return true;
-};
-/**
-* Returns _true_ if `rect` is a positioned rectangle
-* Having width, height, x and y properties.
-* @param rect
-* @returns
-*/
-const isRectPositioned = (rect) => isRect(rect) && isPositioned$1(rect);
-
-//#endregion
-//#region packages/geometry/src/point/normalise-by-rect.ts
-/**
-* Normalises a point so it is on a 0..1 scale
-* 
-* ```js
-* normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); 
-* normaliseByRect({ x: 10, y: 10 }, 20, 40); 
-* normaliseByRect(10, 10, 20, 40);
-* ```
-* @param a Point, or x
-* @param b y coord or width
-* @param c height or width
-* @param d height
-* @returns Point
-*/
-function normaliseByRect(a, b, c, d) {
-	if (isPoint(a)) {
-		if (typeof b === `number` && c !== void 0) resultThrow(numberTest(b, `positive`, `width`), numberTest(c, `positive`, `height`));
-		else {
-			if (!isRect(b)) throw new Error(`Expected second parameter to be a rect`);
-			c = b.height;
-			b = b.width;
-		}
-		return Object.freeze({
-			x: a.x / b,
-			y: a.y / c
-		});
-	} else {
-		resultThrow(numberTest(a, `positive`, `x`));
-		if (typeof b !== `number`) throw new TypeError(`Expecting second parameter to be a number (width)`);
-		if (typeof c !== `number`) throw new TypeError(`Expecting third parameter to be a number (height)`);
-		resultThrow(numberTest(b, `positive`, `y`));
-		resultThrow(numberTest(c, `positive`, `width`));
-		if (d === void 0) throw new Error(`Expected height parameter`);
-		resultThrow(numberTest(d, `positive`, `height`));
-		return Object.freeze({
-			x: a / c,
-			y: b / d
-		});
-	}
-}
-
-//#endregion
-//#region packages/geometry/src/point/get-point-parameter.ts
-function getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6) {
-	if (isPoint3d(a1) && isPoint3d(ab2)) return [a1, ab2];
-	if (isPoint(a1) && isPoint(ab2)) return [a1, ab2];
-	if (isPoint3d(a1)) {
-		const b$1 = {
-			x: ab2,
-			y: ab3,
-			z: ab4
-		};
-		if (!isPoint3d(b$1)) throw new Error(`Expected x, y & z parameters`);
-		return [a1, b$1];
-	}
-	if (isPoint(a1)) {
-		const b$1 = {
-			x: ab2,
-			y: ab3
-		};
-		if (!isPoint(b$1)) throw new Error(`Expected x & y parameters`);
-		return [a1, b$1];
-	}
-	if (typeof ab5 !== `undefined` && typeof ab4 !== `undefined`) {
-		const a$1 = {
-			x: a1,
-			y: ab2,
-			z: ab3
-		};
-		const b$1 = {
-			x: ab4,
-			y: ab5,
-			z: ab6
-		};
-		if (!isPoint3d(a$1)) throw new Error(`Expected x,y,z for first point`);
-		if (!isPoint3d(b$1)) throw new Error(`Expected x,y,z for second point`);
-		return [a$1, b$1];
-	}
-	const a = {
-		x: a1,
-		y: ab2
-	};
-	const b = {
-		x: ab3,
-		y: ab4
-	};
-	if (!isPoint(a)) throw new Error(`Expected x,y for first point`);
-	if (!isPoint(b)) throw new Error(`Expected x,y for second point`);
-	return [a, b];
-}
-/**
-* Returns a Point form of either a point, x,y params or x,y,z params.
-* If parameters are undefined, an empty point is returned (0, 0)
-* @ignore
-* @param a
-* @param b
-* @returns
-*/
-function getPointParameter(a, b, c) {
-	if (a === void 0) return {
-		x: 0,
-		y: 0
-	};
-	if (Array.isArray(a)) {
-		if (a.length === 0) return Object.freeze({
-			x: 0,
-			y: 0
-		});
-		if (a.length === 1) return Object.freeze({
-			x: a[0],
-			y: 0
-		});
-		if (a.length === 2) return Object.freeze({
-			x: a[0],
-			y: a[1]
-		});
-		if (a.length === 3) return Object.freeze({
-			x: a[0],
-			y: a[1],
-			z: a[2]
-		});
-		throw new Error(`Expected array to be 1-3 elements in length. Got ${a.length}.`);
-	}
-	if (isPoint(a)) return a;
-	else if (typeof a !== `number` || typeof b !== `number`) throw new TypeError(`Expected point or x,y as parameters. Got: a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
-	if (typeof c === `number`) return Object.freeze({
-		x: a,
-		y: b,
-		z: c
-	});
-	return Object.freeze({
-		x: a,
-		y: b
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/point/distance.ts
-/**
-* Calculate distance between two points.
-* If both points have a `z` property, the distance is 3D distance is calculated.
-* If only one point has a `z`, it is ignored.
+* Sorts an array of objects in ascending order
+* by the given property name, assuming it is a number.
 *
 * ```js
-* // Distance between two points
-* const ptA = { x: 0.5, y:0.8 };
-* const ptB = { x: 1, y: 0.4 };
-* distance(ptA, ptB);
-* // Or, provide x,y as parameters
-* distance(ptA, 0.4, 0.9);
+* const data = [
+*  { size: 10, colour: `red` },
+*  { size: 20, colour: `blue` },
+*  { size: 5, colour: `pink` }
+* ];
+* const sorted = Arrays.sortByNumericProperty(data, `size`);
 *
-* // Distance from ptA to x: 0.5, y:0.8, z: 0.1
-* const ptC = { x: 0.5, y:0.5, z: 0.3 };
-* // With x,y,z as parameters:
-* distance(ptC, 0.5, 0.8, 0.1);
+* Yields items ascending order:
+* [ { size: 5, colour: `pink` }, { size: 10, colour: `red` }, { size: 20, colour: `blue` } ]
 * ```
-* @param a First point
-* @param xOrB Second point, or x coord
-* @param y y coord, if x coord is given
-* @param z Optional z coord, if x and y are given.
-* @returns
+* @param data
+* @param propertyName
 */
-function distance(a, xOrB, y, z) {
-	const pt = getPointParameter(xOrB, y, z);
-	guard$1(pt, `b`);
-	guard$1(a, `a`);
-	return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
-}
-
-//#endregion
-//#region packages/geometry/src/line/nearest.ts
-/**
-* Returns the nearest point on `line` closest to `point`.
-* 
-* ```js
-* const pt = Lines.nearest(line, {x:10,y:10});
-* ```
-* 
-* If an array of lines is provided, it will be the closest point amongst all the lines
-* @param line Line or array of lines
-* @param point
-* @returns Point `{ x, y }`
-*/
-const nearest$1 = (line, point$1) => {
-	const n = (line$1) => {
-		const { a, b } = line$1;
-		const atob = {
-			x: b.x - a.x,
-			y: b.y - a.y
-		};
-		const atop = {
-			x: point$1.x - a.x,
-			y: point$1.y - a.y
-		};
-		const length$4 = atob.x * atob.x + atob.y * atob.y;
-		let dot = atop.x * atob.x + atop.y * atob.y;
-		const t = Math.min(1, Math.max(0, dot / length$4));
-		dot = (b.x - a.x) * (point$1.y - a.y) - (b.y - a.y) * (point$1.x - a.x);
-		return {
-			x: a.x + atob.x * t,
-			y: a.y + atob.y * t
-		};
-	};
-	if (Array.isArray(line)) {
-		const pts = line.map((l) => n(l));
-		const dists = pts.map((p) => distance(p, point$1));
-		return Object.freeze(pts[minIndex(...dists)]);
-	} else return Object.freeze(n(line));
-};
-
-//#endregion
-//#region packages/geometry/src/line/distance-single-line.ts
-/**
-* Returns the distance of `point` to the nearest point on `line`
-* 
-* ```js
-* const distance = Lines.distanceSingleLine(line, pt);
-* ```
-* @param line Line
-* @param point Target point
-* @returns 
-*/
-const distanceSingleLine = (line, point$1) => {
-	guard$5(line, `line`);
-	guard$1(point$1, `point`);
-	if (length(line) === 0) return length(line.a, point$1);
-	const near = nearest$1(line, point$1);
-	return length(near, point$1);
-};
-
-//#endregion
-//#region packages/geometry/src/point/find-minimum.ts
-/**
-* Returns the 'minimum' point from an array of points, using a comparison function.
-*
-* @example Find point closest to a coordinate
-* ```js
-* const points = [...];
-* const center = {x: 100, y: 100};
-*
-* const closestToCenter = findMinimum((a, b) => {
-*  const aDist = distance(a, center);
-*  const bDist = distance(b, center);
-*  if (aDistance < bDistance) return a;
-*  return b;
-* }, points);
-* ```
-* @param comparer Compare function returns the smallest of `a` or `b`
-* @param points
-* @returns
-*/
-function findMinimum(comparer, ...points) {
-	if (points.length === 0) throw new Error(`No points provided`);
-	let min = points[0];
-	for (const p of points) if (isPoint3d(min) && isPoint3d(p)) min = comparer(min, p);
-	else min = comparer(min, p);
-	return min;
-}
-
-//#endregion
-//#region packages/geometry/src/rect/max.ts
-/**
-* Returns a rectangle based on provided four corners.
-*
-* To create a rectangle that contains an arbitary set of points, use {@link Points.bbox}.
-*
-* Does some sanity checking such as:
-*  - x will be smallest of topLeft/bottomLeft
-*  - y will be smallest of topRight/topLeft
-*  - width will be largest between top/bottom left and right
-*  - height will be largest between left and right top/bottom
-*
-*/
-const maxFromCorners = (topLeft, topRight, bottomRight, bottomLeft) => {
-	if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
-	if (topLeft.y > bottomLeft.y) throw new Error(`topLeft.y greater than bottomLeft.y`);
-	const w1 = topRight.x - topLeft.x;
-	const w2 = bottomRight.x - bottomLeft.x;
-	const h1 = Math.abs(bottomLeft.y - topLeft.y);
-	const h2 = Math.abs(bottomRight.y - topRight.y);
-	return {
-		x: Math.min(topLeft.x, bottomLeft.x),
-		y: Math.min(topRight.y, topLeft.y),
-		width: Math.max(w1, w2),
-		height: Math.max(h1, h2)
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/point/bbox.ts
-/**
-* Returns the minimum rectangle that can enclose all provided points
-* @param points
-* @returns
-*/
-const bbox$1 = (...points) => {
-	const leftMost = findMinimum((a, b) => {
-		return a.x < b.x ? a : b;
-	}, ...points);
-	const rightMost = findMinimum((a, b) => {
-		return a.x > b.x ? a : b;
-	}, ...points);
-	const topMost = findMinimum((a, b) => {
-		return a.y < b.y ? a : b;
-	}, ...points);
-	const bottomMost = findMinimum((a, b) => {
-		return a.y > b.y ? a : b;
-	}, ...points);
-	const topLeft = {
-		x: leftMost.x,
-		y: topMost.y
-	};
-	const topRight = {
-		x: rightMost.x,
-		y: topMost.y
-	};
-	const bottomRight = {
-		x: rightMost.x,
-		y: bottomMost.y
-	};
-	const bottomLeft = {
-		x: leftMost.x,
-		y: bottomMost.y
-	};
-	return maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
-};
-const bbox3d = (...points) => {
-	const box = bbox$1(...points);
-	const zMin = findMinimum((a, b) => {
-		return a.z < b.z ? a : b;
-	}, ...points);
-	const zMax = findMinimum((a, b) => {
-		return a.z > b.z ? a : b;
-	}, ...points);
-	return {
-		...box,
-		z: zMin.z,
-		depth: zMax.z - zMin.z
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/line/bbox.ts
-/**
-* Returns a rectangle that encompasses dimension of line
-* 
-* ```js
-* const rect = Lines.bbox(line);
-* ```
-*/
-const bbox$5 = (line) => bbox$1(line.a, line.b);
-
-//#endregion
-//#region packages/geometry/src/point/divider.ts
-/**
-* Returns a Point with the x,y,z values of two points divide (a/b).
-* 
-* `z` parameter is used, if present. Uses a default value of 0 for 'z' when dividing a 2D point with a 3D one.
-*
-* Examples:
-*
-* ```js
-* divide(ptA, ptB);
-* divide(x1, y1, x2, y2);
-* divide(ptA, x2, y2);
-* ```
-*/
-function divide$2(a1, ab2, ab3, ab4, ab5, ab6) {
-	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
-	guard$1(ptA, `a`);
-	guard$1(ptB, `b`);
-	if (ptB.x === 0) throw new TypeError("Cannot divide by zero (b.x is 0)");
-	if (ptB.y === 0) throw new TypeError("Cannot divide by zero (b.y is 0)");
-	const pt = {
-		x: ptA.x / ptB.x,
-		y: ptA.y / ptB.y
-	};
-	if (isPoint3d(ptA) || isPoint3d(ptB)) {
-		if (ptB.z === 0) throw new TypeError("Cannot divide by zero (b.z is 0)");
-		pt.z = (ptA.z ?? 0) / (ptB.z ?? 0);
-	}
-	return Object.freeze(pt);
-}
-/**
-* Returns a function that divides a point:
-* ```js
-* const f = divider(100, 200);
-* f(50,100); // Yields: { x: 0.5, y: 0.5 }
-* ```
-*
-* Input values can be Point, separate x,y and optional z values or an array:
-* ```js
-* const f = divider({ x: 100, y: 100 });
-* const f = divider( 100, 100 );
-* const f = divider([ 100, 100 ]);
-* ```
-*
-* Likewise the returned function an take these as inputs:
-* ```js
-* f({ x: 100, y: 100});
-* f( 100, 100 );
-* f([ 100, 100 ]);
-* ```
-*
-* Function throws if divisor has 0 for any coordinate (since we can't divide by 0)
-* @param a Divisor point, array of points or x
-* @param b Divisor y value
-* @param c Divisor z value
-* @returns
-*/
-function divider(a, b, c) {
-	const divisor = getPointParameter(a, b, c);
-	guardNonZeroPoint(divisor, `divisor`);
-	return (aa, bb, cc) => {
-		const dividend = getPointParameter(aa, bb, cc);
-		return typeof dividend.z === `undefined` ? Object.freeze({
-			x: dividend.x / divisor.x,
-			y: dividend.y / divisor.y
-		}) : Object.freeze({
-			x: dividend.x / divisor.x,
-			y: dividend.y / divisor.y,
-			z: dividend.z / (divisor.z ?? 1)
-		});
-	};
-}
-
-//#endregion
-//#region packages/geometry/src/line/divide.ts
-/**
-* Divides both start and end points by given x,y
-* ```js
-* // Line 1,1 -> 10,10
-* const l = Lines.fromNumbers(1,1,10,10);
-* const ll = Lines.divide(l, {x:2, y:4});
-* // Yields: 0.5,0.25 -> 5,2.5
-* ```
-* 
-* Dividing by zero will give Infinity for that dimension.
-* @param line 
-* @param point 
-* @returns 
-*/
-const divide$1 = (line, point$1) => Object.freeze({
-	...line,
-	a: divide$2(line.a, point$1),
-	b: divide$2(line.b, point$1)
+const sortByNumericProperty = (data, propertyName) => [...data].sort((a, b) => {
+	resultThrow(arrayTest(data, `data`));
+	const av = a[propertyName];
+	const bv = b[propertyName];
+	if (av < bv) return -1;
+	if (av > bv) return 1;
+	return 0;
 });
 
 //#endregion
-//#region packages/geometry/src/line/from-numbers.ts
+//#region ../numbers/dist/src/linear-space.js
 /**
-* Returns a line from a basis of coordinates (x1, y1, x2, y2)
-* 
+* Generates a `step`-length series of values between `start` and `end` (inclusive).
+* Each value will be equally spaced.
+*
 * ```js
-* // Line from 0,1 -> 10,15
-* Lines.fromNumbers(0, 1, 10, 15);
+* for (const v of linearSpace(1, 5, 6)) {
+*  // Yields: [ 1, 1.8, 2.6, 3.4, 4.2, 5 ]
+* }
 * ```
-* @param x1 
-* @param y1 
-* @param x2 
-* @param y2 
-* @returns 
-*/
-const fromNumbers$2 = (x1, y1, x2, y2) => {
-	if (Number.isNaN(x1)) throw new Error(`x1 is NaN`);
-	if (Number.isNaN(x2)) throw new Error(`x2 is NaN`);
-	if (Number.isNaN(y1)) throw new Error(`y1 is NaN`);
-	if (Number.isNaN(y2)) throw new Error(`y2 is NaN`);
-	const a = {
-		x: x1,
-		y: y1
-	};
-	const b = {
-		x: x2,
-		y: y2
-	};
-	return fromPoints$1(a, b);
-};
-
-//#endregion
-//#region packages/geometry/src/line/from-flat-array.ts
-/**
-* Returns a line from four numbers [x1,y1,x2,y2].
-* 
-* See {@link toFlatArray} to create an array from a line.
-* 
+*
+* Numbers can be produced from large to small as well
 * ```js
-* const line = Lines.fromFlatArray(...[0, 0, 100, 100]);
-* // line is {a: { x:0, y:0 }, b: { x: 100, y: 100 } }
+* const values = [...linearSpace(10, 5, 3)];
+* // Yields: [10, 7.5, 5]
 * ```
-* @param array Array in the form [x1,y1,x2,y2]
-* @returns Line
+* @param start Start number (inclusive)
+* @param end  End number (inclusive)
+* @param steps How many steps to make from start -> end
+* @param precision Number of decimal points to round to
 */
-const fromFlatArray$1 = (array) => {
-	if (!Array.isArray(array)) throw new Error(`arr parameter is not an array`);
-	if (array.length !== 4) throw new Error(`array is expected to have length four`);
-	return fromNumbers$2(array[0], array[1], array[2], array[3]);
+function* linearSpace(start, end, steps, precision) {
+	resultThrow(numberTest(start, ``, `start`), numberTest(end, ``, `end`), numberTest(steps, ``, `steps`));
+	const r = precision ? round(precision) : (v) => v;
+	const step = (end - start) / (steps - 1);
+	resultThrow(numberTest(step, ``, `step`));
+	if (!Number.isFinite(step)) throw new TypeError(`Calculated step value is infinite`);
+	for (let index = 0; index < steps; index++) {
+		const v = start + step * index;
+		yield r(v);
+	}
+}
+
+//#endregion
+//#region ../random/dist/src/arrays.js
+/**
+* Returns random element.
+*
+* ```js
+* const v = [`blue`, `red`, `orange`];
+* randomElement(v); // Yields `blue`, `red` or `orange`
+* ```
+*
+* Use {@link randomIndex} if you want a random index within `array`.
+*
+* @param array
+* @param rand Random generator. `Math.random` by default.
+* @returns
+*/
+const randomElement = (array, rand = Math.random) => {
+	resultThrow(arrayTest(array, `array`));
+	return array[Math.floor(rand() * array.length)];
 };
 
 //#endregion
-//#region packages/geometry/src/polar/guard.ts
+//#region ../collections/dist/src/set/set-mutable.js
 /**
-* Returns true if `p` seems to be a {@link Polar.Coord} (ie has both distance & angleRadian fields)
-* @param p
-* @returns True if `p` seems to be a PolarCoord
+* Creates a {@link ISetMutable}.
+* @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
+* @returns
 */
-const isPolarCoord = (p) => {
-	if (p.distance === void 0) return false;
-	if (p.angleRadian === void 0) return false;
-	return true;
-};
+const mutable = (keyString) => new SetStringMutable(keyString);
 /**
-* Throws an error if Coord is invalid
-* @param p
-* @param name
+* Mutable string set
 */
-const guard$6 = (p, name = `Point`) => {
-	if (p === void 0) throw new Error(`'${name}' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
-	if (p === null) throw new Error(`'${name}' is null. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
-	if (p.angleRadian === void 0) throw new Error(`'${name}.angleRadian' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
-	if (p.distance === void 0) throw new Error(`'${name}.distance' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
-	if (typeof p.angleRadian !== `number`) throw new TypeError(`'${name}.angleRadian' must be a number. Got ${p.angleRadian}`);
-	if (typeof p.distance !== `number`) throw new TypeError(`'${name}.distance' must be a number. Got ${p.distance}`);
-	if (p.angleRadian === null) throw new Error(`'${name}.angleRadian' is null`);
-	if (p.distance === null) throw new Error(`'${name}.distance' is null`);
-	if (Number.isNaN(p.angleRadian)) throw new TypeError(`'${name}.angleRadian' is NaN`);
-	if (Number.isNaN(p.distance)) throw new Error(`'${name}.distance' is NaN`);
+var SetStringMutable = class extends SimpleEventEmitter {
+	store = /* @__PURE__ */ new Map();
+	keyString;
+	/**
+	* Constructor
+	* @param keyString Function which returns a string version of added items. If unspecified `JSON.stringify`
+	*/
+	constructor(keyString) {
+		super();
+		this.keyString = keyString ?? defaultKeyer;
+	}
+	/**
+	* Number of items stored in set
+	*/
+	get size() {
+		return this.store.size;
+	}
+	/**
+	* Adds one or more items to set. `add` event is fired for each item
+	* @param values items to add
+	*/
+	add(...values$1) {
+		let somethingAdded = false;
+		for (const value of values$1) {
+			const isUpdated = this.has(value);
+			this.store.set(this.keyString(value), value);
+			super.fireEvent(`add`, {
+				value,
+				updated: isUpdated
+			});
+			if (!isUpdated) somethingAdded = true;
+		}
+		return somethingAdded;
+	}
+	/**
+	* Returns values from set as an iterable
+	* @returns
+	*/
+	values() {
+		return this.store.values();
+	}
+	/**
+	* Clear items from set
+	*/
+	clear() {
+		this.store.clear();
+		super.fireEvent(`clear`, true);
+	}
+	/**
+	* Delete value from set.
+	* @param v Value to delete
+	* @returns _True_ if item was found and removed
+	*/
+	delete(v) {
+		const isDeleted = this.store.delete(this.keyString(v));
+		if (isDeleted) super.fireEvent(`delete`, v);
+		return isDeleted;
+	}
+	/**
+	* Returns _true_ if item exists in set
+	* @param v
+	* @returns
+	*/
+	has(v) {
+		return this.store.has(this.keyString(v));
+	}
+	/**
+	* Returns array copy of set
+	* @returns Array copy of set
+	*/
+	toArray() {
+		return [...this.store.values()];
+	}
 };
 
 //#endregion
-//#region packages/geometry/src/pi.ts
+//#region ../geometry/src/pi.ts
 const piPi = Math.PI * 2;
 
 //#endregion
-//#region packages/geometry/src/angles.ts
+//#region ../geometry/src/angles.ts
 function degreeToRadian(angleInDegrees) {
 	return Array.isArray(angleInDegrees) ? angleInDegrees.map((v) => v * (Math.PI / 180)) : angleInDegrees * (Math.PI / 180);
 }
@@ -1386,7 +526,386 @@ const degreeToTurn = (degrees) => degrees / 360;
 const radianToTurn = (radians) => radians / piPi;
 
 //#endregion
-//#region packages/geometry/src/polar/angles.ts
+//#region ../geometry/src/point/guard.ts
+/**
+* Returns true if xy (and z, if present) are _null_.
+* @param p
+* @returns
+*/
+const isNull = (p) => {
+	if (isPoint3d(p)) {
+		if (p.z !== null) return false;
+	}
+	return p.x === null && p.y === null;
+};
+/***
+* Returns true if either x, y, z isNaN.
+*/
+const isNaN$1 = (p) => {
+	if (isPoint3d(p)) {
+		if (!Number.isNaN(p.z)) return false;
+	}
+	return Number.isNaN(p.x) || Number.isNaN(p.y);
+};
+/**
+* Throws an error if point is invalid
+* @param p
+* @param name
+*/
+function guard$1(p, name = `Point`) {
+	if (p === void 0) throw new Error(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+	if (p === null) throw new Error(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
+	if (p.x === void 0) throw new Error(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+	if (p.y === void 0) throw new Error(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+	if (typeof p.x !== `number`) throw new TypeError(`'${name}.x' must be a number. Got ${typeof p.x}`);
+	if (typeof p.y !== `number`) throw new TypeError(`'${name}.y' must be a number. Got ${typeof p.y}`);
+	if (p.z !== void 0) {
+		if (typeof p.z !== `number`) throw new TypeError(`${name}.z must be a number. Got: ${typeof p.z}`);
+		if (Number.isNaN(p.z)) throw new Error(`'${name}.z' is NaN. Got: ${JSON.stringify(p)}`);
+	}
+	if (p.x === null) throw new Error(`'${name}.x' is null`);
+	if (p.y === null) throw new Error(`'${name}.y' is null`);
+	if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
+	if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
+}
+/**
+* Throws if parameter is not a valid point, or either x or y is 0
+* @param pt
+* @returns
+*/
+const guardNonZeroPoint = (pt, name = `pt`) => {
+	guard$1(pt, name);
+	resultThrow(numberTest(pt.x, `nonZero`, `${name}.x`), numberTest(pt.y, `nonZero`, `${name}.y`), () => {
+		if (typeof pt.z !== `undefined`) return numberTest(pt.z, `nonZero`, `${name}.z`);
+	});
+	return true;
+};
+/**
+* Returns _true_ if `p` has x & y properties.
+* Returns _false_ if `p` is undefined, null or does not contain properties.
+* Use {@link isPoint3d} to check further check for `z`.
+* @param p 
+* @returns 
+*/
+function isPoint(p) {
+	if (p === void 0) return false;
+	if (p === null) return false;
+	if (p.x === void 0) return false;
+	if (p.y === void 0) return false;
+	return true;
+}
+/**
+* Returns _true_ if `p` has x, y, & z properties.
+* Returns _false_ if `p` is undefined, null or does not contain properties.
+* @param p 
+* @returns 
+*/
+const isPoint3d = (p) => {
+	if (p === void 0) return false;
+	if (p === null) return false;
+	if (p.x === void 0) return false;
+	if (p.y === void 0) return false;
+	if (p.z === void 0) return false;
+	return true;
+};
+/**
+* Returns true if both xy (and z, if present) are 0.
+* Use `Points.Empty` to return an empty point.
+* @param p
+* @returns
+*/
+const isEmpty = (p) => {
+	if (isPoint3d(p)) {
+		if (p.z !== 0) return false;
+	}
+	return p.x === 0 && p.y === 0;
+};
+/**
+* Returns true if point is a placeholder, where xy (and z, if present)
+* are `NaN`.
+*
+* Use Points.Placeholder to return a placeholder point.
+* @param p
+* @returns
+*/
+const isPlaceholder = (p) => {
+	if (isPoint3d(p)) {
+		if (!Number.isNaN(p.z)) return false;
+	}
+	return Number.isNaN(p.x) && Number.isNaN(p.y);
+};
+
+//#endregion
+//#region ../geometry/src/point/get-point-parameter.ts
+function getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6) {
+	if (isPoint3d(a1) && isPoint3d(ab2)) return [a1, ab2];
+	if (isPoint(a1) && isPoint(ab2)) return [a1, ab2];
+	if (isPoint3d(a1)) {
+		const b$1 = {
+			x: ab2,
+			y: ab3,
+			z: ab4
+		};
+		if (!isPoint3d(b$1)) throw new Error(`Expected x, y & z parameters`);
+		return [a1, b$1];
+	}
+	if (isPoint(a1)) {
+		const b$1 = {
+			x: ab2,
+			y: ab3
+		};
+		if (!isPoint(b$1)) throw new Error(`Expected x & y parameters`);
+		return [a1, b$1];
+	}
+	if (typeof ab5 !== `undefined` && typeof ab4 !== `undefined`) {
+		const a$1 = {
+			x: a1,
+			y: ab2,
+			z: ab3
+		};
+		const b$1 = {
+			x: ab4,
+			y: ab5,
+			z: ab6
+		};
+		if (!isPoint3d(a$1)) throw new Error(`Expected x,y,z for first point`);
+		if (!isPoint3d(b$1)) throw new Error(`Expected x,y,z for second point`);
+		return [a$1, b$1];
+	}
+	const a = {
+		x: a1,
+		y: ab2
+	};
+	const b = {
+		x: ab3,
+		y: ab4
+	};
+	if (!isPoint(a)) throw new Error(`Expected x,y for first point`);
+	if (!isPoint(b)) throw new Error(`Expected x,y for second point`);
+	return [a, b];
+}
+/**
+* Returns a Point form of either a point, x,y params or x,y,z params.
+* If parameters are undefined, an empty point is returned (0, 0)
+* @ignore
+* @param a
+* @param b
+* @returns
+*/
+function getPointParameter(a, b, c) {
+	if (a === void 0) return {
+		x: 0,
+		y: 0
+	};
+	if (Array.isArray(a)) {
+		if (a.length === 0) return Object.freeze({
+			x: 0,
+			y: 0
+		});
+		if (a.length === 1) return Object.freeze({
+			x: a[0],
+			y: 0
+		});
+		if (a.length === 2) return Object.freeze({
+			x: a[0],
+			y: a[1]
+		});
+		if (a.length === 3) return Object.freeze({
+			x: a[0],
+			y: a[1],
+			z: a[2]
+		});
+		throw new Error(`Expected array to be 1-3 elements in length. Got ${a.length}.`);
+	}
+	if (isPoint(a)) return a;
+	else if (typeof a !== `number` || typeof b !== `number`) throw new TypeError(`Expected point or x,y as parameters. Got: a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
+	if (typeof c === `number`) return Object.freeze({
+		x: a,
+		y: b,
+		z: c
+	});
+	return Object.freeze({
+		x: a,
+		y: b
+	});
+}
+
+//#endregion
+//#region ../geometry/src/point/distance.ts
+/**
+* Calculate distance between two points.
+* If both points have a `z` property, the distance is 3D distance is calculated.
+* If only one point has a `z`, it is ignored.
+*
+* ```js
+* // Distance between two points
+* const ptA = { x: 0.5, y:0.8 };
+* const ptB = { x: 1, y: 0.4 };
+* distance(ptA, ptB);
+* // Or, provide x,y as parameters
+* distance(ptA, 0.4, 0.9);
+*
+* // Distance from ptA to x: 0.5, y:0.8, z: 0.1
+* const ptC = { x: 0.5, y:0.5, z: 0.3 };
+* // With x,y,z as parameters:
+* distance(ptC, 0.5, 0.8, 0.1);
+* ```
+* @param a First point
+* @param xOrB Second point, or x coord
+* @param y y coord, if x coord is given
+* @param z Optional z coord, if x and y are given.
+* @returns
+*/
+function distance(a, xOrB, y, z) {
+	const pt = getPointParameter(xOrB, y, z);
+	guard$1(pt, `b`);
+	guard$1(a, `a`);
+	return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
+}
+
+//#endregion
+//#region ../geometry/src/point/find-minimum.ts
+/**
+* Returns the 'minimum' point from an array of points, using a comparison function.
+*
+* @example Find point closest to a coordinate
+* ```js
+* const points = [...];
+* const center = {x: 100, y: 100};
+*
+* const closestToCenter = findMinimum((a, b) => {
+*  const aDist = distance(a, center);
+*  const bDist = distance(b, center);
+*  if (aDistance < bDistance) return a;
+*  return b;
+* }, points);
+* ```
+* @param comparer Compare function returns the smallest of `a` or `b`
+* @param points
+* @returns
+*/
+function findMinimum(comparer, ...points) {
+	if (points.length === 0) throw new Error(`No points provided`);
+	let min = points[0];
+	for (const p of points) if (isPoint3d(min) && isPoint3d(p)) min = comparer(min, p);
+	else min = comparer(min, p);
+	return min;
+}
+
+//#endregion
+//#region ../geometry/src/rect/max.ts
+/**
+* Returns a rectangle based on provided four corners.
+*
+* To create a rectangle that contains an arbitary set of points, use {@link Points.bbox}.
+*
+* Does some sanity checking such as:
+*  - x will be smallest of topLeft/bottomLeft
+*  - y will be smallest of topRight/topLeft
+*  - width will be largest between top/bottom left and right
+*  - height will be largest between left and right top/bottom
+*
+*/
+const maxFromCorners = (topLeft, topRight, bottomRight, bottomLeft) => {
+	if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
+	if (topLeft.y > bottomLeft.y) throw new Error(`topLeft.y greater than bottomLeft.y`);
+	const w1 = topRight.x - topLeft.x;
+	const w2 = bottomRight.x - bottomLeft.x;
+	const h1 = Math.abs(bottomLeft.y - topLeft.y);
+	const h2 = Math.abs(bottomRight.y - topRight.y);
+	return {
+		x: Math.min(topLeft.x, bottomLeft.x),
+		y: Math.min(topRight.y, topLeft.y),
+		width: Math.max(w1, w2),
+		height: Math.max(h1, h2)
+	};
+};
+
+//#endregion
+//#region ../geometry/src/point/bbox.ts
+/**
+* Returns the minimum rectangle that can enclose all provided points
+* @param points
+* @returns
+*/
+const bbox$1 = (...points) => {
+	const leftMost = findMinimum((a, b) => {
+		return a.x < b.x ? a : b;
+	}, ...points);
+	const rightMost = findMinimum((a, b) => {
+		return a.x > b.x ? a : b;
+	}, ...points);
+	const topMost = findMinimum((a, b) => {
+		return a.y < b.y ? a : b;
+	}, ...points);
+	const bottomMost = findMinimum((a, b) => {
+		return a.y > b.y ? a : b;
+	}, ...points);
+	const topLeft = {
+		x: leftMost.x,
+		y: topMost.y
+	};
+	const topRight = {
+		x: rightMost.x,
+		y: topMost.y
+	};
+	const bottomRight = {
+		x: rightMost.x,
+		y: bottomMost.y
+	};
+	const bottomLeft = {
+		x: leftMost.x,
+		y: bottomMost.y
+	};
+	return maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
+};
+const bbox3d = (...points) => {
+	const box = bbox$1(...points);
+	const zMin = findMinimum((a, b) => {
+		return a.z < b.z ? a : b;
+	}, ...points);
+	const zMax = findMinimum((a, b) => {
+		return a.z > b.z ? a : b;
+	}, ...points);
+	return {
+		...box,
+		z: zMin.z,
+		depth: zMax.z - zMin.z
+	};
+};
+
+//#endregion
+//#region ../geometry/src/polar/guard.ts
+/**
+* Returns true if `p` seems to be a {@link Polar.Coord} (ie has both distance & angleRadian fields)
+* @param p
+* @returns True if `p` seems to be a PolarCoord
+*/
+const isPolarCoord = (p) => {
+	if (p.distance === void 0) return false;
+	if (p.angleRadian === void 0) return false;
+	return true;
+};
+/**
+* Throws an error if Coord is invalid
+* @param p
+* @param name
+*/
+const guard$6 = (p, name = `Point`) => {
+	if (p === void 0) throw new Error(`'${name}' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
+	if (p === null) throw new Error(`'${name}' is null. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
+	if (p.angleRadian === void 0) throw new Error(`'${name}.angleRadian' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
+	if (p.distance === void 0) throw new Error(`'${name}.distance' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(p)}`);
+	if (typeof p.angleRadian !== `number`) throw new TypeError(`'${name}.angleRadian' must be a number. Got ${p.angleRadian}`);
+	if (typeof p.distance !== `number`) throw new TypeError(`'${name}.distance' must be a number. Got ${p.distance}`);
+	if (p.angleRadian === null) throw new Error(`'${name}.angleRadian' is null`);
+	if (p.distance === null) throw new Error(`'${name}.distance' is null`);
+	if (Number.isNaN(p.angleRadian)) throw new TypeError(`'${name}.angleRadian' is NaN`);
+	if (Number.isNaN(p.distance)) throw new Error(`'${name}.distance' is NaN`);
+};
+
+//#endregion
+//#region ../geometry/src/polar/angles.ts
 /**
 * Returns a rotated coordinate
 * @param c Coordinate
@@ -1455,7 +974,7 @@ const rotateDegrees = (c, amountDeg) => Object.freeze({
 });
 
 //#endregion
-//#region packages/geometry/src/point/subtract.ts
+//#region ../geometry/src/point/subtract.ts
 /**
 * Returns a Point with the x,y,z values of two points subtracted (a-b).
 * 
@@ -1482,14 +1001,14 @@ function subtract$2(a1, ab2, ab3, ab4, ab5, ab6) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/empty.ts
+//#region ../geometry/src/point/empty.ts
 /**
 * An empty point of `{ x: 0, y: 0 }`.
 *
 * Use `isEmpty` to check if a point is empty.
 * Use `Empty3d` to get an empty point with `z`.
 */
-const Empty$1 = {
+const Empty = {
 	x: 0,
 	y: 0
 };
@@ -1520,7 +1039,7 @@ const Unit3d = {
 };
 
 //#endregion
-//#region packages/geometry/src/polar/conversions.ts
+//#region ../geometry/src/polar/conversions.ts
 /**
 * Converts to Cartesian coordinate from polar.
 *
@@ -1545,12 +1064,12 @@ const Unit3d = {
 */
 const toCartesian = (a, b, c) => {
 	if (isPolarCoord(a)) {
-		if (typeof b === `undefined`) b = Empty$1;
+		if (typeof b === `undefined`) b = Empty;
 		if (isPoint(b)) return polarToCartesian(a.distance, a.angleRadian, b);
 		throw new Error(`Expecting (Coord, Point). Second parameter is not a point`);
 	} else if (typeof a === `object`) throw new TypeError(`First param is an object, but not a Coord: ${JSON.stringify(a)}`);
 	else if (typeof a === `number` && typeof b === `number`) {
-		if (c === void 0) c = Empty$1;
+		if (c === void 0) c = Empty;
 		if (!isPoint(c)) throw new Error(`Expecting (number, number, Point). Point param wrong type`);
 		return polarToCartesian(a, b, c);
 	} else throw new TypeError(`Expecting parameters of (number, number). Got: (${typeof a}, ${typeof b}, ${typeof c}). a: ${JSON.stringify(a)}`);
@@ -1585,7 +1104,7 @@ const fromCartesian = (point$1, origin) => {
 * @param origin Origin, or 0,0 by default.
 * @returns
 */
-const polarToCartesian = (distance$2, angleRadians, origin = Empty$1) => {
+const polarToCartesian = (distance$2, angleRadians, origin = Empty) => {
 	guard$1(origin);
 	return Object.freeze({
 		x: origin.x + distance$2 * Math.cos(angleRadians),
@@ -1606,7 +1125,7 @@ const toString$5 = (p, digits) => {
 	const a = digits ? angleDeg.toFixed(digits) : angleDeg;
 	return `(${d},${a})`;
 };
-const toPoint = (v, origin = Empty$1) => {
+const toPoint = (v, origin = Empty) => {
 	guard$6(v, `v`);
 	return Object.freeze({
 		x: origin.x + v.distance * Math.cos(v.angleRadian),
@@ -1615,7 +1134,7 @@ const toPoint = (v, origin = Empty$1) => {
 };
 
 //#endregion
-//#region packages/geometry/src/polar/math.ts
+//#region ../geometry/src/polar/math.ts
 const normalise$2 = (c) => {
 	if (c.distance === 0) throw new Error(`Cannot normalise vector of length 0`);
 	return Object.freeze({
@@ -1687,7 +1206,7 @@ const divide$4 = (v, amt) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/point-type.ts
+//#region ../geometry/src/point/point-type.ts
 /**
 * Placeholder point: `{ x: NaN, y: NaN }`
 * Use `isPlaceholder` to check if a point is a placeholder.
@@ -1709,7 +1228,7 @@ const Placeholder3d = Object.freeze({
 });
 
 //#endregion
-//#region packages/geometry/src/point/angle.ts
+//#region ../geometry/src/point/angle.ts
 /**
 * Returns the angle in radians between `a` and `b`.
 *
@@ -1758,7 +1277,7 @@ const angleRadianCircle = (a, b, c) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/To.ts
+//#region ../geometry/src/point/To.ts
 /**
 * Returns a point with rounded x,y coordinates. By default uses `Math.round` to round.
 * ```js
@@ -1825,7 +1344,7 @@ function toString$2(p, digits) {
 }
 
 //#endregion
-//#region packages/geometry/src/polar/ray.ts
+//#region ../geometry/src/polar/ray.ts
 var ray_exports = {};
 __export(ray_exports, {
 	fromLine: () => fromLine,
@@ -1893,7 +1412,7 @@ const fromLine = (line, origin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/polar/spiral.ts
+//#region ../geometry/src/polar/spiral.ts
 function* spiral(smoothness, zoom) {
 	let step = 0;
 	while (true) {
@@ -1921,7 +1440,7 @@ const spiralRaw = (step, smoothness, zoom) => {
 };
 
 //#endregion
-//#region packages/geometry/src/polar/index.ts
+//#region ../geometry/src/polar/index.ts
 var polar_exports = {};
 __export(polar_exports, {
 	Ray: () => ray_exports,
@@ -1947,7 +1466,3452 @@ __export(polar_exports, {
 });
 
 //#endregion
-//#region packages/geometry/src/line/from-pivot.ts
+//#region ../geometry/src/line/from-points.ts
+/**
+* Returns a line from two points
+* 
+* ```js
+* // Line from 0,1 to 10,15
+* const line = Lines.fromPoints( { x:0, y:1 }, { x:10, y:15 });
+* // line is: { a: { x: 0, y: 1}, b: { x: 10, y: 15 } };
+* ```
+* @param a Start point
+* @param b End point
+* @returns 
+*/
+const fromPoints$2 = (a, b) => {
+	guard$1(a, `a`);
+	guard$1(b, `b`);
+	a = Object.freeze({ ...a });
+	b = Object.freeze({ ...b });
+	return Object.freeze({
+		a,
+		b
+	});
+};
+
+//#endregion
+//#region ../geometry/src/arc/index.ts
+var arc_exports = {};
+__export(arc_exports, {
+	angularSize: () => angularSize,
+	bbox: () => bbox$5,
+	distanceCenter: () => distanceCenter$1,
+	fromCircle: () => fromCircle,
+	fromCircleAmount: () => fromCircleAmount,
+	fromDegrees: () => fromDegrees$1,
+	getStartEnd: () => getStartEnd,
+	guard: () => guard$5,
+	interpolate: () => interpolate$4,
+	isArc: () => isArc,
+	isEqual: () => isEqual$6,
+	isPositioned: () => isPositioned$2,
+	length: () => length$3,
+	point: () => point,
+	toLine: () => toLine,
+	toPath: () => toPath$3,
+	toSvg: () => toSvg$1
+});
+/**
+* Returns true if parameter is an arc
+* @param p Arc or number
+* @returns 
+*/
+const isArc = (p) => typeof p.startRadian !== `undefined` && typeof p.endRadian !== `undefined` && typeof p.clockwise !== `undefined`;
+/**
+* Returns true if parameter has a positioned (x,y) 
+* @param p Point, Arc or ArcPositiond
+* @returns 
+*/
+const isPositioned$2 = (p) => typeof p.x !== `undefined` && typeof p.y !== `undefined`;
+/**
+* Returns an arc from degrees, rather than radians
+* @param radius Radius of arc
+* @param startDegrees Start angle in degrees
+* @param endDegrees End angle in degrees
+* @param origin Optional center of arc
+* @param clockwise Whether arc moves in clockwise direction
+* @returns Arc
+*/
+function fromDegrees$1(radius, startDegrees, endDegrees, clockwise, origin) {
+	const a = {
+		radius,
+		startRadian: degreeToRadian(startDegrees),
+		endRadian: degreeToRadian(endDegrees),
+		clockwise
+	};
+	if (isPoint(origin)) {
+		guard$1(origin);
+		const ap = {
+			...a,
+			x: origin.x,
+			y: origin.y
+		};
+		return Object.freeze(ap);
+	} else return Object.freeze(a);
+}
+/**
+* Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
+*
+* @param arc
+* @returns Line from start to end of arc
+*/
+const toLine = (arc) => fromPoints$2(point(arc, arc.startRadian), point(arc, arc.endRadian));
+/**
+* Return start and end points of `arc`.
+* `origin` will override arc's origin, if defined.
+* 
+* See also: 
+* * {@link point} - get point on arc by angle
+* * {@link interpolate} - get point on arc by interpolation percentage
+* @param arc 
+* @param origin 
+* @returns 
+*/
+const getStartEnd = (arc, origin) => {
+	guard$5(arc);
+	const start = point(arc, arc.startRadian, origin);
+	const end = point(arc, arc.endRadian, origin);
+	return [start, end];
+};
+/**
+* Calculates a coordinate on an arc, based on an angle.
+* `origin` will override arc's origin, if defined.
+* 
+* See also:
+* * {@link getStartEnd} - get start and end of arc
+* * {@link interpolate} - get point on arc by interpolation percentage
+* @param arc Arc
+* @param angleRadian Angle of desired coordinate 
+* @param origin Origin of arc (0,0 used by default)
+* @returns Coordinate
+*/
+const point = (arc, angleRadian$2, origin) => {
+	if (typeof origin === `undefined`) origin = isPositioned$2(arc) ? arc : {
+		x: 0,
+		y: 0
+	};
+	return {
+		x: Math.cos(angleRadian$2) * arc.radius + origin.x,
+		y: Math.sin(angleRadian$2) * arc.radius + origin.y
+	};
+};
+/**
+* Throws an error if arc instance is invalid
+* @param arc 
+*/
+const guard$5 = (arc) => {
+	if (typeof arc === `undefined`) throw new TypeError(`Arc is undefined`);
+	if (isPositioned$2(arc)) guard$1(arc, `arc`);
+	if (typeof arc.radius === `undefined`) throw new TypeError(`Arc radius is undefined (${JSON.stringify(arc)})`);
+	if (typeof arc.radius !== `number`) throw new TypeError(`Radius must be a number`);
+	if (Number.isNaN(arc.radius)) throw new TypeError(`Radius is NaN`);
+	if (arc.radius <= 0) throw new TypeError(`Radius must be greater than zero`);
+	if (typeof arc.startRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
+	if (typeof arc.endRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
+	if (Number.isNaN(arc.endRadian)) throw new TypeError(`Arc endRadian is NaN`);
+	if (Number.isNaN(arc.startRadian)) throw new TypeError(`Arc endRadian is NaN`);
+	if (typeof arc.clockwise === `undefined`) throw new TypeError(`Arc is missing 'clockwise field`);
+	if (arc.startRadian >= arc.endRadian) throw new TypeError(`startRadian is expected to be les than endRadian`);
+};
+/**
+* Compute relative position on arc.
+* 
+* See also:
+* * {@link getStartEnd} - get start and end of arc
+* * {@link point} - get point on arc by angle
+* @param arc Arc
+* @param amount Relative position 0-1
+* @param origin If arc is not positioned, pass in an origin
+* @param allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
+* @returns 
+*/
+const interpolate$4 = (amount, arc, allowOverflow, origin) => {
+	guard$5(arc);
+	const overflowOk = allowOverflow ?? false;
+	if (!overflowOk) {
+		if (amount < 0) throw new Error(`Param 'amount' is under zero, and overflow is not allowed`);
+		if (amount > 1) throw new Error(`Param 'amount' is above 1 and overflow is not allowed`);
+	}
+	const span = angularSize(arc);
+	const rel = span * amount;
+	const angle = radiansSum(arc.startRadian, rel, arc.clockwise);
+	return point(arc, angle, origin);
+};
+/**
+* Returns the angular size of arc.
+* Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
+* @param arc 
+*/
+const angularSize = (arc) => radianArc(arc.startRadian, arc.endRadian, arc.clockwise);
+/**
+* Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.
+* @param arc 
+* @returns Path
+*/
+const toPath$3 = (arc) => {
+	guard$5(arc);
+	return Object.freeze({
+		...arc,
+		nearest: (_point) => {
+			throw new Error(`not implemented`);
+		},
+		interpolate: (amount) => interpolate$4(amount, arc),
+		bbox: () => bbox$5(arc),
+		length: () => length$3(arc),
+		toSvgString: () => toSvg$1(arc),
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		kind: `arc`
+	});
+};
+/**
+* Returns an arc based on a circle using start and end angles.
+* If you don't have the end angle, but rather the size of the arc, use {@link fromCircleAmount}
+* @param circle Circle
+* @param startRadian Start radian
+* @param endRadian End radian
+* @param clockwise Whether arc goes in a clockwise direction (default: true)
+* @returns 
+*/
+const fromCircle = (circle, startRadian, endRadian, clockwise = true) => {
+	const a = Object.freeze({
+		...circle,
+		endRadian,
+		startRadian,
+		clockwise
+	});
+	return a;
+};
+/**
+* Returns an arc based on a circle, a start angle, and the size of the arc.
+* See {@link fromCircle} if you already have start and end angles.
+* @param circle Circle to base off
+* @param startRadian Starting angle
+* @param sizeRadian Size of arc
+* @param clockwise Whether arc moves in clockwise direction (default: true)
+* @returns 
+*/
+const fromCircleAmount = (circle, startRadian, sizeRadian, clockwise = true) => {
+	const endRadian = radiansSum(startRadian, sizeRadian, clockwise);
+	return fromCircle(circle, startRadian, endRadian);
+};
+/**
+* Calculates the length of the arc
+* @param arc 
+* @returns Length
+*/
+const length$3 = (arc) => piPi * arc.radius * ((arc.startRadian - arc.endRadian) / piPi);
+/**
+* Calculates a {@link Rect} bounding box for arc.
+* @param arc 
+* @returns Rectangle encompassing arc.
+*/
+const bbox$5 = (arc) => {
+	if (isPositioned$2(arc)) {
+		const middle = interpolate$4(.5, arc);
+		const asLine = toLine(arc);
+		return bbox$1(middle, asLine.a, asLine.b);
+	} else return {
+		width: arc.radius * 2,
+		height: arc.radius * 2
+	};
+};
+/**
+* Creates an SV path snippet for arc
+* @returns 
+*/
+const toSvg$1 = (a, b, c, d, e) => {
+	if (isArc(a)) if (isPositioned$2(a)) if (isPoint(b)) return toSvgFull$1(b, a.radius, a.startRadian, a.endRadian, c);
+	else return toSvgFull$1(a, a.radius, a.startRadian, a.endRadian, b);
+	else return isPoint(b) ? toSvgFull$1(b, a.radius, a.startRadian, a.endRadian, c) : toSvgFull$1({
+		x: 0,
+		y: 0
+	}, a.radius, a.startRadian, a.endRadian);
+	else {
+		if (c === void 0) throw new Error(`startAngle undefined`);
+		if (d === void 0) throw new Error(`endAngle undefined`);
+		if (isPoint(a)) if (typeof b === `number` && typeof c === `number` && typeof d === `number`) return toSvgFull$1(a, b, c, d, e);
+		else throw new TypeError(`Expected (point, number, number, number). Missing a number param.`);
+		else throw new Error(`Expected (point, number, number, number). Missing first point.`);
+	}
+};
+const toSvgFull$1 = (origin, radius, startRadian, endRadian, opts) => {
+	if (opts === void 0 || typeof opts !== `object`) opts = {};
+	const isFullCircle = endRadian - startRadian === 360;
+	const start = toCartesian(radius, endRadian - .01, origin);
+	const end = toCartesian(radius, startRadian, origin);
+	const { largeArc = false, sweep = false } = opts;
+	const d = [`
+    M ${start.x} ${start.y}
+    A ${radius} ${radius} 0 ${largeArc ? `1` : `0`} ${sweep ? `1` : `0`} ${end.x} ${end.y},
+  `];
+	if (isFullCircle) d.push(`z`);
+	return d;
+};
+/**
+* Calculates the distance between the centers of two arcs
+* @param a
+* @param b 
+* @returns Distance 
+*/
+const distanceCenter$1 = (a, b) => distance(a, b);
+/**
+* Returns true if the two arcs have the same values
+*
+* ```js
+* const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+* const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+* arcA === arcB; // false, because object identities are different
+* Arcs.isEqual(arcA, arcB); // true, because values are identical
+* ```
+* @param a
+* @param b
+* @returns {boolean}
+*/
+const isEqual$6 = (a, b) => {
+	if (a.radius !== b.radius) return false;
+	if (a.endRadian !== b.endRadian) return false;
+	if (a.startRadian !== b.startRadian) return false;
+	if (a.clockwise !== b.clockwise) return false;
+	if (isPositioned$2(a) && isPositioned$2(b)) {
+		if (a.x !== b.x) return false;
+		if (a.y !== b.y) return false;
+		if (a.z !== b.z) return false;
+	} else if (!isPositioned$2(a) && !isPositioned$2(b)) {} else return false;
+	return true;
+};
+
+//#endregion
+//#region ../geometry/src/line/guard.ts
+/**
+* Returns true if `p` is a valid line, containing `a` and `b` Points.
+* ```js
+* Lines.isLine(l);
+* ```
+* @param p Value to check
+* @returns True if a valid line.
+*/
+const isLine = (p) => {
+	if (p === void 0) return false;
+	if (p.a === void 0) return false;
+	if (p.b === void 0) return false;
+	if (!isPoint(p.a)) return false;
+	if (!isPoint(p.b)) return false;
+	return true;
+};
+/**
+* Returns true if `p` is a {@link PolyLine}, ie. an array of {@link Line}s.
+* Validates all items in array.
+* @param p 
+* @returns
+*/
+const isPolyLine = (p) => {
+	if (!Array.isArray(p)) return false;
+	const valid = !p.some((v) => !isLine(v));
+	return valid;
+};
+/**
+* Throws an exception if:
+* * line is undefined
+* * a or b parameters are missing
+* 
+* Does not validate points
+* @param line 
+* @param name 
+*/
+const guard$3 = (line, name = `line`) => {
+	if (line === void 0) throw new Error(`${name} undefined`);
+	if (line.a === void 0) throw new Error(`${name}.a undefined. Expected {a:Point, b:Point}. Got: ${JSON.stringify(line)}`);
+	if (line.b === void 0) throw new Error(`${name}.b undefined. Expected {a:Point, b:Point} Got: ${JSON.stringify(line)}`);
+};
+
+//#endregion
+//#region ../geometry/src/line/get-points-parameter.ts
+/**
+* Returns [a,b] points from either a line parameter, or two points.
+* It additionally applies the guardPoint function to ensure validity.
+* This supports function overloading.
+* @ignore
+* @param aOrLine 
+* @param b 
+* @returns 
+*/
+const getPointParameter$1 = (aOrLine, b) => {
+	let a;
+	if (isLine(aOrLine)) {
+		b = aOrLine.b;
+		a = aOrLine.a;
+	} else {
+		a = aOrLine;
+		if (b === void 0) throw new Error(`Since first parameter is not a line, two points are expected. Got a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
+	}
+	guard$1(a, `a`);
+	guard$1(a, `b`);
+	return [a, b];
+};
+
+//#endregion
+//#region ../geometry/src/line/length.ts
+/**
+* Returns length of line, polyline or between two points
+* 
+* @param aOrLine Point A, line or polyline (array of lines)
+* @param pointB Point B, if first parameter is a point
+* @returns Length (total accumulated length for arrays)
+*/
+function length(aOrLine, pointB) {
+	if (isPolyLine(aOrLine)) {
+		const sum$4 = aOrLine.reduce((accumulator, v) => length(v) + accumulator, 0);
+		return sum$4;
+	}
+	if (aOrLine === void 0) throw new TypeError(`Parameter 'aOrLine' is undefined`);
+	const [a, b] = getPointParameter$1(aOrLine, pointB);
+	const x = b.x - a.x;
+	const y = b.y - a.y;
+	if (a.z !== void 0 && b.z !== void 0) {
+		const z = b.z - a.z;
+		return Math.hypot(x, y, z);
+	} else return Math.hypot(x, y);
+}
+
+//#endregion
+//#region ../geometry/src/line/reverse.ts
+/**
+* Reverses a line.
+* ````js
+* const a = { x: 10, y: 20 };
+* const b = { x: 100, y: 200 };
+* const line = reverse({ a, b });
+* // { a: { x: 100, y: 200 }, b: { x: 10, y: 20 } }
+* ```
+* @param line 
+* @returns 
+*/
+function reverse(line) {
+	guard$3(line, `line`);
+	return {
+		a: line.b,
+		b: line.a
+	};
+}
+
+//#endregion
+//#region ../geometry/src/line/interpolate.ts
+/**
+* Calculates a point in-between a line's start and end points.
+* 
+* @param amount Interpolation amount
+* @param aOrLine Line, or first point
+* @param pointBOrAllowOverflow Second point (if needed) or allowOverflow.
+* @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line.
+* @returns 
+*/
+function interpolate$1(amount, aOrLine, pointBOrAllowOverflow, allowOverflow) {
+	if (typeof pointBOrAllowOverflow === `boolean`) {
+		allowOverflow = pointBOrAllowOverflow;
+		pointBOrAllowOverflow = void 0;
+	}
+	if (!allowOverflow) resultThrow(percentTest(amount, `amount`));
+	else resultThrow(numberTest(amount, ``, `amount`));
+	const [a, b] = getPointParameter$1(aOrLine, pointBOrAllowOverflow);
+	const d = length(a, b);
+	const d2 = d * (1 - amount);
+	if (d === 0 && d2 === 0) return Object.freeze({ ...b });
+	const x = b.x - d2 * (b.x - a.x) / d;
+	const y = b.y - d2 * (b.y - a.y) / d;
+	return Object.freeze({
+		...b,
+		x,
+		y
+	});
+}
+/**
+* Returns the point along a line from its start (A)
+* @param line Line
+* @param distance Distance
+* @param fromA If _true_ (default) returns from A. Use _false_ to calculate from end
+* @returns 
+*/
+function pointAtDistance(line, distance$2, fromA$2 = true) {
+	if (!fromA$2) line = reverse(line);
+	const dx = line.b.x - line.a.x;
+	const dy = line.b.y - line.a.y;
+	const theta = Math.atan2(dy, dx);
+	const xp = distance$2 * Math.cos(theta);
+	const yp = distance$2 * Math.sin(theta);
+	return {
+		x: xp + line.a.x,
+		y: yp + line.a.y
+	};
+}
+
+//#endregion
+//#region ../geometry/src/rect/guard.ts
+/**
+* Throws an error if the dimensions of the rectangle are undefined, NaN or negative.
+* @param d 
+* @param name 
+*/
+const guardDim = (d, name = `Dimension`) => {
+	if (d === void 0) throw new Error(`${name} is undefined`);
+	if (Number.isNaN(d)) throw new Error(`${name} is NaN`);
+	if (d < 0) throw new Error(`${name} cannot be negative`);
+};
+/**
+* Throws an error if rectangle is missing fields or they
+* are not valid.
+* 
+* Checks:
+* * `width` and `height` must be defined on `rect`
+* * dimensions (w & h) must not be NaN
+* * dimensions (w & h) must not be negative
+* 
+* If `rect` has x,y, this value is checked as well.
+* @param rect
+* @param name
+*/
+const guard$2 = (rect, name = `rect`) => {
+	if (rect === void 0) throw new Error(`{$name} undefined`);
+	if (isPositioned(rect)) guard$1(rect, name);
+	guardDim(rect.width, name + `.width`);
+	guardDim(rect.height, name + `.height`);
+};
+/**
+* Returns a positioned rect or if it's not possible, throws an error.
+* 
+* If `rect` does not have a position, `origin` is used.
+* If `rect` is positioned and `origin` is provided, returned result uses `origin` as x,y instead.
+* ```js
+* // Returns input because it's positioned
+* getRectPositioned({ x:1, y:2, width:10, height:20 });
+* 
+* // Returns { x:1, y:2, width:10, height:20 }
+* getRectPositioned({ width:10, height:20 }, { x:1, y:2 });
+*  
+* // Throws, because we have no point
+* getRectPositioned({width:10,height:20})
+* ```
+* @param rect 
+* @param origin 
+* @returns 
+*/
+const getRectPositioned = (rect, origin) => {
+	guard$2(rect);
+	if (isPositioned(rect) && origin === void 0) return rect;
+	if (origin === void 0) throw new Error(`Unpositioned rect needs origin parameter`);
+	return Object.freeze({
+		...rect,
+		...origin
+	});
+};
+/**
+* Throws an error if `rect` is does not have a position, or
+* is an invalid rectangle
+* @param rect 
+* @param name 
+*/
+const guardPositioned = (rect, name = `rect`) => {
+	if (!isPositioned(rect)) throw new Error(`Expected ${name} to have x,y`);
+	guard$2(rect, name);
+};
+/**
+* Returns _true_ if `rect` has width and height values of 0.
+* Use Rects.Empty or Rects.EmptyPositioned to generate an empty rectangle.
+* @param rect 
+* @returns 
+*/
+const isEmpty$3 = (rect) => rect.width === 0 && rect.height === 0;
+/**
+* Returns _true_ if `rect` is a placeholder, with both width and height values of NaN.
+* Use Rects.Placeholder or Rects.PlaceholderPositioned to generate a placeholder.
+* @param rect 
+* @returns 
+*/
+const isPlaceholder$3 = (rect) => Number.isNaN(rect.width) && Number.isNaN(rect.height);
+/**
+* Returns _true_ if `rect` has position (x,y) fields.
+* @param rect Point, Rect or RectPositiond
+* @returns
+*/
+const isPositioned = (rect) => rect.x !== void 0 && rect.y !== void 0;
+/**
+* Returns _true_ if `rect` has width and height fields.
+* @param rect
+* @returns
+*/
+const isRect = (rect) => {
+	if (rect === void 0) return false;
+	if (rect.width === void 0) return false;
+	if (rect.height === void 0) return false;
+	return true;
+};
+/**
+* Returns _true_ if `rect` is a positioned rectangle
+* Having width, height, x and y properties.
+* @param rect
+* @returns
+*/
+const isRectPositioned = (rect) => isRect(rect) && isPositioned(rect);
+
+//#endregion
+//#region ../geometry/src/rect/from-top-left.ts
+/**
+* Creates a rectangle from its top-left coordinate, a width and height.
+*
+* ```js
+* // Rectangle at 50,50 with width of 100, height of 200.
+* const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
+* ```
+* @param origin
+* @param width
+* @param height
+* @returns
+*/
+const fromTopLeft = (origin, width, height$3) => {
+	guardDim(width, `width`);
+	guardDim(height$3, `height`);
+	guard$1(origin, `origin`);
+	return {
+		x: origin.x,
+		y: origin.y,
+		width,
+		height: height$3
+	};
+};
+
+//#endregion
+//#region ../geometry/src/bezier/guard.ts
+const isQuadraticBezier = (path) => path.quadratic !== void 0;
+const isCubicBezier = (path) => path.cubic1 !== void 0 && path.cubic2 !== void 0;
+
+//#endregion
+//#region ../geometry/src/bezier/index.ts
+var bezier_exports = {};
+__export(bezier_exports, {
+	cubic: () => cubic,
+	interpolator: () => interpolator,
+	isCubicBezier: () => isCubicBezier,
+	isQuadraticBezier: () => isQuadraticBezier,
+	quadratic: () => quadratic,
+	quadraticSimple: () => quadraticSimple,
+	quadraticToSvgString: () => quadraticToSvgString,
+	toPath: () => toPath$2
+});
+/**
+* Returns a new quadratic bezier with specified bend amount
+*
+* @param {QuadraticBezier} b Curve
+* @param {number} [bend=0] Bend amount, from -1 to 1
+* @returns {QuadraticBezier}
+*/
+/**
+* Creates a simple quadratic bezier with a specified amount of 'bend'.
+* Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
+* 
+* Use {@link interpolator} to calculate a point along the curve.
+* @param {Point} start Start of curve
+* @param {Point} end End of curve
+* @param {number} [bend=0] Bend amount, -1 to 1
+* @returns {QuadraticBezier}
+*/
+const quadraticSimple = (start, end, bend = 0) => {
+	if (Number.isNaN(bend)) throw new Error(`bend is NaN`);
+	if (bend < -1 || bend > 1) throw new Error(`Expects bend range of -1 to 1`);
+	const middle = interpolate$1(.5, start, end);
+	let target = middle;
+	if (end.y < start.y) target = bend > 0 ? {
+		x: Math.min(start.x, end.x),
+		y: Math.min(start.y, end.y)
+	} : {
+		x: Math.max(start.x, end.x),
+		y: Math.max(start.y, end.y)
+	};
+	else target = bend > 0 ? {
+		x: Math.max(start.x, end.x),
+		y: Math.min(start.y, end.y)
+	} : {
+		x: Math.min(start.x, end.x),
+		y: Math.max(start.y, end.y)
+	};
+	const handle = interpolate$1(Math.abs(bend), middle, target);
+	return quadratic(start, end, handle);
+};
+/**
+* Returns a relative point on a simple quadratic 
+* @param start Start
+* @param end  End
+* @param bend Bend (-1 to 1)
+* @param amt Amount
+* @returns Point
+*/
+/**
+* Interpolate cubic or quadratic bezier
+* ```js
+* const i = interpolator(myBezier);
+* 
+* // Get point at 50%
+* i(0.5); // { x, y }
+* ```
+* @param q 
+* @returns 
+*/
+const interpolator = (q) => {
+	const bzr = isCubicBezier(q) ? new Bezier(q.a.x, q.a.y, q.cubic1.x, q.cubic1.y, q.cubic2.x, q.cubic2.y, q.b.x, q.b.y) : new Bezier(q.a, q.quadratic, q.b);
+	return (amount) => bzr.compute(amount);
+};
+const quadraticToSvgString = (start, end, handle) => [`M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`];
+const toPath$2 = (cubicOrQuadratic) => {
+	if (isCubicBezier(cubicOrQuadratic)) return cubicToPath(cubicOrQuadratic);
+	else if (isQuadraticBezier(cubicOrQuadratic)) return quadratictoPath(cubicOrQuadratic);
+	else throw new Error(`Unknown bezier type`);
+};
+const cubic = (start, end, cubic1, cubic2) => ({
+	a: Object.freeze(start),
+	b: Object.freeze(end),
+	cubic1: Object.freeze(cubic1),
+	cubic2: Object.freeze(cubic2)
+});
+const cubicToPath = (cubic$1) => {
+	const { a, cubic1, cubic2, b } = cubic$1;
+	const bzr = new Bezier(a, cubic1, cubic2, b);
+	return Object.freeze({
+		...cubic$1,
+		length: () => bzr.length(),
+		interpolate: (t) => bzr.compute(t),
+		nearest: (_) => {
+			throw new Error(`not implemented`);
+		},
+		bbox: () => {
+			const { x, y } = bzr.bbox();
+			const xSize = x.size;
+			const ySize = y.size;
+			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			return fromTopLeft({
+				x: x.min,
+				y: y.min
+			}, xSize, ySize);
+		},
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		toSvgString: () => [`brrup`],
+		kind: `bezier/cubic`
+	});
+};
+const quadratic = (start, end, handle) => ({
+	a: Object.freeze(start),
+	b: Object.freeze(end),
+	quadratic: Object.freeze(handle)
+});
+const quadratictoPath = (quadraticBezier) => {
+	const { a, b, quadratic: quadratic$1 } = quadraticBezier;
+	const bzr = new Bezier(a, quadratic$1, b);
+	return Object.freeze({
+		...quadraticBezier,
+		length: () => bzr.length(),
+		interpolate: (t) => bzr.compute(t),
+		nearest: (_) => {
+			throw new Error(`not implemented`);
+		},
+		bbox: () => {
+			const { x, y } = bzr.bbox();
+			const xSize = x.size;
+			const ySize = y.size;
+			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
+			return fromTopLeft({
+				x: x.min,
+				y: y.min
+			}, xSize, ySize);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		toString: () => bzr.toString(),
+		toSvgString: () => quadraticToSvgString(a, b, quadratic$1),
+		kind: `bezier/quadratic`
+	});
+};
+
+//#endregion
+//#region ../geometry/src/circle/guard.ts
+/**
+* Throws if radius is out of range. If x,y is present, these will be validated too.
+* @param circle 
+* @param parameterName 
+*/
+const guard$4 = (circle, parameterName = `circle`) => {
+	if (isCirclePositioned(circle)) guard$1(circle, `circle`);
+	if (Number.isNaN(circle.radius)) throw new Error(`${parameterName}.radius is NaN`);
+	if (circle.radius <= 0) throw new Error(`${parameterName}.radius must be greater than zero`);
+};
+/**
+* Throws if `circle` is not positioned or has dodgy fields
+* @param circle 
+* @param parameterName 
+* @returns 
+*/
+const guardPositioned$1 = (circle, parameterName = `circle`) => {
+	if (!isCirclePositioned(circle)) throw new Error(`Expected a positioned circle with x,y`);
+	guard$4(circle, parameterName);
+};
+/***
+* Returns true if radius, x or y are NaN
+*/
+const isNaN = (a) => {
+	if (Number.isNaN(a.radius)) return true;
+	if (isCirclePositioned(a)) {
+		if (Number.isNaN(a.x)) return true;
+		if (Number.isNaN(a.y)) return true;
+	}
+	return false;
+};
+/**
+* Returns true if parameter has x,y. Does not verify if parameter is a circle or not
+* 
+* ```js
+* const circleA = { radius: 5 };
+* Circles.isPositioned(circle); // false
+* 
+* const circleB = { radius: 5, x: 10, y: 10 }
+* Circles.isPositioned(circle); // true
+* ```
+* @param p Circle
+* @returns 
+*/
+const isPositioned$1 = (p) => p.x !== void 0 && p.y !== void 0;
+const isCircle = (p) => p.radius !== void 0;
+const isCirclePositioned = (p) => isCircle(p) && isPositioned$1(p);
+
+//#endregion
+//#region ../geometry/src/circle/area.ts
+/**
+* Returns the area of `circle`.
+* @param circle 
+* @returns 
+*/
+const area$5 = (circle) => {
+	guard$4(circle);
+	return Math.PI * circle.radius * circle.radius;
+};
+
+//#endregion
+//#region ../geometry/src/rect/from-center.ts
+/**
+* Initialises a rectangle based on its center, a width and height
+*
+* ```js
+* // Rectangle with center at 50,50, width 100 height 200
+* Rects.fromCenter({x: 50, y:50}, 100, 200);
+* ```
+* @param origin
+* @param width
+* @param height
+* @returns
+*/
+const fromCenter$2 = (origin, width, height$3) => {
+	guard$1(origin, `origin`);
+	guardDim(width, `width`);
+	guardDim(height$3, `height`);
+	const halfW = width / 2;
+	const halfH = height$3 / 2;
+	return {
+		x: origin.x - halfW,
+		y: origin.y - halfH,
+		width,
+		height: height$3
+	};
+};
+
+//#endregion
+//#region ../geometry/src/circle/bbox.ts
+/**
+* Computes a bounding box that encloses circle
+* @param circle
+* @returns 
+*/
+const bbox$4 = (circle) => {
+	return isCirclePositioned(circle) ? fromCenter$2(circle, circle.radius * 2, circle.radius * 2) : {
+		width: circle.radius * 2,
+		height: circle.radius * 2,
+		x: 0,
+		y: 0
+	};
+};
+
+//#endregion
+//#region ../geometry/src/circle/center.ts
+/**
+* Returns the center of a circle
+* 
+* If the circle has an x,y, that is the center.
+* If not, `radius` is used as the x and y.
+* 
+* ```js
+* const circle = { radius: 5, x: 10, y: 10};
+* 
+* // Yields: { x: 5, y: 10 }
+* Circles.center(circle);
+* ```
+* 
+* It's a trivial function, but can make for more understandable code
+* @param circle 
+* @returns Center of circle
+*/
+const center = (circle) => {
+	return isCirclePositioned(circle) ? Object.freeze({
+		x: circle.x,
+		y: circle.y
+	}) : Object.freeze({
+		x: circle.radius,
+		y: circle.radius
+	});
+};
+
+//#endregion
+//#region ../geometry/src/circle/distance-center.ts
+/**
+* Returns the distance between two circle centers.
+* 
+* ```js
+* const circleA = { radius: 5, x: 5, y: 5 }
+* const circleB = { radius: 10, x: 20, y: 20 }
+* const distance = Circles.distanceCenter(circleA, circleB);
+* ```
+* Throws an error if either is lacking position.
+* @param a 
+* @param b 
+* @returns Distance
+*/
+const distanceCenter = (a, b) => {
+	guardPositioned$1(a, `a`);
+	if (isCirclePositioned(b)) guardPositioned$1(b, `b`);
+	return distance(a, b);
+};
+
+//#endregion
+//#region ../geometry/src/circle/distance-from-exterior.ts
+/**
+* Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
+* If `b` overlaps or is enclosed by `a`, distance is 0.
+* 
+* ```js
+* const circleA = { radius: 5, x: 5, y: 5 }
+* const circleB = { radius: 10, x: 20, y: 20 }
+* const distance = Circles.distanceCenter(circleA, circleB);
+* ```
+* @param a
+* @param b 
+*/
+const distanceFromExterior$1 = (a, b) => {
+	guardPositioned$1(a, `a`);
+	if (isCirclePositioned(b)) return Math.max(0, distanceCenter(a, b) - a.radius - b.radius);
+	else if (isPoint(b)) {
+		const distribution = distance(a, b);
+		if (distribution < a.radius) return 0;
+		return distribution;
+	} else throw new Error(`Second parameter invalid type`);
+};
+
+//#endregion
+//#region ../geometry/src/circle/exterior-points.ts
+/**
+* Yields the points making up the exterior (ie. circumference) of the circle.
+* Uses [Midpoint Circle Algorithm](http://en.wikipedia.org/wiki/Midpoint_circle_algorithm)
+* 
+* @example Draw outline of circle
+* ```js
+* const circle = { x: 100, y: 100, radius: 50 }
+* for (const pt of Circles.exteriorIntegerPoints(circle)) {
+*  // Fill 1x1 pixel
+*  ctx.fillRect(pt.x, pt.y, 1, 1);
+* }
+* ```
+* @param circle 
+*/
+function* exteriorIntegerPoints(circle) {
+	const { x, y, radius } = circle;
+	let xx = radius;
+	let yy = 0;
+	let radiusError = 1 - x;
+	while (xx >= yy) {
+		yield {
+			x: xx + x,
+			y: yy + y
+		};
+		yield {
+			x: yy + x,
+			y: xx + y
+		};
+		yield {
+			x: -xx + x,
+			y: yy + y
+		};
+		yield {
+			x: -yy + x,
+			y: xx + y
+		};
+		yield {
+			x: -xx + x,
+			y: -yy + y
+		};
+		yield {
+			x: -yy + x,
+			y: -xx + y
+		};
+		yield {
+			x: xx + x,
+			y: -yy + y
+		};
+		yield {
+			x: yy + x,
+			y: -xx + y
+		};
+		yy++;
+		if (radiusError < 0) radiusError += 2 * yy + 1;
+		else {
+			xx--;
+			radiusError += 2 * (yy - xx + 1);
+		}
+	}
+}
+
+//#endregion
+//#region ../geometry/src/circle/interior-points.ts
+/**
+* Returns all integer points contained within `circle`.
+* 
+* ```js
+* const c = { x:100, y:100, radius:100 };
+* for (const pt of Circles.interiorIntegerPoints(c)) {
+*   ctx.fillRect(pt.x, pt.y, 1, 1);
+* }
+* ```
+* @param circle 
+*/
+function* interiorIntegerPoints(circle) {
+	const xMin = circle.x - circle.radius;
+	const xMax = circle.x + circle.radius;
+	const yMin = circle.y - circle.radius;
+	const yMax = circle.y + circle.radius;
+	for (let x = xMin; x < xMax; x++) for (let y = yMin; y < yMax; y++) {
+		const r = Math.abs(distance(circle, x, y));
+		if (r <= circle.radius) yield {
+			x,
+			y
+		};
+	}
+}
+
+//#endregion
+//#region ../geometry/src/circle/perimeter.ts
+const piPi$5 = Math.PI * 2;
+/**
+* Returns the nearest point on `circle`'s perimeter closest to `point`.
+* 
+* ```js
+* const pt = Circles.nearest(circle, {x:10,y:10});
+* ```
+* 
+* If an array of circles is provided, it will be the closest point amongst all the circles
+* @param circle Circle or array of circles
+* @param point
+* @returns Point `{ x, y }`
+*/
+const nearest$1 = (circle, point$1) => {
+	const n = (a) => {
+		const l = Math.sqrt(Math.pow(point$1.x - a.x, 2) + Math.pow(point$1.y - a.y, 2));
+		const x = a.x + a.radius * ((point$1.x - a.x) / l);
+		const y = a.y + a.radius * ((point$1.y - a.y) / l);
+		return {
+			x,
+			y
+		};
+	};
+	if (Array.isArray(circle)) {
+		const pts = circle.map((l) => n(l));
+		const dists = pts.map((p) => distance(p, point$1));
+		return Object.freeze(pts[minIndex(...dists)]);
+	} else return Object.freeze(n(circle));
+};
+/**
+* Returns a point on a circle's perimeter at a specified angle in radians
+* 
+* ```js
+* // Circle without position
+* const circleA = { radius: 5 };
+* 
+* // Get point at angle Math.PI, passing in a origin coordinate
+* const ptA = Circles.pointOnPerimeter(circleA, Math.PI, {x: 10, y: 10 });
+* 
+* // Point on circle with position
+* const circleB = { radius: 5, x: 10, y: 10};
+* const ptB = Circles.pointOnPerimeter(circleB, Math.PI);
+* ```
+* @param circle
+* @param angleRadian Angle in radians
+* @param origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
+* @returns Point oo circle
+*/
+const pointOnPerimeter = (circle, angleRadian$2, origin) => {
+	if (origin === void 0) origin = isCirclePositioned(circle) ? circle : {
+		x: 0,
+		y: 0
+	};
+	return {
+		x: Math.cos(-angleRadian$2) * circle.radius + origin.x,
+		y: Math.sin(-angleRadian$2) * circle.radius + origin.y
+	};
+};
+/**
+* Returns circumference of `circle` (alias of {@link length})
+* @param circle 
+* @returns 
+*/
+const circumference = (circle) => {
+	guard$4(circle);
+	return piPi$5 * circle.radius;
+};
+/**
+* Returns circumference of `circle` (alias of {@link circumference})
+* @param circle 
+* @returns 
+*/
+const length$2 = (circle) => circumference(circle);
+
+//#endregion
+//#region ../geometry/src/circle/interpolate.ts
+const piPi$4 = Math.PI * 2;
+/**
+* Computes relative position along circle perimeter
+* 
+* ```js
+* const circle = { radius: 100, x: 100, y: 100 };
+* 
+* // Get a point halfway around circle
+* // Yields { x, y }
+* const pt = Circles.interpolate(circle, 0.5);
+* ```
+* @param circle 
+* @param t Position, 0-1
+* @returns 
+*/
+const interpolate$3 = (circle, t) => pointOnPerimeter(circle, t * piPi$4);
+
+//#endregion
+//#region ../geometry/src/circle/is-equal.ts
+/**
+* Returns true if the two objects have the same values
+*
+* ```js
+* const circleA = { radius: 10, x: 5, y: 5 };
+* const circleB = { radius: 10, x: 5, y: 5 };
+* 
+* circleA === circleB; // false, because identity of objects is different
+* Circles.isEqual(circleA, circleB); // true, because values are the same
+* ```
+* 
+* Circles must both be positioned or not.
+* @param a
+* @param b
+* @returns
+*/
+const isEqual$5 = (a, b) => {
+	if (a.radius !== b.radius) return false;
+	if (isCirclePositioned(a) && isCirclePositioned(b)) {
+		if (a.x !== b.x) return false;
+		if (a.y !== b.y) return false;
+		if (a.z !== b.z) return false;
+		return true;
+	} else if (!isCirclePositioned(a) && !isCirclePositioned(b)) {} else return false;
+	return false;
+};
+
+//#endregion
+//#region ../geometry/src/point/sum.ts
+/**
+* Returns a Point with the x,y,z values of two points added.
+* 
+* `z` parameter is used, if present. Uses a default value of 0 for 'z' when adding a 2D point with a 3D one.
+*
+* Examples:
+*
+* ```js
+* sum(ptA, ptB);
+* sum(x1, y1, x2, y2);
+* sum(ptA, x2, y2);
+* ```
+*/
+function sum$1(a1, ab2, ab3, ab4, ab5, ab6) {
+	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
+	guard$1(ptA, `a`);
+	guard$1(ptB, `b`);
+	const pt = {
+		x: ptA.x + ptB.x,
+		y: ptA.y + ptB.y
+	};
+	if (isPoint3d(ptA) || isPoint3d(ptB)) pt.z = (ptA.z ?? 0) + (ptB.z ?? 0);
+	return Object.freeze(pt);
+}
+
+//#endregion
+//#region ../geometry/src/circle/intersections.ts
+/**
+* Returns the point(s) of intersection between a circle and line.
+* 
+* ```js
+* const circle = { radius: 5, x: 5, y: 5 };
+* const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
+* const pts = Circles.intersectionLine(circle, line);
+* ```
+* @param circle 
+* @param line 
+* @returns Point(s) of intersection, or empty array
+*/
+const intersectionLine = (circle, line) => {
+	const v1 = {
+		x: line.b.x - line.a.x,
+		y: line.b.y - line.a.y
+	};
+	const v2 = {
+		x: line.a.x - circle.x,
+		y: line.a.y - circle.y
+	};
+	const b = (v1.x * v2.x + v1.y * v2.y) * -2;
+	const c = 2 * (v1.x * v1.x + v1.y * v1.y);
+	const d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.radius * circle.radius));
+	if (Number.isNaN(d)) return [];
+	const u1 = (b - d) / c;
+	const u2 = (b + d) / c;
+	const returnValue = [];
+	if (u1 <= 1 && u1 >= 0) returnValue.push({
+		x: line.a.x + v1.x * u1,
+		y: line.a.y + v1.y * u1
+	});
+	if (u2 <= 1 && u2 >= 0) returnValue.push({
+		x: line.a.x + v1.x * u2,
+		y: line.a.y + v1.y * u2
+	});
+	return returnValue;
+};
+/**
+* 
+* Returns the points of intersection betweeen `a` and `b`.
+* 
+* Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
+*
+* @param a Circle
+* @param b Circle
+* @returns Points of intersection, or an empty list if there are none
+*/
+const intersections = (a, b) => {
+	const vector = subtract$2(b, a);
+	const centerD = Math.hypot(vector.y, vector.x);
+	if (centerD > a.radius + b.radius) return [];
+	if (centerD < Math.abs(a.radius - b.radius)) return [];
+	if (isEqual$5(a, b)) return [];
+	const centroidD = (a.radius * a.radius - b.radius * b.radius + centerD * centerD) / (2 * centerD);
+	const centroid$2 = {
+		x: a.x + vector.x * centroidD / centerD,
+		y: a.y + vector.y * centroidD / centerD
+	};
+	const centroidIntersectionD = Math.sqrt(a.radius * a.radius - centroidD * centroidD);
+	const intersection = {
+		x: -vector.y * (centroidIntersectionD / centerD),
+		y: vector.x * (centroidIntersectionD / centerD)
+	};
+	return [sum$1(centroid$2, intersection), subtract$2(centroid$2, intersection)];
+};
+
+//#endregion
+//#region ../geometry/src/intersects.ts
+const circleRect = (a, b) => {
+	const deltaX = a.x - Math.max(b.x, Math.min(a.x, b.x + b.width));
+	const deltaY = a.y - Math.max(b.y, Math.min(a.y, b.y + b.height));
+	return deltaX * deltaX + deltaY * deltaY < a.radius * a.radius;
+};
+const circleCircle = (a, b) => intersections(a, b).length === 2;
+
+//#endregion
+//#region ../geometry/src/circle/is-contained-by.ts
+/**
+* Returns true if `b` is completely contained by `a`
+*
+* ```js
+* // Compare two points
+* isContainedBy(circleA, circleB);
+* 
+* // Compare a circle with a point
+* isContainedBy(circleA, {x: 10, y: 20});
+* 
+* // Define radius as third parameter
+* isContainedBy(circleA, {x: 10, y: 20}, 20);
+* ```
+* @param a Circle
+* @param b Circle or point to compare to
+* @param c Radius to accompany parameter b if it's a point
+* @returns
+*/
+const isContainedBy = (a, b, c) => {
+	const d = distanceCenter(a, b);
+	if (isCircle(b)) return d < Math.abs(a.radius - b.radius);
+	else if (isPoint(b)) if (c === void 0) return d <= a.radius;
+	else return d < Math.abs(a.radius - c);
+	else throw new Error(`b parameter is expected to be CirclePositioned or Point`);
+};
+
+//#endregion
+//#region ../geometry/src/point/is-equal.ts
+/**
+* Returns _true_ if the points have identical values
+*
+* ```js
+* const a = {x: 10, y: 10};
+* const b = {x: 10, y: 10;};
+* a === b        // False, because a and be are different objects
+* isEqual(a, b)   // True, because a and b are same value
+* ```
+* @param p Points
+* @returns _True_ if points are equal
+*/
+const isEqual = (...p) => {
+	if (p === void 0) throw new Error(`parameter 'p' is undefined`);
+	if (p.length < 2) return true;
+	for (let index = 1; index < p.length; index++) {
+		if (p[index].x !== p[0].x) return false;
+		if (p[index].y !== p[0].y) return false;
+	}
+	return true;
+};
+
+//#endregion
+//#region ../geometry/src/circle/intersecting.ts
+/**
+* Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
+* A circle can be checked for intersections with another CirclePositioned, Point or RectPositioned.
+* 
+* Use `intersections` to find the points of intersection.
+*
+* @param a Circle
+* @param b Circle or point to test
+* @returns True if circle overlap
+*/
+const isIntersecting = (a, b, c) => {
+	if (isEqual(a, b)) return true;
+	if (isContainedBy(a, b, c)) return true;
+	if (isCircle(b)) return circleCircle(a, b);
+	else if (isRectPositioned(b)) return circleRect(a, b);
+	else if (isPoint(b) && c !== void 0) return circleCircle(a, {
+		...b,
+		radius: c
+	});
+	return false;
+};
+
+//#endregion
+//#region ../geometry/src/point/multiply.ts
+/**
+* Returns a Point with the x,y,z values of two points multiply (a/b).
+* 
+* `z` parameter is used, if present. Uses a default value of 0 for 'z' when multiplying a 2D point with a 3D one.
+*
+* Examples:
+*
+* ```js
+* multiply(ptA, ptB);
+* multiply(x1, y1, x2, y2);
+* multiply(ptA, x2, y2);
+* ```
+*/
+function multiply$2(a1, ab2, ab3, ab4, ab5, ab6) {
+	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
+	guard$1(ptA, `a`);
+	guard$1(ptB, `b`);
+	const pt = {
+		x: ptA.x * ptB.x,
+		y: ptA.y * ptB.y
+	};
+	if (isPoint3d(ptA) || isPoint3d(ptB)) pt.z = (ptA.z ?? 0) * (ptB.z ?? 0);
+	return Object.freeze(pt);
+}
+/**
+* Multiplies all components by `v`.
+* Existing properties of `pt` are maintained.
+*
+* ```js
+* multiplyScalar({ x:2, y:4 }, 2);
+* // Yields: { x:4, y:8 }
+* ```
+* @param pt Point
+* @param v Value to multiply by
+* @returns
+*/
+const multiplyScalar$1 = (pt, v) => {
+	return isPoint3d(pt) ? Object.freeze({
+		...pt,
+		x: pt.x * v,
+		y: pt.y * v,
+		z: pt.z * v
+	}) : Object.freeze({
+		...pt,
+		x: pt.x * v,
+		y: pt.y * v
+	});
+};
+
+//#endregion
+//#region ../geometry/src/circle/multiply.ts
+/**
+* Multiplies a circle's radius and position (if provided) by `value`.
+* 
+* ```js
+* multiplyScalar({ radius: 5 }, 5);
+* // Yields: { radius: 25 }
+* 
+* multiplyScalar({ radius: 5, x: 10, y: 20 }, 5);
+* // Yields: { radius: 25, x: 50, y: 100 }
+* ```
+*/
+function multiplyScalar$2(a, value) {
+	if (isCirclePositioned(a)) {
+		const pt = multiplyScalar$1(a, value);
+		return Object.freeze({
+			...a,
+			...pt,
+			radius: a.radius * value
+		});
+	} else return Object.freeze({
+		...a,
+		radius: a.radius * value
+	});
+}
+
+//#endregion
+//#region ../geometry/src/circle/random.ts
+const piPi$3 = Math.PI * 2;
+/**
+* Returns a random point within a circle.
+* 
+* By default creates a uniform distribution.
+* 
+* ```js
+* const pt = randomPoint({radius: 5});
+* const pt = randomPoint({radius: 5, x: 10, y: 20});
+* ```'
+* 
+* Generate points with a gaussian distribution
+* ```js
+* const pt = randomPoint(circle, {
+*  randomSource: Random.gaussian
+* })
+* ```
+* @param within Circle to generate a point within
+* @param opts Options
+* @returns 
+*/
+const randomPoint$1 = (within, opts = {}) => {
+	const offset$1 = isCirclePositioned(within) ? within : {
+		x: 0,
+		y: 0
+	};
+	const strategy = opts.strategy ?? `uniform`;
+	const margin = opts.margin ?? 0;
+	const radius = within.radius - margin;
+	const rand = opts.randomSource ?? Math.random;
+	switch (strategy) {
+		case `naive`: return sum$1(offset$1, toCartesian(rand() * radius, rand() * piPi$3));
+		case `uniform`: return sum$1(offset$1, toCartesian(Math.sqrt(rand()) * radius, rand() * piPi$3));
+		default: throw new Error(`Unknown strategy '${strategy}'. Expects 'uniform' or 'naive'`);
+	}
+};
+
+//#endregion
+//#region ../geometry/src/circle/svg.ts
+/**
+* Creates a SVG path segment.
+* @param a Circle or radius
+* @param sweep If true, path is 'outward'
+* @param origin Origin of path. Required if first parameter is just a radius or circle is non-positioned
+* @returns 
+*/
+const toSvg = (a, sweep, origin) => {
+	if (isCircle(a)) {
+		if (origin !== void 0) return toSvgFull(a.radius, origin, sweep);
+		if (isCirclePositioned(a)) return toSvgFull(a.radius, a, sweep);
+		else throw new Error(`origin parameter needed for non-positioned circle`);
+	} else if (origin === void 0) throw new Error(`origin parameter needed`);
+	else return toSvgFull(a, origin, sweep);
+};
+const toSvgFull = (radius, origin, sweep) => {
+	const { x, y } = origin;
+	const s = sweep ? `1` : `0`;
+	return `
+    M ${x}, ${y}
+    m -${radius}, 0
+    a ${radius},${radius} 0 1,${s} ${radius * 2},0
+    a ${radius},${radius} 0 1,${s} -${radius * 2},0
+  `.split(`\n`);
+};
+
+//#endregion
+//#region ../geometry/src/circle/to-path.ts
+/**
+* Returns a `CircularPath` representation of a circle
+*
+* @param {CirclePositioned} circle
+* @returns {CircularPath}
+*/
+const toPath$1 = (circle) => {
+	guard$4(circle);
+	return {
+		...circle,
+		nearest: (point$1) => nearest$1(circle, point$1),
+		interpolate: (t) => interpolate$3(circle, t),
+		bbox: () => bbox$4(circle),
+		length: () => circumference(circle),
+		toSvgString: (sweep = true) => toSvg(circle, sweep),
+		relativePosition: (_point, _intersectionThreshold) => {
+			throw new Error(`Not implemented`);
+		},
+		distanceToPoint: (_point) => {
+			throw new Error(`Not implemented`);
+		},
+		kind: `circular`
+	};
+};
+
+//#endregion
+//#region ../geometry/src/circle/to-positioned.ts
+/**
+* Returns a positioned version of a circle.
+* If circle is already positioned, it is returned.
+* If no default position is supplied, 0,0 is used.
+* @param circle 
+* @param defaultPositionOrX 
+* @param y 
+* @returns 
+*/
+const toPositioned = (circle, defaultPositionOrX, y) => {
+	if (isCirclePositioned(circle)) return circle;
+	const pt = getPointParameter(defaultPositionOrX, y);
+	return Object.freeze({
+		...circle,
+		...pt
+	});
+};
+
+//#endregion
+//#region ../geometry/src/circle/index.ts
+var circle_exports = {};
+__export(circle_exports, {
+	area: () => area$5,
+	bbox: () => bbox$4,
+	center: () => center,
+	circumference: () => circumference,
+	distanceCenter: () => distanceCenter,
+	distanceFromExterior: () => distanceFromExterior$1,
+	exteriorIntegerPoints: () => exteriorIntegerPoints,
+	guard: () => guard$4,
+	guardPositioned: () => guardPositioned$1,
+	interiorIntegerPoints: () => interiorIntegerPoints,
+	interpolate: () => interpolate$3,
+	intersectionLine: () => intersectionLine,
+	intersections: () => intersections,
+	isCircle: () => isCircle,
+	isCirclePositioned: () => isCirclePositioned,
+	isContainedBy: () => isContainedBy,
+	isEqual: () => isEqual$5,
+	isIntersecting: () => isIntersecting,
+	isNaN: () => isNaN,
+	isPositioned: () => isPositioned$1,
+	length: () => length$2,
+	multiplyScalar: () => multiplyScalar$2,
+	nearest: () => nearest$1,
+	pointOnPerimeter: () => pointOnPerimeter,
+	randomPoint: () => randomPoint$1,
+	toPath: () => toPath$1,
+	toPositioned: () => toPositioned,
+	toSvg: () => toSvg
+});
+
+//#endregion
+//#region ../geometry/src/grid/inside.ts
+/**
+* Returns _true_ if cell coordinates are above zero and within bounds of grid
+*
+* @param grid
+* @param cell
+* @return
+*/
+const inside = (grid, cell) => {
+	if (cell.x < 0 || cell.y < 0) return false;
+	if (cell.x >= grid.cols || cell.y >= grid.rows) return false;
+	return true;
+};
+
+//#endregion
+//#region ../geometry/src/grid/guards.ts
+/**
+* Returns true if `cell` parameter is a cell with x,y fields.
+* Does not check validity of fields.
+*
+* @param cell
+* @return True if parameter is a cell
+*/
+const isCell = (cell) => {
+	if (cell === void 0) return false;
+	return `x` in cell && `y` in cell;
+};
+/**
+* Throws an exception if any of the cell's parameters are invalid
+* @private
+* @param cell
+* @param parameterName
+* @param grid
+*/
+const guardCell = (cell, parameterName = `Param`, grid) => {
+	if (cell === void 0) throw new Error(parameterName + ` is undefined. Expecting {x,y}`);
+	if (cell.x === void 0) throw new Error(parameterName + `.x is undefined`);
+	if (cell.y === void 0) throw new Error(parameterName + `.y is undefined`);
+	if (Number.isNaN(cell.x)) throw new Error(parameterName + `.x is NaN`);
+	if (Number.isNaN(cell.y)) throw new Error(parameterName + `.y is NaN`);
+	if (!Number.isInteger(cell.x)) throw new TypeError(parameterName + `.x is non-integer`);
+	if (!Number.isInteger(cell.y)) throw new TypeError(parameterName + `.y is non-integer`);
+	if (grid !== void 0 && !inside(grid, cell)) throw new Error(`${parameterName} is outside of grid. Cell: ${cell.x},${cell.y} Grid: ${grid.cols}, ${grid.rows}`);
+};
+/**
+* Throws an exception if any of the grid's parameters are invalid
+* @param grid
+* @param parameterName
+*/
+const guardGrid = (grid, parameterName = `Param`) => {
+	if (grid === void 0) throw new Error(`${parameterName} is undefined. Expecting grid.`);
+	if (!(`rows` in grid)) throw new Error(`${parameterName}.rows is undefined`);
+	if (!(`cols` in grid)) throw new Error(`${parameterName}.cols is undefined`);
+	if (!Number.isInteger(grid.rows)) throw new TypeError(`${parameterName}.rows is not an integer`);
+	if (!Number.isInteger(grid.cols)) throw new TypeError(`${parameterName}.cols is not an integer`);
+};
+
+//#endregion
+//#region ../geometry/src/grid/apply-bounds.ts
+/**
+* Calculates a legal position for a cell based on
+* `grid` size and `bounds` wrapping logic.
+* @param grid 
+* @param cell 
+* @param wrap 
+* @returns 
+*/
+const applyBounds = function(grid, cell, wrap$4 = `undefined`) {
+	guardGrid(grid, `grid`);
+	guardCell(cell, `cell`);
+	let x = cell.x;
+	let y = cell.y;
+	switch (wrap$4) {
+		case `wrap`: {
+			x = x % grid.cols;
+			y = y % grid.rows;
+			if (x < 0) x = grid.cols + x;
+			else if (x >= grid.cols) x -= grid.cols;
+			if (y < 0) y = grid.rows + y;
+			else if (y >= grid.rows) y -= grid.rows;
+			x = Math.abs(x);
+			y = Math.abs(y);
+			break;
+		}
+		case `stop`: {
+			x = clampIndex(x, grid.cols);
+			y = clampIndex(y, grid.rows);
+			break;
+		}
+		case `undefined`: {
+			if (x < 0 || y < 0) return;
+			if (x >= grid.cols || y >= grid.rows) return;
+			break;
+		}
+		case `unbounded`: break;
+		default: throw new Error(`Unknown BoundsLogic '${wrap$4}'. Expected: wrap, stop, undefined or unbounded`);
+	}
+	return Object.freeze({
+		x,
+		y
+	});
+};
+
+//#endregion
+//#region ../geometry/src/grid/array-1d.ts
+var array_1d_exports = {};
+__export(array_1d_exports, {
+	access: () => access$1,
+	createArray: () => createArray,
+	createMutable: () => createMutable,
+	set: () => set$1,
+	setMutate: () => setMutate$1,
+	wrap: () => wrap$3,
+	wrapMutable: () => wrapMutable$1
+});
+/**
+* Returns a {@link GridCellAccessor} to get values from `array`
+* based on cell (`{x,y}`) coordinates.
+* 
+* ```js
+* const arr = [
+*  1,2,3,
+*  4,5,6
+* ]
+* const a = access(arr, 3);
+* a({x:0,y:0});  // 1
+* a({x:2, y:2}); // 6
+* ```
+* @param array 
+* @param cols 
+* @returns 
+*/
+const access$1 = (array, cols) => {
+	const grid = gridFromArrayDimensions(array, cols);
+	const fn = (cell, wrap$4 = `undefined`) => accessWithGrid$1(grid, array, cell, wrap$4);
+	return fn;
+};
+const accessWithGrid$1 = (grid, array, cell, wrap$4) => {
+	const index = indexFromCell(grid, cell, wrap$4);
+	if (index === void 0) return void 0;
+	return array[index];
+};
+/**
+* Returns a {@link GridCellSetter} that can mutate
+* array values based on cell {x,y} positions.
+* ```js
+* const arr = [
+*  1,2,3,
+*  4,5,6
+* ]
+* const a = setMutate(arr, 3);
+* a(10, {x:0,y:0});
+* a(20, {x:2, y:2});
+* 
+* // Arr is now:
+* // [
+* //  10, 2, 3,
+* //  4, 5, 20
+* // ]
+* ```
+* @param array 
+* @param cols 
+* @returns 
+*/
+const setMutate$1 = (array, cols) => {
+	const grid = gridFromArrayDimensions(array, cols);
+	return (value, cell, wrap$4 = `undefined`) => setMutateWithGrid$1(grid, array, value, cell, wrap$4);
+};
+const setMutateWithGrid$1 = (grid, array, value, cell, wrap$4) => {
+	const index = indexFromCell(grid, cell, wrap$4);
+	if (index === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
+	array[index] = value;
+	return array;
+};
+const set$1 = (array, cols) => {
+	const grid = gridFromArrayDimensions(array, cols);
+	return (value, cell, wrap$4) => setWithGrid$1(grid, array, value, cell, wrap$4);
+};
+const setWithGrid$1 = (grid, array, value, cell, wrap$4) => {
+	const index = indexFromCell(grid, cell, wrap$4);
+	if (index === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
+	const copy = [...array];
+	copy[index] = value;
+	array = copy;
+	return copy;
+};
+/**
+* Creates a {@link Grid} from the basis of an array and a given number of columns
+* @param array 
+* @param cols 
+* @returns 
+*/
+const gridFromArrayDimensions = (array, cols) => {
+	const grid = {
+		cols,
+		rows: Math.ceil(array.length / cols)
+	};
+	return grid;
+};
+/**
+* Wraps `array` for grid access.
+* Mutable, meaning that `array` gets modified if `set` function is used.
+*  
+* ```js
+* const g = wrapMutable(myArray, 5); // 5 columns wide
+* g.get({x:1,y:2});     // Get value at cell position
+* g.set(10, {x:1,y:2}); // Set value at cell position
+* g.array;              // Get reference to original passed-in array
+* ```
+* 
+* Use {@link wrap} for an immutable version.
+* 
+* @param array Array to wrap
+* @param cols Width of grid
+* @returns 
+*/
+const wrapMutable$1 = (array, cols) => {
+	const grid = gridFromArrayDimensions(array, cols);
+	return {
+		...grid,
+		get: access$1(array, cols),
+		set: setMutate$1(array, cols),
+		get array() {
+			return array;
+		}
+	};
+};
+/**
+* Wraps `array` for grid access.
+* Immutable, such that underlying array is not modified and a
+* call to `set` returns a new `GridArray1d`.
+* 
+* ```js
+* const myArray = [
+*    `a`, `b`, `c`, 
+*    `d`, `e`, `f` 
+* ];
+* let g = wrap(myArray, 3);  // 3 columns wide
+* g.get({ x:1, y:2 });          // Get value at cell position
+* 
+* // Note that `set` returns a new instance
+* g = g.set(10, { x:1, y:2 });  // Set value at cell position
+* g.array;                      // Get reference to current array
+* ```
+* 
+* Use {@link wrapMutable} to modify an array in-place
+* @param array Array to wrap
+* @param cols Width of grid
+* @returns 
+*/
+const wrap$3 = (array, cols) => {
+	const grid = gridFromArrayDimensions(array, cols);
+	return {
+		...grid,
+		get: (cell, boundsLogic = `undefined`) => accessWithGrid$1(grid, array, cell, boundsLogic),
+		set: (value, cell, boundsLogic = `undefined`) => {
+			array = setWithGrid$1(grid, array, value, cell, boundsLogic);
+			return wrap$3(array, cols);
+		},
+		get array() {
+			return array;
+		}
+	};
+};
+/**
+* Creates a 1-dimensional array to fit a grid of rows x cols.
+* Use {@link createArray} if you want to create this array and wrap it for grid access.
+* 
+* ```js
+* // Creates an array filled with 0, sized for a grid 10 rows by 20 columns
+* const arr = createArray(0, 10, 20);
+* 
+* // Alternatively, pass in a grid
+* const arr = createArray(0, { rows: 10, cols: 20 });
+* ```
+* @param rowsOrGrid Number of rows, or a grid to use the settings of
+* @param columns Columns
+*/
+const createArray = (initialValue, rowsOrGrid, columns$1) => {
+	const rows$1 = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
+	const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns$1;
+	if (!cols) throw new Error(`Parameter 'columns' missing`);
+	resultThrow(integerTest(rows$1, `aboveZero`, `rows`), integerTest(cols, `aboveZero`, `cols`));
+	const t = [];
+	const total = rows$1 * cols;
+	for (let index = 0; index < total; index++) t[index] = initialValue;
+	return t;
+};
+/**
+* Creates a {@link GridArray1d} instance given the dimensions of the grid.
+* Use {@link createArray} if you just want to create an array sized for a grid.
+* 
+* Behind the scenes, it runs:
+* ```js
+* const arr = createArray(initialValue, rows, cols);
+* return wrapMutable(arr, cols);
+* ```
+* @param initialValue 
+* @param rowsOrGrid 
+* @param columns 
+* @returns 
+*/
+const createMutable = (initialValue, rowsOrGrid, columns$1) => {
+	const rows$1 = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
+	const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns$1;
+	if (!cols) throw new Error(`Parameter 'columns' missing`);
+	const array = createArray(initialValue, rows$1, cols);
+	return wrapMutable$1(array, cols);
+};
+
+//#endregion
+//#region ../geometry/src/grid/array-2d.ts
+var array_2d_exports = {};
+__export(array_2d_exports, {
+	access: () => access,
+	create: () => create$1,
+	set: () => set,
+	setMutate: () => setMutate,
+	wrap: () => wrap$2,
+	wrapMutable: () => wrapMutable
+});
+/**
+* Create a grid from a 2-dimensional array.
+* ```js
+* const data = [
+*  [1,2,3],
+*  [4,5,6]
+* ]
+* const g = create(data);
+* // { rows: 2, cols: 3 }
+* ```
+* @param array 
+* @returns 
+*/
+const create$1 = (array) => {
+	let colLen = NaN;
+	for (const row of array) if (Number.isNaN(colLen)) colLen = row.length;
+	else if (colLen !== row.length) throw new Error(`Array does not have uniform column length`);
+	return {
+		rows: array.length,
+		cols: colLen
+	};
+};
+const setMutate = (array) => {
+	const grid = create$1(array);
+	return (value, cell, wrap$4 = `undefined`) => setMutateWithGrid(grid, array, value, cell, wrap$4);
+};
+/**
+* Returns a function that updates a 2D array representation
+* of a grid. Array is mutated.
+*
+* ```js
+* const m = Grids.Array2d.setMutateWithGrid(grid, array);
+* m(someValue, { x:2, y:3 });
+* ```
+* @param grid
+* @param array
+* @returns
+*/
+const setMutateWithGrid = (grid, array, value, cell, bounds) => {
+	let boundCell = applyBounds(grid, cell, bounds);
+	if (boundCell === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
+	array[boundCell.y][boundCell.x] = value;
+	return array;
+};
+const access = (array) => {
+	const grid = create$1(array);
+	const fn = (cell, wrap$4 = `undefined`) => accessWithGrid(grid, array, cell, wrap$4);
+	return fn;
+};
+const accessWithGrid = (grid, array, cell, wrap$4) => {
+	let boundCell = applyBounds(grid, cell, wrap$4);
+	if (boundCell === void 0) return void 0;
+	return array[boundCell.y][boundCell.x];
+};
+const wrapMutable = (array) => {
+	const grid = create$1(array);
+	return {
+		...grid,
+		get: access(array),
+		set: setMutate(array),
+		get array() {
+			return array;
+		}
+	};
+};
+const set = (array) => {
+	const grid = create$1(array);
+	return (value, cell, wrap$4) => setWithGrid(grid, array, value, cell, wrap$4);
+};
+const setWithGrid = (grid, array, value, cell, wrap$4) => {
+	let boundCell = applyBounds(grid, cell, wrap$4);
+	if (boundCell === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
+	let copyWhole = [...array];
+	let copyRow = [...copyWhole[boundCell.y]];
+	copyRow[boundCell.x] = value;
+	copyWhole[boundCell.y] = copyRow;
+	array = copyWhole;
+	return copyWhole;
+};
+/**
+* Wraps `array` with two dimensions for grid access.
+* Immutable, such that underlying array is not modified and a
+* call to `set` returns a new `GridArray1d`.
+* 
+* ```js
+* // Grid of rows: 2, cols: 3
+* const myArray = [
+*  [ `a`, `b`, `c` ],
+*  [ `d`, `e`, `f` ]
+* ]
+* let g = wrap(myArray);
+* g.get({x:1,y:2});          // Get value at cell position
+* g = g.set(10, {x:1,y:2}); // Set value at cell position
+* g.array;                  // Get reference to current array
+* ```
+* 
+* Use {@link wrapMutable} to modify an array in-place
+* @param array Array to wrap
+* @returns 
+*/
+const wrap$2 = (array) => {
+	const grid = create$1(array);
+	return {
+		...grid,
+		get: (cell, boundsLogic = `undefined`) => accessWithGrid(grid, array, cell, boundsLogic),
+		set: (value, cell, boundsLogic = `undefined`) => {
+			array = setWithGrid(grid, array, value, cell, boundsLogic);
+			return wrap$2(array);
+		},
+		get array() {
+			return array;
+		}
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/values.ts
+/**
+* Converts an 1D or 2D array of cell coordinates into values
+* 
+* ```js
+* // 1D (ie an array of coordinates)
+* const cells = Grid.As.cells(grid);
+* for (const v of Grid.values(grid, cells)) {
+* 
+* }
+* ```
+* ```js
+* // 2D (ie an array of rows)
+* const rows = Grid.As.rows(grid);
+* for (const v of Grid.values(grid, rows)) {
+* }
+* ```
+* @param grid 
+* @param iter 
+*/
+function* values(grid, iter) {
+	for (const d of iter) if (Array.isArray(d)) yield d.map((v) => grid.get(v, `undefined`));
+	else yield grid.get(d, `undefined`);
+}
+
+//#endregion
+//#region ../geometry/src/grid/enumerators/cells.ts
+/**
+* Enumerate all cell coordinates in an efficient manner.
+* Runs left-to-right, top-to-bottom.
+* 
+* If end of grid is reached, behaviour depends on `wrap`:
+* * _true_ (default): iterator will wrap to ensure all are visited.
+* * _false_: iterator stops at end of grid
+* 
+* ```js
+* import { Grids } from 'ixfx/geometry.js';
+* 
+* // Enumerate each cell position, left-to-right, top-to-bottom
+* for (const cell of Grids.By.cells(grid)) {
+*  // cell will be { x, y }
+* }
+* ```
+* 
+* See also:
+* * {@link cellValues}: Iterate over cell values
+* * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
+* @param grid Grid to iterate over
+* @param start Starting cell position (default: {x:0,y:0})
+* @param wrap If true (default), iteration will wrap around through (0,0) when end of grid is reached.
+*/
+function* cells(grid, start, wrap$4 = true) {
+	if (!start) start = {
+		x: 0,
+		y: 0
+	};
+	guardGrid(grid, `grid`);
+	guardCell(start, `start`, grid);
+	let { x, y } = start;
+	let canMove = true;
+	do {
+		yield {
+			x,
+			y
+		};
+		x++;
+		if (x === grid.cols) {
+			y++;
+			x = 0;
+		}
+		if (y === grid.rows) if (wrap$4) {
+			y = 0;
+			x = 0;
+		} else canMove = false;
+		if (x === start.x && y === start.y) canMove = false;
+	} while (canMove);
+}
+/**
+* Yield all the values of a grid, left-to-right, top-to-bottom.
+* 
+* This is just a wrapper around Grids.values:
+* ```js
+* yield* values(grid, cells(grid, start, wrap));
+* ```
+* 
+* See also:
+* * {@link cells}: Iterate over cell coordinates
+* * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
+* @param grid 
+* @param start 
+* @param wrap 
+*/
+function* cellValues(grid, start, wrap$4 = true) {
+	yield* values(grid, cells(grid, start, wrap$4));
+}
+/**
+* Yield all cell coordinates and values of a grid, left-to-right, top-to-bottom
+* 
+* See also:
+* * {@link cells}: Iterate over cell coordinates
+* * {@link cellValues}: Iterate over cell values
+* @param grid 
+* @param start 
+* @param wrap 
+*/
+function* cellsAndValues(grid, start, wrap$4 = true) {
+	for (const cell of cells(grid, start, wrap$4)) yield {
+		cell,
+		value: grid.get(cell)
+	};
+}
+
+//#endregion
+//#region ../geometry/src/grid/as.ts
+var as_exports = {};
+__export(as_exports, {
+	columns: () => columns,
+	rows: () => rows
+});
+/**
+* Enumerate rows of grid, returning all the cells in the row
+* as an array
+*
+* ```js
+* for (const row of Grid.As.rows(shape)) {
+*  // row is an array of Cells.
+*  // [ {x:0, y:0}, {x:1, y:0} ... ]
+* }
+* ```
+* 
+* Use `Grid.values` to convert the returned iterator into values:
+* ```js
+* for (const v of Grid.values(Grid.rows(shape))) {
+* }
+* ```
+* @param grid
+* @param start
+*/
+const rows = function* (grid, start) {
+	if (!start) start = {
+		x: 0,
+		y: 0
+	};
+	let row = start.y;
+	let rowCells = [];
+	for (const c of cells(grid, start)) if (c.y === row) rowCells.push(c);
+	else {
+		yield rowCells;
+		rowCells = [c];
+		row = c.y;
+	}
+	if (rowCells.length > 0) yield rowCells;
+};
+/**
+* Enumerate columns of grid, returning all the cells in the
+* same column as an array.
+* 
+* ```js
+* for (const col of Grid.As.columns(grid)) {
+* }
+* ```
+* 
+* Use `Grid.values` to convert into values
+* ```js
+* for (const value of Grid.values(Grid.As.columns(grid))) {
+* }
+* ```
+* @param grid 
+* @param start 
+*/
+function* columns(grid, start) {
+	if (!start) start = {
+		x: 0,
+		y: 0
+	};
+	for (let x = start.x; x < grid.cols; x++) {
+		let colCells = [];
+		for (let y = start.y; y < grid.rows; y++) colCells.push({
+			x,
+			y
+		});
+		yield colCells;
+	}
+}
+
+//#endregion
+//#region ../geometry/src/grid/offset.ts
+/**
+* Returns a coordinate offset from `start` by `vector` amount.
+*
+* Different behaviour can be specified for how to handle when coordinates exceed the bounds of the grid
+*
+* Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift up/down a line.
+* 
+* Use {@link Grids.applyBounds} if you need to calculate a wrapped coordinate without adding two together.
+* @param grid Grid to traverse
+* @param vector Offset in x/y
+* @param start Start point
+* @param bounds
+* @returns Cell
+*/
+const offset = function(grid, start, vector, bounds = `undefined`) {
+	return applyBounds(grid, {
+		x: start.x + vector.x,
+		y: start.y + vector.y
+	}, bounds);
+};
+
+//#endregion
+//#region ../geometry/src/grid/directions.ts
+/**
+* Returns a list of all cardinal directions: n, ne, nw, e, s, se, sw, w
+*/
+const allDirections = Object.freeze([
+	`n`,
+	`ne`,
+	`nw`,
+	`e`,
+	`s`,
+	`se`,
+	`sw`,
+	`w`
+]);
+/**
+* Returns a list of + shaped directions: n, e, s, w
+*/
+const crossDirections = Object.freeze([
+	`n`,
+	`e`,
+	`s`,
+	`w`
+]);
+/**
+* Returns cells that correspond to the cardinal directions at a specified distance
+* i.e. it projects a line from `start` cell in all cardinal directions and returns the cells at `steps` distance.
+* @param grid Grid
+* @param steps Distance
+* @param start Start poiint
+* @param bounds Logic for if bounds of grid are exceeded
+* @returns Cells corresponding to cardinals
+*/
+const offsetCardinals = (grid, start, steps, bounds = `stop`) => {
+	guardGrid(grid, `grid`);
+	guardCell(start, `start`);
+	resultThrow(integerTest(steps, `aboveZero`, `steps`));
+	const directions = allDirections;
+	const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
+	const cells$1 = directions.map((d, index) => offset(grid, start, vectors[index], bounds));
+	return zipKeyValue(directions, cells$1);
+};
+/**
+* Returns an `{ x, y }` signed vector corresponding to the provided cardinal direction.
+* ```js
+* const n = getVectorFromCardinal(`n`); // {x: 0, y: -1}
+* ```
+*
+* Optional `multiplier` can be applied to vector
+* ```js
+* const n = getVectorFromCardinal(`n`, 10); // {x: 0, y: -10}
+* ```
+*
+* Blank direction returns `{ x: 0, y: 0 }`
+* @param cardinal Direction
+* @param multiplier Multipler
+* @returns Signed vector in the form of `{ x, y }`
+*/
+const getVectorFromCardinal = (cardinal$1, multiplier = 1) => {
+	let v;
+	switch (cardinal$1) {
+		case `n`: {
+			v = {
+				x: 0,
+				y: -1 * multiplier
+			};
+			break;
+		}
+		case `ne`: {
+			v = {
+				x: 1 * multiplier,
+				y: -1 * multiplier
+			};
+			break;
+		}
+		case `e`: {
+			v = {
+				x: 1 * multiplier,
+				y: 0
+			};
+			break;
+		}
+		case `se`: {
+			v = {
+				x: 1 * multiplier,
+				y: 1 * multiplier
+			};
+			break;
+		}
+		case `s`: {
+			v = {
+				x: 0,
+				y: 1 * multiplier
+			};
+			break;
+		}
+		case `sw`: {
+			v = {
+				x: -1 * multiplier,
+				y: 1 * multiplier
+			};
+			break;
+		}
+		case `w`: {
+			v = {
+				x: -1 * multiplier,
+				y: 0
+			};
+			break;
+		}
+		case `nw`: {
+			v = {
+				x: -1 * multiplier,
+				y: -1 * multiplier
+			};
+			break;
+		}
+		default: v = {
+			x: 0,
+			y: 0
+		};
+	}
+	return Object.freeze(v);
+};
+
+//#endregion
+//#region ../geometry/src/grid/enumerators/index.ts
+var enumerators_exports = {};
+__export(enumerators_exports, {
+	cellValues: () => cellValues,
+	cells: () => cells,
+	cellsAndValues: () => cellsAndValues
+});
+
+//#endregion
+//#region ../geometry/src/grid/geometry.ts
+/**
+* Returns the cells on the line of `start` and `end`, inclusive
+*
+* ```js
+* // Get cells that connect 0,0 and 10,10
+* const cells = Grids.getLine({x:0,y:0}, {x:10,y:10});
+* ```
+*
+* This function does not handle wrapped coordinates.
+* @param start Starting cell
+* @param end End cell
+* @returns
+*/
+const getLine = (start, end) => {
+	guardCell(start);
+	guardCell(end);
+	let startX = start.x;
+	let startY = start.y;
+	const dx = Math.abs(end.x - startX);
+	const dy = Math.abs(end.y - startY);
+	const sx = startX < end.x ? 1 : -1;
+	const sy = startY < end.y ? 1 : -1;
+	let error = dx - dy;
+	const cells$1 = [];
+	while (true) {
+		cells$1.push(Object.freeze({
+			x: startX,
+			y: startY
+		}));
+		if (startX === end.x && startY === end.y) break;
+		const error2 = 2 * error;
+		if (error2 > -dy) {
+			error -= dy;
+			startX += sx;
+		}
+		if (error2 < dx) {
+			error += dx;
+			startY += sy;
+		}
+	}
+	return cells$1;
+};
+/**
+* Returns a list of cells from `start` to `end`.
+*
+* Throws an error if start and end are not on same row or column.
+*
+* @param start Start cell
+* @param end end clel
+* @param endInclusive
+* @return Array of cells
+*/
+const simpleLine = function(start, end, endInclusive = false) {
+	const cells$1 = [];
+	if (start.x === end.x) {
+		const lastY = endInclusive ? end.y + 1 : end.y;
+		for (let y = start.y; y < lastY; y++) cells$1.push({
+			x: start.x,
+			y
+		});
+	} else if (start.y === end.y) {
+		const lastX = endInclusive ? end.x + 1 : end.x;
+		for (let x = start.x; x < lastX; x++) cells$1.push({
+			x,
+			y: start.y
+		});
+	} else throw new Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
+	return cells$1;
+};
+
+//#endregion
+//#region ../geometry/src/grid/indexing.ts
+/**
+* Returns the index for a given cell.
+* This is useful if a grid is stored in an array.
+*
+* ```js
+* const data = [
+*  1, 2,
+*  3, 4,
+*  5, 6 ];
+* const cols = 2; // Grid of 2 columns wide
+* const index = indexFromCell(cols, {x: 1, y: 1});
+* // Yields an index of 3
+* console.log(data[index]); // Yields 4
+* ```
+*
+* Bounds logic is applied to cell.x/y separately. Wrapping
+* only ever happens in same col/row.
+* @see cellFromIndex
+* @param grid Grid
+* @param cell Cell to get index for
+* @param wrap Logic for if we hit bounds of grid
+* @returns
+*/
+const indexFromCell = (grid, cell, wrap$4) => {
+	guardGrid(grid, `grid`);
+	if (cell.x < 0) switch (wrap$4) {
+		case `stop`: {
+			cell = {
+				...cell,
+				x: 0
+			};
+			break;
+		}
+		case `unbounded`: throw new Error(`unbounded not supported`);
+		case `undefined`: return void 0;
+		case `wrap`: {
+			cell = offset(grid, {
+				x: 0,
+				y: cell.y
+			}, {
+				x: cell.x,
+				y: 0
+			}, `wrap`);
+			break;
+		}
+	}
+	if (cell.y < 0) switch (wrap$4) {
+		case `stop`: {
+			cell = {
+				...cell,
+				y: 0
+			};
+			break;
+		}
+		case `unbounded`: throw new Error(`unbounded not supported`);
+		case `undefined`: return void 0;
+		case `wrap`: {
+			cell = {
+				...cell,
+				y: grid.rows + cell.y
+			};
+			break;
+		}
+	}
+	if (cell.x >= grid.cols) switch (wrap$4) {
+		case `stop`: {
+			cell = {
+				...cell,
+				x: grid.cols - 1
+			};
+			break;
+		}
+		case `unbounded`: throw new Error(`unbounded not supported`);
+		case `undefined`: return void 0;
+		case `wrap`: {
+			cell = {
+				...cell,
+				x: cell.x % grid.cols
+			};
+			break;
+		}
+	}
+	if (cell.y >= grid.rows) switch (wrap$4) {
+		case `stop`: {
+			cell = {
+				...cell,
+				y: grid.rows - 1
+			};
+			break;
+		}
+		case `unbounded`: throw new Error(`unbounded not supported`);
+		case `undefined`: return void 0;
+		case `wrap`: {
+			cell = {
+				...cell,
+				y: cell.y % grid.rows
+			};
+			break;
+		}
+	}
+	const index = cell.y * grid.cols + cell.x;
+	return index;
+};
+/**
+* Returns x,y from an array index.
+*
+* ```js
+*  const data = [
+*   1, 2,
+*   3, 4,
+*   5, 6 ];
+*
+* // Cols of 2, index 2 (ie. data[2] == 3)
+* const cell = cellFromIndex(2, 2);
+* // Yields: {x: 0, y: 1}
+* ```
+* @see indexFromCell
+* @param colsOrGrid
+* @param index
+* @returns
+*/
+const cellFromIndex = (colsOrGrid, index) => {
+	let cols = 0;
+	cols = typeof colsOrGrid === `number` ? colsOrGrid : colsOrGrid.cols;
+	resultThrow(integerTest(cols, `aboveZero`, `colsOrGrid`));
+	return {
+		x: index % cols,
+		y: Math.floor(index / cols)
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/is-equal.ts
+/**
+* Returns _true_ if grids `a` and `b` are equal in value.
+* Returns _false_ if either parameter is undefined.
+*
+* @param a
+* @param b
+* @return
+*/
+const isEqual$4 = (a, b) => {
+	if (b === void 0) return false;
+	if (a === void 0) return false;
+	if (`rows` in a && `cols` in a) if (`rows` in b && `cols` in b) {
+		if (a.rows !== b.rows || a.cols !== b.cols) return false;
+	} else return false;
+	if (`size` in a) if (`size` in b) {
+		if (a.size !== b.size) return false;
+	} else return false;
+	return true;
+};
+/**
+* Returns _true_ if two cells equal.
+* Returns _false_ if either cell are undefined
+*
+* @param a
+* @param b
+* @returns
+*/
+const cellEquals = (a, b) => {
+	if (b === void 0) return false;
+	if (a === void 0) return false;
+	return a.x === b.x && a.y === b.y;
+};
+
+//#endregion
+//#region ../geometry/src/grid/neighbour.ts
+const randomNeighbour = (nbos) => randomElement(nbos);
+/**
+* Returns _true_ if `n` is a Neighbour type, eliminating NeighbourMaybe possibility
+*
+* @param n
+* @return
+*/
+const isNeighbour = (n) => {
+	if (n === void 0) return false;
+	if (n[1] === void 0) return false;
+	return true;
+};
+/**
+* Gets a list of neighbours for `cell` (using {@link neighbours}), filtering
+* results to only those that are valid neighbours (using {@link isNeighbour})
+* 
+* ```js
+* // Get all eight surrounding cells
+* const n = Grids.neighbourList(grid, cell, Grids.allDirections);
+* 
+* // Get north, east, south, west cells
+* const n = Grids.neighbourList(grid, cell, Grids.crossDirections);
+* ```
+* @param grid Grid
+* @param cell Cell
+* @param directions Directions 
+* @param bounds Bounds
+* @returns 
+*/
+const neighbourList = (grid, cell, directions, bounds) => {
+	const cellNeighbours = neighbours(grid, cell, bounds, directions);
+	const entries = Object.entries(cellNeighbours);
+	return entries.filter((n) => isNeighbour(n));
+};
+/**
+* Returns neighbours for a cell. If no `directions` are provided, it defaults to {@link allDirections}.
+*
+* ```js
+* const grid = { rows: 5, cols: 5 };
+* const cell = { x:2, y:2 };
+*
+* // Get n,ne,nw,e,s,se,sw and w neighbours
+* const n = Grids.neighbours(grid, cell, `wrap`);
+*
+* Yields:
+* {
+*  n: {x: 2, y: 1}
+*  s: {x: 2, y: 3}
+*  ....
+* }
+* ```
+*
+* Returns neighbours without diagonals (ie: n, e, s, w):
+* ```js
+* const n = Grids.neighbours(grid, cell, `stop`, Grids.crossDirections);
+* ```
+* @returns Returns a map of cells, keyed by cardinal direction
+* @param grid Grid
+* @param cell Cell
+* @param bounds How to handle edges of grid
+* @param directions Directions to return
+*/
+const neighbours = (grid, cell, bounds = `undefined`, directions) => {
+	const directories = directions ?? allDirections;
+	const points = directories.map((c) => offset(grid, cell, getVectorFromCardinal(c), bounds));
+	return zipKeyValue(directories, points);
+};
+
+//#endregion
+//#region ../geometry/src/grid/to-array.ts
+const toArray2d = (grid, initialValue) => {
+	const returnValue = [];
+	for (let row = 0; row < grid.rows; row++) {
+		returnValue[row] = Array.from({ length: grid.cols });
+		if (initialValue) for (let col = 0; col < grid.cols; col++) returnValue[row][col] = initialValue;
+	}
+	return returnValue;
+};
+
+//#endregion
+//#region ../geometry/src/grid/to-string.ts
+/**
+* Returns a key string for a cell instance
+* A key string allows comparison of instances by value rather than reference
+*
+* ```js
+* cellKeyString({x:10,y:20});
+* // Yields: "Cell{10,20}";
+* ```
+* @param v
+* @returns
+*/
+const cellKeyString = (v) => `Cell{${v.x},${v.y}}`;
+
+//#endregion
+//#region ../geometry/src/grid/visual.ts
+/**
+* Generator that returns rectangles for each cell in a grid
+*
+* @example Draw rectangles
+* ```js
+* import { Drawing } from 'visuals.js'
+* const rects = [...Grids.asRectangles(grid)];
+* Drawing.rect(ctx, rects, { strokeStyle: `silver`});
+* ```
+* @param grid
+*/
+function* asRectangles(grid) {
+	for (const c of cells(grid)) yield rectangleForCell(grid, c);
+}
+/**
+* Returns the cell at a specified visual coordinate
+* or _undefined_ if the position is outside of the grid.
+*
+* `position` must be in same coordinate/scale as the grid.
+*
+* @param position Position, eg in pixels
+* @param grid Grid
+* @return Cell at position or undefined if outside of the grid
+*/
+const cellAtPoint = (grid, position) => {
+	const size = grid.size;
+	resultThrow(numberTest(size, `positive`, `grid.size`));
+	if (position.x < 0 || position.y < 0) return;
+	const x = Math.floor(position.x / size);
+	const y = Math.floor(position.y / size);
+	if (x >= grid.cols) return;
+	if (y >= grid.rows) return;
+	return {
+		x,
+		y
+	};
+};
+/**
+* Returns a visual rectangle of the cell, positioned from the top-left corner
+*
+* ```js
+* const cell = { x: 1, y: 0 };
+*
+* // 5x5 grid, each cell 5px in size
+* const grid = { rows: 5, cols: 5, size: 5 }
+*
+* const r = rectangleForCell(grid, cell,);
+*
+* // Yields: { x: 5, y: 0, width: 5, height: 5 }
+* ```
+* @param cell
+* @param grid
+* @return
+*/
+const rectangleForCell = (grid, cell) => {
+	guardCell(cell);
+	const size = grid.size;
+	const x = cell.x * size;
+	const y = cell.y * size;
+	const r = fromTopLeft({
+		x,
+		y
+	}, size, size);
+	return r;
+};
+/**
+* Returns the visual midpoint of a cell (eg. pixel coordinate)
+*
+* @param cell
+* @param grid
+* @return
+*/
+const cellMiddle = (grid, cell) => {
+	guardCell(cell);
+	const size = grid.size;
+	const x = cell.x * size;
+	const y = cell.y * size;
+	return Object.freeze({
+		x: x + size / 2,
+		y: y + size / 2
+	});
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/breadth.ts
+const breadthLogic = () => {
+	return { select: (nbos) => nbos[0] };
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/cell-neighbours.ts
+const neighboursLogic = () => {
+	return {
+		select: (neighbours$1) => {
+			return neighbours$1.at(0);
+		},
+		getNeighbours: (grid, cell) => {
+			return neighbourList(grid, cell, allDirections, `undefined`);
+		}
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/columns.ts
+/**
+* Visits cells running down columns, left-to-right.
+* @param opts Options
+* @returns Visitor generator
+*/
+const columnLogic = (opts = {}) => {
+	const reversed = opts.reversed ?? false;
+	return {
+		select: (nbos) => nbos.find((n) => n[0] === (reversed ? `n` : `s`)),
+		getNeighbours: (grid, cell) => {
+			if (reversed) if (cell.y > 0) cell = {
+				x: cell.x,
+				y: cell.y - 1
+			};
+			else if (cell.x === 0) cell = {
+				x: grid.cols - 1,
+				y: grid.rows - 1
+			};
+			else cell = {
+				x: cell.x - 1,
+				y: grid.rows - 1
+			};
+			else if (cell.y < grid.rows - 1) cell = {
+				x: cell.x,
+				y: cell.y + 1
+			};
+			else if (cell.x < grid.cols - 1) cell = {
+				x: cell.x + 1,
+				y: 0
+			};
+			else cell = {
+				x: 0,
+				y: 0
+			};
+			return [[reversed ? `n` : `s`, cell]];
+		}
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/depth.ts
+const depthLogic = () => {
+	return { select: (nbos) => nbos.at(-1) };
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/random.ts
+const randomLogic = () => {
+	return {
+		getNeighbours: (grid, cell) => {
+			const t = [];
+			for (const c of cells(grid, cell)) t.push([`n`, c]);
+			return t;
+		},
+		select: randomNeighbour
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/random-contiguous.ts
+const randomContiguousLogic = () => {
+	return { select: randomNeighbour };
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/rows.ts
+/**
+* Visit by following rows. Normal order is left-to-right, top-to-bottom.
+* @param opts Options
+* @returns
+*/
+const rowLogic = (opts = {}) => {
+	const reversed = opts.reversed ?? false;
+	return {
+		select: (nbos) => nbos.find((n) => n[0] === (reversed ? `w` : `e`)),
+		getNeighbours: (grid, cell) => {
+			if (reversed) if (cell.x > 0) cell = {
+				x: cell.x - 1,
+				y: cell.y
+			};
+			else if (cell.y > 0) cell = {
+				x: grid.cols - 1,
+				y: cell.y - 1
+			};
+			else cell = {
+				x: grid.cols - 1,
+				y: grid.rows - 1
+			};
+			else if (cell.x < grid.rows - 1) cell = {
+				x: cell.x + 1,
+				y: cell.y
+			};
+			else if (cell.y < grid.rows - 1) cell = {
+				x: 0,
+				y: cell.y + 1
+			};
+			else cell = {
+				x: 0,
+				y: 0
+			};
+			return [[reversed ? `w` : `e`, cell]];
+		}
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/visitor.ts
+/**
+* Visits every cell in grid using supplied selection function
+* In-built functions to use: visitorDepth, visitorBreadth, visitorRandom,
+* visitorColumn, visitorRow.
+*
+* Usage example:
+* ```js
+*  let visitor = Grids.visitor(Grids.visitorRandom, grid, startCell);
+*  for (let cell of visitor) {
+*   // do something with cell
+*  }
+* ```
+*
+* If you want to keep tabs on the visitor, pass in a @ixfx/collections.Sets.ISetMutable instance. This gets
+* updated as cells are visited to make sure we don't visit the same one twice. If a set is not passed
+* in, one will be created internally.
+* ```js
+* let visited = new SetStringMutable<Grids.Cell>(c => Grids.cellKeyString(c));
+* let visitor = Grids.visitor(Grids.visitorRandom, grid, startCell, visited);
+* ```
+*
+* To visit with some delay, try this pattern
+* ```js
+*  const delayMs = 100;
+*  const run = () => {
+*   let cell = visitor.next().value;
+*   if (cell === undefined) return;
+*   // Do something with cell
+*   setTimeout(run, delayMs);
+*  }
+*  setTimeout(run, delayMs);
+* ```
+* @param logic Logic for selecting next cell
+* @param grid Grid to visitl
+* @param opts Options
+* @returns Cells
+*/
+function* visitByNeighbours(logic, grid, opts = {}) {
+	guardGrid(grid, `grid`);
+	const start = opts.start ?? {
+		x: 0,
+		y: 0
+	};
+	guardCell(start, `opts.start`, grid);
+	const v = opts.visited ?? mutable(cellKeyString);
+	const possibleNeighbours = logic.getNeighbours ?? ((g, c) => neighbourList(g, c, crossDirections, `undefined`));
+	let cellQueue = [start];
+	let moveQueue = [];
+	let current = void 0;
+	while (cellQueue.length > 0) {
+		if (current === void 0) {
+			const nv = cellQueue.pop();
+			if (nv === void 0) break;
+			current = nv;
+		}
+		if (!v.has(current)) {
+			v.add(current);
+			yield current;
+			const nextSteps = possibleNeighbours(grid, current).filter((step) => {
+				if (step[1] === void 0) return false;
+				return !v.has(step[1]);
+			});
+			if (nextSteps.length === 0) {
+				if (current !== void 0) cellQueue = cellQueue.filter((cq) => cellEquals(cq, current));
+			} else for (const n of nextSteps) {
+				if (n === void 0) continue;
+				if (n[1] === void 0) continue;
+				moveQueue.push(n);
+			}
+		}
+		moveQueue = moveQueue.filter((step) => !v.has(step[1]));
+		if (moveQueue.length === 0) current = void 0;
+		else {
+			const potential = logic.select(moveQueue);
+			if (potential !== void 0) {
+				cellQueue.push(potential[1]);
+				current = potential[1];
+			}
+		}
+	}
+}
+
+//#endregion
+//#region ../geometry/src/grid/visitors/step.ts
+/**
+* Runs the provided `visitor` for `steps`, returning the cell we end at
+* ```js
+* // Create visitor & stepper
+* const visitor = Grids.Visit.create(`row`);
+* const stepper = Grids.Visit.stepper(grid, visitor);
+* 
+* // Step by 10
+* stepper(10); // GridCell {x,y}
+* 
+* // Step by another 2
+* stepper(2);
+* ```
+* @param grid Grid to traverse
+* @param start Start point
+* @param createVisitor Visitor function
+* @returns
+*/
+const stepper = (grid, createVisitor, start = {
+	x: 0,
+	y: 0
+}, resolution = 1) => {
+	guardGrid(grid, `grid`);
+	guardCell(start, `start`);
+	resultThrow(integerTest(resolution, ``, `resolution`));
+	const steps = [];
+	let count = 0;
+	let position = 0;
+	for (const c of createVisitor(grid, {
+		start,
+		boundsWrap: `undefined`
+	})) {
+		count++;
+		if (count % resolution !== 0) continue;
+		steps.push(c);
+	}
+	return (step, fromStart = false) => {
+		resultThrow(integerTest(step, ``, `step`));
+		if (fromStart) position = step;
+		else position += step;
+		return steps.at(position % steps.length);
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/visitors/index.ts
+var visitors_exports = {};
+__export(visitors_exports, {
+	breadthLogic: () => breadthLogic,
+	columnLogic: () => columnLogic,
+	create: () => create,
+	depthLogic: () => depthLogic,
+	neighboursLogic: () => neighboursLogic,
+	randomContiguousLogic: () => randomContiguousLogic,
+	randomLogic: () => randomLogic,
+	rowLogic: () => rowLogic,
+	stepper: () => stepper,
+	visitByNeighbours: () => visitByNeighbours,
+	withLogic: () => withLogic
+});
+/**
+* Logic types:
+* * 'row': left-to-right, top-to-bottom
+* * 'column': top-to-bottom, left-to-right
+* * 'neighbours': neighbours surrounding cell (eight)
+* * 'breadth`: breadth-first
+* * 'depth': depth-first
+* * 'random': any random cell in grid
+* * 'random-contiguous': any random cell neighbouring an already visited cell
+* @param type 
+* @param opts 
+* @returns 
+*/
+const create = (type, opts = {}) => {
+	switch (type) {
+		case `random-contiguous`: return withLogic(randomContiguousLogic(), opts);
+		case `random`: return withLogic(randomLogic(), opts);
+		case `depth`: return withLogic(depthLogic(), opts);
+		case `breadth`: return withLogic(breadthLogic(), opts);
+		case `neighbours`: return withLogic(neighboursLogic(), opts);
+		case `row`: return withLogic(rowLogic(opts), opts);
+		case `column`: return withLogic(columnLogic(opts), opts);
+		default: throw new TypeError(`Param 'type' unknown. Value: ${type}`);
+	}
+};
+const withLogic = (logic, options = {}) => {
+	return (grid, optionsOverride = {}) => {
+		return visitByNeighbours(logic, grid, {
+			...options,
+			...optionsOverride
+		});
+	};
+};
+
+//#endregion
+//#region ../geometry/src/grid/index.ts
+var grid_exports = {};
+__export(grid_exports, {
+	Array1d: () => array_1d_exports,
+	Array2d: () => array_2d_exports,
+	As: () => as_exports,
+	By: () => enumerators_exports,
+	Visit: () => visitors_exports,
+	allDirections: () => allDirections,
+	applyBounds: () => applyBounds,
+	asRectangles: () => asRectangles,
+	cellAtPoint: () => cellAtPoint,
+	cellEquals: () => cellEquals,
+	cellFromIndex: () => cellFromIndex,
+	cellKeyString: () => cellKeyString,
+	cellMiddle: () => cellMiddle,
+	crossDirections: () => crossDirections,
+	getLine: () => getLine,
+	getVectorFromCardinal: () => getVectorFromCardinal,
+	guardCell: () => guardCell,
+	guardGrid: () => guardGrid,
+	indexFromCell: () => indexFromCell,
+	inside: () => inside,
+	isCell: () => isCell,
+	isEqual: () => isEqual$4,
+	neighbourList: () => neighbourList,
+	neighbours: () => neighbours,
+	offset: () => offset,
+	offsetCardinals: () => offsetCardinals,
+	randomNeighbour: () => randomNeighbour,
+	rectangleForCell: () => rectangleForCell,
+	simpleLine: () => simpleLine,
+	toArray2d: () => toArray2d,
+	values: () => values
+});
+
+//#endregion
+//#region ../geometry/src/point/normalise-by-rect.ts
+/**
+* Normalises a point so it is on a 0..1 scale
+* 
+* ```js
+* normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); 
+* normaliseByRect({ x: 10, y: 10 }, 20, 40); 
+* normaliseByRect(10, 10, 20, 40);
+* ```
+* @param a Point, or x
+* @param b y coord or width
+* @param c height or width
+* @param d height
+* @returns Point
+*/
+function normaliseByRect(a, b, c, d) {
+	if (isPoint(a)) {
+		if (typeof b === `number` && c !== void 0) resultThrow(numberTest(b, `positive`, `width`), numberTest(c, `positive`, `height`));
+		else {
+			if (!isRect(b)) throw new Error(`Expected second parameter to be a rect`);
+			c = b.height;
+			b = b.width;
+		}
+		return Object.freeze({
+			x: a.x / b,
+			y: a.y / c
+		});
+	} else {
+		resultThrow(numberTest(a, `positive`, `x`));
+		if (typeof b !== `number`) throw new TypeError(`Expecting second parameter to be a number (width)`);
+		if (typeof c !== `number`) throw new TypeError(`Expecting third parameter to be a number (height)`);
+		resultThrow(numberTest(b, `positive`, `y`));
+		resultThrow(numberTest(c, `positive`, `width`));
+		if (d === void 0) throw new Error(`Expected height parameter`);
+		resultThrow(numberTest(d, `positive`, `height`));
+		return Object.freeze({
+			x: a / c,
+			y: b / d
+		});
+	}
+}
+
+//#endregion
+//#region ../geometry/src/line/nearest.ts
+/**
+* Returns the nearest point on `line` closest to `point`.
+* 
+* ```js
+* const pt = Lines.nearest(line, {x:10,y:10});
+* ```
+* 
+* If an array of lines is provided, it will be the closest point amongst all the lines
+* @param line Line or array of lines
+* @param point
+* @returns Point `{ x, y }`
+*/
+const nearest = (line, point$1) => {
+	const n = (line$1) => {
+		const { a, b } = line$1;
+		const atob = {
+			x: b.x - a.x,
+			y: b.y - a.y
+		};
+		const atop = {
+			x: point$1.x - a.x,
+			y: point$1.y - a.y
+		};
+		const length$4 = atob.x * atob.x + atob.y * atob.y;
+		let dot = atop.x * atob.x + atop.y * atob.y;
+		const t = Math.min(1, Math.max(0, dot / length$4));
+		dot = (b.x - a.x) * (point$1.y - a.y) - (b.y - a.y) * (point$1.x - a.x);
+		return {
+			x: a.x + atob.x * t,
+			y: a.y + atob.y * t
+		};
+	};
+	if (Array.isArray(line)) {
+		const pts = line.map((l) => n(l));
+		const dists = pts.map((p) => distance(p, point$1));
+		return Object.freeze(pts[minIndex(...dists)]);
+	} else return Object.freeze(n(line));
+};
+
+//#endregion
+//#region ../geometry/src/line/distance-single-line.ts
+/**
+* Returns the distance of `point` to the nearest point on `line`
+* 
+* ```js
+* const distance = Lines.distanceSingleLine(line, pt);
+* ```
+* @param line Line
+* @param point Target point
+* @returns 
+*/
+const distanceSingleLine = (line, point$1) => {
+	guard$3(line, `line`);
+	guard$1(point$1, `point`);
+	if (length(line) === 0) return length(line.a, point$1);
+	const near = nearest(line, point$1);
+	return length(near, point$1);
+};
+
+//#endregion
+//#region ../geometry/src/line/angles.ts
+const directionVector = (line) => ({
+	x: line.b.x - line.a.x,
+	y: line.b.y - line.a.y
+});
+const directionVectorNormalised = (line) => {
+	const l = length(line);
+	const v = directionVector(line);
+	return {
+		x: v.x / l,
+		y: v.y / l
+	};
+};
+/**
+* Returns a parallel line to `line` at `distance`.
+* 
+* ```js
+* const l = Lines.parallel(line, 10);
+* ```
+* @param line
+* @param distance 
+*/
+const parallel = (line, distance$2) => {
+	const dv = directionVector(line);
+	const dvn = directionVectorNormalised(line);
+	const a = {
+		x: line.a.x - dvn.y * distance$2,
+		y: line.a.y + dvn.x * distance$2
+	};
+	return {
+		a,
+		b: {
+			x: a.x + dv.x,
+			y: a.y + dv.y
+		}
+	};
+};
+/**
+* Returns a point perpendicular to `line` at a specified `distance`. Use negative
+* distances for the other side of line.
+* ```
+* // Project a point 100 units away from line, at its midpoint.
+* const pt = Lines.perpendicularPoint(line, 100, 0.5);
+* ```
+* @param line Line
+* @param distance Distance from line. Use negatives to flip side
+* @param amount Relative place on line to project point from. 0 projects from A, 0.5 from the middle, 1 from B.
+*/
+const perpendicularPoint = (line, distance$2, amount = 0) => {
+	const origin = interpolate$1(amount, line);
+	const dvn = directionVectorNormalised(line);
+	return {
+		x: origin.x - dvn.y * distance$2,
+		y: origin.y + dvn.x * distance$2
+	};
+};
+
+//#endregion
+//#region ../geometry/src/line/bbox.ts
+/**
+* Returns a rectangle that encompasses dimension of line
+* 
+* ```js
+* const rect = Lines.bbox(line);
+* ```
+*/
+const bbox$3 = (line) => bbox$1(line.a, line.b);
+
+//#endregion
+//#region ../geometry/src/point/divider.ts
+/**
+* Returns a Point with the x,y,z values of two points divide (a/b).
+* 
+* `z` parameter is used, if present. Uses a default value of 0 for 'z' when dividing a 2D point with a 3D one.
+*
+* Examples:
+*
+* ```js
+* divide(ptA, ptB);
+* divide(x1, y1, x2, y2);
+* divide(ptA, x2, y2);
+* ```
+*/
+function divide$2(a1, ab2, ab3, ab4, ab5, ab6) {
+	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
+	guard$1(ptA, `a`);
+	guard$1(ptB, `b`);
+	if (ptB.x === 0) throw new TypeError("Cannot divide by zero (b.x is 0)");
+	if (ptB.y === 0) throw new TypeError("Cannot divide by zero (b.y is 0)");
+	const pt = {
+		x: ptA.x / ptB.x,
+		y: ptA.y / ptB.y
+	};
+	if (isPoint3d(ptA) || isPoint3d(ptB)) {
+		if (ptB.z === 0) throw new TypeError("Cannot divide by zero (b.z is 0)");
+		pt.z = (ptA.z ?? 0) / (ptB.z ?? 0);
+	}
+	return Object.freeze(pt);
+}
+/**
+* Returns a function that divides a point:
+* ```js
+* const f = divider(100, 200);
+* f(50,100); // Yields: { x: 0.5, y: 0.5 }
+* ```
+*
+* Input values can be Point, separate x,y and optional z values or an array:
+* ```js
+* const f = divider({ x: 100, y: 100 });
+* const f = divider( 100, 100 );
+* const f = divider([ 100, 100 ]);
+* ```
+*
+* Likewise the returned function an take these as inputs:
+* ```js
+* f({ x: 100, y: 100});
+* f( 100, 100 );
+* f([ 100, 100 ]);
+* ```
+*
+* Function throws if divisor has 0 for any coordinate (since we can't divide by 0)
+* @param a Divisor point, array of points or x
+* @param b Divisor y value
+* @param c Divisor z value
+* @returns
+*/
+function divider(a, b, c) {
+	const divisor = getPointParameter(a, b, c);
+	guardNonZeroPoint(divisor, `divisor`);
+	return (aa, bb, cc) => {
+		const dividend = getPointParameter(aa, bb, cc);
+		return typeof dividend.z === `undefined` ? Object.freeze({
+			x: dividend.x / divisor.x,
+			y: dividend.y / divisor.y
+		}) : Object.freeze({
+			x: dividend.x / divisor.x,
+			y: dividend.y / divisor.y,
+			z: dividend.z / (divisor.z ?? 1)
+		});
+	};
+}
+
+//#endregion
+//#region ../geometry/src/line/divide.ts
+/**
+* Divides both start and end points by given x,y
+* ```js
+* // Line 1,1 -> 10,10
+* const l = Lines.fromNumbers(1,1,10,10);
+* const ll = Lines.divide(l, {x:2, y:4});
+* // Yields: 0.5,0.25 -> 5,2.5
+* ```
+* 
+* Dividing by zero will give Infinity for that dimension.
+* @param line 
+* @param point 
+* @returns 
+*/
+const divide$1 = (line, point$1) => Object.freeze({
+	...line,
+	a: divide$2(line.a, point$1),
+	b: divide$2(line.b, point$1)
+});
+
+//#endregion
+//#region ../geometry/src/line/from-numbers.ts
+/**
+* Returns a line from a basis of coordinates (x1, y1, x2, y2)
+* 
+* ```js
+* // Line from 0,1 -> 10,15
+* Lines.fromNumbers(0, 1, 10, 15);
+* ```
+* @param x1 
+* @param y1 
+* @param x2 
+* @param y2 
+* @returns 
+*/
+const fromNumbers$2 = (x1, y1, x2, y2) => {
+	if (Number.isNaN(x1)) throw new Error(`x1 is NaN`);
+	if (Number.isNaN(x2)) throw new Error(`x2 is NaN`);
+	if (Number.isNaN(y1)) throw new Error(`y1 is NaN`);
+	if (Number.isNaN(y2)) throw new Error(`y2 is NaN`);
+	const a = {
+		x: x1,
+		y: y1
+	};
+	const b = {
+		x: x2,
+		y: y2
+	};
+	return fromPoints$2(a, b);
+};
+
+//#endregion
+//#region ../geometry/src/line/from-flat-array.ts
+/**
+* Returns a line from four numbers [x1,y1,x2,y2].
+* 
+* See {@link toFlatArray} to create an array from a line.
+* 
+* ```js
+* const line = Lines.fromFlatArray(...[0, 0, 100, 100]);
+* // line is {a: { x:0, y:0 }, b: { x: 100, y: 100 } }
+* ```
+* @param array Array in the form [x1,y1,x2,y2]
+* @returns Line
+*/
+const fromFlatArray$1 = (array) => {
+	if (!Array.isArray(array)) throw new Error(`arr parameter is not an array`);
+	if (array.length !== 4) throw new Error(`array is expected to have length four`);
+	return fromNumbers$2(array[0], array[1], array[2], array[3]);
+};
+
+//#endregion
+//#region ../geometry/src/line/from-pivot.ts
 /**
 * Creates a line from an origin point.
 * ```js
@@ -1985,65 +4949,59 @@ const fromPivot = (origin = {
 };
 
 //#endregion
-//#region packages/geometry/src/line/from-points-to-path.ts
+//#region ../geometry/src/line/midpoint.ts
 /**
-* Returns a {@link LinePath} from two points
+* Returns the mid-point of a line (same as `interpolate` with an amount of 0.5)
 * 
 * ```js
-* const path = Lines.fromPointsToPath(ptA, ptB);
+* Lines.midpoint(line); // Returns {x, y}
 * ```
-* @param a 
-* @param b 
+* @param aOrLine 
+* @param pointB 
 * @returns 
 */
-const fromPointsToPath = (a, b) => toPath$3(fromPoints$1(a, b));
-
-//#endregion
-//#region packages/geometry/src/point/is-equal.ts
-/**
-* Returns _true_ if the points have identical values
-*
-* ```js
-* const a = {x: 10, y: 10};
-* const b = {x: 10, y: 10;};
-* a === b        // False, because a and be are different objects
-* isEqual(a, b)   // True, because a and b are same value
-* ```
-* @param p Points
-* @returns _True_ if points are equal
-*/
-const isEqual$2 = (...p) => {
-	if (p === void 0) throw new Error(`parameter 'p' is undefined`);
-	if (p.length < 2) return true;
-	for (let index = 1; index < p.length; index++) {
-		if (p[index].x !== p[0].x) return false;
-		if (p[index].y !== p[0].y) return false;
-	}
-	return true;
+const midpoint = (aOrLine, pointB) => {
+	const [a, b] = getPointParameter$1(aOrLine, pointB);
+	return interpolate$1(.5, a, b);
 };
 
 //#endregion
-//#region packages/geometry/src/line/is-equal.ts
+//#region ../geometry/src/line/relative-position.ts
 /**
-* Returns true if the lines have the same value. Note that only
-* the line start and end points are compared. So the lines might
-* be different in other properties, and `isEqual` will still return
-* true.
-* 
-* ```js
-* const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
-* const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
-* a === b; // false, because they are different objects
-* Lines.isEqual(a, b); // true, because they have the same value
-* ```
-* @param {Line} a
-* @param {Line} b
-* @returns {boolean}
+* Returns the relative position of `pt` along `line`.
+* Warning: assumes `pt` is actually on `line`. Results may be bogus if not.
+* @param line 
+* @param pt 
 */
-const isEqual$5 = (a, b) => isEqual$2(a.a, b.a) && isEqual$2(a.b, b.b);
+const relativePosition$1 = (line, pt) => {
+	const fromStart = distance(line.a, pt);
+	const total = length(line);
+	return fromStart / total;
+};
 
 //#endregion
-//#region packages/geometry/src/point/abs.ts
+//#region ../geometry/src/line/sum.ts
+/**
+* Adds both start and end points by given x,y
+* ```js
+* 
+* // Line 1,1 -> 10,10
+* const l = Lines.fromNumbers(1,1,10,10);
+* const ll = Lines.sum(l, {x:2, y:4});
+* // Yields: 3,5 -> 12,14
+* ```
+* @param line 
+* @param point 
+* @returns 
+*/
+const sum$2 = (line, point$1) => Object.freeze({
+	...line,
+	a: sum$1(line.a, point$1),
+	b: sum$1(line.b, point$1)
+});
+
+//#endregion
+//#region ../geometry/src/point/abs.ts
 /**
 * Returns a point with Math.abs applied to x,y and z if present.
 * ```js
@@ -2070,7 +5028,7 @@ function abs(pt) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/apply.ts
+//#region ../geometry/src/point/apply.ts
 /**
 * Applies `fn` on x,y & z (if present) fields, returning all other fields as well
 * ```js
@@ -2108,7 +5066,7 @@ function apply$2(pt, fn) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/averager.ts
+//#region ../geometry/src/point/averager.ts
 function averager(kind, opts) {
 	let x;
 	let y;
@@ -2140,7 +5098,7 @@ function averager(kind, opts) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/centroid.ts
+//#region ../geometry/src/point/centroid.ts
 /**
 * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
 * Undefined values are skipped over.
@@ -2176,7 +5134,7 @@ const centroid$1 = (...points) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/clamp.ts
+//#region ../geometry/src/point/clamp.ts
 /**
 * Clamps a point to be between `min` and `max` (0 & 1 by default)
 * @param pt Point
@@ -2196,7 +5154,7 @@ function clamp$1(a, min = 0, max = 1) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/compare.ts
+//#region ../geometry/src/point/compare.ts
 /**
 * Returns -2 if both x & y of a is less than b
 * Returns -1 if either x/y of a is less than b
@@ -2281,7 +5239,7 @@ const compareByZ = (a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/convex-hull.ts
+//#region ../geometry/src/point/convex-hull.ts
 /**
 * Simple convex hull impementation. Returns a set of points which
 * enclose `pts`.
@@ -2309,241 +5267,12 @@ const convexHull = (...pts) => {
 	};
 	const upper = x(sorted);
 	const lower = x(sorted.reverse());
-	if (upper.length === 1 && lower.length === 1 && isEqual$2(lower[0], upper[0])) return upper;
+	if (upper.length === 1 && lower.length === 1 && isEqual(lower[0], upper[0])) return upper;
 	return [...upper, ...lower];
 };
 
 //#endregion
-//#region packages/geometry/src/circle/guard.ts
-/**
-* Throws if radius is out of range. If x,y is present, these will be validated too.
-* @param circle 
-* @param parameterName 
-*/
-const guard$4 = (circle, parameterName = `circle`) => {
-	if (isCirclePositioned(circle)) guard$1(circle, `circle`);
-	if (Number.isNaN(circle.radius)) throw new Error(`${parameterName}.radius is NaN`);
-	if (circle.radius <= 0) throw new Error(`${parameterName}.radius must be greater than zero`);
-};
-/**
-* Throws if `circle` is not positioned or has dodgy fields
-* @param circle 
-* @param parameterName 
-* @returns 
-*/
-const guardPositioned$1 = (circle, parameterName = `circle`) => {
-	if (!isCirclePositioned(circle)) throw new Error(`Expected a positioned circle with x,y`);
-	guard$4(circle, parameterName);
-};
-/***
-* Returns true if radius, x or y are NaN
-*/
-const isNaN = (a) => {
-	if (Number.isNaN(a.radius)) return true;
-	if (isCirclePositioned(a)) {
-		if (Number.isNaN(a.x)) return true;
-		if (Number.isNaN(a.y)) return true;
-	}
-	return false;
-};
-/**
-* Returns true if parameter has x,y. Does not verify if parameter is a circle or not
-* 
-* ```js
-* const circleA = { radius: 5 };
-* Circles.isPositioned(circle); // false
-* 
-* const circleB = { radius: 5, x: 10, y: 10 }
-* Circles.isPositioned(circle); // true
-* ```
-* @param p Circle
-* @returns 
-*/
-const isPositioned$2 = (p) => p.x !== void 0 && p.y !== void 0;
-const isCircle = (p) => p.radius !== void 0;
-const isCirclePositioned = (p) => isCircle(p) && isPositioned$2(p);
-
-//#endregion
-//#region packages/geometry/src/circle/distance-center.ts
-/**
-* Returns the distance between two circle centers.
-* 
-* ```js
-* const circleA = { radius: 5, x: 5, y: 5 }
-* const circleB = { radius: 10, x: 20, y: 20 }
-* const distance = Circles.distanceCenter(circleA, circleB);
-* ```
-* Throws an error if either is lacking position.
-* @param a 
-* @param b 
-* @returns Distance
-*/
-const distanceCenter$1 = (a, b) => {
-	guardPositioned$1(a, `a`);
-	if (isCirclePositioned(b)) guardPositioned$1(b, `b`);
-	return distance(a, b);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/distance-from-exterior.ts
-/**
-* Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
-* If `b` overlaps or is enclosed by `a`, distance is 0.
-* 
-* ```js
-* const circleA = { radius: 5, x: 5, y: 5 }
-* const circleB = { radius: 10, x: 20, y: 20 }
-* const distance = Circles.distanceCenter(circleA, circleB);
-* ```
-* @param a
-* @param b 
-*/
-const distanceFromExterior$1 = (a, b) => {
-	guardPositioned$1(a, `a`);
-	if (isCirclePositioned(b)) return Math.max(0, distanceCenter$1(a, b) - a.radius - b.radius);
-	else if (isPoint(b)) {
-		const distribution = distance(a, b);
-		if (distribution < a.radius) return 0;
-		return distribution;
-	} else throw new Error(`Second parameter invalid type`);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/is-equal.ts
-/**
-* Returns true if the two objects have the same values
-*
-* ```js
-* const circleA = { radius: 10, x: 5, y: 5 };
-* const circleB = { radius: 10, x: 5, y: 5 };
-* 
-* circleA === circleB; // false, because identity of objects is different
-* Circles.isEqual(circleA, circleB); // true, because values are the same
-* ```
-* 
-* Circles must both be positioned or not.
-* @param a
-* @param b
-* @returns
-*/
-const isEqual$6 = (a, b) => {
-	if (a.radius !== b.radius) return false;
-	if (isCirclePositioned(a) && isCirclePositioned(b)) {
-		if (a.x !== b.x) return false;
-		if (a.y !== b.y) return false;
-		if (a.z !== b.z) return false;
-		return true;
-	} else if (!isCirclePositioned(a) && !isCirclePositioned(b)) {} else return false;
-	return false;
-};
-
-//#endregion
-//#region packages/geometry/src/point/sum.ts
-/**
-* Returns a Point with the x,y,z values of two points added.
-* 
-* `z` parameter is used, if present. Uses a default value of 0 for 'z' when adding a 2D point with a 3D one.
-*
-* Examples:
-*
-* ```js
-* sum(ptA, ptB);
-* sum(x1, y1, x2, y2);
-* sum(ptA, x2, y2);
-* ```
-*/
-function sum$1(a1, ab2, ab3, ab4, ab5, ab6) {
-	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
-	guard$1(ptA, `a`);
-	guard$1(ptB, `b`);
-	const pt = {
-		x: ptA.x + ptB.x,
-		y: ptA.y + ptB.y
-	};
-	if (isPoint3d(ptA) || isPoint3d(ptB)) pt.z = (ptA.z ?? 0) + (ptB.z ?? 0);
-	return Object.freeze(pt);
-}
-
-//#endregion
-//#region packages/geometry/src/circle/intersections.ts
-/**
-* Returns the point(s) of intersection between a circle and line.
-* 
-* ```js
-* const circle = { radius: 5, x: 5, y: 5 };
-* const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
-* const pts = Circles.intersectionLine(circle, line);
-* ```
-* @param circle 
-* @param line 
-* @returns Point(s) of intersection, or empty array
-*/
-const intersectionLine = (circle, line) => {
-	const v1 = {
-		x: line.b.x - line.a.x,
-		y: line.b.y - line.a.y
-	};
-	const v2 = {
-		x: line.a.x - circle.x,
-		y: line.a.y - circle.y
-	};
-	const b = (v1.x * v2.x + v1.y * v2.y) * -2;
-	const c = 2 * (v1.x * v1.x + v1.y * v1.y);
-	const d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.radius * circle.radius));
-	if (Number.isNaN(d)) return [];
-	const u1 = (b - d) / c;
-	const u2 = (b + d) / c;
-	const returnValue = [];
-	if (u1 <= 1 && u1 >= 0) returnValue.push({
-		x: line.a.x + v1.x * u1,
-		y: line.a.y + v1.y * u1
-	});
-	if (u2 <= 1 && u2 >= 0) returnValue.push({
-		x: line.a.x + v1.x * u2,
-		y: line.a.y + v1.y * u2
-	});
-	return returnValue;
-};
-/**
-* 
-* Returns the points of intersection betweeen `a` and `b`.
-* 
-* Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
-*
-* @param a Circle
-* @param b Circle
-* @returns Points of intersection, or an empty list if there are none
-*/
-const intersections = (a, b) => {
-	const vector = subtract$2(b, a);
-	const centerD = Math.hypot(vector.y, vector.x);
-	if (centerD > a.radius + b.radius) return [];
-	if (centerD < Math.abs(a.radius - b.radius)) return [];
-	if (isEqual$6(a, b)) return [];
-	const centroidD = (a.radius * a.radius - b.radius * b.radius + centerD * centerD) / (2 * centerD);
-	const centroid$2 = {
-		x: a.x + vector.x * centroidD / centerD,
-		y: a.y + vector.y * centroidD / centerD
-	};
-	const centroidIntersectionD = Math.sqrt(a.radius * a.radius - centroidD * centroidD);
-	const intersection = {
-		x: -vector.y * (centroidIntersectionD / centerD),
-		y: vector.x * (centroidIntersectionD / centerD)
-	};
-	return [sum$1(centroid$2, intersection), subtract$2(centroid$2, intersection)];
-};
-
-//#endregion
-//#region packages/geometry/src/intersects.ts
-const circleRect = (a, b) => {
-	const deltaX = a.x - Math.max(b.x, Math.min(a.x, b.x + b.width));
-	const deltaY = a.y - Math.max(b.y, Math.min(a.y, b.y + b.height));
-	return deltaX * deltaX + deltaY * deltaY < a.radius * a.radius;
-};
-const circleCircle = (a, b) => intersections(a, b).length === 2;
-
-//#endregion
-//#region packages/geometry/src/rect/Intersects.ts
+//#region ../geometry/src/rect/Intersects.ts
 /**
 * Returns true if point is within or on boundary of `rect`.
 *
@@ -2557,7 +5286,7 @@ const circleCircle = (a, b) => intersections(a, b).length === 2;
 * @returns
 */
 function intersectsPoint(rect, a, b) {
-	guard$3(rect, `rect`);
+	guard$2(rect, `rect`);
 	let x = 0;
 	let y = 0;
 	if (typeof a === `number`) {
@@ -2568,7 +5297,7 @@ function intersectsPoint(rect, a, b) {
 		x = a.x;
 		y = a.y;
 	}
-	if (isPositioned$1(rect)) {
+	if (isPositioned(rect)) {
 		if (x - rect.x > rect.width || x < rect.x) return false;
 		if (y - rect.y > rect.height || y < rect.y) return false;
 	} else {
@@ -2590,7 +5319,7 @@ const isIntersecting$1 = (a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/rect/center.ts
+//#region ../geometry/src/rect/center.ts
 /**
 * Returns the center of a rectangle as a {@link Point}.
 *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
@@ -2604,7 +5333,7 @@ const isIntersecting$1 = (a, b) => {
 * @returns
 */
 const center$1 = (rect, origin) => {
-	guard$3(rect);
+	guard$2(rect);
 	if (origin === void 0 && isPoint(rect)) origin = rect;
 	else if (origin === void 0) origin = {
 		x: 0,
@@ -2618,7 +5347,7 @@ const center$1 = (rect, origin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/rect/distance.ts
+//#region ../geometry/src/rect/distance.ts
 /**
 * Returns the distance from the perimeter of `rect` to `pt`.
 * If the point is within the rectangle, 0 is returned.
@@ -2655,7 +5384,7 @@ const distanceFromExterior = (rect, pt) => {
 const distanceFromCenter = (rect, pt) => distance(center$1(rect), pt);
 
 //#endregion
-//#region packages/geometry/src/point/distance-to-center.ts
+//#region ../geometry/src/point/distance-to-center.ts
 /**
 * Returns the distance from point `a` to the center of `shape`.
 * @param a Point
@@ -2670,7 +5399,7 @@ const distanceToCenter = (a, shape) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/distance-to-exterior.ts
+//#region ../geometry/src/point/distance-to-exterior.ts
 /**
 * Returns the distance from point `a` to the exterior of `shape`.
 *
@@ -2702,7 +5431,7 @@ const distanceToExterior = (a, shape) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/to-array.ts
+//#region ../geometry/src/point/to-array.ts
 /**
 * Returns point as an array in the form [x,y]. This can be useful for some libraries
 * that expect points in array form.
@@ -2717,14 +5446,14 @@ const distanceToExterior = (a, shape) => {
 const toArray$1 = (p) => [p.x, p.y];
 
 //#endregion
-//#region packages/geometry/src/point/dot-product.ts
+//#region ../geometry/src/point/dot-product.ts
 const dotProduct$1 = (...pts) => {
 	const a = pts.map((p) => toArray$1(p));
 	return dotProduct(a);
 };
 
 //#endregion
-//#region packages/geometry/src/point/from.ts
+//#region ../geometry/src/point/from.ts
 /**
 * Returns a point from two or three coordinates or an array of [x,y] or [x,y,z].
 * @example
@@ -2835,7 +5564,7 @@ const fromNumbers = (...coords) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/interpolate.ts
+//#region ../geometry/src/point/interpolate.ts
 /**
 * Returns a relative point between two points.
 * 
@@ -2851,10 +5580,10 @@ const fromNumbers = (...coords) => {
 * @param allowOverflow If true, length of line can be exceeded for `amount` of below 0 and above `1`.
 * @returns {@link Point}
 */
-const interpolate$4 = (amount, a, b, allowOverflow = false) => interpolate$1(amount, a, b, allowOverflow);
+const interpolate$2 = (amount, a, b, allowOverflow = false) => interpolate$1(amount, a, b, allowOverflow);
 
 //#endregion
-//#region packages/geometry/src/point/invert.ts
+//#region ../geometry/src/point/invert.ts
 /**
 * Inverts one or more axis of a point
 * ```js
@@ -2895,58 +5624,7 @@ const invert = (pt, what = `both`) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/multiply.ts
-/**
-* Returns a Point with the x,y,z values of two points multiply (a/b).
-* 
-* `z` parameter is used, if present. Uses a default value of 0 for 'z' when multiplying a 2D point with a 3D one.
-*
-* Examples:
-*
-* ```js
-* multiply(ptA, ptB);
-* multiply(x1, y1, x2, y2);
-* multiply(ptA, x2, y2);
-* ```
-*/
-function multiply$2(a1, ab2, ab3, ab4, ab5, ab6) {
-	const [ptA, ptB] = getTwoPointParameters(a1, ab2, ab3, ab4, ab5, ab6);
-	guard$1(ptA, `a`);
-	guard$1(ptB, `b`);
-	const pt = {
-		x: ptA.x * ptB.x,
-		y: ptA.y * ptB.y
-	};
-	if (isPoint3d(ptA) || isPoint3d(ptB)) pt.z = (ptA.z ?? 0) * (ptB.z ?? 0);
-	return Object.freeze(pt);
-}
-/**
-* Multiplies all components by `v`.
-* Existing properties of `pt` are maintained.
-*
-* ```js
-* multiplyScalar({ x:2, y:4 }, 2);
-* // Yields: { x:4, y:8 }
-* ```
-* @param pt Point
-* @param v Value to multiply by
-* @returns
-*/
-const multiplyScalar$1 = (pt, v) => {
-	return isPoint3d(pt) ? Object.freeze({
-		...pt,
-		x: pt.x * v,
-		y: pt.y * v,
-		z: pt.z * v
-	}) : Object.freeze({
-		...pt,
-		x: pt.x * v,
-		y: pt.y * v
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/point/magnitude.ts
+//#region ../geometry/src/point/magnitude.ts
 /**
 * Clamps the magnitude of a point.
 * This is useful when using a Point as a vector, to limit forces.
@@ -2964,7 +5642,7 @@ const clampMagnitude = (pt, max = 1, min = 0) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/most.ts
+//#region ../geometry/src/point/most.ts
 /**
 * Returns the left-most of the provided points.
 *
@@ -2997,8 +5675,8 @@ const leftmost = (...points) => findMinimum((a, b) => a.x <= b.x ? a : b, ...poi
 const rightmost = (...points) => findMinimum((a, b) => a.x >= b.x ? a : b, ...points);
 
 //#endregion
-//#region packages/geometry/src/point/normalise.ts
-const length$3 = (ptOrX, y) => {
+//#region ../geometry/src/point/normalise.ts
+const length$1 = (ptOrX, y) => {
 	if (isPoint(ptOrX)) {
 		y = ptOrX.y;
 		ptOrX = ptOrX.x;
@@ -3019,8 +5697,8 @@ const length$3 = (ptOrX, y) => {
 */
 const normalise = (ptOrX, y) => {
 	const pt = getPointParameter(ptOrX, y);
-	const l = length$3(pt);
-	if (l === 0) return Empty$1;
+	const l = length$1(pt);
+	if (l === 0) return Empty;
 	return Object.freeze({
 		...pt,
 		x: pt.x / l,
@@ -3029,7 +5707,7 @@ const normalise = (ptOrX, y) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/pipeline.ts
+//#region ../geometry/src/point/pipeline.ts
 /**
 * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
 * ```js
@@ -3060,7 +5738,7 @@ const pipelineApply = (point$1, ...pipelineFns) => pipeline(...pipelineFns)(poin
 const pipeline = (...pipeline$1) => (pt) => pipeline$1.reduce((previous, current) => current(previous), pt);
 
 //#endregion
-//#region packages/geometry/src/vector.ts
+//#region ../geometry/src/vector.ts
 var vector_exports = {};
 __export(vector_exports, {
 	clampMagnitude: () => clampMagnitude$1,
@@ -3084,7 +5762,7 @@ const EmptyCartesian = Object.freeze({
 	x: 0,
 	y: 0
 });
-const piPi$5 = Math.PI * 2;
+const piPi$2 = Math.PI * 2;
 const pi$1 = Math.PI;
 const fromRadians = (radians) => {
 	return Object.freeze({
@@ -3108,10 +5786,10 @@ const toRadians = (point$1) => {
 const fromPointPolar = (pt, angleNormalisation = ``, origin = EmptyCartesian) => {
 	pt = subtract$2(pt, origin);
 	let direction = Math.atan2(pt.y, pt.x);
-	if (angleNormalisation === `unipolar` && direction < 0) direction += piPi$5;
+	if (angleNormalisation === `unipolar` && direction < 0) direction += piPi$2;
 	else if (angleNormalisation === `bipolar`) {
-		if (direction > pi$1) direction -= piPi$5;
-		else if (direction <= -pi$1) direction += piPi$5;
+		if (direction > pi$1) direction -= piPi$2;
+		else if (direction <= -pi$1) direction += piPi$2;
 	}
 	return Object.freeze({
 		distance: distance(pt),
@@ -3130,7 +5808,7 @@ const fromLineCartesian = (line) => subtract$2(line.b, line.a);
 * @returns
 */
 const fromLinePolar = (line) => {
-	guard$5(line, `line`);
+	guard$3(line, `line`);
 	const pt = subtract$2(line.b, line.a);
 	return fromPointPolar(pt);
 };
@@ -3158,7 +5836,7 @@ const quadrantOffsetAngle = (p) => {
 	if (p.x >= 0 && p.y >= 0) return 0;
 	if (p.x < 0 && p.y >= 0) return pi$1;
 	if (p.x < 0 && p.y < 0) return pi$1;
-	return piPi$5;
+	return piPi$2;
 };
 /**
 * Converts a vector to a polar coordinate. If the provided
@@ -3167,7 +5845,7 @@ const quadrantOffsetAngle = (p) => {
 * @param origin
 * @returns Polar vector
 */
-const toPolar = (v, origin = Empty$1) => {
+const toPolar = (v, origin = Empty) => {
 	if (isPolar(v)) return v;
 	else if (isCartesian(v)) return fromCartesian(v, origin);
 	throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
@@ -3276,7 +5954,31 @@ const divide$3 = (a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/relation.ts
+//#region ../geometry/src/line/join-points-to-lines.ts
+/**
+* Returns an array of lines that connects provided points. Note that line is not closed.
+* 
+* Eg, if points a,b,c are provided, two lines are provided: a->b and b->c.
+* 
+* ```js
+* const lines = Lines.joinPointsToLines(ptA, ptB, ptC);
+* // lines is an array of, well, lines
+* ```
+* @param points 
+* @returns 
+*/
+const joinPointsToLines = (...points) => {
+	const lines = [];
+	let start = points[0];
+	for (let index = 1; index < points.length; index++) {
+		lines.push(fromPoints$2(start, points[index]));
+		start = points[index];
+	}
+	return lines;
+};
+
+//#endregion
+//#region ../geometry/src/point/relation.ts
 /**
 * Tracks the relation between two points.
 * 
@@ -3348,7 +6050,7 @@ const relation = (a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/point-tracker.ts
+//#region ../geometry/src/point/point-tracker.ts
 /**
 * A tracked point. Mutable. Useful for monitoring how
 * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
@@ -3613,7 +6315,7 @@ var PointsTracker = class extends TrackedValueMap {
 };
 
 //#endregion
-//#region packages/geometry/src/point/progress-between.ts
+//#region ../geometry/src/point/progress-between.ts
 /**
 * Computes the progress between two waypoints, given `position`.
 * 
@@ -3630,7 +6332,7 @@ const progressBetween = (position, waypointA, waypointB) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/project.ts
+//#region ../geometry/src/point/project.ts
 /**
 * Project `origin` by `distance` and `angle` (radians).
 *
@@ -3659,7 +6361,7 @@ const project = (origin, distance$2, angle) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/quantise.ts
+//#region ../geometry/src/point/quantise.ts
 /**
 * Quantises a point.
 * @param pt 
@@ -3685,7 +6387,7 @@ function quantiseEvery$1(pt, snap, middleRoundsUp = true) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/random.ts
+//#region ../geometry/src/point/random.ts
 /**
 * Returns a random 2D point on a 0..1 scale.
 * ```js
@@ -3735,7 +6437,7 @@ const random3d = (rando) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/reduce.ts
+//#region ../geometry/src/point/reduce.ts
 /**
 * Reduces over points, treating _x_ and _y_ separately.
 *
@@ -3761,7 +6463,7 @@ const reduce = (pts, fn, initial) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/rotate.ts
+//#region ../geometry/src/point/rotate.ts
 function rotate(pt, amountRadian, origin) {
 	if (typeof origin === `undefined`) origin = {
 		x: 0,
@@ -3781,7 +6483,7 @@ function rotate(pt, amountRadian, origin) {
 }
 
 //#endregion
-//#region packages/geometry/src/point/rotate-point-array.ts
+//#region ../geometry/src/point/rotate-point-array.ts
 const rotatePointArray = (v, amountRadian) => {
 	const mat = [[Math.cos(amountRadian), -Math.sin(amountRadian)], [Math.sin(amountRadian), Math.cos(amountRadian)]];
 	const result = [];
@@ -3790,7 +6492,7 @@ const rotatePointArray = (v, amountRadian) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/round.ts
+//#region ../geometry/src/point/round.ts
 /**
 * Round the point's _x_ and _y_ to given number of digits
 * @param ptOrX 
@@ -3810,7 +6512,7 @@ const round$1 = (ptOrX, yOrDigits, digits) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/within-range.ts
+//#region ../geometry/src/point/within-range.ts
 /**
 * Returns true if two points are within a specified range on both axes.
 * 
@@ -3846,7 +6548,7 @@ const withinRange$1 = (a, b, maxRange) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/wrap.ts
+//#region ../geometry/src/point/wrap.ts
 /**
 * Wraps a point to be within `ptMin` and `ptMax`.
 * Note that max values are _exclusive_, meaning the return value will always be one less.
@@ -3867,7 +6569,7 @@ const withinRange$1 = (a, b, maxRange) => {
 * @param ptMin Minimum value, or `{ x:0, y:0 }` by default
 * @returns Wrapped point
 */
-const wrap$3 = (pt, ptMax, ptMin) => {
+const wrap$1 = (pt, ptMax, ptMin) => {
 	if (ptMax === void 0) ptMax = {
 		x: 1,
 		y: 1
@@ -3886,10 +6588,10 @@ const wrap$3 = (pt, ptMax, ptMin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/point/index.ts
+//#region ../geometry/src/point/index.ts
 var point_exports = {};
 __export(point_exports, {
-	Empty: () => Empty$1,
+	Empty: () => Empty,
 	Empty3d: () => Empty3d,
 	Placeholder: () => Placeholder$3,
 	Placeholder3d: () => Placeholder3d,
@@ -3926,10 +6628,10 @@ __export(point_exports, {
 	getTwoPointParameters: () => getTwoPointParameters,
 	guard: () => guard$1,
 	guardNonZeroPoint: () => guardNonZeroPoint,
-	interpolate: () => interpolate$4,
+	interpolate: () => interpolate$2,
 	invert: () => invert,
 	isEmpty: () => isEmpty,
-	isEqual: () => isEqual$2,
+	isEqual: () => isEqual,
 	isNaN: () => isNaN$1,
 	isNull: () => isNull,
 	isPlaceholder: () => isPlaceholder,
@@ -3961,47 +6663,11 @@ __export(point_exports, {
 	toIntegerValues: () => toIntegerValues,
 	toString: () => toString$2,
 	withinRange: () => withinRange$1,
-	wrap: () => wrap$3
+	wrap: () => wrap$1
 });
 
 //#endregion
-//#region packages/geometry/src/line/multiply.ts
-/**
-* Multiplies start and end of line by point.x, point.y.
-* 
-* ```js
-* 
-* // Line 1,1 -> 10,10
-* const l = Lines.fromNumbers(1, 1, 10, 10);
-* const ll = Lines.multiply(l, {x:2, y:3});
-* // Yields: 2,20 -> 3,30
-* ```
-* @param line 
-* @param point 
-* @returns 
-*/
-const multiply$1 = (line, point$1) => Object.freeze({
-	...line,
-	a: multiply$2(line.a, point$1),
-	b: multiply$2(line.b, point$1)
-});
-
-//#endregion
-//#region packages/geometry/src/line/relative-position.ts
-/**
-* Returns the relative position of `pt` along `line`.
-* Warning: assumes `pt` is actually on `line`. Results may be bogus if not.
-* @param line 
-* @param pt 
-*/
-const relativePosition$1 = (line, pt) => {
-	const fromStart = distance(line.a, pt);
-	const total = length(line);
-	return fromStart / total;
-};
-
-//#endregion
-//#region packages/geometry/src/line/rotate.ts
+//#region ../geometry/src/line/rotate.ts
 /**
 * Returns a line that is rotated by `angleRad`. By default it rotates
 * around its center, but an arbitrary `origin` point can be provided.
@@ -4037,7 +6703,49 @@ const rotate$2 = (line, amountRadian, origin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/line/subtract.ts
+//#region ../geometry/src/line/is-equal.ts
+/**
+* Returns true if the lines have the same value. Note that only
+* the line start and end points are compared. So the lines might
+* be different in other properties, and `isEqual` will still return
+* true.
+* 
+* ```js
+* const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
+* const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
+* a === b; // false, because they are different objects
+* Lines.isEqual(a, b); // true, because they have the same value
+* ```
+* @param {Line} a
+* @param {Line} b
+* @returns {boolean}
+*/
+const isEqual$3 = (a, b) => isEqual(a.a, b.a) && isEqual(a.b, b.b);
+
+//#endregion
+//#region ../geometry/src/line/multiply.ts
+/**
+* Multiplies start and end of line by point.x, point.y.
+* 
+* ```js
+* 
+* // Line 1,1 -> 10,10
+* const l = Lines.fromNumbers(1, 1, 10, 10);
+* const ll = Lines.multiply(l, {x:2, y:3});
+* // Yields: 2,20 -> 3,30
+* ```
+* @param line 
+* @param point 
+* @returns 
+*/
+const multiply$1 = (line, point$1) => Object.freeze({
+	...line,
+	a: multiply$2(line.a, point$1),
+	b: multiply$2(line.b, point$1)
+});
+
+//#endregion
+//#region ../geometry/src/line/subtract.ts
 /**
 * Subtracts both start and end points by given x,y
 * ```js
@@ -4057,28 +6765,7 @@ const subtract$1 = (line, point$1) => Object.freeze({
 });
 
 //#endregion
-//#region packages/geometry/src/line/sum.ts
-/**
-* Adds both start and end points by given x,y
-* ```js
-* 
-* // Line 1,1 -> 10,10
-* const l = Lines.fromNumbers(1,1,10,10);
-* const ll = Lines.sum(l, {x:2, y:4});
-* // Yields: 3,5 -> 12,14
-* ```
-* @param line 
-* @param point 
-* @returns 
-*/
-const sum$2 = (line, point$1) => Object.freeze({
-	...line,
-	a: sum$1(line.a, point$1),
-	b: sum$1(line.b, point$1)
-});
-
-//#endregion
-//#region packages/geometry/src/line/to-string.ts
+//#region ../geometry/src/line/to-string.ts
 /**
 * Returns a string representation of a line or two points.
 * @param a
@@ -4087,7 +6774,7 @@ const sum$2 = (line, point$1) => Object.freeze({
 */
 function toString$1(a, b) {
 	if (isLine(a)) {
-		guard$5(a, `a`);
+		guard$3(a, `a`);
 		b = a.b;
 		a = a.a;
 	} else if (b === void 0) throw new Error(`Expect second point if first is a point`);
@@ -4095,7 +6782,75 @@ function toString$1(a, b) {
 }
 
 //#endregion
-//#region packages/geometry/src/line/index.ts
+//#region ../geometry/src/line/to-path.ts
+/**
+* Returns a path wrapper around a line instance. This is useful if there are a series
+* of operations you want to do with the same line because you don't have to pass it
+* in as an argument to each function.
+* 
+* Note that the line is immutable, so a function like `sum` returns a new LinePath,
+* wrapping the result of `sum`.
+* 
+* ```js
+* // Create a path
+* const l = Lines.toPath(fromNumbers(0,0,10,10));
+* 
+* // Now we can use it...
+* l.length();
+* 
+* // Mutate functions return a new path
+* const ll = l.sum({x:10,y:10});
+* ll.length();
+* ```
+* @param line 
+* @returns 
+*/
+const toPath = (line) => {
+	const { a, b } = line;
+	return Object.freeze({
+		...line,
+		length: () => length(a, b),
+		interpolate: (amount) => interpolate$1(amount, a, b),
+		relativePosition: (point$1) => relativePosition$1(line, point$1),
+		bbox: () => bbox$3(line),
+		toString: () => toString$1(a, b),
+		toFlatArray: () => toFlatArray$1(a, b),
+		toSvgString: () => toSvgString$1(a, b),
+		toPoints: () => [a, b],
+		rotate: (amountRadian, origin) => toPath(rotate$2(line, amountRadian, origin)),
+		nearest: (point$1) => nearest(line, point$1),
+		sum: (point$1) => toPath(sum$2(line, point$1)),
+		divide: (point$1) => toPath(divide$1(line, point$1)),
+		multiply: (point$1) => toPath(multiply$1(line, point$1)),
+		subtract: (point$1) => toPath(subtract$1(line, point$1)),
+		midpoint: () => midpoint(a, b),
+		distanceToPoint: (point$1) => distanceSingleLine(line, point$1),
+		parallel: (distance$2) => parallel(line, distance$2),
+		perpendicularPoint: (distance$2, amount) => perpendicularPoint(line, distance$2, amount),
+		slope: () => slope(line),
+		withinRange: (point$1, maxRange) => withinRange(line, point$1, maxRange),
+		isEqual: (otherLine) => isEqual$3(line, otherLine),
+		apply: (fn) => toPath(apply$1(line, fn)),
+		kind: `line`
+	});
+};
+
+//#endregion
+//#region ../geometry/src/line/from-points-to-path.ts
+/**
+* Returns a {@link LinePath} from two points
+* 
+* ```js
+* const path = Lines.fromPointsToPath(ptA, ptB);
+* ```
+* @param a 
+* @param b 
+* @returns 
+*/
+const fromPointsToPath = (a, b) => toPath(fromPoints$2(a, b));
+
+//#endregion
+//#region ../geometry/src/line/index.ts
 var line_exports = {};
 __export(line_exports, {
 	Empty: () => Empty$3,
@@ -4103,7 +6858,7 @@ __export(line_exports, {
 	angleRadian: () => angleRadian$1,
 	apply: () => apply$1,
 	asPoints: () => asPoints,
-	bbox: () => bbox$5,
+	bbox: () => bbox$3,
 	distance: () => distance$1,
 	distanceSingleLine: () => distanceSingleLine,
 	divide: () => divide$1,
@@ -4111,13 +6866,13 @@ __export(line_exports, {
 	fromFlatArray: () => fromFlatArray$1,
 	fromNumbers: () => fromNumbers$2,
 	fromPivot: () => fromPivot,
-	fromPoints: () => fromPoints$1,
+	fromPoints: () => fromPoints$2,
 	fromPointsToPath: () => fromPointsToPath,
 	getPointParameter: () => getPointParameter$1,
-	guard: () => guard$5,
+	guard: () => guard$3,
 	interpolate: () => interpolate$1,
 	isEmpty: () => isEmpty$2,
-	isEqual: () => isEqual$5,
+	isEqual: () => isEqual$3,
 	isLine: () => isLine,
 	isPlaceholder: () => isPlaceholder$2,
 	isPolyLine: () => isPolyLine,
@@ -4125,7 +6880,7 @@ __export(line_exports, {
 	length: () => length,
 	midpoint: () => midpoint,
 	multiply: () => multiply$1,
-	nearest: () => nearest$1,
+	nearest: () => nearest,
 	normaliseByRect: () => normaliseByRect$1,
 	parallel: () => parallel,
 	perpendicularPoint: () => perpendicularPoint,
@@ -4140,7 +6895,7 @@ __export(line_exports, {
 	subtract: () => subtract$1,
 	sum: () => sum$2,
 	toFlatArray: () => toFlatArray$1,
-	toPath: () => toPath$3,
+	toPath: () => toPath,
 	toString: () => toString$1,
 	toSvgString: () => toSvgString$1,
 	withinRange: () => withinRange
@@ -4456,169 +7211,7 @@ function* asPoints(lines) {
 const toSvgString$1 = (a, b) => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
 
 //#endregion
-//#region packages/geometry/src/line/to-path.ts
-/**
-* Returns a path wrapper around a line instance. This is useful if there are a series
-* of operations you want to do with the same line because you don't have to pass it
-* in as an argument to each function.
-* 
-* Note that the line is immutable, so a function like `sum` returns a new LinePath,
-* wrapping the result of `sum`.
-* 
-* ```js
-* // Create a path
-* const l = Lines.toPath(fromNumbers(0,0,10,10));
-* 
-* // Now we can use it...
-* l.length();
-* 
-* // Mutate functions return a new path
-* const ll = l.sum({x:10,y:10});
-* ll.length();
-* ```
-* @param line 
-* @returns 
-*/
-const toPath$3 = (line) => {
-	const { a, b } = line;
-	return Object.freeze({
-		...line,
-		length: () => length(a, b),
-		interpolate: (amount) => interpolate$1(amount, a, b),
-		relativePosition: (point$1) => relativePosition$1(line, point$1),
-		bbox: () => bbox$5(line),
-		toString: () => toString$1(a, b),
-		toFlatArray: () => toFlatArray$1(a, b),
-		toSvgString: () => toSvgString$1(a, b),
-		toPoints: () => [a, b],
-		rotate: (amountRadian, origin) => toPath$3(rotate$2(line, amountRadian, origin)),
-		nearest: (point$1) => nearest$1(line, point$1),
-		sum: (point$1) => toPath$3(sum$2(line, point$1)),
-		divide: (point$1) => toPath$3(divide$1(line, point$1)),
-		multiply: (point$1) => toPath$3(multiply$1(line, point$1)),
-		subtract: (point$1) => toPath$3(subtract$1(line, point$1)),
-		midpoint: () => midpoint(a, b),
-		distanceToPoint: (point$1) => distanceSingleLine(line, point$1),
-		parallel: (distance$2) => parallel(line, distance$2),
-		perpendicularPoint: (distance$2, amount) => perpendicularPoint(line, distance$2, amount),
-		slope: () => slope(line),
-		withinRange: (point$1, maxRange) => withinRange(line, point$1, maxRange),
-		isEqual: (otherLine) => isEqual$5(line, otherLine),
-		apply: (fn) => toPath$3(apply$1(line, fn)),
-		kind: `line`
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/waypoint.ts
-var waypoint_exports = {};
-__export(waypoint_exports, {
-	fromPoints: () => fromPoints$2,
-	init: () => init
-});
-/**
-* Create from set of points, connected in order starting at array position 0.
-* @param waypoints 
-* @param opts 
-* @returns 
-*/
-const fromPoints$2 = (waypoints, opts = {}) => {
-	const lines = joinPointsToLines(...waypoints);
-	return init(lines.map((l) => toPath$3(l)), opts);
-};
-/**
-* Initialise
-* 
-* Options:
-* * maxDistanceFromLine: Distances greater than this are not matched. Default 0.1
-* @param paths 
-* @param opts 
-* @returns 
-*/
-const init = (paths, opts = {}) => {
-	const maxDistanceFromLine = opts.maxDistanceFromLine ?? .1;
-	const checkUnordered = (pt) => {
-		const results = paths.map((p, index) => {
-			const nearest$2 = p.nearest(pt);
-			const distance$2 = distance(pt, nearest$2);
-			const positionRelative = p.relativePosition(nearest$2, maxDistanceFromLine);
-			return {
-				positionRelative,
-				path: p,
-				index,
-				nearest: nearest$2,
-				distance: distance$2,
-				rank: Number.MAX_SAFE_INTEGER
-			};
-		});
-		const filtered = results.filter((v) => v.distance <= maxDistanceFromLine);
-		const sorted = sortByNumericProperty(filtered, `distance`);
-		for (let rank = 0; rank < sorted.length; rank++) sorted[rank].rank = rank;
-		return sorted;
-	};
-	return checkUnordered;
-};
-
-//#endregion
-//#region packages/geometry/src/triangle/create.ts
-/**
-* A triangle consisting of three empty points (Points.Empty)
-*/
-const Empty$2 = Object.freeze({
-	a: {
-		x: 0,
-		y: 0
-	},
-	b: {
-		x: 0,
-		y: 0
-	},
-	c: {
-		x: 0,
-		y: 0
-	}
-});
-/**
-* A triangle consisting of three placeholder points (Points.Placeholder)
-*/
-const Placeholder$1 = Object.freeze({
-	a: {
-		x: NaN,
-		y: NaN
-	},
-	b: {
-		x: NaN,
-		y: NaN
-	},
-	c: {
-		x: NaN,
-		y: NaN
-	}
-});
-/**
-* Returns a triangle anchored at `origin` with a given `length` and `angleRadian`.
-* The origin will be point `b` of the triangle, and the angle will be the angle for b.
-* @param origin Origin
-* @param length Length
-* @param angleRadian Angle
-* @returns
-*/
-const equilateralFromVertex = (origin, length$4 = 10, angleRadian$2 = Math.PI / 2) => {
-	if (!origin) origin = Object.freeze({
-		x: 0,
-		y: 0
-	});
-	const a = project(origin, length$4, Math.PI - -angleRadian$2 / 2);
-	const c = project(origin, length$4, Math.PI - angleRadian$2 / 2);
-	return {
-		a,
-		b: origin,
-		c
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/rect/corners.ts
+//#region ../geometry/src/rect/corners.ts
 /**
 * Returns the four corners of a rectangle as an array of Points.
 *
@@ -4656,1733 +7249,7 @@ const corners$1 = (rect, origin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/rect/from-top-left.ts
-/**
-* Creates a rectangle from its top-left coordinate, a width and height.
-*
-* ```js
-* // Rectangle at 50,50 with width of 100, height of 200.
-* const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
-* ```
-* @param origin
-* @param width
-* @param height
-* @returns
-*/
-const fromTopLeft = (origin, width, height$3) => {
-	guardDim(width, `width`);
-	guardDim(height$3, `height`);
-	guard$1(origin, `origin`);
-	return {
-		x: origin.x,
-		y: origin.y,
-		width,
-		height: height$3
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/shape/arrow.ts
-/**
-* Returns the points forming an arrow.
-*
-* @example Create an arrow anchored by its tip at 100,100
-* ```js
-* const opts = {
-*  tailLength: 10,
-*  arrowSize: 20,
-*  tailThickness: 5,
-*  angleRadian: degreeToRadian(45)
-* }
-* const arrow = Shapes.arrow({x:100, y:100}, `tip`, opts); // Yields an array of points
-*
-* // Eg: draw points
-* Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
-* ```
-*
-* @param origin Origin of arrow
-* @param from Does origin describe the tip, tail or middle?
-* @param opts Options for arrow
-* @returns
-*/
-const arrow = (origin, from$1, opts = {}) => {
-	const tailLength = opts.tailLength ?? 10;
-	const tailThickness = opts.tailThickness ?? Math.max(tailLength / 5, 5);
-	const angleRadian$2 = opts.angleRadian ?? 0;
-	const arrowSize = opts.arrowSize ?? Math.max(tailLength / 5, 15);
-	const triAngle = Math.PI / 2;
-	let tri;
-	let tailPoints;
-	if (from$1 === `tip`) {
-		tri = equilateralFromVertex(origin, arrowSize, triAngle);
-		tailPoints = corners$1(fromTopLeft({
-			x: tri.a.x - tailLength,
-			y: origin.y - tailThickness / 2
-		}, tailLength, tailThickness));
-	} else if (from$1 === `middle`) {
-		const midX = tailLength + arrowSize / 2;
-		const midY = tailThickness / 2;
-		tri = equilateralFromVertex({
-			x: origin.x + arrowSize * 1.2,
-			y: origin.y
-		}, arrowSize, triAngle);
-		tailPoints = corners$1(fromTopLeft({
-			x: origin.x - midX,
-			y: origin.y - midY
-		}, tailLength + arrowSize, tailThickness));
-	} else {
-		tailPoints = corners$1(fromTopLeft({
-			x: origin.x,
-			y: origin.y - tailThickness / 2
-		}, tailLength, tailThickness));
-		tri = equilateralFromVertex({
-			x: origin.x + tailLength + arrowSize * .7,
-			y: origin.y
-		}, arrowSize, triAngle);
-	}
-	const arrow$1 = rotate([
-		tailPoints[0],
-		tailPoints[1],
-		tri.a,
-		tri.b,
-		tri.c,
-		tailPoints[2],
-		tailPoints[3]
-	], angleRadian$2, origin);
-	return arrow$1;
-};
-
-//#endregion
-//#region packages/geometry/src/circle/random.ts
-const piPi$4 = Math.PI * 2;
-/**
-* Returns a random point within a circle.
-* 
-* By default creates a uniform distribution.
-* 
-* ```js
-* const pt = randomPoint({radius: 5});
-* const pt = randomPoint({radius: 5, x: 10, y: 20});
-* ```'
-* 
-* Generate points with a gaussian distribution
-* ```js
-* const pt = randomPoint(circle, {
-*  randomSource: Random.gaussian
-* })
-* ```
-* @param within Circle to generate a point within
-* @param opts Options
-* @returns 
-*/
-const randomPoint$1 = (within, opts = {}) => {
-	const offset$1 = isCirclePositioned(within) ? within : {
-		x: 0,
-		y: 0
-	};
-	const strategy = opts.strategy ?? `uniform`;
-	const margin = opts.margin ?? 0;
-	const radius = within.radius - margin;
-	const rand = opts.randomSource ?? Math.random;
-	switch (strategy) {
-		case `naive`: return sum$1(offset$1, toCartesian(rand() * radius, rand() * piPi$4));
-		case `uniform`: return sum$1(offset$1, toCartesian(Math.sqrt(rand()) * radius, rand() * piPi$4));
-		default: throw new Error(`Unknown strategy '${strategy}'. Expects 'uniform' or 'naive'`);
-	}
-};
-
-//#endregion
-//#region packages/geometry/src/rect/random.ts
-/**
-* Returns a random positioned Rect on a 0..1 scale.
-* ```js
-* const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
-* ```
-*
-* A custom source of randomness can be provided:
-* ```js
-* import { Rects } from "@ixfx/geometry.js";
-* import { weightedSource } from "@ixfx/random.js"
-* const r = Rects.random(weightedSource(`quadIn`));
-* ```
-* @param rando
-* @returns
-*/
-const random$1 = (rando) => {
-	rando ??= Math.random;
-	return Object.freeze({
-		x: rando(),
-		y: rando(),
-		width: rando(),
-		height: rando()
-	});
-};
-/**
-* Returns a random point within a rectangle.
-*
-* By default creates a uniform distribution.
-*
-* ```js
-* const pt = randomPoint({width: 5, height: 10});
-* ```'
-* @param within Rectangle to generate a point within
-* @param options Options
-* @returns
-*/
-const randomPoint$2 = (within, options = {}) => {
-	const rand = options.randomSource ?? Math.random;
-	const margin = options.margin ?? {
-		x: 0,
-		y: 0
-	};
-	const x = rand() * (within.width - margin.x - margin.x);
-	const y = rand() * (within.height - margin.y - margin.y);
-	const pos = {
-		x: x + margin.x,
-		y: y + margin.y
-	};
-	return isPositioned$1(within) ? sum$1(pos, within) : Object.freeze(pos);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/center.ts
-/**
-* Returns the center of a circle
-* 
-* If the circle has an x,y, that is the center.
-* If not, `radius` is used as the x and y.
-* 
-* ```js
-* const circle = { radius: 5, x: 10, y: 10};
-* 
-* // Yields: { x: 5, y: 10 }
-* Circles.center(circle);
-* ```
-* 
-* It's a trivial function, but can make for more understandable code
-* @param circle 
-* @returns Center of circle
-*/
-const center = (circle) => {
-	return isCirclePositioned(circle) ? Object.freeze({
-		x: circle.x,
-		y: circle.y
-	}) : Object.freeze({
-		x: circle.radius,
-		y: circle.radius
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/triangle/guard.ts
-/**
-* Throws an exception if the triangle is invalid
-* @param t
-* @param name
-*/
-const guard = (t, name = `t`) => {
-	if (t === void 0) throw new Error(`{$name} undefined`);
-	guard$1(t.a, name + `.a`);
-	guard$1(t.b, name + `.b`);
-	guard$1(t.c, name + `.c`);
-};
-/**
-* Returns true if the parameter appears to be a valid triangle
-* @param p
-* @returns
-*/
-const isTriangle = (p) => {
-	if (p === void 0) return false;
-	const tri = p;
-	if (!isPoint(tri.a)) return false;
-	if (!isPoint(tri.b)) return false;
-	if (!isPoint(tri.c)) return false;
-	return true;
-};
-/**
-* Returns true if triangle is empty
-* @param t
-* @returns
-*/
-const isEmpty$1 = (t) => isEmpty(t.a) && isEmpty(t.b) && isEmpty(t.c);
-/**
-* Returns true if triangle is a placeholder
-* @param t
-* @returns
-*/
-const isPlaceholder$1 = (t) => isPlaceholder(t.a) && isPlaceholder(t.b) && isPlaceholder(t.c);
-/**
-* Returns true if the two parameters have equal values
-* @param a
-* @param b
-* @returns
-*/
-const isEqual$4 = (a, b) => isEqual$2(a.a, b.a) && isEqual$2(a.b, b.b) && isEqual$2(a.c, b.c);
-
-//#endregion
-//#region packages/geometry/src/triangle/centroid.ts
-/**
-* Returns simple centroid of triangle
-* @param t
-* @returns
-*/
-const centroid = (t) => {
-	guard(t);
-	const total = reduce([
-		t.a,
-		t.b,
-		t.c
-	], (p, accumulator) => ({
-		x: p.x + accumulator.x,
-		y: p.y + accumulator.y
-	}));
-	const div = {
-		x: total.x / 3,
-		y: total.y / 3
-	};
-	return div;
-};
-
-//#endregion
-//#region packages/geometry/src/shape/etc.ts
-/**
-* Returns a random point within a shape.
-* `shape` can be {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
-* @param shape 
-* @param opts 
-* @returns 
-*/
-const randomPoint = (shape, opts = {}) => {
-	if (isCirclePositioned(shape)) return randomPoint$1(shape, opts);
-	else if (isRectPositioned(shape)) return randomPoint$2(shape, opts);
-	throw new Error(`Unknown shape. Only CirclePositioned and RectPositioned are supported.`);
-};
-/**
-* Returns the center of a shape
-* Shape can be: rectangle, triangle, circle
-* @param shape
-* @returns
-*/
-const center$2 = (shape) => {
-	if (shape === void 0) return Object.freeze({
-		x: .5,
-		y: .5
-	});
-	else if (isRect(shape)) return center$1(shape);
-	else if (isTriangle(shape)) return centroid(shape);
-	else if (isCircle(shape)) return center(shape);
-	else throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/is-contained-by.ts
-/**
-* Returns true if `b` is completely contained by `a`
-*
-* ```js
-* // Compare two points
-* isContainedBy(circleA, circleB);
-* 
-* // Compare a circle with a point
-* isContainedBy(circleA, {x: 10, y: 20});
-* 
-* // Define radius as third parameter
-* isContainedBy(circleA, {x: 10, y: 20}, 20);
-* ```
-* @param a Circle
-* @param b Circle or point to compare to
-* @param c Radius to accompany parameter b if it's a point
-* @returns
-*/
-const isContainedBy = (a, b, c) => {
-	const d = distanceCenter$1(a, b);
-	if (isCircle(b)) return d < Math.abs(a.radius - b.radius);
-	else if (isPoint(b)) if (c === void 0) return d <= a.radius;
-	else return d < Math.abs(a.radius - c);
-	else throw new Error(`b parameter is expected to be CirclePositioned or Point`);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/intersecting.ts
-/**
-* Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
-* A circle can be checked for intersections with another CirclePositioned, Point or RectPositioned.
-* 
-* Use `intersections` to find the points of intersection.
-*
-* @param a Circle
-* @param b Circle or point to test
-* @returns True if circle overlap
-*/
-const isIntersecting = (a, b, c) => {
-	if (isEqual$2(a, b)) return true;
-	if (isContainedBy(a, b, c)) return true;
-	if (isCircle(b)) return circleCircle(a, b);
-	else if (isRectPositioned(b)) return circleRect(a, b);
-	else if (isPoint(b) && c !== void 0) return circleCircle(a, {
-		...b,
-		radius: c
-	});
-	return false;
-};
-
-//#endregion
-//#region packages/geometry/src/shape/is-intersecting.ts
-/**
-* Returns the intersection result between a and b.
-* `a` can be a {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
-* `b` can be as above or a {@link Point}.
-* @param a
-* @param b
-*/
-const isIntersecting$2 = (a, b) => {
-	if (isCirclePositioned(a)) return isIntersecting(a, b);
-	else if (isRectPositioned(a)) return isIntersecting$1(a, b);
-	throw new Error(`a or b are unknown shapes. a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
-};
-
-//#endregion
-//#region packages/geometry/src/shape/starburst.ts
-/**
-* Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
-*
-* ```
-* // Generate a starburst with four spikes
-* const pts = starburst(4, 100, 200);
-* ```
-*
-* `points` of two produces a lozenge shape.
-* `points` of three produces a triangle shape.
-* `points` of five is the familiar 'star' shape.
-*
-* Note that the path will need to be closed back to the first point to enclose the shape.
-*
-* @example Create starburst and draw it. Note use of 'loop' flag to close the path
-* ```
-* const points = starburst(4, 100, 200);
-* Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
-* ```
-*
-* Options:
-* * initialAngleRadian: angle offset to begin from. This overrides the `-Math.PI/2` default.
-*
-* @param points Number of points in the starburst. Defaults to five, which produces a typical star
-* @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
-* @param outerRadius Outer radius. Maximum radius of a spike to origin
-* @param opts Options
-* @param origin Origin, or `{ x:0, y:0 }` by default.
-*/
-const starburst = (outerRadius, points = 5, innerRadius, origin = Empty$1, opts) => {
-	resultThrow(integerTest(points, `positive`, `points`));
-	const angle = Math.PI * 2 / points;
-	const angleHalf = angle / 2;
-	const initialAngle = opts?.initialAngleRadian ?? -Math.PI / 2;
-	if (innerRadius === void 0) innerRadius = outerRadius / 2;
-	let a = initialAngle;
-	const pts = [];
-	for (let index = 0; index < points; index++) {
-		const peak = toCartesian(outerRadius, a, origin);
-		const left = toCartesian(innerRadius, a - angleHalf, origin);
-		const right = toCartesian(innerRadius, a + angleHalf, origin);
-		pts.push(left, peak);
-		if (index + 1 < points) pts.push(right);
-		a += angle;
-	}
-	return pts;
-};
-
-//#endregion
-//#region packages/geometry/src/shape/index.ts
-var shape_exports = {};
-__export(shape_exports, {
-	arrow: () => arrow,
-	center: () => center$2,
-	isIntersecting: () => isIntersecting$2,
-	randomPoint: () => randomPoint,
-	starburst: () => starburst
-});
-
-//#endregion
-//#region packages/geometry/src/circle-packing.ts
-var circle_packing_exports = {};
-__export(circle_packing_exports, { random: () => random });
-/**
-* Naive randomised circle packing.
-* [Algorithm by Taylor Hobbs](https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing)
-*/
-const random = (circles, container, opts = {}) => {
-	if (!Array.isArray(circles)) throw new Error(`Parameter 'circles' is not an array`);
-	const attempts = opts.attempts ?? 2e3;
-	const sorted = sortByNumericProperty(circles, `radius`);
-	const positionedCircles = [];
-	const willHit = (b, radius) => positionedCircles.some((v) => isIntersecting(v, b, radius));
-	while (sorted.length > 0) {
-		const circle = sorted.pop();
-		if (!circle) break;
-		const randomPointOpts = {
-			...opts,
-			margin: {
-				x: circle.radius,
-				y: circle.radius
-			}
-		};
-		for (let index = 0; index < attempts; index++) {
-			const position = randomPoint(container, randomPointOpts);
-			if (!willHit(position, circle.radius)) {
-				positionedCircles.push(Object.freeze({
-					...circle,
-					...position
-				}));
-				break;
-			}
-		}
-	}
-	return positionedCircles;
-};
-
-//#endregion
-//#region packages/geometry/src/layout.ts
-var layout_exports = {};
-__export(layout_exports, { CirclePacking: () => circle_packing_exports });
-
-//#endregion
-//#region packages/geometry/src/circle/area.ts
-/**
-* Returns the area of `circle`.
-* @param circle 
-* @returns 
-*/
-const area$5 = (circle) => {
-	guard$4(circle);
-	return Math.PI * circle.radius * circle.radius;
-};
-
-//#endregion
-//#region packages/geometry/src/rect/from-center.ts
-/**
-* Initialises a rectangle based on its center, a width and height
-*
-* ```js
-* // Rectangle with center at 50,50, width 100 height 200
-* Rects.fromCenter({x: 50, y:50}, 100, 200);
-* ```
-* @param origin
-* @param width
-* @param height
-* @returns
-*/
-const fromCenter$2 = (origin, width, height$3) => {
-	guard$1(origin, `origin`);
-	guardDim(width, `width`);
-	guardDim(height$3, `height`);
-	const halfW = width / 2;
-	const halfH = height$3 / 2;
-	return {
-		x: origin.x - halfW,
-		y: origin.y - halfH,
-		width,
-		height: height$3
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/circle/bbox.ts
-/**
-* Computes a bounding box that encloses circle
-* @param circle
-* @returns 
-*/
-const bbox$4 = (circle) => {
-	return isCirclePositioned(circle) ? fromCenter$2(circle, circle.radius * 2, circle.radius * 2) : {
-		width: circle.radius * 2,
-		height: circle.radius * 2,
-		x: 0,
-		y: 0
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/circle/exterior-points.ts
-/**
-* Yields the points making up the exterior (ie. circumference) of the circle.
-* Uses [Midpoint Circle Algorithm](http://en.wikipedia.org/wiki/Midpoint_circle_algorithm)
-* 
-* @example Draw outline of circle
-* ```js
-* const circle = { x: 100, y: 100, radius: 50 }
-* for (const pt of Circles.exteriorIntegerPoints(circle)) {
-*  // Fill 1x1 pixel
-*  ctx.fillRect(pt.x, pt.y, 1, 1);
-* }
-* ```
-* @param circle 
-*/
-function* exteriorIntegerPoints(circle) {
-	const { x, y, radius } = circle;
-	let xx = radius;
-	let yy = 0;
-	let radiusError = 1 - x;
-	while (xx >= yy) {
-		yield {
-			x: xx + x,
-			y: yy + y
-		};
-		yield {
-			x: yy + x,
-			y: xx + y
-		};
-		yield {
-			x: -xx + x,
-			y: yy + y
-		};
-		yield {
-			x: -yy + x,
-			y: xx + y
-		};
-		yield {
-			x: -xx + x,
-			y: -yy + y
-		};
-		yield {
-			x: -yy + x,
-			y: -xx + y
-		};
-		yield {
-			x: xx + x,
-			y: -yy + y
-		};
-		yield {
-			x: yy + x,
-			y: -xx + y
-		};
-		yy++;
-		if (radiusError < 0) radiusError += 2 * yy + 1;
-		else {
-			xx--;
-			radiusError += 2 * (yy - xx + 1);
-		}
-	}
-}
-
-//#endregion
-//#region packages/geometry/src/circle/interior-points.ts
-/**
-* Returns all integer points contained within `circle`.
-* 
-* ```js
-* const c = { x:100, y:100, radius:100 };
-* for (const pt of Circles.interiorIntegerPoints(c)) {
-*   ctx.fillRect(pt.x, pt.y, 1, 1);
-* }
-* ```
-* @param circle 
-*/
-function* interiorIntegerPoints(circle) {
-	const xMin = circle.x - circle.radius;
-	const xMax = circle.x + circle.radius;
-	const yMin = circle.y - circle.radius;
-	const yMax = circle.y + circle.radius;
-	for (let x = xMin; x < xMax; x++) for (let y = yMin; y < yMax; y++) {
-		const r = Math.abs(distance(circle, x, y));
-		if (r <= circle.radius) yield {
-			x,
-			y
-		};
-	}
-}
-
-//#endregion
-//#region packages/geometry/src/circle/perimeter.ts
-const piPi$3 = Math.PI * 2;
-/**
-* Returns the nearest point on `circle`'s perimeter closest to `point`.
-* 
-* ```js
-* const pt = Circles.nearest(circle, {x:10,y:10});
-* ```
-* 
-* If an array of circles is provided, it will be the closest point amongst all the circles
-* @param circle Circle or array of circles
-* @param point
-* @returns Point `{ x, y }`
-*/
-const nearest = (circle, point$1) => {
-	const n = (a) => {
-		const l = Math.sqrt(Math.pow(point$1.x - a.x, 2) + Math.pow(point$1.y - a.y, 2));
-		const x = a.x + a.radius * ((point$1.x - a.x) / l);
-		const y = a.y + a.radius * ((point$1.y - a.y) / l);
-		return {
-			x,
-			y
-		};
-	};
-	if (Array.isArray(circle)) {
-		const pts = circle.map((l) => n(l));
-		const dists = pts.map((p) => distance(p, point$1));
-		return Object.freeze(pts[minIndex(...dists)]);
-	} else return Object.freeze(n(circle));
-};
-/**
-* Returns a point on a circle's perimeter at a specified angle in radians
-* 
-* ```js
-* // Circle without position
-* const circleA = { radius: 5 };
-* 
-* // Get point at angle Math.PI, passing in a origin coordinate
-* const ptA = Circles.pointOnPerimeter(circleA, Math.PI, {x: 10, y: 10 });
-* 
-* // Point on circle with position
-* const circleB = { radius: 5, x: 10, y: 10};
-* const ptB = Circles.pointOnPerimeter(circleB, Math.PI);
-* ```
-* @param circle
-* @param angleRadian Angle in radians
-* @param origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
-* @returns Point oo circle
-*/
-const pointOnPerimeter = (circle, angleRadian$2, origin) => {
-	if (origin === void 0) origin = isCirclePositioned(circle) ? circle : {
-		x: 0,
-		y: 0
-	};
-	return {
-		x: Math.cos(-angleRadian$2) * circle.radius + origin.x,
-		y: Math.sin(-angleRadian$2) * circle.radius + origin.y
-	};
-};
-/**
-* Returns circumference of `circle` (alias of {@link length})
-* @param circle 
-* @returns 
-*/
-const circumference = (circle) => {
-	guard$4(circle);
-	return piPi$3 * circle.radius;
-};
-/**
-* Returns circumference of `circle` (alias of {@link circumference})
-* @param circle 
-* @returns 
-*/
-const length$2 = (circle) => circumference(circle);
-
-//#endregion
-//#region packages/geometry/src/circle/interpolate.ts
-const piPi$2 = Math.PI * 2;
-/**
-* Computes relative position along circle perimeter
-* 
-* ```js
-* const circle = { radius: 100, x: 100, y: 100 };
-* 
-* // Get a point halfway around circle
-* // Yields { x, y }
-* const pt = Circles.interpolate(circle, 0.5);
-* ```
-* @param circle 
-* @param t Position, 0-1
-* @returns 
-*/
-const interpolate$3 = (circle, t) => pointOnPerimeter(circle, t * piPi$2);
-
-//#endregion
-//#region packages/geometry/src/circle/multiply.ts
-/**
-* Multiplies a circle's radius and position (if provided) by `value`.
-* 
-* ```js
-* multiplyScalar({ radius: 5 }, 5);
-* // Yields: { radius: 25 }
-* 
-* multiplyScalar({ radius: 5, x: 10, y: 20 }, 5);
-* // Yields: { radius: 25, x: 50, y: 100 }
-* ```
-*/
-function multiplyScalar$2(a, value) {
-	if (isCirclePositioned(a)) {
-		const pt = multiplyScalar$1(a, value);
-		return Object.freeze({
-			...a,
-			...pt,
-			radius: a.radius * value
-		});
-	} else return Object.freeze({
-		...a,
-		radius: a.radius * value
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/circle/svg.ts
-/**
-* Creates a SVG path segment.
-* @param a Circle or radius
-* @param sweep If true, path is 'outward'
-* @param origin Origin of path. Required if first parameter is just a radius or circle is non-positioned
-* @returns 
-*/
-const toSvg$1 = (a, sweep, origin) => {
-	if (isCircle(a)) {
-		if (origin !== void 0) return toSvgFull$1(a.radius, origin, sweep);
-		if (isCirclePositioned(a)) return toSvgFull$1(a.radius, a, sweep);
-		else throw new Error(`origin parameter needed for non-positioned circle`);
-	} else if (origin === void 0) throw new Error(`origin parameter needed`);
-	else return toSvgFull$1(a, origin, sweep);
-};
-const toSvgFull$1 = (radius, origin, sweep) => {
-	const { x, y } = origin;
-	const s = sweep ? `1` : `0`;
-	return `
-    M ${x}, ${y}
-    m -${radius}, 0
-    a ${radius},${radius} 0 1,${s} ${radius * 2},0
-    a ${radius},${radius} 0 1,${s} -${radius * 2},0
-  `.split(`\n`);
-};
-
-//#endregion
-//#region packages/geometry/src/circle/to-path.ts
-/**
-* Returns a `CircularPath` representation of a circle
-*
-* @param {CirclePositioned} circle
-* @returns {CircularPath}
-*/
-const toPath$2 = (circle) => {
-	guard$4(circle);
-	return {
-		...circle,
-		nearest: (point$1) => nearest(circle, point$1),
-		interpolate: (t) => interpolate$3(circle, t),
-		bbox: () => bbox$4(circle),
-		length: () => circumference(circle),
-		toSvgString: (sweep = true) => toSvg$1(circle, sweep),
-		relativePosition: (_point, _intersectionThreshold) => {
-			throw new Error(`Not implemented`);
-		},
-		distanceToPoint: (_point) => {
-			throw new Error(`Not implemented`);
-		},
-		kind: `circular`
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/circle/to-positioned.ts
-/**
-* Returns a positioned version of a circle.
-* If circle is already positioned, it is returned.
-* If no default position is supplied, 0,0 is used.
-* @param circle 
-* @param defaultPositionOrX 
-* @param y 
-* @returns 
-*/
-const toPositioned = (circle, defaultPositionOrX, y) => {
-	if (isCirclePositioned(circle)) return circle;
-	const pt = getPointParameter(defaultPositionOrX, y);
-	return Object.freeze({
-		...circle,
-		...pt
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/circle/index.ts
-var circle_exports = {};
-__export(circle_exports, {
-	area: () => area$5,
-	bbox: () => bbox$4,
-	center: () => center,
-	circumference: () => circumference,
-	distanceCenter: () => distanceCenter$1,
-	distanceFromExterior: () => distanceFromExterior$1,
-	exteriorIntegerPoints: () => exteriorIntegerPoints,
-	guard: () => guard$4,
-	guardPositioned: () => guardPositioned$1,
-	interiorIntegerPoints: () => interiorIntegerPoints,
-	interpolate: () => interpolate$3,
-	intersectionLine: () => intersectionLine,
-	intersections: () => intersections,
-	isCircle: () => isCircle,
-	isCirclePositioned: () => isCirclePositioned,
-	isContainedBy: () => isContainedBy,
-	isEqual: () => isEqual$6,
-	isIntersecting: () => isIntersecting,
-	isNaN: () => isNaN,
-	isPositioned: () => isPositioned$2,
-	length: () => length$2,
-	multiplyScalar: () => multiplyScalar$2,
-	nearest: () => nearest,
-	pointOnPerimeter: () => pointOnPerimeter,
-	randomPoint: () => randomPoint$1,
-	toPath: () => toPath$2,
-	toPositioned: () => toPositioned,
-	toSvg: () => toSvg$1
-});
-
-//#endregion
-//#region packages/geometry/src/rect/area.ts
-/**
-* Returns the area of `rect`
-*
-* ```js
-* const rect = { width: 100, height: 100, x: 100, y: 100 };
-* Rects.area(rect);
-* ```
-* @param rect
-* @returns
-*/
-const area$4 = (rect) => {
-	guard$3(rect);
-	return rect.height * rect.width;
-};
-
-//#endregion
-//#region packages/geometry/src/rect/apply.ts
-/**
-* Applies an operation over each field of a rectangle.
-* ```js
-* // Convert x,y,width,height to integer values
-* applyFields(v => Number.floor(v), someRect);
-* ```
-* @param op
-* @param rectOrWidth 
-* @param heightValue 
-* @returns 
-*/
-function applyFields(op, rectOrWidth, heightValue) {
-	let width = typeof rectOrWidth === `number` ? rectOrWidth : rectOrWidth.width;
-	let height$3 = typeof rectOrWidth === `number` ? heightValue : rectOrWidth.height;
-	if (width === void 0) throw new Error(`Param 'width' undefined`);
-	if (height$3 === void 0) throw new Error(`Param 'height' undefined`);
-	width = op(width, `width`);
-	height$3 = op(height$3, `height`);
-	if (typeof rectOrWidth === `object`) if (isPositioned$1(rectOrWidth)) {
-		const x = op(rectOrWidth.x, `x`);
-		const y = op(rectOrWidth.y, `y`);
-		return {
-			...rectOrWidth,
-			width,
-			height: height$3,
-			x,
-			y
-		};
-	} else return {
-		...rectOrWidth,
-		width,
-		height: height$3
-	};
-	return {
-		width,
-		height: height$3
-	};
-}
-/**
-* Applies an joint operation field-wise on two rectangles, returning a single rectangle. This is used to support operations like summing two rectangles.
-* ```js
-* // Eg make a new rectangle by summing each field of rectangle A & B.
-* apply((valueA,valueB) => valueA+valueB, rectA, rectB);
-* ```
-* @param op 
-* @param a 
-* @param b 
-* @param c 
-* @returns 
-*/
-function applyMerge(op, a, b, c) {
-	guard$3(a, `a`);
-	if (isRect(b)) return isRectPositioned(a) ? Object.freeze({
-		...a,
-		x: op(a.x, b.width),
-		y: op(a.y, b.height),
-		width: op(a.width, b.width),
-		height: op(a.height, b.height)
-	}) : Object.freeze({
-		...a,
-		width: op(a.width, b.width),
-		height: op(a.height, b.height)
-	});
-	else {
-		if (typeof b !== `number`) throw new TypeError(`Expected second parameter of type Rect or number. Got ${JSON.stringify(b)}`);
-		if (typeof c !== `number`) throw new Error(`Expected third param as height. Got ${JSON.stringify(c)}`);
-		return isRectPositioned(a) ? Object.freeze({
-			...a,
-			x: op(a.x, b),
-			y: op(a.y, c),
-			width: op(a.width, b),
-			height: op(a.height, c)
-		}) : Object.freeze({
-			...a,
-			width: op(a.width, b),
-			height: op(a.height, c)
-		});
-	}
-}
-function applyScalar(op, rect, parameter) {
-	return isPositioned$1(rect) ? Object.freeze({
-		...rect,
-		x: op(rect.x, parameter),
-		y: op(rect.y, parameter),
-		width: op(rect.width, parameter),
-		height: op(rect.height, parameter)
-	}) : Object.freeze({
-		...rect,
-		width: op(rect.width, parameter),
-		height: op(rect.height, parameter)
-	});
-}
-/**
-* Applies `op` with `param` to `rect`'s width and height.
-* @param op 
-* @param rect 
-* @param parameter 
-* @returns 
-*/
-function applyDim(op, rect, parameter) {
-	return Object.freeze({
-		...rect,
-		width: op(rect.width, parameter),
-		height: op(rect.height, parameter)
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/rect/cardinal.ts
-/**
-* Returns a point on cardinal direction, or 'center' for the middle.
-*
-* ```js
-* cardinal({x: 10, y:10, width:100, height: 20}, 'center');
-* ```
-* @param rect Rectangle
-* @param card Cardinal direction or 'center'
-* @returns Point
-*/
-const cardinal = (rect, card) => {
-	const { x, y, width, height: height$3 } = rect;
-	switch (card) {
-		case `nw`: return Object.freeze({
-			x,
-			y
-		});
-		case `n`: return Object.freeze({
-			x: x + width / 2,
-			y
-		});
-		case `ne`: return Object.freeze({
-			x: x + width,
-			y
-		});
-		case `sw`: return Object.freeze({
-			x,
-			y: y + height$3
-		});
-		case `s`: return Object.freeze({
-			x: x + width / 2,
-			y: y + height$3
-		});
-		case `se`: return Object.freeze({
-			x: x + width,
-			y: y + height$3
-		});
-		case `w`: return Object.freeze({
-			x,
-			y: y + height$3 / 2
-		});
-		case `e`: return Object.freeze({
-			x: x + width,
-			y: y + height$3 / 2
-		});
-		case `center`: return Object.freeze({
-			x: x + width / 2,
-			y: y + height$3 / 2
-		});
-		default: throw new Error(`Unknown direction: ${card}`);
-	}
-};
-
-//#endregion
-//#region packages/geometry/src/rect/divide.ts
-const divideOp = (a, b) => a / b;
-/**
-* @internal
-* @param a 
-* @param b 
-* @param c 
-* @returns 
-*/
-function divide(a, b, c) {
-	return applyMerge(divideOp, a, b, c);
-}
-/**
-* Divides all components of `rect` by `amount`.
-* This includes x,y if present.
-* 
-* ```js
-* divideScalar({ width:10, height:20 }, 2); // { width:5, height: 10 }
-* divideScalar({ x: 1, y: 2, width:10, height:20 }, 2); // { x: 0.5, y: 1, width:5, height: 10 }
-* ```
-* @param rect
-* @param amount
-*/
-function divideScalar(rect, amount) {
-	return applyScalar(divideOp, rect, amount);
-}
-function divideDim(rect, amount) {
-	return applyDim(divideOp, rect, amount);
-}
-
-//#endregion
-//#region packages/geometry/src/rect/edges.ts
-/**
-* Returns four lines based on each corner.
-* Lines are given in order: top, right, bottom, left
-*
-* ```js
-* const rect = { width: 100, height: 100, x: 100, y: 100 };
-* // Yields: array of length four
-* const lines = Rects.lines(rect);
-* ```
-*
-* @param {(RectPositioned|Rect)} rect
-* @param {Points.Point} [origin]
-* @returns {Lines.Line[]}
-*/
-const edges$1 = (rect, origin) => {
-	const c = corners$1(rect, origin);
-	return joinPointsToLines(...c, c[0]);
-};
-/**
-* Returns a point on the edge of rectangle
-* ```js
-* const r1 = {x: 10, y: 10, width: 100, height: 50};
-* Rects.getEdgeX(r1, `right`);  // Yields: 110
-* Rects.getEdgeX(r1, `bottom`); // Yields: 10
-*
-* const r2 = {width: 100, height: 50};
-* Rects.getEdgeX(r2, `right`);  // Yields: 100
-* Rects.getEdgeX(r2, `bottom`); // Yields: 0
-* ```
-* @param rect
-* @param edge Which edge: right, left, bottom, top
-* @returns
-*/
-const getEdgeX = (rect, edge) => {
-	guard$3(rect);
-	switch (edge) {
-		case `top`: return isPoint(rect) ? rect.x : 0;
-		case `bottom`: return isPoint(rect) ? rect.x : 0;
-		case `left`: return isPoint(rect) ? rect.y : 0;
-		case `right`: return isPoint(rect) ? rect.x + rect.width : rect.width;
-	}
-};
-/**
-* Returns a point on the edge of rectangle
-*
-* ```js
-* const r1 = {x: 10, y: 10, width: 100, height: 50};
-* Rects.getEdgeY(r1, `right`);  // Yields: 10
-* Rects.getEdgeY(r1, `bottom`); // Yields: 60
-*
-* const r2 = {width: 100, height: 50};
-* Rects.getEdgeY(r2, `right`);  // Yields: 0
-* Rects.getEdgeY(r2, `bottom`); // Yields: 50
-* ```
-* @param rect
-* @param edge Which edge: right, left, bottom, top
-* @returns
-*/
-const getEdgeY = (rect, edge) => {
-	guard$3(rect);
-	switch (edge) {
-		case `top`: return isPoint(rect) ? rect.y : 0;
-		case `bottom`: return isPoint(rect) ? rect.y + rect.height : rect.height;
-		case `left`: return isPoint(rect) ? rect.y : 0;
-		case `right`: return isPoint(rect) ? rect.y : 0;
-	}
-};
-
-//#endregion
-//#region packages/geometry/src/rect/empty.ts
-const Empty = Object.freeze({
-	width: 0,
-	height: 0
-});
-const EmptyPositioned = Object.freeze({
-	x: 0,
-	y: 0,
-	width: 0,
-	height: 0
-});
-
-//#endregion
-//#region packages/geometry/src/rect/encompass.ts
-/**
-* Returns a copy of `rect` with `rect` resized so it also encompasses `points`.
-* If provided point(s) are within bounds of `rect`, a copy of `rect` is returned.
-* @param rect 
-* @param points 
-* @returns 
-*/
-const encompass = (rect, ...points) => {
-	const x = points.map((p) => p.x);
-	const y = points.map((p) => p.y);
-	let minX = Math.min(...x, rect.x);
-	let minY = Math.min(...y, rect.y);
-	let maxX = Math.max(...x, rect.x + rect.width);
-	let maxY = Math.max(...y, rect.y + rect.height);
-	let rectW = Math.max(rect.width, maxX - minX);
-	let rectH = Math.max(rect.height, maxY - minY);
-	return Object.freeze({
-		...rect,
-		x: minX,
-		y: minY,
-		width: rectW,
-		height: rectH
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/rect/from-element.ts
-/**
-* Initialise a rectangle based on the width and height of a HTML element.
-*
-* ```js
-* Rects.fromElement(document.querySelector(`body`));
-* ```
-* @param el
-* @returns
-*/
-const fromElement = (el) => ({
-	width: el.clientWidth,
-	height: el.clientHeight
-});
-
-//#endregion
-//#region packages/geometry/src/rect/from-numbers.ts
-/**
-* Returns a rectangle from a series of numbers: x, y, width, height OR width, height
-*
-* ```js
-* const r1 = Rects.fromNumbers(100, 200);
-* // {width: 100, height: 200}
-*
-* const r2 = Rects.fromNumbers(10, 20, 100, 200);
-* // {x: 10, y: 20, width: 100, height: 200}
-* ```
-* Use the spread operator (...) if the source is an array:
-*
-* ```js
-* const r3 = Rects.fromNumbers(...[10, 20, 100, 200]);
-* ```
-*
-* Use {@link toArray} for the opposite conversion.
-*
-* @see toArray
-* @param xOrWidth
-* @param yOrHeight
-* @param width
-* @param height
-* @returns
-*/
-function fromNumbers$1(xOrWidth, yOrHeight, width, height$3) {
-	if (width === void 0 || height$3 === void 0) {
-		if (typeof xOrWidth !== `number`) throw new Error(`width is not an number`);
-		if (typeof yOrHeight !== `number`) throw new TypeError(`height is not an number`);
-		return Object.freeze({
-			width: xOrWidth,
-			height: yOrHeight
-		});
-	}
-	if (typeof xOrWidth !== `number`) throw new Error(`x is not an number`);
-	if (typeof yOrHeight !== `number`) throw new Error(`y is not an number`);
-	if (typeof width !== `number`) throw new Error(`width is not an number`);
-	if (typeof height$3 !== `number`) throw new Error(`height is not an number`);
-	return Object.freeze({
-		x: xOrWidth,
-		y: yOrHeight,
-		width,
-		height: height$3
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/rect/get-rect-positionedparameter.ts
-/**
-* Accepts:
-* * x,y,w,h
-* * x,y,rect
-* * point,rect
-* * RectPositioned
-* * Rect, x,y
-* * Rect, Point
-* @param a 
-* @param b 
-* @param c 
-* @param d 
-* @returns 
-*/
-function getRectPositionedParameter(a, b, c, d) {
-	if (typeof a === `number`) if (typeof b === `number`) if (typeof c === `number` && typeof d === `number`) return {
-		x: a,
-		y: b,
-		width: c,
-		height: d
-	};
-	else if (isRect(c)) return {
-		x: a,
-		y: b,
-		width: c.width,
-		height: c.height
-	};
-	else throw new TypeError(`If params 'a' & 'b' are numbers, expect following parameters to be x,y or Rect`);
-	else throw new TypeError(`If parameter 'a' is a number, expect following parameters to be: y,w,h`);
-	else if (isRectPositioned(a)) return a;
-	else if (isRect(a)) if (typeof b === `number` && typeof c === `number`) return {
-		width: a.width,
-		height: a.height,
-		x: b,
-		y: c
-	};
-	else if (isPoint(b)) return {
-		width: a.width,
-		height: a.height,
-		x: b.x,
-		y: b.y
-	};
-	else throw new TypeError(`If param 'a' is a Rect, expects following parameters to be x,y`);
-	else if (isPoint(a)) if (typeof b === `number` && typeof c === `number`) return {
-		x: a.x,
-		y: a.y,
-		width: b,
-		height: c
-	};
-	else if (isRect(b)) return {
-		x: a.x,
-		y: a.y,
-		width: b.width,
-		height: b.height
-	};
-	else throw new TypeError(`If parameter 'a' is a Point, expect following params to be: Rect or width,height`);
-	throw new TypeError(`Expect a first parameter to be x,RectPositioned,Rect or Point`);
-}
-
-//#endregion
-//#region packages/geometry/src/rect/is-equal.ts
-/**
-* Returns _true_ if the width & height of the two rectangles is the same.
-*
-* ```js
-* const rectA = { width: 10, height: 10, x: 10, y: 10 };
-* const rectB = { width: 10, height: 10, x: 20, y: 20 };
-*
-* // True, even though x,y are different
-* Rects.isEqualSize(rectA, rectB);
-*
-* // False, because coordinates are different
-* Rects.isEqual(rectA, rectB)
-* ```
-* @param a
-* @param b
-* @returns
-*/
-const isEqualSize = (a, b) => {
-	if (a === void 0) throw new Error(`a undefined`);
-	if (b === void 0) throw new Error(`b undefined`);
-	return a.width === b.width && a.height === b.height;
-};
-/**
-* Returns _true_ if two rectangles have identical values.
-* Both rectangles must be positioned or not.
-*
-* ```js
-* const rectA = { width: 10, height: 10, x: 10, y: 10 };
-* const rectB = { width: 10, height: 10, x: 20, y: 20 };
-*
-* // False, because coordinates are different
-* Rects.isEqual(rectA, rectB)
-*
-* // True, even though x,y are different
-* Rects.isEqualSize(rectA, rectB);
-* ```
-* @param a
-* @param b
-* @returns
-*/
-const isEqual$3 = (a, b) => {
-	if (isPositioned$1(a) && isPositioned$1(b)) {
-		if (!isEqual$2(a, b)) return false;
-		return a.width === b.width && a.height === b.height;
-	} else if (!isPositioned$1(a) && !isPositioned$1(b)) return a.width === b.width && a.height === b.height;
-	else return false;
-};
-
-//#endregion
-//#region packages/geometry/src/rect/lengths.ts
-/**
-* Returns the length of each side of the rectangle (top, right, bottom, left)
-*
-* ```js
-* const rect = { width: 100, height: 100, x: 100, y: 100 };
-* // Yields: array of length four
-* const lengths = Rects.lengths(rect);
-* ```
-* @param rect
-* @returns
-*/
-const lengths$1 = (rect) => {
-	guardPositioned(rect, `rect`);
-	return edges$1(rect).map((l) => length(l));
-};
-
-//#endregion
-//#region packages/geometry/src/rect/multiply.ts
-const multiplyOp = (a, b) => a * b;
-/**
-* @internal
-* @param a 
-* @param b 
-* @param c 
-* @returns 
-*/
-function multiply(a, b, c) {
-	return applyMerge(multiplyOp, a, b, c);
-}
-/**
-* Multiplies all components of `rect` by `amount`.
-* This includes x,y if present.
-* 
-* ```js
-* multiplyScalar({ width:10, height:20 }, 2); // { width:20, height: 40 }
-* multiplyScalar({ x: 1, y: 2, width:10, height:20 }, 2); // { x: 2, y: 4, width:20, height: 40 }
-* ```
-* 
-* Use {@link multiplyDim} to only multiply width & height.
-* @param rect
-* @param amount
-*/
-function multiplyScalar(rect, amount) {
-	return applyScalar(multiplyOp, rect, amount);
-}
-/**
-* Multiplies only the width/height of `rect`, leaving `x` and `y` as they are.
-* ```js
-* multiplyDim({ x:1,y:2,width:3,height:4 }, 2);
-* // Yields: { x:1, y:2, width:6, height: 8 }
-* ```
-* 
-* In comparison, {@link multiply} will also include x & y.
-* @param rect Rectangle
-* @param amount Amount to multiply by
-* @returns 
-*/
-function multiplyDim(rect, amount) {
-	return applyDim(multiplyOp, rect, amount);
-}
-
-//#endregion
-//#region packages/geometry/src/rect/nearest.ts
-/**
-* If `p` is inside of `rect`, a copy of `p` is returned.
-* If `p` is outside of `rect`, a point is returned closest to `p` on the edge
-* of the rectangle.
-* @param rect 
-* @param p 
-* @returns 
-*/
-const nearestInternal = (rect, p) => {
-	let { x, y } = p;
-	if (x < rect.x) x = rect.x;
-	else if (x > rect.x + rect.width) x = rect.x + rect.width;
-	if (y < rect.y) y = rect.y;
-	else if (y > rect.y + rect.height) y = rect.y + rect.height;
-	return Object.freeze({
-		...p,
-		x,
-		y
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/rect/placeholder.ts
-const Placeholder = Object.freeze({
-	width: NaN,
-	height: NaN
-});
-const PlaceholderPositioned = Object.freeze({
-	x: NaN,
-	y: NaN,
-	width: NaN,
-	height: NaN
-});
-
-//#endregion
-//#region packages/geometry/src/rect/perimeter.ts
-/**
-* Returns the perimeter of `rect` (ie. sum of all edges)
-*  * ```js
-* const rect = { width: 100, height: 100, x: 100, y: 100 };
-* Rects.perimeter(rect);
-* ```
-* @param rect
-* @returns
-*/
-const perimeter$4 = (rect) => {
-	guard$3(rect);
-	return rect.height + rect.height + rect.width + rect.width;
-};
-
-//#endregion
-//#region packages/geometry/src/rect/normalise-by-rect.ts
-/**
-* Returns a function that divides numbers or points by the largest dimension of `rect`.
-* 
-* ```js
-* const d = dividerByLargestDimension({width:100,height:50});
-* d(50);                // 0.5 (50/100)
-* d({ x: 10, y: 20 }); // { x: 0.1, y: 0.2 }
-* ```
-* @param rect 
-* @returns 
-*/
-const dividerByLargestDimension = (rect) => {
-	const largest = Math.max(rect.width, rect.height);
-	return (value) => {
-		if (typeof value === `number`) return value / largest;
-		else if (isPoint3d(value)) return Object.freeze({
-			...value,
-			x: value.x / largest,
-			y: value.y / largest,
-			z: value.x / largest
-		});
-		else if (isPoint(value)) return Object.freeze({
-			...value,
-			x: value.x / largest,
-			y: value.y / largest
-		});
-		else throw new Error(`Param 'value' is neither number nor Point`);
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/rect/subtract.ts
-const subtractOp = (a, b) => a - b;
-/**
-* Subtracts width/height from `a`.
-*
-* ```js
-* const rectA = { width: 100, height: 100 };
-* const rectB = { width: 200, height: 200 };
-*
-* // Yields: { width: -100, height: -100 }
-* Rects.subtract(rectA, rectB);
-* Rects.subtract(rectA, 200, 200);
-* ```
-* @param a
-* @param b
-* @param c
-* @returns
-*/
-function subtract(a, b, c) {
-	return applyMerge(subtractOp, a, b, c);
-}
-function subtractSize(a, b, c) {
-	const w = typeof b === `number` ? b : b.width;
-	const h = typeof b === `number` ? c : b.height;
-	if (h === void 0) throw new Error(`Expected height as third parameter`);
-	const r = {
-		...a,
-		width: a.width - w,
-		height: a.height - h
-	};
-	return r;
-}
-/**
-* Subtracts A-B. Applies to x, y, width & height
-* ```js
-* subtractOffset(
-*  { x:100, y:100, width:100, height:100 }, 
-*  { x:10, y:20,   width: 30, height: 40 }
-* );
-* // Yields: {x: 90, y: 80, width: 70, height: 60 }
-* ```
-* If either `a` or `b` are missing x & y, 0 is used.
-* @param a 
-* @param b 
-* @returns 
-*/
-function subtractOffset(a, b) {
-	let x = 0;
-	let y = 0;
-	if (isPositioned$1(a)) {
-		x = a.x;
-		y = a.y;
-	}
-	let xB = 0;
-	let yB = 0;
-	if (isPositioned$1(b)) {
-		xB = b.x;
-		yB = b.y;
-	}
-	return Object.freeze({
-		...a,
-		x: x - xB,
-		y: y - yB,
-		width: a.width - b.width,
-		height: a.height - b.height
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/rect/sum.ts
-const sumOp = (a, b) => a + b;
-/**
-* Sums width/height of `b` with `a` (ie: a + b), returning result.
-*
-* ```js
-* const rectA = { width: 100, height: 100 };
-* const rectB = { width: 200, height: 200 };
-*
-* // Yields: { width: 300, height: 300 }
-* Rects.sum(rectA, rectB);
-* Rects.sum(rectA, 200, 200);
-* ```
-* @param a
-* @param b
-* @param c
-* @returns
-*/
-function sum(a, b, c) {
-	return applyMerge(sumOp, a, b, c);
-}
-/**
-* Sums x,y,width,height of a+b.
-* ```js
-* sumOffset({x:100,y:100,width:100,height:100}, {x:10, y:20, width: 30, height: 40});
-* // Yields: {x: 110, y: 120, width: 130, height: 140 }
-* ```
-* If either `a` or `b` are missing x & y, 0 is used
-* @param a 
-* @param b 
-* @returns 
-*/
-function sumOffset(a, b) {
-	let x = 0;
-	let y = 0;
-	if (isPositioned$1(a)) {
-		x = a.x;
-		y = a.y;
-	}
-	let xB = 0;
-	let yB = 0;
-	if (isPositioned$1(b)) {
-		xB = b.x;
-		yB = b.y;
-	}
-	return Object.freeze({
-		...a,
-		x: x + xB,
-		y: y + yB,
-		width: a.width + b.width,
-		height: a.height + b.height
-	});
-}
-
-//#endregion
-//#region packages/geometry/src/rect/to-array.ts
-/**
-* Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
-*
-* ```js
-* const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
-* // [10, 20, 100, 200]
-* const r2 = Rects.toArray({ width: 100, height: 200 });
-* // [100, 200]
-* ```
-* @param rect
-* @see fromNumbers
-*/
-function toArray(rect) {
-	if (isPositioned$1(rect)) return [
-		rect.x,
-		rect.y,
-		rect.width,
-		rect.height
-	];
-	else if (isRect(rect)) return [rect.width, rect.height];
-	else throw new Error(`Param 'rect' is not a rectangle. Got: ${JSON.stringify(rect)}`);
-}
-
-//#endregion
-//#region packages/geometry/src/rect/index.ts
-var rect_exports = {};
-__export(rect_exports, {
-	Empty: () => Empty,
-	EmptyPositioned: () => EmptyPositioned,
-	Placeholder: () => Placeholder,
-	PlaceholderPositioned: () => PlaceholderPositioned,
-	applyDim: () => applyDim,
-	applyFields: () => applyFields,
-	applyMerge: () => applyMerge,
-	applyScalar: () => applyScalar,
-	area: () => area$4,
-	cardinal: () => cardinal,
-	center: () => center$1,
-	corners: () => corners$1,
-	distanceFromCenter: () => distanceFromCenter,
-	distanceFromExterior: () => distanceFromExterior,
-	divide: () => divide,
-	divideDim: () => divideDim,
-	divideScalar: () => divideScalar,
-	dividerByLargestDimension: () => dividerByLargestDimension,
-	edges: () => edges$1,
-	encompass: () => encompass,
-	fromCenter: () => fromCenter$2,
-	fromElement: () => fromElement,
-	fromNumbers: () => fromNumbers$1,
-	fromTopLeft: () => fromTopLeft,
-	getEdgeX: () => getEdgeX,
-	getEdgeY: () => getEdgeY,
-	getRectPositioned: () => getRectPositioned,
-	getRectPositionedParameter: () => getRectPositionedParameter,
-	guard: () => guard$3,
-	guardDim: () => guardDim,
-	guardPositioned: () => guardPositioned,
-	intersectsPoint: () => intersectsPoint,
-	isEmpty: () => isEmpty$3,
-	isEqual: () => isEqual$3,
-	isEqualSize: () => isEqualSize,
-	isIntersecting: () => isIntersecting$1,
-	isPlaceholder: () => isPlaceholder$3,
-	isPositioned: () => isPositioned$1,
-	isRect: () => isRect,
-	isRectPositioned: () => isRectPositioned,
-	lengths: () => lengths$1,
-	maxFromCorners: () => maxFromCorners,
-	multiply: () => multiply,
-	multiplyDim: () => multiplyDim,
-	multiplyScalar: () => multiplyScalar,
-	nearestInternal: () => nearestInternal,
-	perimeter: () => perimeter$4,
-	random: () => random$1,
-	randomPoint: () => randomPoint$2,
-	subtract: () => subtract,
-	subtractOffset: () => subtractOffset,
-	subtractSize: () => subtractSize,
-	sum: () => sum,
-	sumOffset: () => sumOffset,
-	toArray: () => toArray
-});
-
-//#endregion
-//#region packages/geometry/src/bezier/guard.ts
-const isQuadraticBezier = (path) => path.quadratic !== void 0;
-const isCubicBezier = (path) => path.cubic1 !== void 0 && path.cubic2 !== void 0;
-
-//#endregion
-//#region packages/geometry/src/path/start-end.ts
+//#region ../geometry/src/path/start-end.ts
 /**
 * Return the start point of a path
 *
@@ -6407,15 +7274,15 @@ const getEnd = function(path) {
 };
 
 //#endregion
-//#region packages/geometry/src/path/compound-path.ts
+//#region ../geometry/src/path/compound-path.ts
 var compound_path_exports = {};
 __export(compound_path_exports, {
-	bbox: () => bbox$3,
+	bbox: () => bbox$2,
 	computeDimensions: () => computeDimensions,
 	distanceToPoint: () => distanceToPoint,
 	fromPaths: () => fromPaths,
 	guardContinuous: () => guardContinuous,
-	interpolate: () => interpolate$2,
+	interpolate: () => interpolate,
 	relativePosition: () => relativePosition,
 	setSegment: () => setSegment,
 	toString: () => toString,
@@ -6443,7 +7310,7 @@ const setSegment = (compoundPath, index, path) => {
 * @param dimensions Precalculated dimensions of paths, will be computed if omitted
 * @returns
 */
-const interpolate$2 = (paths, t, useWidth, dimensions) => {
+const interpolate = (paths, t, useWidth, dimensions) => {
 	if (dimensions === void 0) dimensions = computeDimensions(paths);
 	const expected = t * (useWidth ? dimensions.totalWidth : dimensions.totalLength);
 	let soFar = 0;
@@ -6529,7 +7396,7 @@ const computeDimensions = (paths) => {
 * @param paths
 * @returns
 */
-const bbox$3 = (paths) => {
+const bbox$2 = (paths) => {
 	const boxes = paths.map((p) => p.bbox());
 	const corners$2 = boxes.flatMap((b) => corners$1(b));
 	return bbox$1(...corners$2);
@@ -6550,7 +7417,7 @@ const guardContinuous = (paths) => {
 	let lastPos = getEnd(paths[0]);
 	for (let index = 1; index < paths.length; index++) {
 		const start = getStart(paths[index]);
-		if (!isEqual$2(start, lastPos)) throw new Error(`Path index ${index} does not start at prior path end. Start: ${start.x},${start.y} expected: ${lastPos.x},${lastPos.y}`);
+		if (!isEqual(start, lastPos)) throw new Error(`Path index ${index} does not start at prior path end. Start: ${start.x},${start.y} expected: ${lastPos.x},${lastPos.y}`);
 		lastPos = getEnd(paths[index]);
 	}
 };
@@ -6571,10 +7438,10 @@ const fromPaths = (...paths) => {
 		nearest: (_) => {
 			throw new Error(`not implemented`);
 		},
-		interpolate: (t, useWidth = false) => interpolate$2(paths, t, useWidth, dims),
+		interpolate: (t, useWidth = false) => interpolate(paths, t, useWidth, dims),
 		relativePosition: (point$1, intersectionThreshold) => relativePosition(paths, point$1, intersectionThreshold, dims),
 		distanceToPoint: (point$1) => distanceToPoint(paths, point$1),
-		bbox: () => bbox$3(paths),
+		bbox: () => bbox$2(paths),
 		toString: () => toString(paths),
 		toSvgString: () => toSvgString(paths),
 		kind: `compound`
@@ -6582,17 +7449,17 @@ const fromPaths = (...paths) => {
 };
 
 //#endregion
-//#region packages/geometry/src/path/index.ts
+//#region ../geometry/src/path/index.ts
 var path_exports = {};
 __export(path_exports, {
-	bbox: () => bbox$3,
+	bbox: () => bbox$2,
 	computeDimensions: () => computeDimensions,
 	distanceToPoint: () => distanceToPoint,
 	fromPaths: () => fromPaths,
 	getEnd: () => getEnd,
 	getStart: () => getStart,
 	guardContinuous: () => guardContinuous,
-	interpolate: () => interpolate$2,
+	interpolate: () => interpolate,
 	relativePosition: () => relativePosition,
 	setSegment: () => setSegment,
 	toString: () => toString,
@@ -6600,1710 +7467,1316 @@ __export(path_exports, {
 });
 
 //#endregion
-//#region packages/geometry/src/grid/inside.ts
+//#region ../geometry/src/rect/area.ts
 /**
-* Returns _true_ if cell coordinates are above zero and within bounds of grid
-*
-* @param grid
-* @param cell
-* @return
-*/
-const inside = (grid, cell) => {
-	if (cell.x < 0 || cell.y < 0) return false;
-	if (cell.x >= grid.cols || cell.y >= grid.rows) return false;
-	return true;
-};
-
-//#endregion
-//#region packages/geometry/src/grid/guards.ts
-/**
-* Returns true if `cell` parameter is a cell with x,y fields.
-* Does not check validity of fields.
-*
-* @param cell
-* @return True if parameter is a cell
-*/
-const isCell = (cell) => {
-	if (cell === void 0) return false;
-	return `x` in cell && `y` in cell;
-};
-/**
-* Throws an exception if any of the cell's parameters are invalid
-* @private
-* @param cell
-* @param parameterName
-* @param grid
-*/
-const guardCell = (cell, parameterName = `Param`, grid) => {
-	if (cell === void 0) throw new Error(parameterName + ` is undefined. Expecting {x,y}`);
-	if (cell.x === void 0) throw new Error(parameterName + `.x is undefined`);
-	if (cell.y === void 0) throw new Error(parameterName + `.y is undefined`);
-	if (Number.isNaN(cell.x)) throw new Error(parameterName + `.x is NaN`);
-	if (Number.isNaN(cell.y)) throw new Error(parameterName + `.y is NaN`);
-	if (!Number.isInteger(cell.x)) throw new TypeError(parameterName + `.x is non-integer`);
-	if (!Number.isInteger(cell.y)) throw new TypeError(parameterName + `.y is non-integer`);
-	if (grid !== void 0 && !inside(grid, cell)) throw new Error(`${parameterName} is outside of grid. Cell: ${cell.x},${cell.y} Grid: ${grid.cols}, ${grid.rows}`);
-};
-/**
-* Throws an exception if any of the grid's parameters are invalid
-* @param grid
-* @param parameterName
-*/
-const guardGrid = (grid, parameterName = `Param`) => {
-	if (grid === void 0) throw new Error(`${parameterName} is undefined. Expecting grid.`);
-	if (!(`rows` in grid)) throw new Error(`${parameterName}.rows is undefined`);
-	if (!(`cols` in grid)) throw new Error(`${parameterName}.cols is undefined`);
-	if (!Number.isInteger(grid.rows)) throw new TypeError(`${parameterName}.rows is not an integer`);
-	if (!Number.isInteger(grid.cols)) throw new TypeError(`${parameterName}.cols is not an integer`);
-};
-
-//#endregion
-//#region packages/geometry/src/grid/apply-bounds.ts
-/**
-* Calculates a legal position for a cell based on
-* `grid` size and `bounds` wrapping logic.
-* @param grid 
-* @param cell 
-* @param wrap 
-* @returns 
-*/
-const applyBounds = function(grid, cell, wrap$4 = `undefined`) {
-	guardGrid(grid, `grid`);
-	guardCell(cell, `cell`);
-	let x = cell.x;
-	let y = cell.y;
-	switch (wrap$4) {
-		case `wrap`: {
-			x = x % grid.cols;
-			y = y % grid.rows;
-			if (x < 0) x = grid.cols + x;
-			else if (x >= grid.cols) x -= grid.cols;
-			if (y < 0) y = grid.rows + y;
-			else if (y >= grid.rows) y -= grid.rows;
-			x = Math.abs(x);
-			y = Math.abs(y);
-			break;
-		}
-		case `stop`: {
-			x = clampIndex(x, grid.cols);
-			y = clampIndex(y, grid.rows);
-			break;
-		}
-		case `undefined`: {
-			if (x < 0 || y < 0) return;
-			if (x >= grid.cols || y >= grid.rows) return;
-			break;
-		}
-		case `unbounded`: break;
-		default: throw new Error(`Unknown BoundsLogic '${wrap$4}'. Expected: wrap, stop, undefined or unbounded`);
-	}
-	return Object.freeze({
-		x,
-		y
-	});
-};
-
-//#endregion
-//#region packages/geometry/src/grid/array-1d.ts
-var array_1d_exports = {};
-__export(array_1d_exports, {
-	access: () => access$1,
-	createArray: () => createArray,
-	createMutable: () => createMutable,
-	set: () => set$1,
-	setMutate: () => setMutate$1,
-	wrap: () => wrap$2,
-	wrapMutable: () => wrapMutable$1
-});
-/**
-* Returns a {@link GridCellAccessor} to get values from `array`
-* based on cell (`{x,y}`) coordinates.
-* 
-* ```js
-* const arr = [
-*  1,2,3,
-*  4,5,6
-* ]
-* const a = access(arr, 3);
-* a({x:0,y:0});  // 1
-* a({x:2, y:2}); // 6
-* ```
-* @param array 
-* @param cols 
-* @returns 
-*/
-const access$1 = (array, cols) => {
-	const grid = gridFromArrayDimensions(array, cols);
-	const fn = (cell, wrap$4 = `undefined`) => accessWithGrid$1(grid, array, cell, wrap$4);
-	return fn;
-};
-const accessWithGrid$1 = (grid, array, cell, wrap$4) => {
-	const index = indexFromCell(grid, cell, wrap$4);
-	if (index === void 0) return void 0;
-	return array[index];
-};
-/**
-* Returns a {@link GridCellSetter} that can mutate
-* array values based on cell {x,y} positions.
-* ```js
-* const arr = [
-*  1,2,3,
-*  4,5,6
-* ]
-* const a = setMutate(arr, 3);
-* a(10, {x:0,y:0});
-* a(20, {x:2, y:2});
-* 
-* // Arr is now:
-* // [
-* //  10, 2, 3,
-* //  4, 5, 20
-* // ]
-* ```
-* @param array 
-* @param cols 
-* @returns 
-*/
-const setMutate$1 = (array, cols) => {
-	const grid = gridFromArrayDimensions(array, cols);
-	return (value, cell, wrap$4 = `undefined`) => setMutateWithGrid$1(grid, array, value, cell, wrap$4);
-};
-const setMutateWithGrid$1 = (grid, array, value, cell, wrap$4) => {
-	const index = indexFromCell(grid, cell, wrap$4);
-	if (index === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
-	array[index] = value;
-	return array;
-};
-const set$1 = (array, cols) => {
-	const grid = gridFromArrayDimensions(array, cols);
-	return (value, cell, wrap$4) => setWithGrid$1(grid, array, value, cell, wrap$4);
-};
-const setWithGrid$1 = (grid, array, value, cell, wrap$4) => {
-	const index = indexFromCell(grid, cell, wrap$4);
-	if (index === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
-	const copy = [...array];
-	copy[index] = value;
-	array = copy;
-	return copy;
-};
-/**
-* Creates a {@link Grid} from the basis of an array and a given number of columns
-* @param array 
-* @param cols 
-* @returns 
-*/
-const gridFromArrayDimensions = (array, cols) => {
-	const grid = {
-		cols,
-		rows: Math.ceil(array.length / cols)
-	};
-	return grid;
-};
-/**
-* Wraps `array` for grid access.
-* Mutable, meaning that `array` gets modified if `set` function is used.
-*  
-* ```js
-* const g = wrapMutable(myArray, 5); // 5 columns wide
-* g.get({x:1,y:2});     // Get value at cell position
-* g.set(10, {x:1,y:2}); // Set value at cell position
-* g.array;              // Get reference to original passed-in array
-* ```
-* 
-* Use {@link wrap} for an immutable version.
-* 
-* @param array Array to wrap
-* @param cols Width of grid
-* @returns 
-*/
-const wrapMutable$1 = (array, cols) => {
-	const grid = gridFromArrayDimensions(array, cols);
-	return {
-		...grid,
-		get: access$1(array, cols),
-		set: setMutate$1(array, cols),
-		get array() {
-			return array;
-		}
-	};
-};
-/**
-* Wraps `array` for grid access.
-* Immutable, such that underlying array is not modified and a
-* call to `set` returns a new `GridArray1d`.
-* 
-* ```js
-* const myArray = [
-*    `a`, `b`, `c`, 
-*    `d`, `e`, `f` 
-* ];
-* let g = wrap(myArray, 3);  // 3 columns wide
-* g.get({ x:1, y:2 });          // Get value at cell position
-* 
-* // Note that `set` returns a new instance
-* g = g.set(10, { x:1, y:2 });  // Set value at cell position
-* g.array;                      // Get reference to current array
-* ```
-* 
-* Use {@link wrapMutable} to modify an array in-place
-* @param array Array to wrap
-* @param cols Width of grid
-* @returns 
-*/
-const wrap$2 = (array, cols) => {
-	const grid = gridFromArrayDimensions(array, cols);
-	return {
-		...grid,
-		get: (cell, boundsLogic = `undefined`) => accessWithGrid$1(grid, array, cell, boundsLogic),
-		set: (value, cell, boundsLogic = `undefined`) => {
-			array = setWithGrid$1(grid, array, value, cell, boundsLogic);
-			return wrap$2(array, cols);
-		},
-		get array() {
-			return array;
-		}
-	};
-};
-/**
-* Creates a 1-dimensional array to fit a grid of rows x cols.
-* Use {@link createArray} if you want to create this array and wrap it for grid access.
-* 
-* ```js
-* // Creates an array filled with 0, sized for a grid 10 rows by 20 columns
-* const arr = createArray(0, 10, 20);
-* 
-* // Alternatively, pass in a grid
-* const arr = createArray(0, { rows: 10, cols: 20 });
-* ```
-* @param rowsOrGrid Number of rows, or a grid to use the settings of
-* @param columns Columns
-*/
-const createArray = (initialValue, rowsOrGrid, columns$1) => {
-	const rows$1 = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
-	const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns$1;
-	if (!cols) throw new Error(`Parameter 'columns' missing`);
-	resultThrow(integerTest(rows$1, `aboveZero`, `rows`), integerTest(cols, `aboveZero`, `cols`));
-	const t = [];
-	const total = rows$1 * cols;
-	for (let index = 0; index < total; index++) t[index] = initialValue;
-	return t;
-};
-/**
-* Creates a {@link GridArray1d} instance given the dimensions of the grid.
-* Use {@link createArray} if you just want to create an array sized for a grid.
-* 
-* Behind the scenes, it runs:
-* ```js
-* const arr = createArray(initialValue, rows, cols);
-* return wrapMutable(arr, cols);
-* ```
-* @param initialValue 
-* @param rowsOrGrid 
-* @param columns 
-* @returns 
-*/
-const createMutable = (initialValue, rowsOrGrid, columns$1) => {
-	const rows$1 = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
-	const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns$1;
-	if (!cols) throw new Error(`Parameter 'columns' missing`);
-	const array = createArray(initialValue, rows$1, cols);
-	return wrapMutable$1(array, cols);
-};
-
-//#endregion
-//#region packages/geometry/src/grid/array-2d.ts
-var array_2d_exports = {};
-__export(array_2d_exports, {
-	access: () => access,
-	create: () => create$1,
-	set: () => set,
-	setMutate: () => setMutate,
-	wrap: () => wrap$1,
-	wrapMutable: () => wrapMutable
-});
-/**
-* Create a grid from a 2-dimensional array.
-* ```js
-* const data = [
-*  [1,2,3],
-*  [4,5,6]
-* ]
-* const g = create(data);
-* // { rows: 2, cols: 3 }
-* ```
-* @param array 
-* @returns 
-*/
-const create$1 = (array) => {
-	let colLen = NaN;
-	for (const row of array) if (Number.isNaN(colLen)) colLen = row.length;
-	else if (colLen !== row.length) throw new Error(`Array does not have uniform column length`);
-	return {
-		rows: array.length,
-		cols: colLen
-	};
-};
-const setMutate = (array) => {
-	const grid = create$1(array);
-	return (value, cell, wrap$4 = `undefined`) => setMutateWithGrid(grid, array, value, cell, wrap$4);
-};
-/**
-* Returns a function that updates a 2D array representation
-* of a grid. Array is mutated.
+* Returns the area of `rect`
 *
 * ```js
-* const m = Grids.Array2d.setMutateWithGrid(grid, array);
-* m(someValue, { x:2, y:3 });
+* const rect = { width: 100, height: 100, x: 100, y: 100 };
+* Rects.area(rect);
 * ```
-* @param grid
-* @param array
+* @param rect
 * @returns
 */
-const setMutateWithGrid = (grid, array, value, cell, bounds) => {
-	let boundCell = applyBounds(grid, cell, bounds);
-	if (boundCell === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
-	array[boundCell.y][boundCell.x] = value;
-	return array;
+const area$4 = (rect) => {
+	guard$2(rect);
+	return rect.height * rect.width;
 };
-const access = (array) => {
-	const grid = create$1(array);
-	const fn = (cell, wrap$4 = `undefined`) => accessWithGrid(grid, array, cell, wrap$4);
-	return fn;
-};
-const accessWithGrid = (grid, array, cell, wrap$4) => {
-	let boundCell = applyBounds(grid, cell, wrap$4);
-	if (boundCell === void 0) return void 0;
-	return array[boundCell.y][boundCell.x];
-};
-const wrapMutable = (array) => {
-	const grid = create$1(array);
-	return {
-		...grid,
-		get: access(array),
-		set: setMutate(array),
-		get array() {
-			return array;
-		}
-	};
-};
-const set = (array) => {
-	const grid = create$1(array);
-	return (value, cell, wrap$4) => setWithGrid(grid, array, value, cell, wrap$4);
-};
-const setWithGrid = (grid, array, value, cell, wrap$4) => {
-	let boundCell = applyBounds(grid, cell, wrap$4);
-	if (boundCell === void 0) throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid cols: ${grid.cols} rows: ${grid.rows}`);
-	let copyWhole = [...array];
-	let copyRow = [...copyWhole[boundCell.y]];
-	copyRow[boundCell.x] = value;
-	copyWhole[boundCell.y] = copyRow;
-	array = copyWhole;
-	return copyWhole;
-};
+
+//#endregion
+//#region ../geometry/src/rect/apply.ts
 /**
-* Wraps `array` with two dimensions for grid access.
-* Immutable, such that underlying array is not modified and a
-* call to `set` returns a new `GridArray1d`.
-* 
+* Applies an operation over each field of a rectangle.
 * ```js
-* // Grid of rows: 2, cols: 3
-* const myArray = [
-*  [ `a`, `b`, `c` ],
-*  [ `d`, `e`, `f` ]
-* ]
-* let g = wrap(myArray);
-* g.get({x:1,y:2});          // Get value at cell position
-* g = g.set(10, {x:1,y:2}); // Set value at cell position
-* g.array;                  // Get reference to current array
+* // Convert x,y,width,height to integer values
+* applyFields(v => Number.floor(v), someRect);
 * ```
-* 
-* Use {@link wrapMutable} to modify an array in-place
-* @param array Array to wrap
+* @param op
+* @param rectOrWidth 
+* @param heightValue 
 * @returns 
 */
-const wrap$1 = (array) => {
-	const grid = create$1(array);
-	return {
-		...grid,
-		get: (cell, boundsLogic = `undefined`) => accessWithGrid(grid, array, cell, boundsLogic),
-		set: (value, cell, boundsLogic = `undefined`) => {
-			array = setWithGrid(grid, array, value, cell, boundsLogic);
-			return wrap$1(array);
-		},
-		get array() {
-			return array;
-		}
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/values.ts
-/**
-* Converts an 1D or 2D array of cell coordinates into values
-* 
-* ```js
-* // 1D (ie an array of coordinates)
-* const cells = Grid.As.cells(grid);
-* for (const v of Grid.values(grid, cells)) {
-* 
-* }
-* ```
-* ```js
-* // 2D (ie an array of rows)
-* const rows = Grid.As.rows(grid);
-* for (const v of Grid.values(grid, rows)) {
-* }
-* ```
-* @param grid 
-* @param iter 
-*/
-function* values(grid, iter) {
-	for (const d of iter) if (Array.isArray(d)) yield d.map((v) => grid.get(v, `undefined`));
-	else yield grid.get(d, `undefined`);
-}
-
-//#endregion
-//#region packages/geometry/src/grid/enumerators/cells.ts
-/**
-* Enumerate all cell coordinates in an efficient manner.
-* Runs left-to-right, top-to-bottom.
-* 
-* If end of grid is reached, behaviour depends on `wrap`:
-* * _true_ (default): iterator will wrap to ensure all are visited.
-* * _false_: iterator stops at end of grid
-* 
-* ```js
-* import { Grids } from 'ixfx/geometry.js';
-* 
-* // Enumerate each cell position, left-to-right, top-to-bottom
-* for (const cell of Grids.By.cells(grid)) {
-*  // cell will be { x, y }
-* }
-* ```
-* 
-* See also:
-* * {@link cellValues}: Iterate over cell values
-* * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
-* @param grid Grid to iterate over
-* @param start Starting cell position (default: {x:0,y:0})
-* @param wrap If true (default), iteration will wrap around through (0,0) when end of grid is reached.
-*/
-function* cells(grid, start, wrap$4 = true) {
-	if (!start) start = {
-		x: 0,
-		y: 0
-	};
-	guardGrid(grid, `grid`);
-	guardCell(start, `start`, grid);
-	let { x, y } = start;
-	let canMove = true;
-	do {
-		yield {
+function applyFields(op, rectOrWidth, heightValue) {
+	let width = typeof rectOrWidth === `number` ? rectOrWidth : rectOrWidth.width;
+	let height$3 = typeof rectOrWidth === `number` ? heightValue : rectOrWidth.height;
+	if (width === void 0) throw new Error(`Param 'width' undefined`);
+	if (height$3 === void 0) throw new Error(`Param 'height' undefined`);
+	width = op(width, `width`);
+	height$3 = op(height$3, `height`);
+	if (typeof rectOrWidth === `object`) if (isPositioned(rectOrWidth)) {
+		const x = op(rectOrWidth.x, `x`);
+		const y = op(rectOrWidth.y, `y`);
+		return {
+			...rectOrWidth,
+			width,
+			height: height$3,
 			x,
 			y
 		};
-		x++;
-		if (x === grid.cols) {
-			y++;
-			x = 0;
-		}
-		if (y === grid.rows) if (wrap$4) {
-			y = 0;
-			x = 0;
-		} else canMove = false;
-		if (x === start.x && y === start.y) canMove = false;
-	} while (canMove);
-}
-/**
-* Yield all the values of a grid, left-to-right, top-to-bottom.
-* 
-* This is just a wrapper around Grids.values:
-* ```js
-* yield* values(grid, cells(grid, start, wrap));
-* ```
-* 
-* See also:
-* * {@link cells}: Iterate over cell coordinates
-* * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
-* @param grid 
-* @param start 
-* @param wrap 
-*/
-function* cellValues(grid, start, wrap$4 = true) {
-	yield* values(grid, cells(grid, start, wrap$4));
-}
-/**
-* Yield all cell coordinates and values of a grid, left-to-right, top-to-bottom
-* 
-* See also:
-* * {@link cells}: Iterate over cell coordinates
-* * {@link cellValues}: Iterate over cell values
-* @param grid 
-* @param start 
-* @param wrap 
-*/
-function* cellsAndValues(grid, start, wrap$4 = true) {
-	for (const cell of cells(grid, start, wrap$4)) yield {
-		cell,
-		value: grid.get(cell)
+	} else return {
+		...rectOrWidth,
+		width,
+		height: height$3
+	};
+	return {
+		width,
+		height: height$3
 	};
 }
-
-//#endregion
-//#region packages/geometry/src/grid/as.ts
-var as_exports = {};
-__export(as_exports, {
-	columns: () => columns,
-	rows: () => rows
-});
 /**
-* Enumerate rows of grid, returning all the cells in the row
-* as an array
-*
+* Applies an joint operation field-wise on two rectangles, returning a single rectangle. This is used to support operations like summing two rectangles.
 * ```js
-* for (const row of Grid.As.rows(shape)) {
-*  // row is an array of Cells.
-*  // [ {x:0, y:0}, {x:1, y:0} ... ]
-* }
+* // Eg make a new rectangle by summing each field of rectangle A & B.
+* apply((valueA,valueB) => valueA+valueB, rectA, rectB);
 * ```
-* 
-* Use `Grid.values` to convert the returned iterator into values:
-* ```js
-* for (const v of Grid.values(Grid.rows(shape))) {
-* }
-* ```
-* @param grid
-* @param start
+* @param op 
+* @param a 
+* @param b 
+* @param c 
+* @returns 
 */
-const rows = function* (grid, start) {
-	if (!start) start = {
-		x: 0,
-		y: 0
-	};
-	let row = start.y;
-	let rowCells = [];
-	for (const c of cells(grid, start)) if (c.y === row) rowCells.push(c);
+function applyMerge(op, a, b, c) {
+	guard$2(a, `a`);
+	if (isRect(b)) return isRectPositioned(a) ? Object.freeze({
+		...a,
+		x: op(a.x, b.width),
+		y: op(a.y, b.height),
+		width: op(a.width, b.width),
+		height: op(a.height, b.height)
+	}) : Object.freeze({
+		...a,
+		width: op(a.width, b.width),
+		height: op(a.height, b.height)
+	});
 	else {
-		yield rowCells;
-		rowCells = [c];
-		row = c.y;
-	}
-	if (rowCells.length > 0) yield rowCells;
-};
-/**
-* Enumerate columns of grid, returning all the cells in the
-* same column as an array.
-* 
-* ```js
-* for (const col of Grid.As.columns(grid)) {
-* }
-* ```
-* 
-* Use `Grid.values` to convert into values
-* ```js
-* for (const value of Grid.values(Grid.As.columns(grid))) {
-* }
-* ```
-* @param grid 
-* @param start 
-*/
-function* columns(grid, start) {
-	if (!start) start = {
-		x: 0,
-		y: 0
-	};
-	for (let x = start.x; x < grid.cols; x++) {
-		let colCells = [];
-		for (let y = start.y; y < grid.rows; y++) colCells.push({
-			x,
-			y
+		if (typeof b !== `number`) throw new TypeError(`Expected second parameter of type Rect or number. Got ${JSON.stringify(b)}`);
+		if (typeof c !== `number`) throw new Error(`Expected third param as height. Got ${JSON.stringify(c)}`);
+		return isRectPositioned(a) ? Object.freeze({
+			...a,
+			x: op(a.x, b),
+			y: op(a.y, c),
+			width: op(a.width, b),
+			height: op(a.height, c)
+		}) : Object.freeze({
+			...a,
+			width: op(a.width, b),
+			height: op(a.height, c)
 		});
-		yield colCells;
 	}
+}
+function applyScalar(op, rect, parameter) {
+	return isPositioned(rect) ? Object.freeze({
+		...rect,
+		x: op(rect.x, parameter),
+		y: op(rect.y, parameter),
+		width: op(rect.width, parameter),
+		height: op(rect.height, parameter)
+	}) : Object.freeze({
+		...rect,
+		width: op(rect.width, parameter),
+		height: op(rect.height, parameter)
+	});
+}
+/**
+* Applies `op` with `param` to `rect`'s width and height.
+* @param op 
+* @param rect 
+* @param parameter 
+* @returns 
+*/
+function applyDim(op, rect, parameter) {
+	return Object.freeze({
+		...rect,
+		width: op(rect.width, parameter),
+		height: op(rect.height, parameter)
+	});
 }
 
 //#endregion
-//#region packages/geometry/src/grid/offset.ts
+//#region ../geometry/src/rect/cardinal.ts
 /**
-* Returns a coordinate offset from `start` by `vector` amount.
+* Returns a point on cardinal direction, or 'center' for the middle.
 *
-* Different behaviour can be specified for how to handle when coordinates exceed the bounds of the grid
-*
-* Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift up/down a line.
-* 
-* Use {@link Grids.applyBounds} if you need to calculate a wrapped coordinate without adding two together.
-* @param grid Grid to traverse
-* @param vector Offset in x/y
-* @param start Start point
-* @param bounds
-* @returns Cell
-*/
-const offset = function(grid, start, vector, bounds = `undefined`) {
-	return applyBounds(grid, {
-		x: start.x + vector.x,
-		y: start.y + vector.y
-	}, bounds);
-};
-
-//#endregion
-//#region packages/geometry/src/grid/directions.ts
-/**
-* Returns a list of all cardinal directions: n, ne, nw, e, s, se, sw, w
-*/
-const allDirections = Object.freeze([
-	`n`,
-	`ne`,
-	`nw`,
-	`e`,
-	`s`,
-	`se`,
-	`sw`,
-	`w`
-]);
-/**
-* Returns a list of + shaped directions: n, e, s, w
-*/
-const crossDirections = Object.freeze([
-	`n`,
-	`e`,
-	`s`,
-	`w`
-]);
-/**
-* Returns cells that correspond to the cardinal directions at a specified distance
-* i.e. it projects a line from `start` cell in all cardinal directions and returns the cells at `steps` distance.
-* @param grid Grid
-* @param steps Distance
-* @param start Start poiint
-* @param bounds Logic for if bounds of grid are exceeded
-* @returns Cells corresponding to cardinals
-*/
-const offsetCardinals = (grid, start, steps, bounds = `stop`) => {
-	guardGrid(grid, `grid`);
-	guardCell(start, `start`);
-	resultThrow(integerTest(steps, `aboveZero`, `steps`));
-	const directions = allDirections;
-	const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
-	const cells$1 = directions.map((d, index) => offset(grid, start, vectors[index], bounds));
-	return zipKeyValue(directions, cells$1);
-};
-/**
-* Returns an `{ x, y }` signed vector corresponding to the provided cardinal direction.
 * ```js
-* const n = getVectorFromCardinal(`n`); // {x: 0, y: -1}
+* cardinal({x: 10, y:10, width:100, height: 20}, 'center');
 * ```
-*
-* Optional `multiplier` can be applied to vector
-* ```js
-* const n = getVectorFromCardinal(`n`, 10); // {x: 0, y: -10}
-* ```
-*
-* Blank direction returns `{ x: 0, y: 0 }`
-* @param cardinal Direction
-* @param multiplier Multipler
-* @returns Signed vector in the form of `{ x, y }`
+* @param rect Rectangle
+* @param card Cardinal direction or 'center'
+* @returns Point
 */
-const getVectorFromCardinal = (cardinal$1, multiplier = 1) => {
-	let v;
-	switch (cardinal$1) {
-		case `n`: {
-			v = {
-				x: 0,
-				y: -1 * multiplier
-			};
-			break;
-		}
-		case `ne`: {
-			v = {
-				x: 1 * multiplier,
-				y: -1 * multiplier
-			};
-			break;
-		}
-		case `e`: {
-			v = {
-				x: 1 * multiplier,
-				y: 0
-			};
-			break;
-		}
-		case `se`: {
-			v = {
-				x: 1 * multiplier,
-				y: 1 * multiplier
-			};
-			break;
-		}
-		case `s`: {
-			v = {
-				x: 0,
-				y: 1 * multiplier
-			};
-			break;
-		}
-		case `sw`: {
-			v = {
-				x: -1 * multiplier,
-				y: 1 * multiplier
-			};
-			break;
-		}
-		case `w`: {
-			v = {
-				x: -1 * multiplier,
-				y: 0
-			};
-			break;
-		}
-		case `nw`: {
-			v = {
-				x: -1 * multiplier,
-				y: -1 * multiplier
-			};
-			break;
-		}
-		default: v = {
-			x: 0,
-			y: 0
-		};
+const cardinal = (rect, card) => {
+	const { x, y, width, height: height$3 } = rect;
+	switch (card) {
+		case `nw`: return Object.freeze({
+			x,
+			y
+		});
+		case `n`: return Object.freeze({
+			x: x + width / 2,
+			y
+		});
+		case `ne`: return Object.freeze({
+			x: x + width,
+			y
+		});
+		case `sw`: return Object.freeze({
+			x,
+			y: y + height$3
+		});
+		case `s`: return Object.freeze({
+			x: x + width / 2,
+			y: y + height$3
+		});
+		case `se`: return Object.freeze({
+			x: x + width,
+			y: y + height$3
+		});
+		case `w`: return Object.freeze({
+			x,
+			y: y + height$3 / 2
+		});
+		case `e`: return Object.freeze({
+			x: x + width,
+			y: y + height$3 / 2
+		});
+		case `center`: return Object.freeze({
+			x: x + width / 2,
+			y: y + height$3 / 2
+		});
+		default: throw new Error(`Unknown direction: ${card}`);
 	}
-	return Object.freeze(v);
 };
 
 //#endregion
-//#region packages/geometry/src/grid/enumerators/index.ts
-var enumerators_exports = {};
-__export(enumerators_exports, {
-	cellValues: () => cellValues,
-	cells: () => cells,
-	cellsAndValues: () => cellsAndValues
+//#region ../geometry/src/rect/divide.ts
+const divideOp = (a, b) => a / b;
+/**
+* @internal
+* @param a 
+* @param b 
+* @param c 
+* @returns 
+*/
+function divide(a, b, c) {
+	return applyMerge(divideOp, a, b, c);
+}
+/**
+* Divides all components of `rect` by `amount`.
+* This includes x,y if present.
+* 
+* ```js
+* divideScalar({ width:10, height:20 }, 2); // { width:5, height: 10 }
+* divideScalar({ x: 1, y: 2, width:10, height:20 }, 2); // { x: 0.5, y: 1, width:5, height: 10 }
+* ```
+* @param rect
+* @param amount
+*/
+function divideScalar(rect, amount) {
+	return applyScalar(divideOp, rect, amount);
+}
+function divideDim(rect, amount) {
+	return applyDim(divideOp, rect, amount);
+}
+
+//#endregion
+//#region ../geometry/src/rect/edges.ts
+/**
+* Returns four lines based on each corner.
+* Lines are given in order: top, right, bottom, left
+*
+* ```js
+* const rect = { width: 100, height: 100, x: 100, y: 100 };
+* // Yields: array of length four
+* const lines = Rects.lines(rect);
+* ```
+*
+* @param {(RectPositioned|Rect)} rect
+* @param {Points.Point} [origin]
+* @returns {Lines.Line[]}
+*/
+const edges$1 = (rect, origin) => {
+	const c = corners$1(rect, origin);
+	return joinPointsToLines(...c, c[0]);
+};
+/**
+* Returns a point on the edge of rectangle
+* ```js
+* const r1 = {x: 10, y: 10, width: 100, height: 50};
+* Rects.getEdgeX(r1, `right`);  // Yields: 110
+* Rects.getEdgeX(r1, `bottom`); // Yields: 10
+*
+* const r2 = {width: 100, height: 50};
+* Rects.getEdgeX(r2, `right`);  // Yields: 100
+* Rects.getEdgeX(r2, `bottom`); // Yields: 0
+* ```
+* @param rect
+* @param edge Which edge: right, left, bottom, top
+* @returns
+*/
+const getEdgeX = (rect, edge) => {
+	guard$2(rect);
+	switch (edge) {
+		case `top`: return isPoint(rect) ? rect.x : 0;
+		case `bottom`: return isPoint(rect) ? rect.x : 0;
+		case `left`: return isPoint(rect) ? rect.y : 0;
+		case `right`: return isPoint(rect) ? rect.x + rect.width : rect.width;
+	}
+};
+/**
+* Returns a point on the edge of rectangle
+*
+* ```js
+* const r1 = {x: 10, y: 10, width: 100, height: 50};
+* Rects.getEdgeY(r1, `right`);  // Yields: 10
+* Rects.getEdgeY(r1, `bottom`); // Yields: 60
+*
+* const r2 = {width: 100, height: 50};
+* Rects.getEdgeY(r2, `right`);  // Yields: 0
+* Rects.getEdgeY(r2, `bottom`); // Yields: 50
+* ```
+* @param rect
+* @param edge Which edge: right, left, bottom, top
+* @returns
+*/
+const getEdgeY = (rect, edge) => {
+	guard$2(rect);
+	switch (edge) {
+		case `top`: return isPoint(rect) ? rect.y : 0;
+		case `bottom`: return isPoint(rect) ? rect.y + rect.height : rect.height;
+		case `left`: return isPoint(rect) ? rect.y : 0;
+		case `right`: return isPoint(rect) ? rect.y : 0;
+	}
+};
+
+//#endregion
+//#region ../geometry/src/rect/empty.ts
+const Empty$2 = Object.freeze({
+	width: 0,
+	height: 0
+});
+const EmptyPositioned = Object.freeze({
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0
 });
 
 //#endregion
-//#region packages/geometry/src/grid/geometry.ts
+//#region ../geometry/src/rect/encompass.ts
 /**
-* Returns the cells on the line of `start` and `end`, inclusive
-*
-* ```js
-* // Get cells that connect 0,0 and 10,10
-* const cells = Grids.getLine({x:0,y:0}, {x:10,y:10});
-* ```
-*
-* This function does not handle wrapped coordinates.
-* @param start Starting cell
-* @param end End cell
-* @returns
-*/
-const getLine = (start, end) => {
-	guardCell(start);
-	guardCell(end);
-	let startX = start.x;
-	let startY = start.y;
-	const dx = Math.abs(end.x - startX);
-	const dy = Math.abs(end.y - startY);
-	const sx = startX < end.x ? 1 : -1;
-	const sy = startY < end.y ? 1 : -1;
-	let error = dx - dy;
-	const cells$1 = [];
-	while (true) {
-		cells$1.push(Object.freeze({
-			x: startX,
-			y: startY
-		}));
-		if (startX === end.x && startY === end.y) break;
-		const error2 = 2 * error;
-		if (error2 > -dy) {
-			error -= dy;
-			startX += sx;
-		}
-		if (error2 < dx) {
-			error += dx;
-			startY += sy;
-		}
-	}
-	return cells$1;
-};
-/**
-* Returns a list of cells from `start` to `end`.
-*
-* Throws an error if start and end are not on same row or column.
-*
-* @param start Start cell
-* @param end end clel
-* @param endInclusive
-* @return Array of cells
-*/
-const simpleLine = function(start, end, endInclusive = false) {
-	const cells$1 = [];
-	if (start.x === end.x) {
-		const lastY = endInclusive ? end.y + 1 : end.y;
-		for (let y = start.y; y < lastY; y++) cells$1.push({
-			x: start.x,
-			y
-		});
-	} else if (start.y === end.y) {
-		const lastX = endInclusive ? end.x + 1 : end.x;
-		for (let x = start.x; x < lastX; x++) cells$1.push({
-			x,
-			y: start.y
-		});
-	} else throw new Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
-	return cells$1;
-};
-
-//#endregion
-//#region packages/geometry/src/grid/indexing.ts
-/**
-* Returns the index for a given cell.
-* This is useful if a grid is stored in an array.
-*
-* ```js
-* const data = [
-*  1, 2,
-*  3, 4,
-*  5, 6 ];
-* const cols = 2; // Grid of 2 columns wide
-* const index = indexFromCell(cols, {x: 1, y: 1});
-* // Yields an index of 3
-* console.log(data[index]); // Yields 4
-* ```
-*
-* Bounds logic is applied to cell.x/y separately. Wrapping
-* only ever happens in same col/row.
-* @see cellFromIndex
-* @param grid Grid
-* @param cell Cell to get index for
-* @param wrap Logic for if we hit bounds of grid
-* @returns
-*/
-const indexFromCell = (grid, cell, wrap$4) => {
-	guardGrid(grid, `grid`);
-	if (cell.x < 0) switch (wrap$4) {
-		case `stop`: {
-			cell = {
-				...cell,
-				x: 0
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = offset(grid, {
-				x: 0,
-				y: cell.y
-			}, {
-				x: cell.x,
-				y: 0
-			}, `wrap`);
-			break;
-		}
-	}
-	if (cell.y < 0) switch (wrap$4) {
-		case `stop`: {
-			cell = {
-				...cell,
-				y: 0
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				y: grid.rows + cell.y
-			};
-			break;
-		}
-	}
-	if (cell.x >= grid.cols) switch (wrap$4) {
-		case `stop`: {
-			cell = {
-				...cell,
-				x: grid.cols - 1
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				x: cell.x % grid.cols
-			};
-			break;
-		}
-	}
-	if (cell.y >= grid.rows) switch (wrap$4) {
-		case `stop`: {
-			cell = {
-				...cell,
-				y: grid.rows - 1
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				y: cell.y % grid.rows
-			};
-			break;
-		}
-	}
-	const index = cell.y * grid.cols + cell.x;
-	return index;
-};
-/**
-* Returns x,y from an array index.
-*
-* ```js
-*  const data = [
-*   1, 2,
-*   3, 4,
-*   5, 6 ];
-*
-* // Cols of 2, index 2 (ie. data[2] == 3)
-* const cell = cellFromIndex(2, 2);
-* // Yields: {x: 0, y: 1}
-* ```
-* @see indexFromCell
-* @param colsOrGrid
-* @param index
-* @returns
-*/
-const cellFromIndex = (colsOrGrid, index) => {
-	let cols = 0;
-	cols = typeof colsOrGrid === `number` ? colsOrGrid : colsOrGrid.cols;
-	resultThrow(integerTest(cols, `aboveZero`, `colsOrGrid`));
-	return {
-		x: index % cols,
-		y: Math.floor(index / cols)
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/is-equal.ts
-/**
-* Returns _true_ if grids `a` and `b` are equal in value.
-* Returns _false_ if either parameter is undefined.
-*
-* @param a
-* @param b
-* @return
-*/
-const isEqual$1 = (a, b) => {
-	if (b === void 0) return false;
-	if (a === void 0) return false;
-	if (`rows` in a && `cols` in a) if (`rows` in b && `cols` in b) {
-		if (a.rows !== b.rows || a.cols !== b.cols) return false;
-	} else return false;
-	if (`size` in a) if (`size` in b) {
-		if (a.size !== b.size) return false;
-	} else return false;
-	return true;
-};
-/**
-* Returns _true_ if two cells equal.
-* Returns _false_ if either cell are undefined
-*
-* @param a
-* @param b
-* @returns
-*/
-const cellEquals = (a, b) => {
-	if (b === void 0) return false;
-	if (a === void 0) return false;
-	return a.x === b.x && a.y === b.y;
-};
-
-//#endregion
-//#region packages/geometry/src/grid/neighbour.ts
-const randomNeighbour = (nbos) => randomElement(nbos);
-/**
-* Returns _true_ if `n` is a Neighbour type, eliminating NeighbourMaybe possibility
-*
-* @param n
-* @return
-*/
-const isNeighbour = (n) => {
-	if (n === void 0) return false;
-	if (n[1] === void 0) return false;
-	return true;
-};
-/**
-* Gets a list of neighbours for `cell` (using {@link neighbours}), filtering
-* results to only those that are valid neighbours (using {@link isNeighbour})
-* 
-* ```js
-* // Get all eight surrounding cells
-* const n = Grids.neighbourList(grid, cell, Grids.allDirections);
-* 
-* // Get north, east, south, west cells
-* const n = Grids.neighbourList(grid, cell, Grids.crossDirections);
-* ```
-* @param grid Grid
-* @param cell Cell
-* @param directions Directions 
-* @param bounds Bounds
+* Returns a copy of `rect` with `rect` resized so it also encompasses `points`.
+* If provided point(s) are within bounds of `rect`, a copy of `rect` is returned.
+* @param rect 
+* @param points 
 * @returns 
 */
-const neighbourList = (grid, cell, directions, bounds) => {
-	const cellNeighbours = neighbours(grid, cell, bounds, directions);
-	const entries = Object.entries(cellNeighbours);
-	return entries.filter((n) => isNeighbour(n));
-};
-/**
-* Returns neighbours for a cell. If no `directions` are provided, it defaults to {@link allDirections}.
-*
-* ```js
-* const grid = { rows: 5, cols: 5 };
-* const cell = { x:2, y:2 };
-*
-* // Get n,ne,nw,e,s,se,sw and w neighbours
-* const n = Grids.neighbours(grid, cell, `wrap`);
-*
-* Yields:
-* {
-*  n: {x: 2, y: 1}
-*  s: {x: 2, y: 3}
-*  ....
-* }
-* ```
-*
-* Returns neighbours without diagonals (ie: n, e, s, w):
-* ```js
-* const n = Grids.neighbours(grid, cell, `stop`, Grids.crossDirections);
-* ```
-* @returns Returns a map of cells, keyed by cardinal direction
-* @param grid Grid
-* @param cell Cell
-* @param bounds How to handle edges of grid
-* @param directions Directions to return
-*/
-const neighbours = (grid, cell, bounds = `undefined`, directions) => {
-	const directories = directions ?? allDirections;
-	const points = directories.map((c) => offset(grid, cell, getVectorFromCardinal(c), bounds));
-	return zipKeyValue(directories, points);
-};
-
-//#endregion
-//#region packages/geometry/src/grid/to-array.ts
-const toArray2d = (grid, initialValue) => {
-	const returnValue = [];
-	for (let row = 0; row < grid.rows; row++) {
-		returnValue[row] = Array.from({ length: grid.cols });
-		if (initialValue) for (let col = 0; col < grid.cols; col++) returnValue[row][col] = initialValue;
-	}
-	return returnValue;
-};
-
-//#endregion
-//#region packages/geometry/src/grid/to-string.ts
-/**
-* Returns a key string for a cell instance
-* A key string allows comparison of instances by value rather than reference
-*
-* ```js
-* cellKeyString({x:10,y:20});
-* // Yields: "Cell{10,20}";
-* ```
-* @param v
-* @returns
-*/
-const cellKeyString = (v) => `Cell{${v.x},${v.y}}`;
-
-//#endregion
-//#region packages/geometry/src/grid/visual.ts
-/**
-* Generator that returns rectangles for each cell in a grid
-*
-* @example Draw rectangles
-* ```js
-* import { Drawing } from 'visuals.js'
-* const rects = [...Grids.asRectangles(grid)];
-* Drawing.rect(ctx, rects, { strokeStyle: `silver`});
-* ```
-* @param grid
-*/
-function* asRectangles(grid) {
-	for (const c of cells(grid)) yield rectangleForCell(grid, c);
-}
-/**
-* Returns the cell at a specified visual coordinate
-* or _undefined_ if the position is outside of the grid.
-*
-* `position` must be in same coordinate/scale as the grid.
-*
-* @param position Position, eg in pixels
-* @param grid Grid
-* @return Cell at position or undefined if outside of the grid
-*/
-const cellAtPoint = (grid, position) => {
-	const size = grid.size;
-	resultThrow(numberTest(size, `positive`, `grid.size`));
-	if (position.x < 0 || position.y < 0) return;
-	const x = Math.floor(position.x / size);
-	const y = Math.floor(position.y / size);
-	if (x >= grid.cols) return;
-	if (y >= grid.rows) return;
-	return {
-		x,
-		y
-	};
-};
-/**
-* Returns a visual rectangle of the cell, positioned from the top-left corner
-*
-* ```js
-* const cell = { x: 1, y: 0 };
-*
-* // 5x5 grid, each cell 5px in size
-* const grid = { rows: 5, cols: 5, size: 5 }
-*
-* const r = rectangleForCell(grid, cell,);
-*
-* // Yields: { x: 5, y: 0, width: 5, height: 5 }
-* ```
-* @param cell
-* @param grid
-* @return
-*/
-const rectangleForCell = (grid, cell) => {
-	guardCell(cell);
-	const size = grid.size;
-	const x = cell.x * size;
-	const y = cell.y * size;
-	const r = fromTopLeft({
-		x,
-		y
-	}, size, size);
-	return r;
-};
-/**
-* Returns the visual midpoint of a cell (eg. pixel coordinate)
-*
-* @param cell
-* @param grid
-* @return
-*/
-const cellMiddle = (grid, cell) => {
-	guardCell(cell);
-	const size = grid.size;
-	const x = cell.x * size;
-	const y = cell.y * size;
+const encompass = (rect, ...points) => {
+	const x = points.map((p) => p.x);
+	const y = points.map((p) => p.y);
+	let minX = Math.min(...x, rect.x);
+	let minY = Math.min(...y, rect.y);
+	let maxX = Math.max(...x, rect.x + rect.width);
+	let maxY = Math.max(...y, rect.y + rect.height);
+	let rectW = Math.max(rect.width, maxX - minX);
+	let rectH = Math.max(rect.height, maxY - minY);
 	return Object.freeze({
-		x: x + size / 2,
-		y: y + size / 2
+		...rect,
+		x: minX,
+		y: minY,
+		width: rectW,
+		height: rectH
 	});
 };
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/breadth.ts
-const breadthLogic = () => {
-	return { select: (nbos) => nbos[0] };
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/cell-neighbours.ts
-const neighboursLogic = () => {
-	return {
-		select: (neighbours$1) => {
-			return neighbours$1.at(0);
-		},
-		getNeighbours: (grid, cell) => {
-			return neighbourList(grid, cell, allDirections, `undefined`);
-		}
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/columns.ts
+//#region ../geometry/src/rect/from-element.ts
 /**
-* Visits cells running down columns, left-to-right.
-* @param opts Options
-* @returns Visitor generator
-*/
-const columnLogic = (opts = {}) => {
-	const reversed = opts.reversed ?? false;
-	return {
-		select: (nbos) => nbos.find((n) => n[0] === (reversed ? `n` : `s`)),
-		getNeighbours: (grid, cell) => {
-			if (reversed) if (cell.y > 0) cell = {
-				x: cell.x,
-				y: cell.y - 1
-			};
-			else if (cell.x === 0) cell = {
-				x: grid.cols - 1,
-				y: grid.rows - 1
-			};
-			else cell = {
-				x: cell.x - 1,
-				y: grid.rows - 1
-			};
-			else if (cell.y < grid.rows - 1) cell = {
-				x: cell.x,
-				y: cell.y + 1
-			};
-			else if (cell.x < grid.cols - 1) cell = {
-				x: cell.x + 1,
-				y: 0
-			};
-			else cell = {
-				x: 0,
-				y: 0
-			};
-			return [[reversed ? `n` : `s`, cell]];
-		}
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/depth.ts
-const depthLogic = () => {
-	return { select: (nbos) => nbos.at(-1) };
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/random.ts
-const randomLogic = () => {
-	return {
-		getNeighbours: (grid, cell) => {
-			const t = [];
-			for (const c of cells(grid, cell)) t.push([`n`, c]);
-			return t;
-		},
-		select: randomNeighbour
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/random-contiguous.ts
-const randomContiguousLogic = () => {
-	return { select: randomNeighbour };
-};
-
-//#endregion
-//#region packages/geometry/src/grid/visitors/rows.ts
-/**
-* Visit by following rows. Normal order is left-to-right, top-to-bottom.
-* @param opts Options
+* Initialise a rectangle based on the width and height of a HTML element.
+*
+* ```js
+* Rects.fromElement(document.querySelector(`body`));
+* ```
+* @param el
 * @returns
 */
-const rowLogic = (opts = {}) => {
-	const reversed = opts.reversed ?? false;
-	return {
-		select: (nbos) => nbos.find((n) => n[0] === (reversed ? `w` : `e`)),
-		getNeighbours: (grid, cell) => {
-			if (reversed) if (cell.x > 0) cell = {
-				x: cell.x - 1,
-				y: cell.y
-			};
-			else if (cell.y > 0) cell = {
-				x: grid.cols - 1,
-				y: cell.y - 1
-			};
-			else cell = {
-				x: grid.cols - 1,
-				y: grid.rows - 1
-			};
-			else if (cell.x < grid.rows - 1) cell = {
-				x: cell.x + 1,
-				y: cell.y
-			};
-			else if (cell.y < grid.rows - 1) cell = {
-				x: 0,
-				y: cell.y + 1
-			};
-			else cell = {
-				x: 0,
-				y: 0
-			};
-			return [[reversed ? `w` : `e`, cell]];
-		}
-	};
-};
+const fromElement = (el) => ({
+	width: el.clientWidth,
+	height: el.clientHeight
+});
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/visitor.ts
+//#region ../geometry/src/rect/from-numbers.ts
 /**
-* Visits every cell in grid using supplied selection function
-* In-built functions to use: visitorDepth, visitorBreadth, visitorRandom,
-* visitorColumn, visitorRow.
+* Returns a rectangle from a series of numbers: x, y, width, height OR width, height
 *
-* Usage example:
 * ```js
-*  let visitor = Grids.visitor(Grids.visitorRandom, grid, startCell);
-*  for (let cell of visitor) {
-*   // do something with cell
-*  }
+* const r1 = Rects.fromNumbers(100, 200);
+* // {width: 100, height: 200}
+*
+* const r2 = Rects.fromNumbers(10, 20, 100, 200);
+* // {x: 10, y: 20, width: 100, height: 200}
+* ```
+* Use the spread operator (...) if the source is an array:
+*
+* ```js
+* const r3 = Rects.fromNumbers(...[10, 20, 100, 200]);
 * ```
 *
-* If you want to keep tabs on the visitor, pass in a @ixfx/collections.Sets.ISetMutable instance. This gets
-* updated as cells are visited to make sure we don't visit the same one twice. If a set is not passed
-* in, one will be created internally.
-* ```js
-* let visited = new SetStringMutable<Grids.Cell>(c => Grids.cellKeyString(c));
-* let visitor = Grids.visitor(Grids.visitorRandom, grid, startCell, visited);
-* ```
+* Use {@link toArray} for the opposite conversion.
 *
-* To visit with some delay, try this pattern
-* ```js
-*  const delayMs = 100;
-*  const run = () => {
-*   let cell = visitor.next().value;
-*   if (cell === undefined) return;
-*   // Do something with cell
-*   setTimeout(run, delayMs);
-*  }
-*  setTimeout(run, delayMs);
-* ```
-* @param logic Logic for selecting next cell
-* @param grid Grid to visitl
-* @param opts Options
-* @returns Cells
+* @see toArray
+* @param xOrWidth
+* @param yOrHeight
+* @param width
+* @param height
+* @returns
 */
-function* visitByNeighbours(logic, grid, opts = {}) {
-	guardGrid(grid, `grid`);
-	const start = opts.start ?? {
-		x: 0,
-		y: 0
-	};
-	guardCell(start, `opts.start`, grid);
-	const v = opts.visited ?? mutable(cellKeyString);
-	const possibleNeighbours = logic.getNeighbours ?? ((g, c) => neighbourList(g, c, crossDirections, `undefined`));
-	let cellQueue = [start];
-	let moveQueue = [];
-	let current = void 0;
-	while (cellQueue.length > 0) {
-		if (current === void 0) {
-			const nv = cellQueue.pop();
-			if (nv === void 0) break;
-			current = nv;
-		}
-		if (!v.has(current)) {
-			v.add(current);
-			yield current;
-			const nextSteps = possibleNeighbours(grid, current).filter((step) => {
-				if (step[1] === void 0) return false;
-				return !v.has(step[1]);
-			});
-			if (nextSteps.length === 0) {
-				if (current !== void 0) cellQueue = cellQueue.filter((cq) => cellEquals(cq, current));
-			} else for (const n of nextSteps) {
-				if (n === void 0) continue;
-				if (n[1] === void 0) continue;
-				moveQueue.push(n);
-			}
-		}
-		moveQueue = moveQueue.filter((step) => !v.has(step[1]));
-		if (moveQueue.length === 0) current = void 0;
-		else {
-			const potential = logic.select(moveQueue);
-			if (potential !== void 0) {
-				cellQueue.push(potential[1]);
-				current = potential[1];
-			}
-		}
+function fromNumbers$1(xOrWidth, yOrHeight, width, height$3) {
+	if (width === void 0 || height$3 === void 0) {
+		if (typeof xOrWidth !== `number`) throw new Error(`width is not an number`);
+		if (typeof yOrHeight !== `number`) throw new TypeError(`height is not an number`);
+		return Object.freeze({
+			width: xOrWidth,
+			height: yOrHeight
+		});
 	}
+	if (typeof xOrWidth !== `number`) throw new Error(`x is not an number`);
+	if (typeof yOrHeight !== `number`) throw new Error(`y is not an number`);
+	if (typeof width !== `number`) throw new Error(`width is not an number`);
+	if (typeof height$3 !== `number`) throw new Error(`height is not an number`);
+	return Object.freeze({
+		x: xOrWidth,
+		y: yOrHeight,
+		width,
+		height: height$3
+	});
 }
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/step.ts
+//#region ../geometry/src/rect/get-rect-positionedparameter.ts
 /**
-* Runs the provided `visitor` for `steps`, returning the cell we end at
+* Accepts:
+* * x,y,w,h
+* * x,y,rect
+* * point,rect
+* * RectPositioned
+* * Rect, x,y
+* * Rect, Point
+* @param a 
+* @param b 
+* @param c 
+* @param d 
+* @returns 
+*/
+function getRectPositionedParameter(a, b, c, d) {
+	if (typeof a === `number`) if (typeof b === `number`) if (typeof c === `number` && typeof d === `number`) return {
+		x: a,
+		y: b,
+		width: c,
+		height: d
+	};
+	else if (isRect(c)) return {
+		x: a,
+		y: b,
+		width: c.width,
+		height: c.height
+	};
+	else throw new TypeError(`If params 'a' & 'b' are numbers, expect following parameters to be x,y or Rect`);
+	else throw new TypeError(`If parameter 'a' is a number, expect following parameters to be: y,w,h`);
+	else if (isRectPositioned(a)) return a;
+	else if (isRect(a)) if (typeof b === `number` && typeof c === `number`) return {
+		width: a.width,
+		height: a.height,
+		x: b,
+		y: c
+	};
+	else if (isPoint(b)) return {
+		width: a.width,
+		height: a.height,
+		x: b.x,
+		y: b.y
+	};
+	else throw new TypeError(`If param 'a' is a Rect, expects following parameters to be x,y`);
+	else if (isPoint(a)) if (typeof b === `number` && typeof c === `number`) return {
+		x: a.x,
+		y: a.y,
+		width: b,
+		height: c
+	};
+	else if (isRect(b)) return {
+		x: a.x,
+		y: a.y,
+		width: b.width,
+		height: b.height
+	};
+	else throw new TypeError(`If parameter 'a' is a Point, expect following params to be: Rect or width,height`);
+	throw new TypeError(`Expect a first parameter to be x,RectPositioned,Rect or Point`);
+}
+
+//#endregion
+//#region ../geometry/src/rect/is-equal.ts
+/**
+* Returns _true_ if the width & height of the two rectangles is the same.
+*
 * ```js
-* // Create visitor & stepper
-* const visitor = Grids.Visit.create(`row`);
-* const stepper = Grids.Visit.stepper(grid, visitor);
-* 
-* // Step by 10
-* stepper(10); // GridCell {x,y}
-* 
-* // Step by another 2
-* stepper(2);
+* const rectA = { width: 10, height: 10, x: 10, y: 10 };
+* const rectB = { width: 10, height: 10, x: 20, y: 20 };
+*
+* // True, even though x,y are different
+* Rects.isEqualSize(rectA, rectB);
+*
+* // False, because coordinates are different
+* Rects.isEqual(rectA, rectB)
 * ```
-* @param grid Grid to traverse
-* @param start Start point
-* @param createVisitor Visitor function
+* @param a
+* @param b
 * @returns
 */
-const stepper = (grid, createVisitor, start = {
-	x: 0,
-	y: 0
-}, resolution = 1) => {
-	guardGrid(grid, `grid`);
-	guardCell(start, `start`);
-	resultThrow(integerTest(resolution, ``, `resolution`));
-	const steps = [];
-	let count = 0;
-	let position = 0;
-	for (const c of createVisitor(grid, {
-		start,
-		boundsWrap: `undefined`
-	})) {
-		count++;
-		if (count % resolution !== 0) continue;
-		steps.push(c);
-	}
-	return (step, fromStart = false) => {
-		resultThrow(integerTest(step, ``, `step`));
-		if (fromStart) position = step;
-		else position += step;
-		return steps.at(position % steps.length);
+const isEqualSize = (a, b) => {
+	if (a === void 0) throw new Error(`a undefined`);
+	if (b === void 0) throw new Error(`b undefined`);
+	return a.width === b.width && a.height === b.height;
+};
+/**
+* Returns _true_ if two rectangles have identical values.
+* Both rectangles must be positioned or not.
+*
+* ```js
+* const rectA = { width: 10, height: 10, x: 10, y: 10 };
+* const rectB = { width: 10, height: 10, x: 20, y: 20 };
+*
+* // False, because coordinates are different
+* Rects.isEqual(rectA, rectB)
+*
+* // True, even though x,y are different
+* Rects.isEqualSize(rectA, rectB);
+* ```
+* @param a
+* @param b
+* @returns
+*/
+const isEqual$2 = (a, b) => {
+	if (isPositioned(a) && isPositioned(b)) {
+		if (!isEqual(a, b)) return false;
+		return a.width === b.width && a.height === b.height;
+	} else if (!isPositioned(a) && !isPositioned(b)) return a.width === b.width && a.height === b.height;
+	else return false;
+};
+
+//#endregion
+//#region ../geometry/src/rect/lengths.ts
+/**
+* Returns the length of each side of the rectangle (top, right, bottom, left)
+*
+* ```js
+* const rect = { width: 100, height: 100, x: 100, y: 100 };
+* // Yields: array of length four
+* const lengths = Rects.lengths(rect);
+* ```
+* @param rect
+* @returns
+*/
+const lengths$1 = (rect) => {
+	guardPositioned(rect, `rect`);
+	return edges$1(rect).map((l) => length(l));
+};
+
+//#endregion
+//#region ../geometry/src/rect/multiply.ts
+const multiplyOp = (a, b) => a * b;
+/**
+* @internal
+* @param a 
+* @param b 
+* @param c 
+* @returns 
+*/
+function multiply(a, b, c) {
+	return applyMerge(multiplyOp, a, b, c);
+}
+/**
+* Multiplies all components of `rect` by `amount`.
+* This includes x,y if present.
+* 
+* ```js
+* multiplyScalar({ width:10, height:20 }, 2); // { width:20, height: 40 }
+* multiplyScalar({ x: 1, y: 2, width:10, height:20 }, 2); // { x: 2, y: 4, width:20, height: 40 }
+* ```
+* 
+* Use {@link multiplyDim} to only multiply width & height.
+* @param rect
+* @param amount
+*/
+function multiplyScalar(rect, amount) {
+	return applyScalar(multiplyOp, rect, amount);
+}
+/**
+* Multiplies only the width/height of `rect`, leaving `x` and `y` as they are.
+* ```js
+* multiplyDim({ x:1,y:2,width:3,height:4 }, 2);
+* // Yields: { x:1, y:2, width:6, height: 8 }
+* ```
+* 
+* In comparison, {@link multiply} will also include x & y.
+* @param rect Rectangle
+* @param amount Amount to multiply by
+* @returns 
+*/
+function multiplyDim(rect, amount) {
+	return applyDim(multiplyOp, rect, amount);
+}
+
+//#endregion
+//#region ../geometry/src/rect/nearest.ts
+/**
+* If `p` is inside of `rect`, a copy of `p` is returned.
+* If `p` is outside of `rect`, a point is returned closest to `p` on the edge
+* of the rectangle.
+* @param rect 
+* @param p 
+* @returns 
+*/
+const nearestInternal = (rect, p) => {
+	let { x, y } = p;
+	if (x < rect.x) x = rect.x;
+	else if (x > rect.x + rect.width) x = rect.x + rect.width;
+	if (y < rect.y) y = rect.y;
+	else if (y > rect.y + rect.height) y = rect.y + rect.height;
+	return Object.freeze({
+		...p,
+		x,
+		y
+	});
+};
+
+//#endregion
+//#region ../geometry/src/rect/placeholder.ts
+const Placeholder = Object.freeze({
+	width: NaN,
+	height: NaN
+});
+const PlaceholderPositioned = Object.freeze({
+	x: NaN,
+	y: NaN,
+	width: NaN,
+	height: NaN
+});
+
+//#endregion
+//#region ../geometry/src/rect/perimeter.ts
+/**
+* Returns the perimeter of `rect` (ie. sum of all edges)
+*  * ```js
+* const rect = { width: 100, height: 100, x: 100, y: 100 };
+* Rects.perimeter(rect);
+* ```
+* @param rect
+* @returns
+*/
+const perimeter$4 = (rect) => {
+	guard$2(rect);
+	return rect.height + rect.height + rect.width + rect.width;
+};
+
+//#endregion
+//#region ../geometry/src/rect/normalise-by-rect.ts
+/**
+* Returns a function that divides numbers or points by the largest dimension of `rect`.
+* 
+* ```js
+* const d = dividerByLargestDimension({width:100,height:50});
+* d(50);                // 0.5 (50/100)
+* d({ x: 10, y: 20 }); // { x: 0.1, y: 0.2 }
+* ```
+* @param rect 
+* @returns 
+*/
+const dividerByLargestDimension = (rect) => {
+	const largest = Math.max(rect.width, rect.height);
+	return (value) => {
+		if (typeof value === `number`) return value / largest;
+		else if (isPoint3d(value)) return Object.freeze({
+			...value,
+			x: value.x / largest,
+			y: value.y / largest,
+			z: value.x / largest
+		});
+		else if (isPoint(value)) return Object.freeze({
+			...value,
+			x: value.x / largest,
+			y: value.y / largest
+		});
+		else throw new Error(`Param 'value' is neither number nor Point`);
 	};
 };
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/index.ts
-var visitors_exports = {};
-__export(visitors_exports, {
-	breadthLogic: () => breadthLogic,
-	columnLogic: () => columnLogic,
-	create: () => create,
-	depthLogic: () => depthLogic,
-	neighboursLogic: () => neighboursLogic,
-	randomContiguousLogic: () => randomContiguousLogic,
-	randomLogic: () => randomLogic,
-	rowLogic: () => rowLogic,
-	stepper: () => stepper,
-	visitByNeighbours: () => visitByNeighbours,
-	withLogic: () => withLogic
+//#region ../geometry/src/rect/random.ts
+/**
+* Returns a random positioned Rect on a 0..1 scale.
+* ```js
+* const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
+* ```
+*
+* A custom source of randomness can be provided:
+* ```js
+* import { Rects } from "@ixfx/geometry.js";
+* import { weightedSource } from "@ixfx/random.js"
+* const r = Rects.random(weightedSource(`quadIn`));
+* ```
+* @param rando
+* @returns
+*/
+const random$1 = (rando) => {
+	rando ??= Math.random;
+	return Object.freeze({
+		x: rando(),
+		y: rando(),
+		width: rando(),
+		height: rando()
+	});
+};
+/**
+* Returns a random point within a rectangle.
+*
+* By default creates a uniform distribution.
+*
+* ```js
+* const pt = randomPoint({width: 5, height: 10});
+* ```'
+* @param within Rectangle to generate a point within
+* @param options Options
+* @returns
+*/
+const randomPoint$2 = (within, options = {}) => {
+	const rand = options.randomSource ?? Math.random;
+	const margin = options.margin ?? {
+		x: 0,
+		y: 0
+	};
+	const x = rand() * (within.width - margin.x - margin.x);
+	const y = rand() * (within.height - margin.y - margin.y);
+	const pos = {
+		x: x + margin.x,
+		y: y + margin.y
+	};
+	return isPositioned(within) ? sum$1(pos, within) : Object.freeze(pos);
+};
+
+//#endregion
+//#region ../geometry/src/rect/subtract.ts
+const subtractOp = (a, b) => a - b;
+/**
+* Subtracts width/height from `a`.
+*
+* ```js
+* const rectA = { width: 100, height: 100 };
+* const rectB = { width: 200, height: 200 };
+*
+* // Yields: { width: -100, height: -100 }
+* Rects.subtract(rectA, rectB);
+* Rects.subtract(rectA, 200, 200);
+* ```
+* @param a
+* @param b
+* @param c
+* @returns
+*/
+function subtract(a, b, c) {
+	return applyMerge(subtractOp, a, b, c);
+}
+function subtractSize(a, b, c) {
+	const w = typeof b === `number` ? b : b.width;
+	const h = typeof b === `number` ? c : b.height;
+	if (h === void 0) throw new Error(`Expected height as third parameter`);
+	const r = {
+		...a,
+		width: a.width - w,
+		height: a.height - h
+	};
+	return r;
+}
+/**
+* Subtracts A-B. Applies to x, y, width & height
+* ```js
+* subtractOffset(
+*  { x:100, y:100, width:100, height:100 }, 
+*  { x:10, y:20,   width: 30, height: 40 }
+* );
+* // Yields: {x: 90, y: 80, width: 70, height: 60 }
+* ```
+* If either `a` or `b` are missing x & y, 0 is used.
+* @param a 
+* @param b 
+* @returns 
+*/
+function subtractOffset(a, b) {
+	let x = 0;
+	let y = 0;
+	if (isPositioned(a)) {
+		x = a.x;
+		y = a.y;
+	}
+	let xB = 0;
+	let yB = 0;
+	if (isPositioned(b)) {
+		xB = b.x;
+		yB = b.y;
+	}
+	return Object.freeze({
+		...a,
+		x: x - xB,
+		y: y - yB,
+		width: a.width - b.width,
+		height: a.height - b.height
+	});
+}
+
+//#endregion
+//#region ../geometry/src/rect/sum.ts
+const sumOp = (a, b) => a + b;
+/**
+* Sums width/height of `b` with `a` (ie: a + b), returning result.
+*
+* ```js
+* const rectA = { width: 100, height: 100 };
+* const rectB = { width: 200, height: 200 };
+*
+* // Yields: { width: 300, height: 300 }
+* Rects.sum(rectA, rectB);
+* Rects.sum(rectA, 200, 200);
+* ```
+* @param a
+* @param b
+* @param c
+* @returns
+*/
+function sum(a, b, c) {
+	return applyMerge(sumOp, a, b, c);
+}
+/**
+* Sums x,y,width,height of a+b.
+* ```js
+* sumOffset({x:100,y:100,width:100,height:100}, {x:10, y:20, width: 30, height: 40});
+* // Yields: {x: 110, y: 120, width: 130, height: 140 }
+* ```
+* If either `a` or `b` are missing x & y, 0 is used
+* @param a 
+* @param b 
+* @returns 
+*/
+function sumOffset(a, b) {
+	let x = 0;
+	let y = 0;
+	if (isPositioned(a)) {
+		x = a.x;
+		y = a.y;
+	}
+	let xB = 0;
+	let yB = 0;
+	if (isPositioned(b)) {
+		xB = b.x;
+		yB = b.y;
+	}
+	return Object.freeze({
+		...a,
+		x: x + xB,
+		y: y + yB,
+		width: a.width + b.width,
+		height: a.height + b.height
+	});
+}
+
+//#endregion
+//#region ../geometry/src/rect/to-array.ts
+/**
+* Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
+*
+* ```js
+* const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
+* // [10, 20, 100, 200]
+* const r2 = Rects.toArray({ width: 100, height: 200 });
+* // [100, 200]
+* ```
+* @param rect
+* @see fromNumbers
+*/
+function toArray(rect) {
+	if (isPositioned(rect)) return [
+		rect.x,
+		rect.y,
+		rect.width,
+		rect.height
+	];
+	else if (isRect(rect)) return [rect.width, rect.height];
+	else throw new Error(`Param 'rect' is not a rectangle. Got: ${JSON.stringify(rect)}`);
+}
+
+//#endregion
+//#region ../geometry/src/rect/index.ts
+var rect_exports = {};
+__export(rect_exports, {
+	Empty: () => Empty$2,
+	EmptyPositioned: () => EmptyPositioned,
+	Placeholder: () => Placeholder,
+	PlaceholderPositioned: () => PlaceholderPositioned,
+	applyDim: () => applyDim,
+	applyFields: () => applyFields,
+	applyMerge: () => applyMerge,
+	applyScalar: () => applyScalar,
+	area: () => area$4,
+	cardinal: () => cardinal,
+	center: () => center$1,
+	corners: () => corners$1,
+	distanceFromCenter: () => distanceFromCenter,
+	distanceFromExterior: () => distanceFromExterior,
+	divide: () => divide,
+	divideDim: () => divideDim,
+	divideScalar: () => divideScalar,
+	dividerByLargestDimension: () => dividerByLargestDimension,
+	edges: () => edges$1,
+	encompass: () => encompass,
+	fromCenter: () => fromCenter$2,
+	fromElement: () => fromElement,
+	fromNumbers: () => fromNumbers$1,
+	fromTopLeft: () => fromTopLeft,
+	getEdgeX: () => getEdgeX,
+	getEdgeY: () => getEdgeY,
+	getRectPositioned: () => getRectPositioned,
+	getRectPositionedParameter: () => getRectPositionedParameter,
+	guard: () => guard$2,
+	guardDim: () => guardDim,
+	guardPositioned: () => guardPositioned,
+	intersectsPoint: () => intersectsPoint,
+	isEmpty: () => isEmpty$3,
+	isEqual: () => isEqual$2,
+	isEqualSize: () => isEqualSize,
+	isIntersecting: () => isIntersecting$1,
+	isPlaceholder: () => isPlaceholder$3,
+	isPositioned: () => isPositioned,
+	isRect: () => isRect,
+	isRectPositioned: () => isRectPositioned,
+	lengths: () => lengths$1,
+	maxFromCorners: () => maxFromCorners,
+	multiply: () => multiply,
+	multiplyDim: () => multiplyDim,
+	multiplyScalar: () => multiplyScalar,
+	nearestInternal: () => nearestInternal,
+	perimeter: () => perimeter$4,
+	random: () => random$1,
+	randomPoint: () => randomPoint$2,
+	subtract: () => subtract,
+	subtractOffset: () => subtractOffset,
+	subtractSize: () => subtractSize,
+	sum: () => sum,
+	sumOffset: () => sumOffset,
+	toArray: () => toArray
+});
+
+//#endregion
+//#region ../geometry/src/triangle/create.ts
+/**
+* A triangle consisting of three empty points (Points.Empty)
+*/
+const Empty$1 = Object.freeze({
+	a: {
+		x: 0,
+		y: 0
+	},
+	b: {
+		x: 0,
+		y: 0
+	},
+	c: {
+		x: 0,
+		y: 0
+	}
 });
 /**
-* Logic types:
-* * 'row': left-to-right, top-to-bottom
-* * 'column': top-to-bottom, left-to-right
-* * 'neighbours': neighbours surrounding cell (eight)
-* * 'breadth`: breadth-first
-* * 'depth': depth-first
-* * 'random': any random cell in grid
-* * 'random-contiguous': any random cell neighbouring an already visited cell
-* @param type 
+* A triangle consisting of three placeholder points (Points.Placeholder)
+*/
+const Placeholder$1 = Object.freeze({
+	a: {
+		x: NaN,
+		y: NaN
+	},
+	b: {
+		x: NaN,
+		y: NaN
+	},
+	c: {
+		x: NaN,
+		y: NaN
+	}
+});
+/**
+* Returns a triangle anchored at `origin` with a given `length` and `angleRadian`.
+* The origin will be point `b` of the triangle, and the angle will be the angle for b.
+* @param origin Origin
+* @param length Length
+* @param angleRadian Angle
+* @returns
+*/
+const equilateralFromVertex = (origin, length$4 = 10, angleRadian$2 = Math.PI / 2) => {
+	if (!origin) origin = Object.freeze({
+		x: 0,
+		y: 0
+	});
+	const a = project(origin, length$4, Math.PI - -angleRadian$2 / 2);
+	const c = project(origin, length$4, Math.PI - angleRadian$2 / 2);
+	return {
+		a,
+		b: origin,
+		c
+	};
+};
+
+//#endregion
+//#region ../geometry/src/shape/arrow.ts
+/**
+* Returns the points forming an arrow.
+*
+* @example Create an arrow anchored by its tip at 100,100
+* ```js
+* const opts = {
+*  tailLength: 10,
+*  arrowSize: 20,
+*  tailThickness: 5,
+*  angleRadian: degreeToRadian(45)
+* }
+* const arrow = Shapes.arrow({x:100, y:100}, `tip`, opts); // Yields an array of points
+*
+* // Eg: draw points
+* Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
+* ```
+*
+* @param origin Origin of arrow
+* @param from Does origin describe the tip, tail or middle?
+* @param opts Options for arrow
+* @returns
+*/
+const arrow = (origin, from$1, opts = {}) => {
+	const tailLength = opts.tailLength ?? 10;
+	const tailThickness = opts.tailThickness ?? Math.max(tailLength / 5, 5);
+	const angleRadian$2 = opts.angleRadian ?? 0;
+	const arrowSize = opts.arrowSize ?? Math.max(tailLength / 5, 15);
+	const triAngle = Math.PI / 2;
+	let tri;
+	let tailPoints;
+	if (from$1 === `tip`) {
+		tri = equilateralFromVertex(origin, arrowSize, triAngle);
+		tailPoints = corners$1(fromTopLeft({
+			x: tri.a.x - tailLength,
+			y: origin.y - tailThickness / 2
+		}, tailLength, tailThickness));
+	} else if (from$1 === `middle`) {
+		const midX = tailLength + arrowSize / 2;
+		const midY = tailThickness / 2;
+		tri = equilateralFromVertex({
+			x: origin.x + arrowSize * 1.2,
+			y: origin.y
+		}, arrowSize, triAngle);
+		tailPoints = corners$1(fromTopLeft({
+			x: origin.x - midX,
+			y: origin.y - midY
+		}, tailLength + arrowSize, tailThickness));
+	} else {
+		tailPoints = corners$1(fromTopLeft({
+			x: origin.x,
+			y: origin.y - tailThickness / 2
+		}, tailLength, tailThickness));
+		tri = equilateralFromVertex({
+			x: origin.x + tailLength + arrowSize * .7,
+			y: origin.y
+		}, arrowSize, triAngle);
+	}
+	const arrow$1 = rotate([
+		tailPoints[0],
+		tailPoints[1],
+		tri.a,
+		tri.b,
+		tri.c,
+		tailPoints[2],
+		tailPoints[3]
+	], angleRadian$2, origin);
+	return arrow$1;
+};
+
+//#endregion
+//#region ../geometry/src/triangle/guard.ts
+/**
+* Throws an exception if the triangle is invalid
+* @param t
+* @param name
+*/
+const guard = (t, name = `t`) => {
+	if (t === void 0) throw new Error(`{$name} undefined`);
+	guard$1(t.a, name + `.a`);
+	guard$1(t.b, name + `.b`);
+	guard$1(t.c, name + `.c`);
+};
+/**
+* Returns true if the parameter appears to be a valid triangle
+* @param p
+* @returns
+*/
+const isTriangle = (p) => {
+	if (p === void 0) return false;
+	const tri = p;
+	if (!isPoint(tri.a)) return false;
+	if (!isPoint(tri.b)) return false;
+	if (!isPoint(tri.c)) return false;
+	return true;
+};
+/**
+* Returns true if triangle is empty
+* @param t
+* @returns
+*/
+const isEmpty$1 = (t) => isEmpty(t.a) && isEmpty(t.b) && isEmpty(t.c);
+/**
+* Returns true if triangle is a placeholder
+* @param t
+* @returns
+*/
+const isPlaceholder$1 = (t) => isPlaceholder(t.a) && isPlaceholder(t.b) && isPlaceholder(t.c);
+/**
+* Returns true if the two parameters have equal values
+* @param a
+* @param b
+* @returns
+*/
+const isEqual$1 = (a, b) => isEqual(a.a, b.a) && isEqual(a.b, b.b) && isEqual(a.c, b.c);
+
+//#endregion
+//#region ../geometry/src/triangle/centroid.ts
+/**
+* Returns simple centroid of triangle
+* @param t
+* @returns
+*/
+const centroid = (t) => {
+	guard(t);
+	const total = reduce([
+		t.a,
+		t.b,
+		t.c
+	], (p, accumulator) => ({
+		x: p.x + accumulator.x,
+		y: p.y + accumulator.y
+	}));
+	const div = {
+		x: total.x / 3,
+		y: total.y / 3
+	};
+	return div;
+};
+
+//#endregion
+//#region ../geometry/src/shape/etc.ts
+/**
+* Returns a random point within a shape.
+* `shape` can be {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
+* @param shape 
 * @param opts 
 * @returns 
 */
-const create = (type, opts = {}) => {
-	switch (type) {
-		case `random-contiguous`: return withLogic(randomContiguousLogic(), opts);
-		case `random`: return withLogic(randomLogic(), opts);
-		case `depth`: return withLogic(depthLogic(), opts);
-		case `breadth`: return withLogic(breadthLogic(), opts);
-		case `neighbours`: return withLogic(neighboursLogic(), opts);
-		case `row`: return withLogic(rowLogic(opts), opts);
-		case `column`: return withLogic(columnLogic(opts), opts);
-		default: throw new TypeError(`Param 'type' unknown. Value: ${type}`);
-	}
+const randomPoint = (shape, opts = {}) => {
+	if (isCirclePositioned(shape)) return randomPoint$1(shape, opts);
+	else if (isRectPositioned(shape)) return randomPoint$2(shape, opts);
+	throw new Error(`Unknown shape. Only CirclePositioned and RectPositioned are supported.`);
 };
-const withLogic = (logic, options = {}) => {
-	return (grid, optionsOverride = {}) => {
-		return visitByNeighbours(logic, grid, {
-			...options,
-			...optionsOverride
-		});
-	};
-};
-
-//#endregion
-//#region packages/geometry/src/grid/index.ts
-var grid_exports = {};
-__export(grid_exports, {
-	Array1d: () => array_1d_exports,
-	Array2d: () => array_2d_exports,
-	As: () => as_exports,
-	By: () => enumerators_exports,
-	Visit: () => visitors_exports,
-	allDirections: () => allDirections,
-	applyBounds: () => applyBounds,
-	asRectangles: () => asRectangles,
-	cellAtPoint: () => cellAtPoint,
-	cellEquals: () => cellEquals,
-	cellFromIndex: () => cellFromIndex,
-	cellKeyString: () => cellKeyString,
-	cellMiddle: () => cellMiddle,
-	crossDirections: () => crossDirections,
-	getLine: () => getLine,
-	getVectorFromCardinal: () => getVectorFromCardinal,
-	guardCell: () => guardCell,
-	guardGrid: () => guardGrid,
-	indexFromCell: () => indexFromCell,
-	inside: () => inside,
-	isCell: () => isCell,
-	isEqual: () => isEqual$1,
-	neighbourList: () => neighbourList,
-	neighbours: () => neighbours,
-	offset: () => offset,
-	offsetCardinals: () => offsetCardinals,
-	randomNeighbour: () => randomNeighbour,
-	rectangleForCell: () => rectangleForCell,
-	simpleLine: () => simpleLine,
-	toArray2d: () => toArray2d,
-	values: () => values
-});
-
-//#endregion
-//#region packages/geometry/src/bezier/index.ts
-var bezier_exports = {};
-__export(bezier_exports, {
-	cubic: () => cubic,
-	interpolator: () => interpolator,
-	isCubicBezier: () => isCubicBezier,
-	isQuadraticBezier: () => isQuadraticBezier,
-	quadratic: () => quadratic,
-	quadraticSimple: () => quadraticSimple,
-	quadraticToSvgString: () => quadraticToSvgString,
-	toPath: () => toPath$1
-});
 /**
-* Returns a new quadratic bezier with specified bend amount
+* Returns the center of a shape
+* Shape can be: rectangle, triangle, circle
+* @param shape
+* @returns
+*/
+const center$2 = (shape) => {
+	if (shape === void 0) return Object.freeze({
+		x: .5,
+		y: .5
+	});
+	else if (isRect(shape)) return center$1(shape);
+	else if (isTriangle(shape)) return centroid(shape);
+	else if (isCircle(shape)) return center(shape);
+	else throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
+};
+
+//#endregion
+//#region ../geometry/src/shape/is-intersecting.ts
+/**
+* Returns the intersection result between a and b.
+* `a` can be a {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
+* `b` can be as above or a {@link Point}.
+* @param a
+* @param b
+*/
+const isIntersecting$2 = (a, b) => {
+	if (isCirclePositioned(a)) return isIntersecting(a, b);
+	else if (isRectPositioned(a)) return isIntersecting$1(a, b);
+	throw new Error(`a or b are unknown shapes. a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
+};
+
+//#endregion
+//#region ../geometry/src/shape/starburst.ts
+/**
+* Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
 *
-* @param {QuadraticBezier} b Curve
-* @param {number} [bend=0] Bend amount, from -1 to 1
-* @returns {QuadraticBezier}
-*/
-/**
-* Creates a simple quadratic bezier with a specified amount of 'bend'.
-* Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
-* 
-* Use {@link interpolator} to calculate a point along the curve.
-* @param {Point} start Start of curve
-* @param {Point} end End of curve
-* @param {number} [bend=0] Bend amount, -1 to 1
-* @returns {QuadraticBezier}
-*/
-const quadraticSimple = (start, end, bend = 0) => {
-	if (Number.isNaN(bend)) throw new Error(`bend is NaN`);
-	if (bend < -1 || bend > 1) throw new Error(`Expects bend range of -1 to 1`);
-	const middle = interpolate$1(.5, start, end);
-	let target = middle;
-	if (end.y < start.y) target = bend > 0 ? {
-		x: Math.min(start.x, end.x),
-		y: Math.min(start.y, end.y)
-	} : {
-		x: Math.max(start.x, end.x),
-		y: Math.max(start.y, end.y)
-	};
-	else target = bend > 0 ? {
-		x: Math.max(start.x, end.x),
-		y: Math.min(start.y, end.y)
-	} : {
-		x: Math.min(start.x, end.x),
-		y: Math.max(start.y, end.y)
-	};
-	const handle = interpolate$1(Math.abs(bend), middle, target);
-	return quadratic(start, end, handle);
-};
-/**
-* Returns a relative point on a simple quadratic 
-* @param start Start
-* @param end  End
-* @param bend Bend (-1 to 1)
-* @param amt Amount
-* @returns Point
-*/
-/**
-* Interpolate cubic or quadratic bezier
-* ```js
-* const i = interpolator(myBezier);
-* 
-* // Get point at 50%
-* i(0.5); // { x, y }
 * ```
-* @param q 
+* // Generate a starburst with four spikes
+* const pts = starburst(4, 100, 200);
+* ```
+*
+* `points` of two produces a lozenge shape.
+* `points` of three produces a triangle shape.
+* `points` of five is the familiar 'star' shape.
+*
+* Note that the path will need to be closed back to the first point to enclose the shape.
+*
+* @example Create starburst and draw it. Note use of 'loop' flag to close the path
+* ```
+* const points = starburst(4, 100, 200);
+* Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
+* ```
+*
+* Options:
+* * initialAngleRadian: angle offset to begin from. This overrides the `-Math.PI/2` default.
+*
+* @param points Number of points in the starburst. Defaults to five, which produces a typical star
+* @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
+* @param outerRadius Outer radius. Maximum radius of a spike to origin
+* @param opts Options
+* @param origin Origin, or `{ x:0, y:0 }` by default.
+*/
+const starburst = (outerRadius, points = 5, innerRadius, origin = Empty, opts) => {
+	resultThrow(integerTest(points, `positive`, `points`));
+	const angle = Math.PI * 2 / points;
+	const angleHalf = angle / 2;
+	const initialAngle = opts?.initialAngleRadian ?? -Math.PI / 2;
+	if (innerRadius === void 0) innerRadius = outerRadius / 2;
+	let a = initialAngle;
+	const pts = [];
+	for (let index = 0; index < points; index++) {
+		const peak = toCartesian(outerRadius, a, origin);
+		const left = toCartesian(innerRadius, a - angleHalf, origin);
+		const right = toCartesian(innerRadius, a + angleHalf, origin);
+		pts.push(left, peak);
+		if (index + 1 < points) pts.push(right);
+		a += angle;
+	}
+	return pts;
+};
+
+//#endregion
+//#region ../geometry/src/shape/index.ts
+var shape_exports = {};
+__export(shape_exports, {
+	arrow: () => arrow,
+	center: () => center$2,
+	isIntersecting: () => isIntersecting$2,
+	randomPoint: () => randomPoint,
+	starburst: () => starburst
+});
+
+//#endregion
+//#region ../geometry/src/waypoint.ts
+var waypoint_exports = {};
+__export(waypoint_exports, {
+	fromPoints: () => fromPoints$1,
+	init: () => init
+});
+/**
+* Create from set of points, connected in order starting at array position 0.
+* @param waypoints 
+* @param opts 
 * @returns 
 */
-const interpolator = (q) => {
-	const bzr = isCubicBezier(q) ? new Bezier(q.a.x, q.a.y, q.cubic1.x, q.cubic1.y, q.cubic2.x, q.cubic2.y, q.b.x, q.b.y) : new Bezier(q.a, q.quadratic, q.b);
-	return (amount) => bzr.compute(amount);
+const fromPoints$1 = (waypoints, opts = {}) => {
+	const lines = joinPointsToLines(...waypoints);
+	return init(lines.map((l) => toPath(l)), opts);
 };
-const quadraticToSvgString = (start, end, handle) => [`M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`];
-const toPath$1 = (cubicOrQuadratic) => {
-	if (isCubicBezier(cubicOrQuadratic)) return cubicToPath(cubicOrQuadratic);
-	else if (isQuadraticBezier(cubicOrQuadratic)) return quadratictoPath(cubicOrQuadratic);
-	else throw new Error(`Unknown bezier type`);
-};
-const cubic = (start, end, cubic1, cubic2) => ({
-	a: Object.freeze(start),
-	b: Object.freeze(end),
-	cubic1: Object.freeze(cubic1),
-	cubic2: Object.freeze(cubic2)
-});
-const cubicToPath = (cubic$1) => {
-	const { a, cubic1, cubic2, b } = cubic$1;
-	const bzr = new Bezier(a, cubic1, cubic2, b);
-	return Object.freeze({
-		...cubic$1,
-		length: () => bzr.length(),
-		interpolate: (t) => bzr.compute(t),
-		nearest: (_) => {
-			throw new Error(`not implemented`);
-		},
-		bbox: () => {
-			const { x, y } = bzr.bbox();
-			const xSize = x.size;
-			const ySize = y.size;
-			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
-			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
-			return fromTopLeft({
-				x: x.min,
-				y: y.min
-			}, xSize, ySize);
-		},
-		relativePosition: (_point, _intersectionThreshold) => {
-			throw new Error(`Not implemented`);
-		},
-		distanceToPoint: (_point) => {
-			throw new Error(`Not implemented`);
-		},
-		toSvgString: () => [`brrup`],
-		kind: `bezier/cubic`
-	});
-};
-const quadratic = (start, end, handle) => ({
-	a: Object.freeze(start),
-	b: Object.freeze(end),
-	quadratic: Object.freeze(handle)
-});
-const quadratictoPath = (quadraticBezier) => {
-	const { a, b, quadratic: quadratic$1 } = quadraticBezier;
-	const bzr = new Bezier(a, quadratic$1, b);
-	return Object.freeze({
-		...quadraticBezier,
-		length: () => bzr.length(),
-		interpolate: (t) => bzr.compute(t),
-		nearest: (_) => {
-			throw new Error(`not implemented`);
-		},
-		bbox: () => {
-			const { x, y } = bzr.bbox();
-			const xSize = x.size;
-			const ySize = y.size;
-			if (xSize === void 0) throw new Error(`x.size not present on calculated bbox`);
-			if (ySize === void 0) throw new Error(`x.size not present on calculated bbox`);
-			return fromTopLeft({
-				x: x.min,
-				y: y.min
-			}, xSize, ySize);
-		},
-		distanceToPoint: (_point) => {
-			throw new Error(`Not implemented`);
-		},
-		relativePosition: (_point, _intersectionThreshold) => {
-			throw new Error(`Not implemented`);
-		},
-		toString: () => bzr.toString(),
-		toSvgString: () => quadraticToSvgString(a, b, quadratic$1),
-		kind: `bezier/quadratic`
-	});
+/**
+* Initialise
+* 
+* Options:
+* * maxDistanceFromLine: Distances greater than this are not matched. Default 0.1
+* @param paths 
+* @param opts 
+* @returns 
+*/
+const init = (paths, opts = {}) => {
+	const maxDistanceFromLine = opts.maxDistanceFromLine ?? .1;
+	const checkUnordered = (pt) => {
+		const results = paths.map((p, index) => {
+			const nearest$2 = p.nearest(pt);
+			const distance$2 = distance(pt, nearest$2);
+			const positionRelative = p.relativePosition(nearest$2, maxDistanceFromLine);
+			return {
+				positionRelative,
+				path: p,
+				index,
+				nearest: nearest$2,
+				distance: distance$2,
+				rank: Number.MAX_SAFE_INTEGER
+			};
+		});
+		const filtered = results.filter((v) => v.distance <= maxDistanceFromLine);
+		const sorted = sortByNumericProperty(filtered, `distance`);
+		for (let rank = 0; rank < sorted.length; rank++) sorted[rank].rank = rank;
+		return sorted;
+	};
+	return checkUnordered;
 };
 
 //#endregion
-//#region packages/geometry/src/ellipse.ts
+//#region ../geometry/src/circle-packing.ts
+var circle_packing_exports = {};
+__export(circle_packing_exports, { random: () => random });
+/**
+* Naive randomised circle packing.
+* [Algorithm by Taylor Hobbs](https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing)
+*/
+const random = (circles, container, opts = {}) => {
+	if (!Array.isArray(circles)) throw new Error(`Parameter 'circles' is not an array`);
+	const attempts = opts.attempts ?? 2e3;
+	const sorted = sortByNumericProperty(circles, `radius`);
+	const positionedCircles = [];
+	const willHit = (b, radius) => positionedCircles.some((v) => isIntersecting(v, b, radius));
+	while (sorted.length > 0) {
+		const circle = sorted.pop();
+		if (!circle) break;
+		const randomPointOpts = {
+			...opts,
+			margin: {
+				x: circle.radius,
+				y: circle.radius
+			}
+		};
+		for (let index = 0; index < attempts; index++) {
+			const position = randomPoint(container, randomPointOpts);
+			if (!willHit(position, circle.radius)) {
+				positionedCircles.push(Object.freeze({
+					...circle,
+					...position
+				}));
+				break;
+			}
+		}
+	}
+	return positionedCircles;
+};
+
+//#endregion
+//#region ../geometry/src/layout.ts
+var layout_exports = {};
+__export(layout_exports, { CirclePacking: () => circle_packing_exports });
+
+//#endregion
+//#region ../geometry/src/ellipse.ts
 var ellipse_exports = {};
-__export(ellipse_exports, { fromDegrees: () => fromDegrees$1 });
-const fromDegrees$1 = (radiusX, radiusY, rotationDeg = 0, startAngleDeg = 0, endAngleDeg = 360) => ({
+__export(ellipse_exports, { fromDegrees: () => fromDegrees });
+const fromDegrees = (radiusX, radiusY, rotationDeg = 0, startAngleDeg = 0, endAngleDeg = 360) => ({
 	radiusX,
 	radiusY,
 	rotation: degreeToRadian(rotationDeg),
@@ -8312,7 +8785,7 @@ const fromDegrees$1 = (radiusX, radiusY, rotationDeg = 0, startAngleDeg = 0, end
 });
 
 //#endregion
-//#region packages/geometry/src/curve-simplification.ts
+//#region ../geometry/src/curve-simplification.ts
 var curve_simplification_exports = {};
 __export(curve_simplification_exports, {
 	rdpPerpendicularDistance: () => rdpPerpendicularDistance,
@@ -8425,7 +8898,7 @@ const distanceFromPointToLine = (p, index, index_) => {
 };
 
 //#endregion
-//#region packages/geometry/src/quad-tree.ts
+//#region ../geometry/src/quad-tree.ts
 var quad_tree_exports = {};
 __export(quad_tree_exports, {
 	Direction: () => Direction,
@@ -8556,7 +9029,7 @@ var QuadTreeNode = class QuadTreeNode {
 };
 
 //#endregion
-//#region packages/geometry/src/scaler.ts
+//#region ../geometry/src/scaler.ts
 /**
 * Returns a set of scaler functions, to convert to and from ranges.
 *
@@ -8705,303 +9178,7 @@ const scaler = (scaleBy = `both`, defaultRect) => {
 };
 
 //#endregion
-//#region packages/geometry/src/arc/index.ts
-var arc_exports = {};
-__export(arc_exports, {
-	angularSize: () => angularSize,
-	bbox: () => bbox$2,
-	distanceCenter: () => distanceCenter,
-	fromCircle: () => fromCircle,
-	fromCircleAmount: () => fromCircleAmount,
-	fromDegrees: () => fromDegrees,
-	getStartEnd: () => getStartEnd,
-	guard: () => guard$2,
-	interpolate: () => interpolate,
-	isArc: () => isArc,
-	isEqual: () => isEqual,
-	isPositioned: () => isPositioned,
-	length: () => length$1,
-	point: () => point,
-	toLine: () => toLine,
-	toPath: () => toPath,
-	toSvg: () => toSvg
-});
-/**
-* Returns true if parameter is an arc
-* @param p Arc or number
-* @returns 
-*/
-const isArc = (p) => typeof p.startRadian !== `undefined` && typeof p.endRadian !== `undefined` && typeof p.clockwise !== `undefined`;
-/**
-* Returns true if parameter has a positioned (x,y) 
-* @param p Point, Arc or ArcPositiond
-* @returns 
-*/
-const isPositioned = (p) => typeof p.x !== `undefined` && typeof p.y !== `undefined`;
-/**
-* Returns an arc from degrees, rather than radians
-* @param radius Radius of arc
-* @param startDegrees Start angle in degrees
-* @param endDegrees End angle in degrees
-* @param origin Optional center of arc
-* @param clockwise Whether arc moves in clockwise direction
-* @returns Arc
-*/
-function fromDegrees(radius, startDegrees, endDegrees, clockwise, origin) {
-	const a = {
-		radius,
-		startRadian: degreeToRadian(startDegrees),
-		endRadian: degreeToRadian(endDegrees),
-		clockwise
-	};
-	if (isPoint(origin)) {
-		guard$1(origin);
-		const ap = {
-			...a,
-			x: origin.x,
-			y: origin.y
-		};
-		return Object.freeze(ap);
-	} else return Object.freeze(a);
-}
-/**
-* Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
-*
-* @param arc
-* @returns Line from start to end of arc
-*/
-const toLine = (arc) => fromPoints$1(point(arc, arc.startRadian), point(arc, arc.endRadian));
-/**
-* Return start and end points of `arc`.
-* `origin` will override arc's origin, if defined.
-* 
-* See also: 
-* * {@link point} - get point on arc by angle
-* * {@link interpolate} - get point on arc by interpolation percentage
-* @param arc 
-* @param origin 
-* @returns 
-*/
-const getStartEnd = (arc, origin) => {
-	guard$2(arc);
-	const start = point(arc, arc.startRadian, origin);
-	const end = point(arc, arc.endRadian, origin);
-	return [start, end];
-};
-/**
-* Calculates a coordinate on an arc, based on an angle.
-* `origin` will override arc's origin, if defined.
-* 
-* See also:
-* * {@link getStartEnd} - get start and end of arc
-* * {@link interpolate} - get point on arc by interpolation percentage
-* @param arc Arc
-* @param angleRadian Angle of desired coordinate 
-* @param origin Origin of arc (0,0 used by default)
-* @returns Coordinate
-*/
-const point = (arc, angleRadian$2, origin) => {
-	if (typeof origin === `undefined`) origin = isPositioned(arc) ? arc : {
-		x: 0,
-		y: 0
-	};
-	return {
-		x: Math.cos(angleRadian$2) * arc.radius + origin.x,
-		y: Math.sin(angleRadian$2) * arc.radius + origin.y
-	};
-};
-/**
-* Throws an error if arc instance is invalid
-* @param arc 
-*/
-const guard$2 = (arc) => {
-	if (typeof arc === `undefined`) throw new TypeError(`Arc is undefined`);
-	if (isPositioned(arc)) guard$1(arc, `arc`);
-	if (typeof arc.radius === `undefined`) throw new TypeError(`Arc radius is undefined (${JSON.stringify(arc)})`);
-	if (typeof arc.radius !== `number`) throw new TypeError(`Radius must be a number`);
-	if (Number.isNaN(arc.radius)) throw new TypeError(`Radius is NaN`);
-	if (arc.radius <= 0) throw new TypeError(`Radius must be greater than zero`);
-	if (typeof arc.startRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
-	if (typeof arc.endRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
-	if (Number.isNaN(arc.endRadian)) throw new TypeError(`Arc endRadian is NaN`);
-	if (Number.isNaN(arc.startRadian)) throw new TypeError(`Arc endRadian is NaN`);
-	if (typeof arc.clockwise === `undefined`) throw new TypeError(`Arc is missing 'clockwise field`);
-	if (arc.startRadian >= arc.endRadian) throw new TypeError(`startRadian is expected to be les than endRadian`);
-};
-/**
-* Compute relative position on arc.
-* 
-* See also:
-* * {@link getStartEnd} - get start and end of arc
-* * {@link point} - get point on arc by angle
-* @param arc Arc
-* @param amount Relative position 0-1
-* @param origin If arc is not positioned, pass in an origin
-* @param allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
-* @returns 
-*/
-const interpolate = (amount, arc, allowOverflow, origin) => {
-	guard$2(arc);
-	const overflowOk = allowOverflow ?? false;
-	if (!overflowOk) {
-		if (amount < 0) throw new Error(`Param 'amount' is under zero, and overflow is not allowed`);
-		if (amount > 1) throw new Error(`Param 'amount' is above 1 and overflow is not allowed`);
-	}
-	const span = angularSize(arc);
-	const rel = span * amount;
-	const angle = radiansSum(arc.startRadian, rel, arc.clockwise);
-	return point(arc, angle, origin);
-};
-/**
-* Returns the angular size of arc.
-* Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
-* @param arc 
-*/
-const angularSize = (arc) => radianArc(arc.startRadian, arc.endRadian, arc.clockwise);
-/**
-* Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.
-* @param arc 
-* @returns Path
-*/
-const toPath = (arc) => {
-	guard$2(arc);
-	return Object.freeze({
-		...arc,
-		nearest: (_point) => {
-			throw new Error(`not implemented`);
-		},
-		interpolate: (amount) => interpolate(amount, arc),
-		bbox: () => bbox$2(arc),
-		length: () => length$1(arc),
-		toSvgString: () => toSvg(arc),
-		relativePosition: (_point, _intersectionThreshold) => {
-			throw new Error(`Not implemented`);
-		},
-		distanceToPoint: (_point) => {
-			throw new Error(`Not implemented`);
-		},
-		kind: `arc`
-	});
-};
-/**
-* Returns an arc based on a circle using start and end angles.
-* If you don't have the end angle, but rather the size of the arc, use {@link fromCircleAmount}
-* @param circle Circle
-* @param startRadian Start radian
-* @param endRadian End radian
-* @param clockwise Whether arc goes in a clockwise direction (default: true)
-* @returns 
-*/
-const fromCircle = (circle, startRadian, endRadian, clockwise = true) => {
-	const a = Object.freeze({
-		...circle,
-		endRadian,
-		startRadian,
-		clockwise
-	});
-	return a;
-};
-/**
-* Returns an arc based on a circle, a start angle, and the size of the arc.
-* See {@link fromCircle} if you already have start and end angles.
-* @param circle Circle to base off
-* @param startRadian Starting angle
-* @param sizeRadian Size of arc
-* @param clockwise Whether arc moves in clockwise direction (default: true)
-* @returns 
-*/
-const fromCircleAmount = (circle, startRadian, sizeRadian, clockwise = true) => {
-	const endRadian = radiansSum(startRadian, sizeRadian, clockwise);
-	return fromCircle(circle, startRadian, endRadian);
-};
-/**
-* Calculates the length of the arc
-* @param arc 
-* @returns Length
-*/
-const length$1 = (arc) => piPi * arc.radius * ((arc.startRadian - arc.endRadian) / piPi);
-/**
-* Calculates a {@link Rect} bounding box for arc.
-* @param arc 
-* @returns Rectangle encompassing arc.
-*/
-const bbox$2 = (arc) => {
-	if (isPositioned(arc)) {
-		const middle = interpolate(.5, arc);
-		const asLine = toLine(arc);
-		return bbox$1(middle, asLine.a, asLine.b);
-	} else return {
-		width: arc.radius * 2,
-		height: arc.radius * 2
-	};
-};
-/**
-* Creates an SV path snippet for arc
-* @returns 
-*/
-const toSvg = (a, b, c, d, e) => {
-	if (isArc(a)) if (isPositioned(a)) if (isPoint(b)) return toSvgFull(b, a.radius, a.startRadian, a.endRadian, c);
-	else return toSvgFull(a, a.radius, a.startRadian, a.endRadian, b);
-	else return isPoint(b) ? toSvgFull(b, a.radius, a.startRadian, a.endRadian, c) : toSvgFull({
-		x: 0,
-		y: 0
-	}, a.radius, a.startRadian, a.endRadian);
-	else {
-		if (c === void 0) throw new Error(`startAngle undefined`);
-		if (d === void 0) throw new Error(`endAngle undefined`);
-		if (isPoint(a)) if (typeof b === `number` && typeof c === `number` && typeof d === `number`) return toSvgFull(a, b, c, d, e);
-		else throw new TypeError(`Expected (point, number, number, number). Missing a number param.`);
-		else throw new Error(`Expected (point, number, number, number). Missing first point.`);
-	}
-};
-const toSvgFull = (origin, radius, startRadian, endRadian, opts) => {
-	if (opts === void 0 || typeof opts !== `object`) opts = {};
-	const isFullCircle = endRadian - startRadian === 360;
-	const start = toCartesian(radius, endRadian - .01, origin);
-	const end = toCartesian(radius, startRadian, origin);
-	const { largeArc = false, sweep = false } = opts;
-	const d = [`
-    M ${start.x} ${start.y}
-    A ${radius} ${radius} 0 ${largeArc ? `1` : `0`} ${sweep ? `1` : `0`} ${end.x} ${end.y},
-  `];
-	if (isFullCircle) d.push(`z`);
-	return d;
-};
-/**
-* Calculates the distance between the centers of two arcs
-* @param a
-* @param b 
-* @returns Distance 
-*/
-const distanceCenter = (a, b) => distance(a, b);
-/**
-* Returns true if the two arcs have the same values
-*
-* ```js
-* const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
-* const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
-* arcA === arcB; // false, because object identities are different
-* Arcs.isEqual(arcA, arcB); // true, because values are identical
-* ```
-* @param a
-* @param b
-* @returns {boolean}
-*/
-const isEqual = (a, b) => {
-	if (a.radius !== b.radius) return false;
-	if (a.endRadian !== b.endRadian) return false;
-	if (a.startRadian !== b.startRadian) return false;
-	if (a.clockwise !== b.clockwise) return false;
-	if (isPositioned(a) && isPositioned(b)) {
-		if (a.x !== b.x) return false;
-		if (a.y !== b.y) return false;
-		if (a.z !== b.z) return false;
-	} else if (!isPositioned(a) && !isPositioned(b)) {} else return false;
-	return true;
-};
-
-//#endregion
-//#region packages/geometry/src/surface-points.ts
+//#region ../geometry/src/surface-points.ts
 var surface_points_exports = {};
 __export(surface_points_exports, {
 	circleRings: () => circleRings,
@@ -9158,7 +9335,7 @@ function* sphereFibonacci(samples = 100, rotationRadians = 0, sphere) {
 }
 
 //#endregion
-//#region packages/geometry/src/triangle/angles.ts
+//#region ../geometry/src/triangle/angles.ts
 /**
 * Return the three interior angles of the triangle, in radians.
 * @param t
@@ -9183,7 +9360,7 @@ const anglesDegrees = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/edges.ts
+//#region ../geometry/src/triangle/edges.ts
 /**
 * Returns the edges (ie sides) of the triangle as an array of lines
 * @param t
@@ -9195,7 +9372,7 @@ const edges = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/area.ts
+//#region ../geometry/src/triangle/area.ts
 /**
 * Calculates the area of a triangle
 * @param t
@@ -9209,7 +9386,7 @@ const area$3 = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/barycentric.ts
+//#region ../geometry/src/triangle/barycentric.ts
 /**
 * Returns the [Barycentric coordinate](https://en.wikipedia.org/wiki/Barycentric_coordinate_system) of a point within a triangle
 *
@@ -9255,7 +9432,7 @@ const barycentricToCartestian = (t, bc) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/bbox.ts
+//#region ../geometry/src/triangle/bbox.ts
 /**
 * Returns the bounding box that encloses the triangle.
 * @param t
@@ -9278,7 +9455,7 @@ const bbox = (t, inflation = 0) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/corners.ts
+//#region ../geometry/src/triangle/corners.ts
 /**
 * Returns the corners (vertices) of the triangle as an array of points
 * @param t
@@ -9294,7 +9471,7 @@ const corners = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/from.ts
+//#region ../geometry/src/triangle/from.ts
 /**
 * Returns an equilateral triangle centered at the origin.
 *
@@ -9351,7 +9528,7 @@ const fromPoints = (points) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/perimeter.ts
+//#region ../geometry/src/triangle/perimeter.ts
 /**
 * Calculates perimeter of a triangle
 * @param t
@@ -9363,7 +9540,7 @@ const perimeter$3 = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/inner-circle.ts
+//#region ../geometry/src/triangle/inner-circle.ts
 /**
 * Returns the largest circle enclosed by triangle `t`.
 * @param t
@@ -9380,7 +9557,7 @@ const innerCircle = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/intersects.ts
+//#region ../geometry/src/triangle/intersects.ts
 /**
 * Returns true if point is within or on the boundary of triangle
 * @param t
@@ -9396,7 +9573,7 @@ const intersectsPoint$1 = (t, a, b) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/lengths.ts
+//#region ../geometry/src/triangle/lengths.ts
 /**
 * Returns the lengths of the triangle sides
 * @param t
@@ -9412,7 +9589,7 @@ const lengths = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/kinds.ts
+//#region ../geometry/src/triangle/kinds.ts
 /**
 * Returns true if it is an equilateral triangle
 * @param t
@@ -9461,7 +9638,7 @@ const isAcute = (t) => !angles(t).some((v) => v >= Math.PI / 2);
 const isObtuse = (t) => angles(t).some((v) => v > Math.PI / 2);
 
 //#endregion
-//#region packages/geometry/src/triangle/math.ts
+//#region ../geometry/src/triangle/math.ts
 /**
 * Applies `fn` to each of a triangle's corner points, returning the result.
 *
@@ -9487,7 +9664,7 @@ const apply = (t, fn) => Object.freeze({
 });
 
 //#endregion
-//#region packages/geometry/src/triangle/outer-circle.ts
+//#region ../geometry/src/triangle/outer-circle.ts
 /**
 * Returns the largest circle touching the corners of triangle `t`.
 * @param t
@@ -9504,7 +9681,7 @@ const outerCircle = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/rotate.ts
+//#region ../geometry/src/triangle/rotate.ts
 /**
 * Returns a triangle that is rotated by `angleRad`. By default it rotates
 * around its center but an arbitrary `origin` point can be provided.
@@ -9556,7 +9733,7 @@ const rotateByVertex = (triangle, amountRadian, vertex = `b`) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/to.ts
+//#region ../geometry/src/triangle/to.ts
 /**
 * Returns the coordinates of triangle in a flat array form:
 * [xA, yA, xB, yB, xC, yC]
@@ -9576,7 +9753,7 @@ const toFlatArray = (t) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/equilateral.ts
+//#region ../geometry/src/triangle/equilateral.ts
 var equilateral_exports = {};
 __export(equilateral_exports, {
 	area: () => area$2,
@@ -9720,7 +9897,7 @@ const circumcircle$2 = (t) => ({ radius: Math.sqrt(3) / 3 * resolveLength(t) });
 const incircle$2 = (t) => ({ radius: Math.sqrt(3) / 6 * resolveLength(t) });
 
 //#endregion
-//#region packages/geometry/src/triangle/right.ts
+//#region ../geometry/src/triangle/right.ts
 var right_exports = {};
 __export(right_exports, {
 	adjacentFromHypotenuse: () => adjacentFromHypotenuse,
@@ -10106,7 +10283,7 @@ const hypotenuseFromOpposite = (angleRadian$2, opposite) => opposite / Math.sin(
 const hypotenuseFromAdjacent = (angleRadian$2, adjacent) => adjacent / Math.cos(angleRadian$2);
 
 //#endregion
-//#region packages/geometry/src/triangle/isosceles.ts
+//#region ../geometry/src/triangle/isosceles.ts
 var isosceles_exports = {};
 __export(isosceles_exports, {
 	apexAngle: () => apexAngle,
@@ -10273,10 +10450,10 @@ const fromC = (t, origin) => {
 };
 
 //#endregion
-//#region packages/geometry/src/triangle/index.ts
+//#region ../geometry/src/triangle/index.ts
 var triangle_exports = {};
 __export(triangle_exports, {
-	Empty: () => Empty$2,
+	Empty: () => Empty$1,
 	Equilateral: () => equilateral_exports,
 	Isosceles: () => isosceles_exports,
 	Placeholder: () => Placeholder$1,
@@ -10300,7 +10477,7 @@ __export(triangle_exports, {
 	intersectsPoint: () => intersectsPoint$1,
 	isAcute: () => isAcute,
 	isEmpty: () => isEmpty$1,
-	isEqual: () => isEqual$4,
+	isEqual: () => isEqual$1,
 	isEquilateral: () => isEquilateral,
 	isIsosceles: () => isIsosceles,
 	isOblique: () => isOblique,

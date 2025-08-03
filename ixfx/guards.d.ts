@@ -1,4 +1,4 @@
-//#region packages/guards/src/types.d.ts
+//#region ../guards/src/types.d.ts
 type NumberGuardRange =
 /**
  * No range checking
@@ -24,7 +24,7 @@ type ResultOrFunction = Result<any, any> | (() => undefined | Result<any, any>);
 type Result<TValue, TError> = ResultOk<TValue> | ResultError<TError>;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/guards/src/arrays.d.ts
+//#region ../guards/src/arrays.d.ts
 /**
  * Throws an error if parameter is not an array
  * @param value
@@ -46,18 +46,18 @@ declare const arrayIndexTest: <V>(array: ArrayLike<V>, index: number, name?: str
 declare const arrayStringsTest: (value: unknown) => Result<string[], string>;
 //# sourceMappingURL=arrays.d.ts.map
 //#endregion
-//#region packages/guards/src/empty.d.ts
+//#region ../guards/src/empty.d.ts
 declare const nullUndefTest: <TValue>(value: TValue, parameterName?: string) => Result<TValue, string>;
 declare const isDefined: <T>(argument: T | undefined) => argument is T;
 //# sourceMappingURL=empty.d.ts.map
 //#endregion
-//#region packages/guards/src/function.d.ts
+//#region ../guards/src/function.d.ts
 declare const isFunction: (object: unknown) => object is (...args: any[]) => any;
 declare const functionTest: (value: unknown, parameterName?: string) => Result<Function, string>;
 //# sourceMappingURL=function.d.ts.map
 
 //#endregion
-//#region packages/guards/src/numbers.d.ts
+//#region ../guards/src/numbers.d.ts
 /**
  * Returns true if `x` is a power of two
  * @param x
@@ -184,7 +184,7 @@ declare const isInteger: (value: number | string) => boolean;
 declare const numberInclusiveRangeTest: (value: number | undefined, min: number, max: number, parameterName?: string) => Result<number, string>;
 //# sourceMappingURL=numbers.d.ts.map
 //#endregion
-//#region packages/guards/src/object.d.ts
+//#region ../guards/src/object.d.ts
 /**
  * Tests_if `value` is a plain object
  *
@@ -205,7 +205,7 @@ declare const testPlainObject: (value: unknown) => Result<object, string>;
 declare const testPlainObjectOrPrimitive: (value: unknown) => Result<object | bigint | number | string | boolean, string>;
 //# sourceMappingURL=object.d.ts.map
 //#endregion
-//#region packages/guards/src/range.d.ts
+//#region ../guards/src/range.d.ts
 type ExpectedOpts = {
   minInclusive?: number;
   maxInclusive?: number;
@@ -224,7 +224,7 @@ declare const rangeIntegerTest: (v: Iterable<number>, expected: ExpectedOpts) =>
 declare const rangeTest: (numbers: Iterable<number>, expected: ExpectedOpts) => Result<Iterable<number>, string>;
 //# sourceMappingURL=range.d.ts.map
 //#endregion
-//#region packages/guards/src/result.d.ts
+//#region ../guards/src/result.d.ts
 declare const getErrorMessage: (ex: unknown) => string;
 /**
  * Throws an error if any result is a failure.
@@ -292,7 +292,7 @@ declare const resultsCollate: <TValue, TError>(...results: ResultOrFunction[]) =
 declare const resultWithFail: <TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void) => void;
 //# sourceMappingURL=result.d.ts.map
 //#endregion
-//#region packages/guards/src/string.d.ts
+//#region ../guards/src/string.d.ts
 type StringGuardRange = `` | `non-empty`;
 /**
  * Throws an error if parameter is not an string

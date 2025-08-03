@@ -1,6 +1,7 @@
-import { arrayTest, integerTest, numberTest, resultThrow } from "./src-Bo4oKRxs.js";
+import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
+import { arrayTest } from "./arrays-yH_qBmt0.js";
 
-//#region packages/random/src/weighted-index.ts
+//#region ../random/src/weighted-index.ts
 /**
 * Returns a random number from 0..weightings.length, distributed by the weighting values.
 * 
@@ -28,7 +29,7 @@ const weightedIndex = (weightings, rand = Math.random) => {
 };
 
 //#endregion
-//#region packages/random/src/arrays.ts
+//#region ../random/src/arrays.ts
 /**
 * Returns a random array index.
 *
@@ -152,7 +153,7 @@ const shuffle = (dataToShuffle, rand = Math.random) => {
 };
 
 //#endregion
-//#region packages/random/src/chance.ts
+//#region ../random/src/chance.ts
 /**
 * Chance of returning `a` or `b`, based on threshold `p`.
 * 
@@ -185,7 +186,7 @@ const chance = (p, a, b, randomSource) => {
 };
 
 //#endregion
-//#region packages/random/src/float-source.ts
+//#region ../random/src/float-source.ts
 /**
 * Source for random bipolar values
 * ```js
@@ -290,7 +291,7 @@ const floatSource = (maxOrOptions = 1) => {
 const float = (maxOrOptions = 1) => floatSource(maxOrOptions)();
 
 //#endregion
-//#region packages/random/src/non-zero.ts
+//#region ../random/src/non-zero.ts
 /**
 * Keeps generating a random number until
 * it's not 0
@@ -304,7 +305,7 @@ const calculateNonZero = (source = Math.random) => {
 };
 
 //#endregion
-//#region packages/random/src/gaussian.ts
+//#region ../random/src/gaussian.ts
 /**
 * Returns a random number with gaussian (ie. bell-curved) distribution
 * 
@@ -368,7 +369,7 @@ const gaussianSource = (skew = 1) => {
 };
 
 //#endregion
-//#region packages/random/src/guid.ts
+//#region ../random/src/guid.ts
 /**
 * Generates a six-digit roughly unique id
 * ```js
@@ -387,7 +388,7 @@ const shortGuid = (options = {}) => {
 };
 
 //#endregion
-//#region packages/random/src/util/count.ts
+//#region ../random/src/util/count.ts
 /**
 * Yields `amount` integers, counting by one from zero. If a negative amount is used,
 * count decreases. If `offset` is provided, this is added to the return result.
@@ -431,7 +432,7 @@ function* count(amount, offset = 0) {
 }
 
 //#endregion
-//#region packages/random/src/integer.ts
+//#region ../random/src/integer.ts
 /**
 * Returns a function that produces a random integer between `max` (exclusive) and 0 (inclusive)
 * Use {@link integer} if you want a random number directly.
@@ -557,7 +558,7 @@ function* integerUniqueGen(maxOrOptions) {
 }
 
 //#endregion
-//#region packages/random/src/seeded.ts
+//#region ../random/src/seeded.ts
 /**
 * Reproducible random values using the Merseene Twister algorithm.
 * With the same seed value, it produces the same series of random values.
@@ -634,7 +635,7 @@ function mersenneTwister(seed) {
 }
 
 //#endregion
-//#region packages/random/src/string.ts
+//#region ../random/src/string.ts
 /**
 * Returns a string of random letters and numbers of a given `length`.
 *
@@ -655,7 +656,7 @@ const string = (lengthOrOptions = 5) => {
 };
 
 //#endregion
-//#region packages/random/src/time.ts
+//#region ../random/src/time.ts
 /**
 * Returns a random number of minutes, with a unit of milliseconds.
 * 
@@ -780,7 +781,7 @@ const secondsMsSource = (maxSecondsOrOptions) => {
 const secondsMs = (maxSecondsOrOptions) => secondsMsSource(maxSecondsOrOptions)();
 
 //#endregion
-//#region packages/random/src/util/clamp.ts
+//#region ../random/src/util/clamp.ts
 function clamp(v, min = 0, max = 1) {
 	if (v < min) return min;
 	if (v > max) return max;
@@ -788,7 +789,7 @@ function clamp(v, min = 0, max = 1) {
 }
 
 //#endregion
-//#region packages/random/src/weighted-integer.ts
+//#region ../random/src/weighted-integer.ts
 /**
 * Random integer, weighted according to an easing function.
 * Number will be inclusive of `min` and below `max`.
@@ -853,7 +854,7 @@ const weightedIntegerSource = (options) => {
 const weightedInteger = (options) => weightedIntegerSource(options)();
 
 //#endregion
-//#region packages/random/src/weighted.ts
+//#region ../random/src/weighted.ts
 /***
 * Returns a random number, 0..1, weighted by a given easing function.
 * See @ixfx/modulation.weighted to use a named easing function.

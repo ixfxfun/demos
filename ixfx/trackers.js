@@ -1,14 +1,16 @@
-import "./src-Bo4oKRxs.js";
-import "./is-primitive-BD8Wwhed.js";
-import "./interval-type-Bu6U9yES.js";
-import { getOrGenerate } from "./basic-BcTIVreK.js";
-import { SimpleEventEmitter } from "./src-IqHxJtRK.js";
-import { keyValueSorter } from "./key-value-DZNL5nwk.js";
-import "./resolve-core-ibINXx_1.js";
-import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-LtkApSyv.js";
-import { timeout } from "./src-D8qEf6yn.js";
+import "./numbers-C359_5A6.js";
+import "./to-string-Dg1sJUf1.js";
+import "./comparers-BtlnApnB.js";
+import "./is-equal-edylSnsn.js";
+import { getOrGenerate } from "./maps-a_ogDHUT.js";
+import { keyValueSorter } from "./key-value-DKJIoES-.js";
+import "./interval-type-Y39UZyyQ.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import { maxFast, minFast, totalFast } from "./numeric-arrays-DwffyOZ3.js";
+import { numberArrayCompute } from "./number-array-compute-CL2ixuue.js";
+import { timeout } from "./timeout-CUZsKULj.js";
 
-//#region packages/trackers/src/frequency-mutable.ts
+//#region ../trackers/src/frequency-mutable.ts
 /**
 * Frequency keeps track of how many times a particular value is seen, but
 * unlike a Map it does not store the data. By default compares
@@ -165,7 +167,7 @@ var FrequencyTracker = class extends SimpleEventEmitter {
 const frequency = (keyString) => new FrequencyTracker(keyString);
 
 //#endregion
-//#region packages/trackers/src/tracker-base.ts
+//#region ../trackers/src/tracker-base.ts
 /**
 * Base tracker class
 */
@@ -226,7 +228,7 @@ var TrackerBase = class {
 };
 
 //#endregion
-//#region packages/trackers/src/primitive-tracker.ts
+//#region ../trackers/src/primitive-tracker.ts
 var PrimitiveTracker = class extends TrackerBase {
 	values;
 	timestamps;
@@ -308,7 +310,7 @@ var PrimitiveTracker = class extends TrackerBase {
 };
 
 //#endregion
-//#region packages/trackers/src/number-tracker.ts
+//#region ../trackers/src/number-tracker.ts
 var NumberTracker = class extends PrimitiveTracker {
 	total = 0;
 	min = Number.MAX_SAFE_INTEGER;
@@ -425,7 +427,7 @@ var NumberTracker = class extends PrimitiveTracker {
 const number = (opts = {}) => new NumberTracker(opts);
 
 //#endregion
-//#region packages/trackers/src/interval-tracker.ts
+//#region ../trackers/src/interval-tracker.ts
 /**
 * A `Tracker` that tracks interval between calls to `mark()`
 */
@@ -469,7 +471,7 @@ var IntervalTracker = class extends NumberTracker {
 const interval = (options) => new IntervalTracker(options);
 
 //#endregion
-//#region packages/trackers/src/rate-tracker.ts
+//#region ../trackers/src/rate-tracker.ts
 /**
 * Tracks the rate of events.
 * It's also able to compute the min,max and average interval between events.
@@ -592,7 +594,7 @@ var RateTracker = class {
 const rate = (opts = {}) => new RateTracker(opts);
 
 //#endregion
-//#region packages/trackers/src/object-tracker.ts
+//#region ../trackers/src/object-tracker.ts
 /**
 * A tracked value of type `V`.
 */
@@ -675,7 +677,7 @@ var ObjectTracker = class extends TrackerBase {
 };
 
 //#endregion
-//#region packages/trackers/src/tracked-value.ts
+//#region ../trackers/src/tracked-value.ts
 /**
 * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
 * must extend from `TrackerBase<V>`, eg `PointTracker`.

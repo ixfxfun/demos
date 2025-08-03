@@ -1,12 +1,20 @@
-import { __export } from "./chunk-Cn1u12Og.js";
-import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-Bo4oKRxs.js";
-import { isPrimitive } from "./is-primitive-BD8Wwhed.js";
-import { intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-Bu6U9yES.js";
-import { addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./basic-BcTIVreK.js";
-import { SimpleEventEmitter, defaultKeyer, last as last$1, last$1 as last, map, max, min, toStringAbbreviate } from "./src-IqHxJtRK.js";
-import { containsDuplicateInstances, without } from "./src-LtkApSyv.js";
+import { __export } from "./chunk-51aI8Tpl.js";
+import { integerTest, numberTest, resultIsError, resultThrow } from "./numbers-C359_5A6.js";
+import { isPrimitive, nullUndefTest } from "./is-primitive-BDz6cwtd.js";
+import { stringTest } from "./string-BeUdcb0y.js";
+import { toStringDefault } from "./to-string-Dg1sJUf1.js";
+import "./comparers-BtlnApnB.js";
+import { isEqualDefault, isEqualValueIgnoreOrder } from "./is-equal-edylSnsn.js";
+import { addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-a_ogDHUT.js";
+import { defaultKeyer } from "./default-keyer-CnxB2rd_.js";
+import { toStringAbbreviate } from "./text-UM1t_CE6.js";
+import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
+import "./sleep-C2hKDgCi.js";
+import { last as last$1, last$1 as last, map, max, min } from "./src-ibi35IYv.js";
+import { isEqualDefault as isEqualDefault$1 } from "./is-equal-y9du2FWU.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
 
-//#region packages/collections/src/circular-array.ts
+//#region ../collections/src/circular-array.ts
 /**
 * A circular array keeps a maximum number of values, overwriting older values as needed. Immutable.
 *
@@ -63,7 +71,75 @@ var CircularArray = class CircularArray extends Array {
 };
 
 //#endregion
-//#region packages/collections/src/queue/queue-fns.ts
+//#region ../arrays/dist/src/contains.js
+/**
+* Returns _true_ if array contains duplicate instances based on `===` equality checking
+* Use {@link containsDuplicateValues} if you'd rather compare by value.
+* @param array
+* @returns
+*/
+const containsDuplicateInstances = (array) => {
+	if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
+	for (let index = 0; index < array.length; index++) for (let x = 0; x < array.length; x++) {
+		if (index === x) continue;
+		if (array[index] === array[x]) return true;
+	}
+	return false;
+};
+
+//#endregion
+//#region ../arrays/dist/src/without.js
+/**
+* Returns an array with value(s) omitted.
+*
+* If value is not found, result will be a copy of input.
+* Value checking is completed via the provided `comparer` function.
+* By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
+*
+* @example
+* ```js
+* const data = [100, 20, 40];
+* const filtered = without(data, 20); // [100, 40]
+* ```
+*
+* @example Using value-based comparison
+* ```js
+* const data = [{ name: `Alice` }, { name:`Sam` }];
+*
+* // This wouldn't work as expected, because the default comparer uses instance,
+* // not value:
+* without(data, { name: `Alice` });
+*
+* // So instead we can use a value comparer:
+* without(data, { name:`Alice` }, isEqualValueDefault);
+* ```
+*
+* @example Use a function
+* ```js
+* const data = [ { name: `Alice` }, { name:`Sam` }];
+* without(data, { name:`ALICE` }, (a, b) => {
+*  return (a.name.toLowerCase() === b.name.toLowerCase());
+* });
+* ```
+*
+* Consider {@link remove} to remove an item by index.
+*
+* @typeParam V - Type of array items
+* @param sourceArray Source array
+* @param toRemove Value(s) to remove
+* @param comparer Comparison function. If not provided `isEqualDefault` is used, which compares using `===`
+* @return Copy of array without value.
+*/
+const without = (sourceArray, toRemove, comparer = isEqualDefault$1) => {
+	if (Array.isArray(toRemove)) {
+		const returnArray = [];
+		for (const source of sourceArray) if (!toRemove.some((v) => comparer(source, v))) returnArray.push(source);
+		return returnArray;
+	} else return sourceArray.filter((v) => !comparer(v, toRemove));
+};
+
+//#endregion
+//#region ../collections/src/queue/queue-fns.ts
 const debug = (opts, message) => {
 	opts.debug && console.log(`queue:${message}`);
 };
@@ -130,7 +206,7 @@ const isFull = (opts, queue) => {
 };
 
 //#endregion
-//#region packages/collections/src/queue/queue-mutable.ts
+//#region ../collections/src/queue/queue-mutable.ts
 /**
 * Mutable queue that fires events when manipulated.
 * 
@@ -273,7 +349,7 @@ function mutable$1(options = {}, ...startingItems) {
 }
 
 //#endregion
-//#region packages/collections/src/stack/StackFns.ts
+//#region ../collections/src/stack/StackFns.ts
 const trimStack = (opts, stack, toAdd) => {
 	const potentialLength = stack.length + toAdd.length;
 	const policy = opts.discardPolicy ?? `additions`;
@@ -321,7 +397,7 @@ const isFull$1 = (opts, stack) => {
 };
 
 //#endregion
-//#region packages/collections/src/stack/StackMutable.ts
+//#region ../collections/src/stack/StackMutable.ts
 /**
 * Creates a stack. Mutable. Use {@link StackImmutable} for an immutable alternative.
 *
@@ -407,7 +483,7 @@ var StackMutable = class {
 const mutable$3 = (opts = {}, ...startingItems) => new StackMutable({ ...opts }, [...startingItems]);
 
 //#endregion
-//#region packages/collections/src/tree/compare.ts
+//#region ../collections/src/tree/compare.ts
 const compare = (a, b, eq = isEqualValueIgnoreOrder, parent) => {
 	const valueEqual = valueOrIdentityEqual(a, b, eq);
 	const childrenCompare = compareChildren(a, b, eq);
@@ -499,7 +575,7 @@ const toStringDiff = (n, indent) => {
 };
 
 //#endregion
-//#region packages/collections/src/tree/tree-mutable.ts
+//#region ../collections/src/tree/tree-mutable.ts
 var tree_mutable_exports = {};
 __export(tree_mutable_exports, {
 	add: () => add$1,
@@ -1007,7 +1083,7 @@ function* followValue$1(root$1, continuePredicate, depth = 1) {
 }
 
 //#endregion
-//#region packages/collections/src/tree/traverse-object.ts
+//#region ../collections/src/tree/traverse-object.ts
 var traverse_object_exports = {};
 __export(traverse_object_exports, {
 	asDynamicTraversable: () => asDynamicTraversable,
@@ -1443,7 +1519,7 @@ function getNamedEntry(node, defaultName = ``) {
 }
 
 //#endregion
-//#region packages/collections/src/tree/pathed.ts
+//#region ../collections/src/tree/pathed.ts
 var pathed_exports = {};
 __export(pathed_exports, {
 	addValueByPath: () => addValueByPath,
@@ -1676,7 +1752,7 @@ const valuesByPath = (path, node, pathOpts = {}) => {
 };
 
 //#endregion
-//#region packages/collections/src/tree/traversable-tree.ts
+//#region ../collections/src/tree/traversable-tree.ts
 var traversable_tree_exports = {};
 __export(traversable_tree_exports, {
 	breadthFirst: () => breadthFirst,
@@ -2083,7 +2159,7 @@ function toString(...nodes) {
 }
 
 //#endregion
-//#region packages/collections/src/tree/index.ts
+//#region ../collections/src/tree/index.ts
 var tree_exports = {};
 __export(tree_exports, {
 	FromObject: () => traverse_object_exports,
@@ -2132,7 +2208,7 @@ const isTraversable = (node) => {
 };
 
 //#endregion
-//#region packages/collections/src/stack/StackImmutable.ts
+//#region ../collections/src/stack/StackImmutable.ts
 var StackImmutable = class StackImmutable {
 	opts;
 	data;
@@ -2191,7 +2267,7 @@ var StackImmutable = class StackImmutable {
 const immutable$3 = (options = {}, ...startingItems) => new StackImmutable({ ...options }, [...startingItems]);
 
 //#endregion
-//#region packages/collections/src/stack/index.ts
+//#region ../collections/src/stack/index.ts
 var stack_exports = {};
 __export(stack_exports, {
 	StackImmutable: () => StackImmutable,
@@ -2207,7 +2283,7 @@ __export(stack_exports, {
 });
 
 //#endregion
-//#region packages/collections/src/set/set-mutable.ts
+//#region ../collections/src/set/set-mutable.ts
 /**
 * Creates a {@link ISetMutable}.
 * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
@@ -2293,7 +2369,7 @@ var SetStringMutable = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/collections/src/set/SetImmutable.ts
+//#region ../collections/src/set/SetImmutable.ts
 var SetStringImmutable = class SetStringImmutable {
 	store;
 	keyString;
@@ -2338,7 +2414,7 @@ var SetStringImmutable = class SetStringImmutable {
 const immutable$2 = (keyString = toStringDefault) => new SetStringImmutable(keyString);
 
 //#endregion
-//#region packages/collections/src/set/massive-set.ts
+//#region ../collections/src/set/massive-set.ts
 /**
 * MassiveSet supports semantics similar to Set, but without the
 * limitation on how much data is stored.
@@ -2471,7 +2547,7 @@ var MassiveSet = class MassiveSet {
 };
 
 //#endregion
-//#region packages/collections/src/set/index.ts
+//#region ../collections/src/set/index.ts
 var set_exports = {};
 __export(set_exports, {
 	MassiveSet: () => MassiveSet,
@@ -2482,7 +2558,7 @@ __export(set_exports, {
 });
 
 //#endregion
-//#region packages/collections/src/queue/priority-mutable.ts
+//#region ../collections/src/queue/priority-mutable.ts
 /**
 * Simple priority queue implementation.
 * Higher numbers mean higher priority.
@@ -2575,7 +2651,7 @@ function priority(opts = {}) {
 }
 
 //#endregion
-//#region packages/collections/src/queue/queue-immutable.ts
+//#region ../collections/src/queue/queue-immutable.ts
 var QueueImmutable = class QueueImmutable {
 	opts;
 	#data;
@@ -2646,7 +2722,7 @@ const immutable$1 = (options = {}, ...startingItems) => {
 };
 
 //#endregion
-//#region packages/collections/src/queue/index.ts
+//#region ../collections/src/queue/index.ts
 var queue_exports = {};
 __export(queue_exports, {
 	PriorityMutable: () => PriorityMutable,
@@ -2665,7 +2741,7 @@ __export(queue_exports, {
 });
 
 //#endregion
-//#region packages/collections/src/map/expiring-map.ts
+//#region ../collections/src/map/expiring-map.ts
 /**
 * Create a ExpiringMap instance
 * @param options Options when creating map
@@ -2960,7 +3036,7 @@ var ExpiringMap = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-multi-fns.ts
+//#region ../collections/src/map/map-multi-fns.ts
 /**
 * Finds first entry by iterable value. Expects a map with an iterable as values.
 *
@@ -3020,7 +3096,7 @@ const firstEntryByValue = (map$1, value$1, isEqual = isEqualDefault) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-simple-base.ts
+//#region ../collections/src/map/map-of-simple-base.ts
 var MapOfSimpleBase = class {
 	map;
 	groupBy;
@@ -3153,7 +3229,7 @@ var MapOfSimpleBase = class {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-simple-mutable.ts
+//#region ../collections/src/map/map-of-simple-mutable.ts
 /**
 * A simple mutable map of arrays, without events. It can store multiple values
 * under the same key.
@@ -3271,7 +3347,7 @@ var MapOfSimpleMutable = class extends MapOfSimpleBase {
 const ofSimpleMutable = (groupBy = defaultKeyer, valueEq = isEqualDefault) => new MapOfSimpleMutable(groupBy, valueEq);
 
 //#endregion
-//#region packages/collections/src/map/map-immutable-fns.ts
+//#region ../collections/src/map/map-immutable-fns.ts
 /**
 * Adds an array o [k,v] to the map, returning a new instance
 * @param map Initial data
@@ -3361,7 +3437,7 @@ const del = (map$1, key) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map.ts
+//#region ../collections/src/map/map.ts
 /**
 * Returns an {@link IMapImmutable}.
 * Use {@link Maps.mutable} as a mutable alternatve.
@@ -3428,7 +3504,7 @@ const immutable = (dataOrMap) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-mutable.ts
+//#region ../collections/src/map/map-mutable.ts
 /**
 * Returns a {@link IMapMutable} (which just wraps the in-built Map)
 * Use {@link Maps.immutable} for the immutable alternative.
@@ -3472,7 +3548,7 @@ const mutable = (...data) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-multi-impl.ts
+//#region ../collections/src/map/map-of-multi-impl.ts
 /**
 * @internal
 */
@@ -3653,7 +3729,7 @@ var MapOfMutableImpl = class extends SimpleEventEmitter {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-set-mutable.ts
+//#region ../collections/src/map/map-of-set-mutable.ts
 /**
 * Returns a {@link IMapOfMutableExtended} that uses a set to hold values.
 * This means that only unique values are stored under each key. By default it
@@ -3702,7 +3778,7 @@ const ofSetMutable = (options) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-circular-mutable.ts
+//#region ../collections/src/map/map-of-circular-mutable.ts
 /**
 * Returns a {@link IMapOfMutableExtended} that uses a {@link ICircularArray} to hold values. Mutable.
 * This means that the number of values stored under each key will be limited to the defined
@@ -3745,7 +3821,7 @@ const ofCircularMutable = (options) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/number-map.ts
+//#region ../collections/src/map/number-map.ts
 /**
 * Simple map for numbers.
 * 
@@ -3822,7 +3898,7 @@ var NumberMap = class extends Map {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-array-mutable.ts
+//#region ../collections/src/map/map-of-array-mutable.ts
 /**
 * Returns a {@link IMapOfMutableExtended} to allow storing multiple values under a key, unlike a regular Map.
 * @example
@@ -3875,7 +3951,7 @@ const ofArrayMutable = (options = {}) => {
 };
 
 //#endregion
-//#region packages/collections/src/map/map-of-simple.ts
+//#region ../collections/src/map/map-of-simple.ts
 /**
 * Simple immutable MapOf
 */
@@ -3938,7 +4014,7 @@ var MapOfSimple = class MapOfSimple extends MapOfSimpleBase {
 const ofSimple = (groupBy = defaultKeyer, valueEq = isEqualDefault) => new MapOfSimple(groupBy, valueEq);
 
 //#endregion
-//#region packages/collections/src/map/index.ts
+//#region ../collections/src/map/index.ts
 var map_exports = {};
 __export(map_exports, {
 	ExpiringMap: () => ExpiringMap,
@@ -3988,7 +4064,7 @@ __export(map_exports, {
 });
 
 //#endregion
-//#region packages/collections/src/table.ts
+//#region ../collections/src/table.ts
 /**
 * Stores values in a table of rows (vertical) and columns (horizontal)
 */
@@ -4287,7 +4363,7 @@ var Table = class {
 };
 
 //#endregion
-//#region packages/collections/src/graph/directed-graph.ts
+//#region ../collections/src/graph/directed-graph.ts
 var directed_graph_exports = {};
 __export(directed_graph_exports, {
 	adjacentVertices: () => adjacentVertices$1,
@@ -4972,7 +5048,7 @@ function transitiveReduction(graph$2) {
 }
 
 //#endregion
-//#region packages/collections/src/graph/undirected-graph.ts
+//#region ../collections/src/graph/undirected-graph.ts
 var undirected_graph_exports = {};
 __export(undirected_graph_exports, {
 	adjacentVertices: () => adjacentVertices,
@@ -5204,7 +5280,7 @@ function* edgesForVertex(graph$2, context) {
 }
 
 //#endregion
-//#region packages/collections/src/graph/index.ts
+//#region ../collections/src/graph/index.ts
 var graph_exports = {};
 __export(graph_exports, {
 	Directed: () => directed_graph_exports,

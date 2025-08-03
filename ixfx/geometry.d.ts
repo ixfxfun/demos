@@ -1,8 +1,396 @@
-import { ISetMutable, TraversableTree } from "@ixfx/collections";
-import { RandomSource } from "@ixfx/random";
-import { ObjectTracker, TimestampedObject, TrackedValueMap, TrackedValueOpts, TrimReason } from "@ixfx/trackers";
+import "./is-equal-aUE7iVHd.js";
+import "./types-BEAJ_GOH.js";
+import { GetOrGenerate } from "./maps-DpHdi7xH.js";
+import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { RandomSource } from "./types-DFWrctU4.js";
 
-//#region packages/geometry/src/point/point-type.d.ts
+//#region ../trackers/dist/src/types.d.ts
+type Timestamped = {
+  readonly at: number;
+};
+type TimestampedObject<V> = V & Timestamped;
+/**
+ * Options
+ */
+type TrackedValueOpts = {
+  readonly id?: string;
+  /**
+   * If true, intermediate points are stored. False by default
+   */
+  readonly storeIntermediate?: boolean;
+  /**
+   * If above zero, tracker will reset after this many samples
+   */
+  readonly resetAfterSamples?: number;
+  /**
+   * If above zero, there will be a limit to intermediate values kept.
+   *
+   * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
+   * to `sampleLimit`. We only do this when the values are double the size so that
+   * the collections do not need to be trimmed repeatedly whilst we are at the limit.
+   *
+   * Automatically implies storeIntermediate
+   */
+  readonly sampleLimit?: number;
+  /**
+   * If _true_, prints debug info
+   */
+  readonly debug?: boolean;
+};
+type TrimReason = `reset` | `resize`;
+//#endregion
+//#region ../trackers/dist/src/tracker-base.d.ts
+/**
+ * Base tracker class
+ */
+declare abstract class TrackerBase<V, SeenResultType> {
+  /**
+   * @ignore
+   */
+  seenCount: number;
+  /**
+   * @ignore
+   */
+  protected storeIntermediate: boolean;
+  /**
+   * @ignore
+   */
+  protected resetAfterSamples: number;
+  /**
+   * @ignore
+   */
+  protected sampleLimit: number;
+  readonly id: string;
+  protected debug: boolean;
+  constructor(opts?: TrackedValueOpts);
+  /**
+   * Reset tracker
+   */
+  reset(): void;
+  /**
+   * Adds a value, returning computed result.
+   *
+   * At this point, we check if the buffer is larger than `resetAfterSamples`. If so, `reset()` is called.
+   * If not, we check `sampleLimit`. If the buffer is twice as large as sample limit, `trimStore()` is
+   * called to take it down to sample limit, and `onTrimmed()` is called.
+   * @param p
+   * @returns
+   */
+  seen(...p: V[]): SeenResultType;
+  /**
+   * @ignore
+   * @param p
+   */
+  abstract filterData(p: V[]): Timestamped[];
+  abstract get last(): V | undefined;
+  /**
+   * Returns the initial value, or undefined
+   */
+  abstract get initial(): V | undefined;
+  /**
+   * Returns the elapsed milliseconds since the initial value
+   */
+  abstract get elapsed(): number;
+  /**
+   * @ignore
+   */
+  abstract computeResults(_p: Timestamped[]): SeenResultType;
+  /**
+   * @ignore
+   */
+  abstract onReset(): void;
+  /**
+   * Notification that buffer has been trimmed
+   */
+  abstract onTrimmed(reason: TrimReason): void;
+  abstract trimStore(limit: number): number;
+}
+//# sourceMappingURL=tracker-base.d.ts.map
+//#endregion
+//#region ../trackers/dist/src/object-tracker.d.ts
+/**
+ * A tracked value of type `V`.
+ */
+declare abstract class ObjectTracker<V extends object, SeenResultType> extends TrackerBase<V, SeenResultType> {
+  values: TimestampedObject<V>[];
+  constructor(opts?: TrackedValueOpts);
+  onTrimmed(reason: TrimReason): void;
+  /**
+   * Reduces size of value store to `limit`.
+   * Returns number of remaining items
+   * @param limit
+   */
+  trimStore(limit: number): number;
+  /**
+   * Allows sub-classes to be notified when a reset happens
+   * @ignore
+   */
+  onReset(): void;
+  /**
+   * Tracks a value
+   * @ignore
+   */
+  filterData(p: V[] | TimestampedObject<V>[]): TimestampedObject<V>[];
+  /**
+   * Last seen value. If no values have been added, it will return the initial value
+   */
+  get last(): TimestampedObject<V>;
+  /**
+   * Returns the oldest value in the buffer
+   */
+  get initial(): TimestampedObject<V> | undefined;
+  /**
+   * Returns number of recorded values (includes the initial value in the count)
+   */
+  get size(): number;
+  /**
+   * Returns the elapsed time, in milliseconds since the initial value
+   */
+  get elapsed(): number;
+}
+//# sourceMappingURL=object-tracker.d.ts.map
+//#endregion
+//#region ../trackers/dist/src/tracked-value.d.ts
+/**
+ * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
+ * must extend from `TrackerBase<V>`, eg `PointTracker`.
+ *
+ * The `creator` function passed in to the constructor is responsible for instantiating
+ * the appropriate `TrackerBase` sub-class.
+ *
+ * @example Sub-class
+ * ```js
+ * export class PointsTracker extends TrackedValueMap<Points.Point> {
+ *  constructor(opts:TrackOpts = {}) {
+ *   super((key, start) => {
+ *    if (start === undefined) throw new Error(`Requires start point`);
+ *    const p = new PointTracker(key, opts);
+ *    p.seen(start);
+ *    return p;
+ *   });
+ *  }
+ * }
+ * ```
+ *
+ */
+declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
+  store: Map<string, T>;
+  gog: GetOrGenerate<string, T, V>;
+  constructor(creator: (key: string, start: V | undefined) => T);
+  /**
+   * Number of named values being tracked
+   */
+  get size(): number;
+  /**
+   * Returns _true_ if `id` is stored
+   * @param id
+   * @returns
+   */
+  has(id: string): boolean;
+  /**
+   * For a given id, note that we have seen one or more values.
+   * @param id Id
+   * @param values Values(s)
+   * @returns Information about start to last value
+   */
+  seen(id: string, ...values: V[]): Promise<TResult>;
+  /**
+   * Creates or returns a TrackedValue instance for `id`.
+   * @param id
+   * @param values
+   * @returns
+   */
+  protected getTrackedValue(id: string, ...values: V[]): Promise<T>;
+  /**
+   * Remove a tracked value by id.
+   * Use {@link reset} to clear them all.
+   * @param id
+   */
+  delete(id: string): void;
+  /**
+   * Remove all tracked values.
+   * Use {@link delete} to remove a single value by id.
+   */
+  reset(): void;
+  /**
+   * Enumerate ids
+   */
+  ids(): Generator<string, void, unknown>;
+  /**
+   * Enumerate tracked values
+   */
+  tracked(): Generator<T, void, unknown>;
+  /**
+   * Iterates TrackedValues ordered with oldest first
+   * @returns
+   */
+  trackedByAge(): Generator<T, void, unknown>;
+  /**
+   * Iterates underlying values, ordered by age (oldest first)
+   * First the named values are sorted by their `elapsed` value, and then
+   * we return the last value for that group.
+   */
+  valuesByAge(): Generator<V | undefined, void, unknown>;
+  /**
+   * Enumerate last received values
+   *
+   * @example Calculate centroid of latest-received values
+   * ```js
+   * const pointers = pointTracker();
+   * const c = Points.centroid(...Array.from(pointers.lastPoints()));
+   * ```
+   */
+  last(): Generator<V | undefined, void, unknown>;
+  /**
+   * Enumerate starting values
+   */
+  initialValues(): Generator<V | undefined, void, unknown>;
+  /**
+   * Returns a tracked value by id, or undefined if not found
+   * @param id
+   * @returns
+   */
+  get(id: string): TrackerBase<V, TResult> | undefined;
+}
+//# sourceMappingURL=tracked-value.d.ts.map
+//#endregion
+//#region ../collections/dist/src/tree/types.d.ts
+/**
+ * Traversable Tree
+ */
+type TraversableTree<TValue> = {
+  /**
+   * Direct children of node
+   */
+  children(): IterableIterator<TraversableTree<TValue>>;
+  /**
+   * Direct parent of node
+   */
+  getParent(): TraversableTree<TValue> | undefined;
+  /**
+   * Value of node
+   */
+  getValue(): TValue;
+  /**
+   * Object reference that acts as the identity of the node
+   */
+  getIdentity(): any;
+};
+//#endregion
+//#region ../collections/dist/src/set/Types.d.ts
+type ValueSetEventMap<V> = {
+  readonly add: {
+    readonly value: V;
+    readonly updated: boolean;
+  };
+  readonly clear: boolean;
+  readonly delete: V;
+};
+//# sourceMappingURL=Types.d.ts.map
+
+//#endregion
+//#region ../collections/dist/src/set/ISetMutable.d.ts
+/**
+ * A Set which stores unique items determined by their value, rather
+ * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Mutable.
+ *
+ * By default the `JSON.stringify()` representation is considered the 'key' for an object.
+ * Pass in a function to `Sets.mutable` to define your own way of creating keys for values. The principle should
+ * be that objects that you consider identical should have the same string key value.
+ *
+ * ISetMutable fires `add`, `clear` and `delete` events.
+ *
+ * @example Overview of functions
+ * ```js
+ * const s = Sets.mutable();
+ * s.add(item);    // Add one or more items. Items with same key are overriden.
+ * s.has(item);    // Returns true if item value is present
+ * s.clear();      // Remove everything
+ * s.delete(item); // Delete item by value
+ * s.toArray();    // Returns values as an array
+ * s.values();     // Returns an iterator over values
+ * s.size;         // Number of items stored in set
+ * ```
+ *
+ * @example Example usage
+ * ```js
+ * // Data to add
+ * const people = [
+ *  {name: `Barry`, city: `London`}
+ *  {name: `Sally`, city: `Bristol`}
+ * ];
+ *
+ * // Create a set, defining how keys will be generated
+ * const set = Sets.mutable(person => {
+ *    // Key person objects by name and city.
+ *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
+ *    return `${person.name}-${person.city}`
+ * });
+ *
+ * // Add list
+ * set.add(...people);
+ *
+ * // Demo:
+ * set.has({name:`Barry`, city:`Manchester`})); // False, key is different (Barry-Manchester)
+ * set.has({name:`Barry`, city:`London`}));     // True, we have Barry-London as a key
+ * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
+ * ```
+ *
+ * @example
+ * Events
+ * ```js
+ * set.addEventListener(`add`, ev => {
+ *  console.log(`New item added: ${ev.value}`);
+ * });
+ * ```
+ *
+ * @typeParam V - Type of data stored
+ */
+interface ISetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
+  /**
+   * Add `values` to set.
+   * Corresponding keys will be generated according to the
+   * function provided to `setMutable`, or `JSON.stringify` by default.
+   * @param values Value(s) to add
+   * @returns _true_ if something new was added
+   */
+  add(...values: readonly V[]): boolean;
+  /**
+   * Iterate over values
+   * ```js
+   * for (let value of set.values()) {
+   *    // use value...
+   * }
+   * ```
+   */
+  values(): IterableIterator<V>;
+  /**
+   * Clears set
+   */
+  clear(): void;
+  /**
+   * Deletes specified value, if present.
+   * @param value
+   * @returns True if value was found
+   */
+  delete(value: V): boolean;
+  /**
+   * Returns _true_ if _value_ is contained in Set
+   * @param value
+   */
+  has(value: V): boolean;
+  /**
+   * Returns an array of values
+   */
+  toArray(): readonly V[];
+  /**
+   * Returns the number of items stored in the set
+   */
+  get size(): number;
+}
+//# sourceMappingURL=ISetMutable.d.ts.map
+//#endregion
+//#region ../geometry/src/point/point-type.d.ts
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -19,7 +407,7 @@ type Point3d = Point & {
  * Use `isPlaceholder` to check if a point is a placeholder.
  * Use `Placeholder3d` get a point with `z` property.
  */
-declare const Placeholder$3: Readonly<{
+declare const Placeholder: Readonly<{
   x: number;
   y: number;
 }>;
@@ -35,41 +423,21 @@ declare const Placeholder3d: Readonly<{
 }>;
 //# sourceMappingURL=point-type.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/circle-type.d.ts
+//#region ../geometry/src/line/line-type.d.ts
 /**
- * A circle
+ * A line, which consists of an `a` and `b` {@link Point}.
  */
-type Circle = {
-  readonly radius: number;
-};
-type CircleToSvg = {
-  (circleOrRadius: Circle | number, sweep: boolean, origin: Point): readonly string[];
-  (circle: CirclePositioned, sweep: boolean): readonly string[];
+type Line = {
+  readonly a: Point;
+  readonly b: Point;
 };
 /**
- * A {@link Circle} with position
+ * A PolyLine, consisting of more than one line.
  */
-type CirclePositioned = Point & Circle;
-type CircleRandomPointOpts = {
-  /**
-   * Algorithm to calculate random values.
-   * Default: 'uniform'
-   */
-  readonly strategy: `naive` | `uniform`;
-  /**
-   * Random number source.
-   * Default: Math.random
-   */
-  readonly randomSource: () => number;
-  /**
-   * Margin within shape to start generating random points
-   * Default: 0
-   */
-  readonly margin: number;
-};
-//# sourceMappingURL=circle-type.d.ts.map
+type PolyLine = ReadonlyArray<Line>;
+//# sourceMappingURL=line-type.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/rect-types.d.ts
+//#region ../geometry/src/rect/rect-types.d.ts
 /**
  * Rectangle as array: `[width, height]`
  */
@@ -89,7 +457,7 @@ type RectPositioned = Point & Rect;
 type Rect3dPositioned = Point3d & Rect3d;
 //# sourceMappingURL=rect-types.d.ts.map
 //#endregion
-//#region packages/geometry/src/path/path-type.d.ts
+//#region ../geometry/src/path/path-type.d.ts
 type Path = {
   /**
    * Length of path
@@ -166,230 +534,332 @@ type Dimensions = {
   readonly totalWidth: number;
 };
 //# sourceMappingURL=path-type.d.ts.map
-declare namespace waypoint_d_exports {
-  export { Waypoint, WaypointOpts, WaypointResult, Waypoints, fromPoints$2 as fromPoints, init };
-}
-type Waypoint = CirclePositioned;
-type WaypointOpts = {
-  readonly maxDistanceFromLine: number;
-  readonly enforceOrder: boolean;
-};
-/**
- * Create from set of points, connected in order starting at array position 0.
- * @param waypoints
- * @param opts
- * @returns
- */
-declare const fromPoints$2: (waypoints: readonly Point[], opts?: Partial<WaypointOpts>) => Waypoints;
-/**
- * Result
- */
-type WaypointResult = {
-  /**
-   * Path being compared against
-   */
-  path: Path;
-  /**
-   * Index of this path in original `paths` array
-   */
-  index: number;
-  /**
-   * Nearest point on path. See also {@link distance}
-   */
-  nearest: Point;
-  /**
-   * Closest distance to path. See also {@link nearest}
-   */
-  distance: number;
-  /**
-   * Rank of this result, 0 being highest.
-   */
-  rank: number;
-  /**
-   * Relative position on this path segment
-   * 0 being start, 0.5 middle and so on.
-   */
-  positionRelative: number;
-};
-/**
- * Given point `pt`, returns a list of {@link WaypointResult}, comparing
- * this point to a set of paths.
- * ```js
- * // Init once with a set of paths
- * const w = init(paths);
- * // Now call with a point to get results
- * const results = w({ x: 10, y: 20 });
- * ```
- */
-type Waypoints = (pt: Point) => WaypointResult[];
-/**
- * Initialise
- *
- * Options:
- * * maxDistanceFromLine: Distances greater than this are not matched. Default 0.1
- * @param paths
- * @param opts
- * @returns
- */
-declare const init: (paths: readonly Path[], opts?: Partial<WaypointOpts>) => Waypoints;
-//# sourceMappingURL=waypoint.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/line-type.d.ts
+//#region ../geometry/src/arc/arc-type.d.ts
 /**
- * A line, which consists of an `a` and `b` {@link Point}.
+ * Arc, defined by radius, start and end point in radians and direction
  */
-type Line = {
-  readonly a: Point;
-  readonly b: Point;
+type Arc = {
+  /**
+   * Radius of arc
+   */
+  readonly radius: number;
+  /**
+   * Start radian
+   */
+  readonly startRadian: number;
+  /**
+   * End radian
+   */
+  readonly endRadian: number;
+  /**
+   * If true, arc runs in clockwise direction
+   */
+  readonly clockwise: boolean;
 };
 /**
- * A PolyLine, consisting of more than one line.
+ * An {@link Arc} that also has a center position, given in x, y
  */
-type PolyLine = ReadonlyArray<Line>;
-//# sourceMappingURL=line-type.d.ts.map
+type ArcPositioned = Point & Arc;
+/**
+ * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
+ */
+type ArcInterpolate = {
+  (amount: number, arc: Arc, allowOverflow: boolean, origin: Point): Point;
+  (amount: number, arc: ArcPositioned, allowOverflow?: boolean): Point;
+};
+/**
+ * Function to convert an arc to SVG segments
+ */
+type ArcToSvg = {
+  /**
+   * SVG path for arc description
+   * @param origin Origin of arc
+   * @param radius Radius
+   * @param startRadian Start
+   * @param endRadian End
+   */
+  (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: ArcSvgOpts): readonly string[];
+  /**
+   * SVG path for non-positioned arc.
+   * If `arc` does have a position, `origin` will override it.
+   */
+  (arc: Arc, origin: Point, opts?: ArcSvgOpts): readonly string[];
+  /**
+   * SVG path for positioned arc
+   */
+  (arc: ArcPositioned, opts?: ArcSvgOpts): readonly string[];
+};
+type ArcSvgOpts = {
+  /**
+   * "If the arc should be greater or less than 180 degrees"
+   * ie. tries to maximise arc length
+   */
+  readonly largeArc?: boolean;
+  /**
+   * "If the arc should begin moving at positive angles"
+   * ie. the kind of bend it makes to reach end point
+   */
+  readonly sweep?: boolean;
+};
+//# sourceMappingURL=arc-type.d.ts.map
 //#endregion
-//#region packages/geometry/src/shape/shape-type.d.ts
-type ShapePositioned = CirclePositioned | RectPositioned;
-type ContainsResult = `none` | `contained`;
-type Sphere = Point3d & {
+//#region ../geometry/src/circle/circle-type.d.ts
+/**
+ * A circle
+ */
+type Circle = {
   readonly radius: number;
 };
-type PointCalculableShape = PolyLine | Line | RectPositioned | Point | CirclePositioned;
-//# sourceMappingURL=shape-type.d.ts.map
-//#endregion
-//#region packages/geometry/src/shape/arrow.d.ts
-type ArrowOpts = {
-  readonly arrowSize?: number;
-  readonly tailLength?: number;
-  readonly tailThickness?: number;
-  readonly angleRadian?: number;
+type CircleToSvg = {
+  (circleOrRadius: Circle | number, sweep: boolean, origin: Point): readonly string[];
+  (circle: CirclePositioned, sweep: boolean): readonly string[];
 };
 /**
- * Returns the points forming an arrow.
- *
- * @example Create an arrow anchored by its tip at 100,100
- * ```js
- * const opts = {
- *  tailLength: 10,
- *  arrowSize: 20,
- *  tailThickness: 5,
- *  angleRadian: degreeToRadian(45)
- * }
- * const arrow = Shapes.arrow({x:100, y:100}, `tip`, opts); // Yields an array of points
- *
- * // Eg: draw points
- * Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
- * ```
- *
- * @param origin Origin of arrow
- * @param from Does origin describe the tip, tail or middle?
- * @param opts Options for arrow
+ * A {@link Circle} with position
+ */
+type CirclePositioned = Point & Circle;
+type CircleRandomPointOpts = {
+  /**
+   * Algorithm to calculate random values.
+   * Default: 'uniform'
+   */
+  readonly strategy: `naive` | `uniform`;
+  /**
+   * Random number source.
+   * Default: Math.random
+   */
+  readonly randomSource: () => number;
+  /**
+   * Margin within shape to start generating random points
+   * Default: 0
+   */
+  readonly margin: number;
+};
+//# sourceMappingURL=circle-type.d.ts.map
+declare namespace index_d_exports {
+  export { Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, angularSize, bbox$5 as bbox, distanceCenter$1 as distanceCenter, fromCircle, fromCircleAmount, fromDegrees$1 as fromDegrees, getStartEnd, guard$6 as guard, interpolate$4 as interpolate, isArc, isEqual$6 as isEqual, isPositioned$2 as isPositioned, length$2 as length, point, toLine, toPath$3 as toPath, toSvg$1 as toSvg };
+}
+/**
+ * Returns true if parameter is an arc
+ * @param p Arc or number
  * @returns
  */
-declare const arrow: (origin: Point, from: `tip` | `tail` | `middle`, opts?: ArrowOpts) => ReadonlyArray<Point>;
-//# sourceMappingURL=arrow.d.ts.map
-//#endregion
-//#region packages/geometry/src/triangle/triangle-type.d.ts
-type Triangle = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly c: Point;
-};
-type BarycentricCoord = {
-  readonly a: number;
-  readonly b: number;
-  readonly c: number;
-};
-//# sourceMappingURL=triangle-type.d.ts.map
-//#endregion
-//#region packages/geometry/src/shape/etc.d.ts
-type ShapeRandomPointOpts = {
-  readonly randomSource: RandomSource;
-};
+declare const isArc: (p: unknown) => p is Arc;
 /**
- * Returns a random point within a shape.
- * `shape` can be {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
- * @param shape
- * @param opts
+ * Returns true if parameter has a positioned (x,y)
+ * @param p Point, Arc or ArcPositiond
  * @returns
  */
-declare const randomPoint$2: (shape: ShapePositioned, opts?: Partial<ShapeRandomPointOpts>) => Point;
+declare const isPositioned$2: (p: Point | Arc | ArcPositioned) => p is Point;
 /**
- * Returns the center of a shape
- * Shape can be: rectangle, triangle, circle
- * @param shape
+ * Returns an arc from degrees, rather than radians
+ * @param radius Radius of arc
+ * @param startDegrees Start angle in degrees
+ * @param endDegrees End angle in degrees
+ * @returns Arc
+ */
+declare function fromDegrees$1(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean): Arc;
+/**
+ * Returns an arc from degrees, rather than radians
+ * @param radius Radius of arc
+ * @param startDegrees Start angle in degrees
+ * @param endDegrees End angle in degrees
+ * @param origin Optional center of arc
+ * @param clockwise Whether arc moves in clockwise direction
+ * @returns Arc
+ */
+declare function fromDegrees$1(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean, origin: Point): ArcPositioned;
+/**
+ * Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
+ *
+ * @param arc
+ * @returns Line from start to end of arc
+ */
+declare const toLine: (arc: ArcPositioned) => Line;
+/**
+ * Return start and end points of `arc`.
+ * `origin` will override arc's origin, if defined.
+ *
+ * See also:
+ * * {@link point} - get point on arc by angle
+ * * {@link interpolate} - get point on arc by interpolation percentage
+ * @param arc
+ * @param origin
  * @returns
  */
-declare const center$2: (shape?: Rect | Triangle | Circle) => Point;
-//# sourceMappingURL=etc.d.ts.map
-//#endregion
-//#region packages/geometry/src/shape/is-intersecting.d.ts
+declare const getStartEnd: (arc: ArcPositioned | Arc, origin?: Point) => [start: Point, end: Point];
 /**
- * Returns the intersection result between a and b.
- * `a` can be a {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
- * `b` can be as above or a {@link Point}.
+ * Calculates a coordinate on an arc, based on an angle.
+ * `origin` will override arc's origin, if defined.
+ *
+ * See also:
+ * * {@link getStartEnd} - get start and end of arc
+ * * {@link interpolate} - get point on arc by interpolation percentage
+ * @param arc Arc
+ * @param angleRadian Angle of desired coordinate
+ * @param origin Origin of arc (0,0 used by default)
+ * @returns Coordinate
+ */
+declare const point: (arc: Arc | ArcPositioned, angleRadian: number, origin?: Point) => Point;
+/**
+ * Throws an error if arc instance is invalid
+ * @param arc
+ */
+declare const guard$6: (arc: Arc | ArcPositioned) => void;
+/**
+ * Compute relative position on arc.
+ *
+ * See also:
+ * * {@link getStartEnd} - get start and end of arc
+ * * {@link point} - get point on arc by angle
+ * @param arc Arc
+ * @param amount Relative position 0-1
+ * @param origin If arc is not positioned, pass in an origin
+ * @param allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
+ * @returns
+ */
+declare const interpolate$4: ArcInterpolate;
+/**
+ * Returns the angular size of arc.
+ * Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
+ * @param arc
+ */
+declare const angularSize: (arc: Arc) => number;
+/**
+ * Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.
+ * @param arc
+ * @returns Path
+ */
+declare const toPath$3: (arc: ArcPositioned) => Path;
+/**
+ * Returns an arc based on a circle using start and end angles.
+ * If you don't have the end angle, but rather the size of the arc, use {@link fromCircleAmount}
+ * @param circle Circle
+ * @param startRadian Start radian
+ * @param endRadian End radian
+ * @param clockwise Whether arc goes in a clockwise direction (default: true)
+ * @returns
+ */
+declare const fromCircle: (circle: CirclePositioned, startRadian: number, endRadian: number, clockwise?: boolean) => ArcPositioned;
+/**
+ * Returns an arc based on a circle, a start angle, and the size of the arc.
+ * See {@link fromCircle} if you already have start and end angles.
+ * @param circle Circle to base off
+ * @param startRadian Starting angle
+ * @param sizeRadian Size of arc
+ * @param clockwise Whether arc moves in clockwise direction (default: true)
+ * @returns
+ */
+declare const fromCircleAmount: (circle: CirclePositioned, startRadian: number, sizeRadian: number, clockwise?: boolean) => ArcPositioned;
+/**
+ * Calculates the length of the arc
+ * @param arc
+ * @returns Length
+ */
+declare const length$2: (arc: Arc) => number;
+/**
+ * Calculates a {@link Rect} bounding box for arc.
+ * @param arc
+ * @returns Rectangle encompassing arc.
+ */
+declare const bbox$5: (arc: ArcPositioned | Arc) => RectPositioned | Rect;
+/**
+ * Creates an SV path snippet for arc
+ * @returns
+ */
+declare const toSvg$1: ArcToSvg;
+/**
+ * Calculates the distance between the centers of two arcs
  * @param a
  * @param b
+ * @returns Distance
  */
-declare const isIntersecting$2: (a: ShapePositioned, b: ShapePositioned | Point) => boolean;
-//# sourceMappingURL=is-intersecting.d.ts.map
-
-//#endregion
-//#region packages/geometry/src/shape/starburst.d.ts
+declare const distanceCenter$1: (a: ArcPositioned, b: ArcPositioned) => number;
 /**
- * Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
+ * Returns true if the two arcs have the same values
  *
+ * ```js
+ * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+ * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+ * arcA === arcB; // false, because object identities are different
+ * Arcs.isEqual(arcA, arcB); // true, because values are identical
  * ```
- * // Generate a starburst with four spikes
- * const pts = starburst(4, 100, 200);
- * ```
- *
- * `points` of two produces a lozenge shape.
- * `points` of three produces a triangle shape.
- * `points` of five is the familiar 'star' shape.
- *
- * Note that the path will need to be closed back to the first point to enclose the shape.
- *
- * @example Create starburst and draw it. Note use of 'loop' flag to close the path
- * ```
- * const points = starburst(4, 100, 200);
- * Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
- * ```
- *
- * Options:
- * * initialAngleRadian: angle offset to begin from. This overrides the `-Math.PI/2` default.
- *
- * @param points Number of points in the starburst. Defaults to five, which produces a typical star
- * @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
- * @param outerRadius Outer radius. Maximum radius of a spike to origin
- * @param opts Options
- * @param origin Origin, or `{ x:0, y:0 }` by default.
+ * @param a
+ * @param b
+ * @returns {boolean}
  */
-declare const starburst: (outerRadius: number, points?: number, innerRadius?: number, origin?: Point, opts?: {
-  readonly initialAngleRadian?: number;
-}) => readonly Point[];
-//# sourceMappingURL=starburst.d.ts.map
-declare namespace index_d_exports$9 {
-  export { ArrowOpts, ContainsResult, PointCalculableShape, ShapePositioned, ShapeRandomPointOpts, Sphere, arrow, center$2 as center, isIntersecting$2 as isIntersecting, randomPoint$2 as randomPoint, starburst };
-}
-declare namespace circle_packing_d_exports {
-  export { RandomOpts, random$2 as random };
-}
-type RandomOpts = {
-  readonly attempts?: number;
-  readonly randomSource?: RandomSource;
+declare const isEqual$6: (a: Arc | ArcPositioned, b: Arc | ArcPositioned) => boolean;
+//# sourceMappingURL=index.d.ts.map
+//#endregion
+//#region ../geometry/src/bezier/bezier-type.d.ts
+type QuadraticBezier = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly quadratic: Point;
 };
-/**
- * Naive randomised circle packing.
- * [Algorithm by Taylor Hobbs](https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing)
- */
-declare const random$2: (circles: readonly Circle[], container: ShapePositioned, opts?: RandomOpts) => CirclePositioned[];
-//# sourceMappingURL=circle-packing.d.ts.map
-declare namespace layout_d_exports {
-  export { circle_packing_d_exports as CirclePacking };
-}
+type QuadraticBezierPath = Path & QuadraticBezier;
+type CubicBezier = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly cubic1: Point;
+  readonly cubic2: Point;
+};
+type CubicBezierPath = Path & CubicBezier;
+//# sourceMappingURL=bezier-type.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/area.d.ts
+//#region ../geometry/src/bezier/guard.d.ts
+declare const isQuadraticBezier: (path: Path | QuadraticBezier | CubicBezier) => path is QuadraticBezier;
+declare const isCubicBezier: (path: Path | CubicBezier | QuadraticBezier) => path is CubicBezier;
+//# sourceMappingURL=guard.d.ts.map
+declare namespace index_d_exports$1 {
+  export { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath, cubic, interpolator, isCubicBezier, isQuadraticBezier, quadratic, quadraticSimple, quadraticToSvgString, toPath$2 as toPath };
+}
+/**
+ * Returns a new quadratic bezier with specified bend amount
+ *
+ * @param {QuadraticBezier} b Curve
+ * @param {number} [bend=0] Bend amount, from -1 to 1
+ * @returns {QuadraticBezier}
+ */
+/**
+ * Creates a simple quadratic bezier with a specified amount of 'bend'.
+ * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
+ *
+ * Use {@link interpolator} to calculate a point along the curve.
+ * @param {Point} start Start of curve
+ * @param {Point} end End of curve
+ * @param {number} [bend=0] Bend amount, -1 to 1
+ * @returns {QuadraticBezier}
+ */
+declare const quadraticSimple: (start: Point, end: Point, bend?: number) => QuadraticBezier;
+/**
+ * Returns a relative point on a simple quadratic
+ * @param start Start
+ * @param end  End
+ * @param bend Bend (-1 to 1)
+ * @param amt Amount
+ * @returns Point
+ */
+/**
+ * Interpolate cubic or quadratic bezier
+ * ```js
+ * const i = interpolator(myBezier);
+ *
+ * // Get point at 50%
+ * i(0.5); // { x, y }
+ * ```
+ * @param q
+ * @returns
+ */
+declare const interpolator: (q: QuadraticBezier | CubicBezier) => (amount: number) => Point;
+declare const quadraticToSvgString: (start: Point, end: Point, handle: Point) => ReadonlyArray<string>;
+declare const toPath$2: (cubicOrQuadratic: CubicBezier | QuadraticBezier) => CubicBezierPath | QuadraticBezierPath;
+declare const cubic: (start: Point, end: Point, cubic1: Point, cubic2: Point) => CubicBezier;
+declare const quadratic: (start: Point, end: Point, handle: Point) => QuadraticBezier;
+//# sourceMappingURL=index.d.ts.map
+//#endregion
+//#region ../geometry/src/circle/area.d.ts
 /**
  * Returns the area of `circle`.
  * @param circle
@@ -398,17 +868,17 @@ declare namespace layout_d_exports {
 declare const area$5: (circle: Circle) => number;
 //# sourceMappingURL=area.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/bbox.d.ts
+//#region ../geometry/src/circle/bbox.d.ts
 /**
  * Computes a bounding box that encloses circle
  * @param circle
  * @returns
  */
-declare const bbox$5: (circle: CirclePositioned | Circle) => RectPositioned;
+declare const bbox$4: (circle: CirclePositioned | Circle) => RectPositioned;
 //# sourceMappingURL=bbox.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/circle/center.d.ts
+//#region ../geometry/src/circle/center.d.ts
 /**
  * Returns the center of a circle
  *
@@ -426,13 +896,13 @@ declare const bbox$5: (circle: CirclePositioned | Circle) => RectPositioned;
  * @param circle
  * @returns Center of circle
  */
-declare const center$1: (circle: CirclePositioned | Circle) => Readonly<{
+declare const center$2: (circle: CirclePositioned | Circle) => Readonly<{
   x: number;
   y: number;
 }>;
 //# sourceMappingURL=center.d.ts.map
 declare namespace compound_path_d_exports {
-  export { bbox$4 as bbox, computeDimensions, distanceToPoint, fromPaths, guardContinuous, interpolate$4 as interpolate, relativePosition$1 as relativePosition, setSegment, toString$5 as toString, toSvgString$1 as toSvgString };
+  export { bbox$3 as bbox, computeDimensions, distanceToPoint, fromPaths, guardContinuous, interpolate$3 as interpolate, relativePosition$1 as relativePosition, setSegment, toString$5 as toString, toSvgString$1 as toSvgString };
 }
 /**
  * Returns a new compoundpath, replacing a path at a given index
@@ -452,7 +922,7 @@ declare const setSegment: (compoundPath: CompoundPath, index: number, path: Path
  * @param dimensions Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-declare const interpolate$4: (paths: readonly Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => Point;
+declare const interpolate$3: (paths: readonly Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => Point;
 /**
  * Returns the shortest distance of `point` to any point on `paths`.
  * @param paths
@@ -482,7 +952,7 @@ declare const computeDimensions: (paths: readonly Path[]) => Dimensions;
  * @param paths
  * @returns
  */
-declare const bbox$4: (paths: readonly Path[]) => RectPositioned;
+declare const bbox$3: (paths: readonly Path[]) => RectPositioned;
 /**
  * Produce a human-friendly representation of paths
  *
@@ -507,7 +977,7 @@ declare const toSvgString$1: (paths: readonly Path[]) => readonly string[];
 declare const fromPaths: (...paths: readonly Path[]) => CompoundPath;
 //# sourceMappingURL=compound-path.d.ts.map
 //#endregion
-//#region packages/geometry/src/path/start-end.d.ts
+//#region ../geometry/src/path/start-end.d.ts
 /**
  * Return the start point of a path
  *
@@ -524,17 +994,17 @@ declare const getStart: (path: Path) => Point;
 declare const getEnd: (path: Path) => Point;
 //# sourceMappingURL=start-end.d.ts.map
 declare namespace index_d_exports$5 {
-  export { CompoundPath, Dimensions, Path, WithBeziers, bbox$4 as bbox, computeDimensions, distanceToPoint, fromPaths, getEnd, getStart, guardContinuous, interpolate$4 as interpolate, relativePosition$1 as relativePosition, setSegment, toString$5 as toString, toSvgString$1 as toSvgString };
+  export { CompoundPath, Dimensions, Path, WithBeziers, bbox$3 as bbox, computeDimensions, distanceToPoint, fromPaths, getEnd, getStart, guardContinuous, interpolate$3 as interpolate, relativePosition$1 as relativePosition, setSegment, toString$5 as toString, toSvgString$1 as toSvgString };
 }
 //#endregion
-//#region packages/geometry/src/circle/circular-path.d.ts
+//#region ../geometry/src/circle/circular-path.d.ts
 type CircularPath = Circle & Path & {
   readonly kind: `circular`;
 };
 //# sourceMappingURL=circular-path.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/circle/distance-center.d.ts
+//#region ../geometry/src/circle/distance-center.d.ts
 /**
  * Returns the distance between two circle centers.
  *
@@ -548,10 +1018,10 @@ type CircularPath = Circle & Path & {
  * @param b
  * @returns Distance
  */
-declare const distanceCenter$1: (a: CirclePositioned, b: CirclePositioned | Point) => number;
+declare const distanceCenter: (a: CirclePositioned, b: CirclePositioned | Point) => number;
 //# sourceMappingURL=distance-center.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/distance-from-exterior.d.ts
+//#region ../geometry/src/circle/distance-from-exterior.d.ts
 /**
  * Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
  * If `b` overlaps or is enclosed by `a`, distance is 0.
@@ -567,7 +1037,7 @@ declare const distanceCenter$1: (a: CirclePositioned, b: CirclePositioned | Poin
 declare const distanceFromExterior$1: (a: CirclePositioned, b: CirclePositioned | Point) => number;
 //# sourceMappingURL=distance-from-exterior.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/exterior-points.d.ts
+//#region ../geometry/src/circle/exterior-points.d.ts
 /**
  * Yields the points making up the exterior (ie. circumference) of the circle.
  * Uses [Midpoint Circle Algorithm](http://en.wikipedia.org/wiki/Midpoint_circle_algorithm)
@@ -585,13 +1055,13 @@ declare const distanceFromExterior$1: (a: CirclePositioned, b: CirclePositioned 
 declare function exteriorIntegerPoints(circle: CirclePositioned): IterableIterator<Point>;
 //# sourceMappingURL=exterior-points.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/guard.d.ts
+//#region ../geometry/src/circle/guard.d.ts
 /**
  * Throws if radius is out of range. If x,y is present, these will be validated too.
  * @param circle
  * @param parameterName
  */
-declare const guard$6: (circle: CirclePositioned | Circle, parameterName?: string) => void;
+declare const guard$5: (circle: CirclePositioned | Circle, parameterName?: string) => void;
 /**
  * Throws if `circle` is not positioned or has dodgy fields
  * @param circle
@@ -616,12 +1086,12 @@ declare const isNaN$1: (a: Circle | CirclePositioned) => boolean;
  * @param p Circle
  * @returns
  */
-declare const isPositioned$2: (p: Circle | Point) => p is Point;
+declare const isPositioned$1: (p: Circle | Point) => p is Point;
 declare const isCircle: (p: any) => p is Circle;
 declare const isCirclePositioned: (p: any) => p is CirclePositioned;
 //# sourceMappingURL=guard.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/interior-points.d.ts
+//#region ../geometry/src/circle/interior-points.d.ts
 /**
  * Returns all integer points contained within `circle`.
  *
@@ -637,7 +1107,7 @@ declare function interiorIntegerPoints(circle: CirclePositioned): IterableIterat
 //# sourceMappingURL=interior-points.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/circle/interpolate.d.ts
+//#region ../geometry/src/circle/interpolate.d.ts
 /**
  * Computes relative position along circle perimeter
  *
@@ -652,10 +1122,10 @@ declare function interiorIntegerPoints(circle: CirclePositioned): IterableIterat
  * @param t Position, 0-1
  * @returns
  */
-declare const interpolate$3: (circle: CirclePositioned, t: number) => Point;
+declare const interpolate$2: (circle: CirclePositioned, t: number) => Point;
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/area.d.ts
+//#region ../geometry/src/rect/area.d.ts
 /**
  * Returns the area of `rect`
  *
@@ -669,7 +1139,7 @@ declare const interpolate$3: (circle: CirclePositioned, t: number) => Point;
 declare const area$4: (rect: Rect) => number;
 //# sourceMappingURL=area.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/apply.d.ts
+//#region ../geometry/src/rect/apply.d.ts
 /**
  * An operation between two fields of a rectangle.
  * Used in the context of {@link applyMerge}
@@ -712,7 +1182,7 @@ declare function applyScalar(op: ApplyMergeOp, rect: RectPositioned, parameter: 
 declare function applyDim(op: ApplyMergeOp, rect: Rect | RectPositioned, parameter: number): Rect | RectPositioned;
 //# sourceMappingURL=apply.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/types.d.ts
+//#region ../geometry/src/grid/types.d.ts
 type GridVisual = Grid & {
   readonly size: number;
 };
@@ -830,7 +1300,7 @@ type GridNeighbourSelector = (neighbours: readonly GridNeighbour[]) => GridNeigh
 type GridIdentifyNeighbours = (grid: Grid, origin: GridCell) => readonly GridNeighbour[];
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/apply-bounds.d.ts
+//#region ../geometry/src/grid/apply-bounds.d.ts
 /**
  * Calculates a legal position for a cell based on
  * `grid` size and `bounds` wrapping logic.
@@ -1049,7 +1519,7 @@ declare const rows: (grid: Grid, start?: GridCell) => Generator<GridCell[], void
 declare function columns(grid: Grid, start?: GridCell): Generator<GridCell[], void, unknown>;
 //# sourceMappingURL=as.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/directions.d.ts
+//#region ../geometry/src/grid/directions.d.ts
 /**
  * Returns a list of all cardinal directions: n, ne, nw, e, s, se, sw, w
  */
@@ -1087,7 +1557,7 @@ declare const offsetCardinals: (grid: Grid, start: GridCell, steps: number, boun
 declare const getVectorFromCardinal: (cardinal: GridCardinalDirectionOptional, multiplier?: number) => GridCell;
 //# sourceMappingURL=directions.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/enumerators/cells.d.ts
+//#region ../geometry/src/grid/enumerators/cells.d.ts
 /**
  * Enumerate all cell coordinates in an efficient manner.
  * Runs left-to-right, top-to-bottom.
@@ -1148,7 +1618,7 @@ declare namespace index_d_exports$11 {
   export { cellValues, cells, cellsAndValues };
 }
 //#endregion
-//#region packages/geometry/src/grid/geometry.d.ts
+//#region ../geometry/src/grid/geometry.d.ts
 /**
  * Returns the cells on the line of `start` and `end`, inclusive
  *
@@ -1176,7 +1646,7 @@ declare const getLine: (start: GridCell, end: GridCell) => ReadonlyArray<GridCel
 declare const simpleLine: (start: GridCell, end: GridCell, endInclusive?: boolean) => ReadonlyArray<GridCell>;
 //# sourceMappingURL=geometry.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/guards.d.ts
+//#region ../geometry/src/grid/guards.d.ts
 /**
  * Returns true if `cell` parameter is a cell with x,y fields.
  * Does not check validity of fields.
@@ -1201,7 +1671,7 @@ declare const guardCell: (cell: GridCell, parameterName?: string, grid?: Grid) =
 declare const guardGrid: (grid: Grid, parameterName?: string) => void;
 //# sourceMappingURL=guards.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/indexing.d.ts
+//#region ../geometry/src/grid/indexing.d.ts
 /**
  * Returns the index for a given cell.
  * This is useful if a grid is stored in an array.
@@ -1247,7 +1717,7 @@ declare const indexFromCell: (grid: Grid, cell: GridCell, wrap: GridBoundsLogic)
 declare const cellFromIndex: (colsOrGrid: number | Grid, index: number) => GridCell;
 //# sourceMappingURL=indexing.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/inside.d.ts
+//#region ../geometry/src/grid/inside.d.ts
 /**
  * Returns _true_ if cell coordinates are above zero and within bounds of grid
  *
@@ -1258,7 +1728,7 @@ declare const cellFromIndex: (colsOrGrid: number | Grid, index: number) => GridC
 declare const inside: (grid: Grid, cell: GridCell) => boolean;
 //# sourceMappingURL=inside.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/is-equal.d.ts
+//#region ../geometry/src/grid/is-equal.d.ts
 /**
  * Returns _true_ if grids `a` and `b` are equal in value.
  * Returns _false_ if either parameter is undefined.
@@ -1267,7 +1737,7 @@ declare const inside: (grid: Grid, cell: GridCell) => boolean;
  * @param b
  * @return
  */
-declare const isEqual$6: (a: Grid | GridVisual, b: Grid | GridVisual) => boolean;
+declare const isEqual$5: (a: Grid | GridVisual, b: Grid | GridVisual) => boolean;
 /**
  * Returns _true_ if two cells equal.
  * Returns _false_ if either cell are undefined
@@ -1279,7 +1749,7 @@ declare const isEqual$6: (a: Grid | GridVisual, b: Grid | GridVisual) => boolean
 declare const cellEquals: (a: GridCell | undefined, b: GridCell | undefined) => boolean;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/neighbour.d.ts
+//#region ../geometry/src/grid/neighbour.d.ts
 declare const randomNeighbour: (nbos: readonly GridNeighbour[]) => GridNeighbour;
 /**
  * Gets a list of neighbours for `cell` (using {@link neighbours}), filtering
@@ -1330,7 +1800,7 @@ declare const neighbourList: (grid: Grid, cell: GridCell, directions: readonly G
 declare const neighbours: (grid: Grid, cell: GridCell, bounds?: GridBoundsLogic, directions?: readonly GridCardinalDirection[]) => GridNeighbours;
 //# sourceMappingURL=neighbour.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/offset.d.ts
+//#region ../geometry/src/grid/offset.d.ts
 /**
  * Returns a coordinate offset from `start` by `vector` amount.
  *
@@ -1349,11 +1819,11 @@ declare const offset: (grid: Grid, start: GridCell, vector: GridCell, bounds?: G
 //# sourceMappingURL=offset.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/grid/to-array.d.ts
+//#region ../geometry/src/grid/to-array.d.ts
 declare const toArray2d: <V>(grid: Grid, initialValue?: V) => V[][];
 //# sourceMappingURL=to-array.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/to-string.d.ts
+//#region ../geometry/src/grid/to-string.d.ts
 /**
  * Returns a key string for a cell instance
  * A key string allows comparison of instances by value rather than reference
@@ -1368,7 +1838,7 @@ declare const toArray2d: <V>(grid: Grid, initialValue?: V) => V[][];
 declare const cellKeyString: (v: GridCell) => string;
 //# sourceMappingURL=to-string.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visual.d.ts
+//#region ../geometry/src/grid/visual.d.ts
 /**
  * Generator that returns rectangles for each cell in a grid
  *
@@ -1420,21 +1890,21 @@ declare const rectangleForCell: (grid: GridVisual, cell: GridCell) => RectPositi
 declare const cellMiddle: (grid: GridVisual, cell: GridCell) => Point;
 //# sourceMappingURL=visual.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/values.d.ts
+//#region ../geometry/src/grid/values.d.ts
 declare function values<T>(grid: GridReadable<T>, iter: Iterable<GridCell>): Generator<T>;
 declare function values<T>(grid: GridReadable<T>, iter: Iterable<GridCell[]>): Generator<T[]>;
 //# sourceMappingURL=values.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visitors/breadth.d.ts
+//#region ../geometry/src/grid/visitors/breadth.d.ts
 declare const breadthLogic: () => GridNeighbourSelectionLogic;
 //# sourceMappingURL=breadth.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visitors/cell-neighbours.d.ts
+//#region ../geometry/src/grid/visitors/cell-neighbours.d.ts
 declare const neighboursLogic: () => GridNeighbourSelectionLogic;
 //# sourceMappingURL=cell-neighbours.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/columns.d.ts
+//#region ../geometry/src/grid/visitors/columns.d.ts
 /**
  * Visits cells running down columns, left-to-right.
  * @param opts Options
@@ -1443,12 +1913,12 @@ declare const neighboursLogic: () => GridNeighbourSelectionLogic;
 declare const columnLogic: (opts?: Partial<GridVisitorOpts>) => GridNeighbourSelectionLogic;
 //# sourceMappingURL=columns.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visitors/depth.d.ts
+//#region ../geometry/src/grid/visitors/depth.d.ts
 declare const depthLogic: () => GridNeighbourSelectionLogic;
 //# sourceMappingURL=depth.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/step.d.ts
+//#region ../geometry/src/grid/visitors/step.d.ts
 /**
  * Runs the provided `visitor` for `steps`, returning the cell we end at
  * ```js
@@ -1470,16 +1940,16 @@ declare const depthLogic: () => GridNeighbourSelectionLogic;
 declare const stepper: (grid: Grid, createVisitor: GridCreateVisitor, start?: GridCell, resolution?: number) => (step: number, fromStart?: boolean) => GridCell | undefined;
 //# sourceMappingURL=step.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visitors/random.d.ts
+//#region ../geometry/src/grid/visitors/random.d.ts
 declare const randomLogic: () => GridNeighbourSelectionLogic;
 //# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region packages/geometry/src/grid/visitors/random-contiguous.d.ts
+//#region ../geometry/src/grid/visitors/random-contiguous.d.ts
 declare const randomContiguousLogic: () => GridNeighbourSelectionLogic;
 //# sourceMappingURL=random-contiguous.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/rows.d.ts
+//#region ../geometry/src/grid/visitors/rows.d.ts
 /**
 * Visit by following rows. Normal order is left-to-right, top-to-bottom.
 * @param opts Options
@@ -1489,7 +1959,7 @@ declare const rowLogic: (opts?: Partial<GridVisitorOpts>) => GridNeighbourSelect
 //# sourceMappingURL=rows.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/grid/visitors/visitor.d.ts
+//#region ../geometry/src/grid/visitors/visitor.d.ts
 /**
  * Visits every cell in grid using supplied selection function
  * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom,
@@ -1550,10 +2020,10 @@ declare const create: (type: VisitorTypes, opts?: Partial<GridVisitorOpts>) => (
 declare const withLogic: (logic: GridNeighbourSelectionLogic, options?: Partial<GridVisitorOpts>) => (grid: Grid, optionsOverride?: Partial<GridVisitorOpts>) => Generator<GridCell, any, any>;
 //# sourceMappingURL=index.d.ts.map
 declare namespace index_d_exports$3 {
-  export { array_1d_d_exports as Array1d, array_2d_d_exports as Array2d, as_d_exports as As, index_d_exports$11 as By, Grid, GridArray1d, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridCreateVisitor, GridIdentifyNeighbours, GridNeighbour, GridNeighbourMaybe, GridNeighbourSelectionLogic, GridNeighbourSelector, GridNeighbours, GridReadable, GridVisitorOpts, GridVisual, GridWritable, index_d_exports$12 as Visit, allDirections, applyBounds, asRectangles, cellAtPoint, cellEquals, cellFromIndex, cellKeyString, cellMiddle, crossDirections, getLine, getVectorFromCardinal, guardCell, guardGrid, indexFromCell, inside, isCell, isEqual$6 as isEqual, neighbourList, neighbours, offset, offsetCardinals, randomNeighbour, rectangleForCell, simpleLine, toArray2d, values };
+  export { array_1d_d_exports as Array1d, array_2d_d_exports as Array2d, as_d_exports as As, index_d_exports$11 as By, Grid, GridArray1d, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridCreateVisitor, GridIdentifyNeighbours, GridNeighbour, GridNeighbourMaybe, GridNeighbourSelectionLogic, GridNeighbourSelector, GridNeighbours, GridReadable, GridVisitorOpts, GridVisual, GridWritable, index_d_exports$12 as Visit, allDirections, applyBounds, asRectangles, cellAtPoint, cellEquals, cellFromIndex, cellKeyString, cellMiddle, crossDirections, getLine, getVectorFromCardinal, guardCell, guardGrid, indexFromCell, inside, isCell, isEqual$5 as isEqual, neighbourList, neighbours, offset, offsetCardinals, randomNeighbour, rectangleForCell, simpleLine, toArray2d, values };
 }
 //#endregion
-//#region packages/geometry/src/rect/cardinal.d.ts
+//#region ../geometry/src/rect/cardinal.d.ts
 /**
  * Returns a point on cardinal direction, or 'center' for the middle.
  *
@@ -1567,7 +2037,7 @@ declare namespace index_d_exports$3 {
 declare const cardinal: (rect: RectPositioned, card: GridCardinalDirection | `center`) => Point;
 //# sourceMappingURL=cardinal.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/center.d.ts
+//#region ../geometry/src/rect/center.d.ts
 /**
  * Returns the center of a rectangle as a {@link Point}.
  *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
@@ -1580,10 +2050,10 @@ declare const cardinal: (rect: RectPositioned, card: GridCardinalDirection | `ce
  * @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
  * @returns
  */
-declare const center: (rect: RectPositioned | Rect, origin?: Point) => Point;
+declare const center$1: (rect: RectPositioned | Rect, origin?: Point) => Point;
 //# sourceMappingURL=center.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/corners.d.ts
+//#region ../geometry/src/rect/corners.d.ts
 /**
  * Returns the four corners of a rectangle as an array of Points.
  *
@@ -1601,7 +2071,7 @@ declare const center: (rect: RectPositioned | Rect, origin?: Point) => Point;
 declare const corners$1: (rect: RectPositioned | Rect, origin?: Point) => readonly Point[];
 //# sourceMappingURL=corners.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/distance.d.ts
+//#region ../geometry/src/rect/distance.d.ts
 /**
  * Returns the distance from the perimeter of `rect` to `pt`.
  * If the point is within the rectangle, 0 is returned.
@@ -1631,7 +2101,7 @@ declare const distanceFromExterior: (rect: RectPositioned, pt: Point) => number;
 declare const distanceFromCenter: (rect: RectPositioned, pt: Point) => number;
 //# sourceMappingURL=distance.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/divide.d.ts
+//#region ../geometry/src/rect/divide.d.ts
 /**
  * Divides positioned `rect` by width/height. Useful for normalising a value.
  * x & y value of second parameter are ignored
@@ -1702,7 +2172,7 @@ declare function divideScalar(rect: RectPositioned, amount: number): RectPositio
 declare function divideDim(rect: Rect | RectPositioned, amount: number): Rect | RectPositioned;
 //# sourceMappingURL=divide.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/edges.d.ts
+//#region ../geometry/src/rect/edges.d.ts
 /**
  * Returns four lines based on each corner.
  * Lines are given in order: top, right, bottom, left
@@ -1753,7 +2223,7 @@ declare const getEdgeX: (rect: RectPositioned | Rect, edge: `right` | `bottom` |
 declare const getEdgeY: (rect: RectPositioned | Rect, edge: `right` | `bottom` | `left` | `top`) => number;
 //# sourceMappingURL=edges.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/empty.d.ts
+//#region ../geometry/src/rect/empty.d.ts
 declare const Empty$3: Readonly<{
   width: 0;
   height: 0;
@@ -1766,7 +2236,7 @@ declare const EmptyPositioned: Readonly<{
 }>;
 //# sourceMappingURL=empty.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/encompass.d.ts
+//#region ../geometry/src/rect/encompass.d.ts
 /**
  * Returns a copy of `rect` with `rect` resized so it also encompasses `points`.
  * If provided point(s) are within bounds of `rect`, a copy of `rect` is returned.
@@ -1778,7 +2248,7 @@ declare const encompass: (rect: RectPositioned, ...points: Point[]) => RectPosit
 //# sourceMappingURL=encompass.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/rect/from-center.d.ts
+//#region ../geometry/src/rect/from-center.d.ts
 /**
  * Initialises a rectangle based on its center, a width and height
  *
@@ -1794,7 +2264,7 @@ declare const encompass: (rect: RectPositioned, ...points: Point[]) => RectPosit
 declare const fromCenter$2: (origin: Point, width: number, height: number) => RectPositioned;
 //# sourceMappingURL=from-center.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/from-element.d.ts
+//#region ../geometry/src/rect/from-element.d.ts
 /**
  * Initialise a rectangle based on the width and height of a HTML element.
  *
@@ -1808,7 +2278,7 @@ declare const fromElement: (el: HTMLElement) => Rect;
 //# sourceMappingURL=from-element.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/rect/from-numbers.d.ts
+//#region ../geometry/src/rect/from-numbers.d.ts
 /**
  * Returns a rectangle from width, height
  * ```js
@@ -1845,7 +2315,7 @@ declare function fromNumbers$2(width: number, height: number): Rect;
 declare function fromNumbers$2(x: number, y: number, width: number, height: number): RectPositioned;
 //# sourceMappingURL=from-numbers.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/from-top-left.d.ts
+//#region ../geometry/src/rect/from-top-left.d.ts
 /**
  * Creates a rectangle from its top-left coordinate, a width and height.
  *
@@ -1861,7 +2331,7 @@ declare function fromNumbers$2(x: number, y: number, width: number, height: numb
 declare const fromTopLeft: (origin: Point, width: number, height: number) => RectPositioned;
 //# sourceMappingURL=from-top-left.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/get-rect-positionedparameter.d.ts
+//#region ../geometry/src/rect/get-rect-positionedparameter.d.ts
 /**
  * Accepts:
  * * x,y,w,h
@@ -1879,7 +2349,7 @@ declare const fromTopLeft: (origin: Point, width: number, height: number) => Rec
 declare function getRectPositionedParameter(a: number | Point | Rect | RectPositioned, b?: Rect | number | Point, c?: number | Rect, d?: number): RectPositioned;
 //# sourceMappingURL=get-rect-positionedparameter.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/guard.d.ts
+//#region ../geometry/src/rect/guard.d.ts
 /**
  * Throws an error if the dimensions of the rectangle are undefined, NaN or negative.
  * @param d
@@ -1899,7 +2369,7 @@ declare const guardDim: (d: number, name?: string) => void;
  * @param rect
  * @param name
  */
-declare const guard$5: (rect: Rect, name?: string) => void;
+declare const guard$4: (rect: Rect, name?: string) => void;
 /**
  * Returns a positioned rect or if it's not possible, throws an error.
  *
@@ -1946,7 +2416,7 @@ declare const isPlaceholder$3: (rect: Rect) => boolean;
  * @param rect Point, Rect or RectPositiond
  * @returns
  */
-declare const isPositioned$1: (rect: Point | Rect | RectPositioned) => rect is Point;
+declare const isPositioned: (rect: Point | Rect | RectPositioned) => rect is Point;
 /**
  * Returns _true_ if `rect` has width and height fields.
  * @param rect
@@ -1962,7 +2432,7 @@ declare const isRect: (rect: unknown) => rect is Rect;
 declare const isRectPositioned: (rect: any) => rect is RectPositioned;
 //# sourceMappingURL=guard.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/Intersects.d.ts
+//#region ../geometry/src/rect/Intersects.d.ts
 /**
  * Returns _true_ if `point` is within, or on boundary of `rect`.
  *
@@ -1988,10 +2458,10 @@ declare function intersectsPoint$1(rect: Rect | RectPositioned, x: number, y: nu
  * A rectangle can be checked for intersections with another RectPositioned, CirclePositioned or Point.
  *
  */
-declare const isIntersecting$1: (a: RectPositioned, b: CirclePositioned | Point) => boolean;
+declare const isIntersecting$2: (a: RectPositioned, b: CirclePositioned | Point) => boolean;
 //# sourceMappingURL=Intersects.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/is-equal.d.ts
+//#region ../geometry/src/rect/is-equal.d.ts
 /**
  * Returns _true_ if the width & height of the two rectangles is the same.
  *
@@ -2028,10 +2498,10 @@ declare const isEqualSize: (a: Rect, b: Rect) => boolean;
  * @param b
  * @returns
  */
-declare const isEqual$5: (a: Rect | RectPositioned, b: Rect | RectPositioned) => boolean;
+declare const isEqual$4: (a: Rect | RectPositioned, b: Rect | RectPositioned) => boolean;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/lengths.d.ts
+//#region ../geometry/src/rect/lengths.d.ts
 /**
  * Returns the length of each side of the rectangle (top, right, bottom, left)
  *
@@ -2046,7 +2516,7 @@ declare const isEqual$5: (a: Rect | RectPositioned, b: Rect | RectPositioned) =>
 declare const lengths$1: (rect: RectPositioned) => readonly number[];
 //# sourceMappingURL=lengths.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/max.d.ts
+//#region ../geometry/src/rect/max.d.ts
 /**
  * Returns a rectangle based on provided four corners.
  *
@@ -2062,7 +2532,7 @@ declare const lengths$1: (rect: RectPositioned) => readonly number[];
 declare const maxFromCorners: (topLeft: Point, topRight: Point, bottomRight: Point, bottomLeft: Point) => RectPositioned;
 //# sourceMappingURL=max.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/multiply.d.ts
+//#region ../geometry/src/rect/multiply.d.ts
 /**
  * Multiplies positioned `rect` by width/height. Useful for denormalising a value.
  * x/y value of second parameter are ignored.
@@ -2150,7 +2620,7 @@ declare function multiplyScalar$2(rect: RectPositioned, amount: number): RectPos
 declare function multiplyDim(rect: Rect | RectPositioned, amount: number): Rect | RectPositioned;
 //# sourceMappingURL=multiply.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/nearest.d.ts
+//#region ../geometry/src/rect/nearest.d.ts
 /**
  * If `p` is inside of `rect`, a copy of `p` is returned.
  * If `p` is outside of `rect`, a point is returned closest to `p` on the edge
@@ -2162,8 +2632,8 @@ declare function multiplyDim(rect: Rect | RectPositioned, amount: number): Rect 
 declare const nearestInternal: (rect: RectPositioned, p: Point) => Point;
 //# sourceMappingURL=nearest.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/placeholder.d.ts
-declare const Placeholder$2: Readonly<{
+//#region ../geometry/src/rect/placeholder.d.ts
+declare const Placeholder$3: Readonly<{
   width: number;
   height: number;
 }>;
@@ -2175,7 +2645,7 @@ declare const PlaceholderPositioned: Readonly<{
 }>;
 //# sourceMappingURL=placeholder.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/perimeter.d.ts
+//#region ../geometry/src/rect/perimeter.d.ts
 /**
  * Returns the perimeter of `rect` (ie. sum of all edges)
  *  * ```js
@@ -2189,7 +2659,7 @@ declare const perimeter$4: (rect: Rect) => number;
 //# sourceMappingURL=perimeter.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/rect/normalise-by-rect.d.ts
+//#region ../geometry/src/rect/normalise-by-rect.d.ts
 /**
  * Returns a function that divides numbers or points by the largest dimension of `rect`.
  *
@@ -2208,7 +2678,7 @@ declare const dividerByLargestDimension: (rect: Rect) => (value: number | Point)
 }>;
 //# sourceMappingURL=normalise-by-rect.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/random.d.ts
+//#region ../geometry/src/rect/random.d.ts
 /**
  * Returns a random positioned Rect on a 0..1 scale.
  * ```js
@@ -2224,7 +2694,7 @@ declare const dividerByLargestDimension: (rect: Rect) => (value: number | Point)
  * @param rando
  * @returns
  */
-declare const random$1: (rando?: RandomSource) => RectPositioned;
+declare const random$2: (rando?: RandomSource) => RectPositioned;
 type RectRandomPointOpts = {
   readonly strategy?: `naive`;
   readonly randomSource?: RandomSource;
@@ -2245,10 +2715,10 @@ type RectRandomPointOpts = {
  * @param options Options
  * @returns
  */
-declare const randomPoint$1: (within: Rect | RectPositioned, options?: RectRandomPointOpts) => Point;
+declare const randomPoint$2: (within: Rect | RectPositioned, options?: RectRandomPointOpts) => Point;
 //# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/subtract.d.ts
+//#region ../geometry/src/rect/subtract.d.ts
 /**
  * Subtracts width/height of `b` from `a` (ie: a - b), returning result.
  * x,y of second parameter is ignored.
@@ -2320,7 +2790,7 @@ declare function subtractSize(a: Rect, b: Rect | number, c?: number): Rect;
 declare function subtractOffset(a: RectPositioned | Rect, b: RectPositioned | Rect): RectPositioned;
 //# sourceMappingURL=subtract.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/sum.d.ts
+//#region ../geometry/src/rect/sum.d.ts
 /**
  * Sums width/height of `b` with `a` (ie: a + b), returning result.
  * x/y of second parameter are ignored
@@ -2391,7 +2861,7 @@ declare function sum$3(rect: RectPositioned, width: number, height: number): Rec
 declare function sumOffset(a: RectPositioned | Rect, b: RectPositioned | Rect): RectPositioned;
 //# sourceMappingURL=sum.d.ts.map
 //#endregion
-//#region packages/geometry/src/rect/to-array.d.ts
+//#region ../geometry/src/rect/to-array.d.ts
 /**
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  *
@@ -2422,10 +2892,10 @@ declare function toArray$1(rect: Rect): RectArray;
 declare function toArray$1(rect: RectPositioned): RectPositionedArray;
 //# sourceMappingURL=to-array.d.ts.map
 declare namespace index_d_exports$8 {
-  export { ApplyFieldOp, ApplyMergeOp, Empty$3 as Empty, EmptyPositioned, Placeholder$2 as Placeholder, PlaceholderPositioned, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, RectRandomPointOpts, applyDim, applyFields, applyMerge, applyScalar, area$4 as area, cardinal, center, corners$1 as corners, distanceFromCenter, distanceFromExterior, divide$4 as divide, divideDim, divideScalar, dividerByLargestDimension, edges$1 as edges, encompass, fromCenter$2 as fromCenter, fromElement, fromNumbers$2 as fromNumbers, fromTopLeft, getEdgeX, getEdgeY, getRectPositioned, getRectPositionedParameter, guard$5 as guard, guardDim, guardPositioned, intersectsPoint$1 as intersectsPoint, isEmpty$3 as isEmpty, isEqual$5 as isEqual, isEqualSize, isIntersecting$1 as isIntersecting, isPlaceholder$3 as isPlaceholder, isPositioned$1 as isPositioned, isRect, isRectPositioned, lengths$1 as lengths, maxFromCorners, multiply$4 as multiply, multiplyDim, multiplyScalar$2 as multiplyScalar, nearestInternal, perimeter$4 as perimeter, random$1 as random, randomPoint$1 as randomPoint, subtract$3 as subtract, subtractOffset, subtractSize, sum$3 as sum, sumOffset, toArray$1 as toArray };
+  export { ApplyFieldOp, ApplyMergeOp, Empty$3 as Empty, EmptyPositioned, Placeholder$3 as Placeholder, PlaceholderPositioned, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, RectRandomPointOpts, applyDim, applyFields, applyMerge, applyScalar, area$4 as area, cardinal, center$1 as center, corners$1 as corners, distanceFromCenter, distanceFromExterior, divide$4 as divide, divideDim, divideScalar, dividerByLargestDimension, edges$1 as edges, encompass, fromCenter$2 as fromCenter, fromElement, fromNumbers$2 as fromNumbers, fromTopLeft, getEdgeX, getEdgeY, getRectPositioned, getRectPositionedParameter, guard$4 as guard, guardDim, guardPositioned, intersectsPoint$1 as intersectsPoint, isEmpty$3 as isEmpty, isEqual$4 as isEqual, isEqualSize, isIntersecting$2 as isIntersecting, isPlaceholder$3 as isPlaceholder, isPositioned, isRect, isRectPositioned, lengths$1 as lengths, maxFromCorners, multiply$4 as multiply, multiplyDim, multiplyScalar$2 as multiplyScalar, nearestInternal, perimeter$4 as perimeter, random$2 as random, randomPoint$2 as randomPoint, subtract$3 as subtract, subtractOffset, subtractSize, sum$3 as sum, sumOffset, toArray$1 as toArray };
 }
 //#endregion
-//#region packages/geometry/src/circle/intersecting.d.ts
+//#region ../geometry/src/circle/intersecting.d.ts
 /**
  * Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
  * A circle can be checked for intersections with another CirclePositioned, Point or RectPositioned.
@@ -2436,10 +2906,10 @@ declare namespace index_d_exports$8 {
  * @param b Circle or point to test
  * @returns True if circle overlap
  */
-declare const isIntersecting: (a: CirclePositioned, b: CirclePositioned | Point | RectPositioned, c?: number) => boolean;
+declare const isIntersecting$1: (a: CirclePositioned, b: CirclePositioned | Point | RectPositioned, c?: number) => boolean;
 //# sourceMappingURL=intersecting.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/intersections.d.ts
+//#region ../geometry/src/circle/intersections.d.ts
 /**
  * Returns the point(s) of intersection between a circle and line.
  *
@@ -2466,7 +2936,7 @@ declare const intersectionLine: (circle: CirclePositioned, line: Line) => readon
 declare const intersections: (a: CirclePositioned, b: CirclePositioned) => readonly Point[];
 //# sourceMappingURL=intersections.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/is-contained-by.d.ts
+//#region ../geometry/src/circle/is-contained-by.d.ts
 /**
  * Returns true if `b` is completely contained by `a`
  *
@@ -2488,7 +2958,7 @@ declare const intersections: (a: CirclePositioned, b: CirclePositioned) => reado
 declare const isContainedBy: (a: CirclePositioned, b: CirclePositioned | Point, c?: number) => boolean;
 //# sourceMappingURL=is-contained-by.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/is-equal.d.ts
+//#region ../geometry/src/circle/is-equal.d.ts
 /**
  * Returns true if the two objects have the same values
  *
@@ -2505,16 +2975,16 @@ declare const isContainedBy: (a: CirclePositioned, b: CirclePositioned | Point, 
  * @param b
  * @returns
  */
-declare const isEqual$4: (a: CirclePositioned | Circle, b: CirclePositioned | Circle) => boolean;
+declare const isEqual$3: (a: CirclePositioned | Circle, b: CirclePositioned | Circle) => boolean;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/multiply.d.ts
+//#region ../geometry/src/circle/multiply.d.ts
 declare function multiplyScalar$1(a: CirclePositioned, value: number): CirclePositioned;
 declare function multiplyScalar$1(a: Circle, value: number): Circle;
 //# sourceMappingURL=multiply.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/circle/perimeter.d.ts
+//#region ../geometry/src/circle/perimeter.d.ts
 /**
  * Returns the nearest point on `circle`'s perimeter closest to `point`.
  *
@@ -2559,10 +3029,10 @@ declare const circumference: (circle: Circle) => number;
  * @param circle
  * @returns
  */
-declare const length$2: (circle: Circle) => number;
+declare const length$1: (circle: Circle) => number;
 //# sourceMappingURL=perimeter.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/random.d.ts
+//#region ../geometry/src/circle/random.d.ts
 /**
  * Returns a random point within a circle.
  *
@@ -2583,10 +3053,10 @@ declare const length$2: (circle: Circle) => number;
  * @param opts Options
  * @returns
  */
-declare const randomPoint: (within: Circle | CirclePositioned, opts?: Partial<CircleRandomPointOpts>) => Point;
+declare const randomPoint$1: (within: Circle | CirclePositioned, opts?: Partial<CircleRandomPointOpts>) => Point;
 //# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/svg.d.ts
+//#region ../geometry/src/circle/svg.d.ts
 /**
  * Creates a SVG path segment.
  * @param a Circle or radius
@@ -2594,21 +3064,21 @@ declare const randomPoint: (within: Circle | CirclePositioned, opts?: Partial<Ci
  * @param origin Origin of path. Required if first parameter is just a radius or circle is non-positioned
  * @returns
  */
-declare const toSvg$1: CircleToSvg;
+declare const toSvg: CircleToSvg;
 //# sourceMappingURL=svg.d.ts.map
 //#endregion
-//#region packages/geometry/src/circle/to-path.d.ts
+//#region ../geometry/src/circle/to-path.d.ts
 /**
  * Returns a `CircularPath` representation of a circle
  *
  * @param {CirclePositioned} circle
  * @returns {CircularPath}
  */
-declare const toPath$3: (circle: CirclePositioned) => CircularPath;
+declare const toPath$1: (circle: CirclePositioned) => CircularPath;
 //# sourceMappingURL=to-path.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/circle/to-positioned.d.ts
+//#region ../geometry/src/circle/to-positioned.d.ts
 /**
  * Returns a positioned version of a circle.
  * If circle is already positioned, it is returned.
@@ -2621,10 +3091,10 @@ declare const toPath$3: (circle: CirclePositioned) => CircularPath;
 declare const toPositioned: (circle: Circle | CirclePositioned, defaultPositionOrX?: Point | number, y?: number) => CirclePositioned;
 //# sourceMappingURL=to-positioned.d.ts.map
 declare namespace index_d_exports$2 {
-  export { Circle, CirclePositioned, CircleRandomPointOpts, CircleToSvg, CircularPath, area$5 as area, bbox$5 as bbox, center$1 as center, circumference, distanceCenter$1 as distanceCenter, distanceFromExterior$1 as distanceFromExterior, exteriorIntegerPoints, guard$6 as guard, guardPositioned$1 as guardPositioned, interiorIntegerPoints, interpolate$3 as interpolate, intersectionLine, intersections, isCircle, isCirclePositioned, isContainedBy, isEqual$4 as isEqual, isIntersecting, isNaN$1 as isNaN, isPositioned$2 as isPositioned, length$2 as length, multiplyScalar$1 as multiplyScalar, nearest$1 as nearest, pointOnPerimeter, randomPoint, toPath$3 as toPath, toPositioned, toSvg$1 as toSvg };
+  export { Circle, CirclePositioned, CircleRandomPointOpts, CircleToSvg, CircularPath, area$5 as area, bbox$4 as bbox, center$2 as center, circumference, distanceCenter, distanceFromExterior$1 as distanceFromExterior, exteriorIntegerPoints, guard$5 as guard, guardPositioned$1 as guardPositioned, interiorIntegerPoints, interpolate$2 as interpolate, intersectionLine, intersections, isCircle, isCirclePositioned, isContainedBy, isEqual$3 as isEqual, isIntersecting$1 as isIntersecting, isNaN$1 as isNaN, isPositioned$1 as isPositioned, length$1 as length, multiplyScalar$1 as multiplyScalar, nearest$1 as nearest, pointOnPerimeter, randomPoint$1 as randomPoint, toPath$1 as toPath, toPositioned, toSvg };
 }
 //#endregion
-//#region packages/geometry/src/line/angles.d.ts
+//#region ../geometry/src/line/angles.d.ts
 /**
  * Returns a parallel line to `line` at `distance`.
  *
@@ -2652,7 +3122,7 @@ declare const perpendicularPoint: (line: Line, distance: number, amount?: number
 };
 //# sourceMappingURL=angles.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/bbox.d.ts
+//#region ../geometry/src/line/bbox.d.ts
 /**
  * Returns a rectangle that encompasses dimension of line
  *
@@ -2660,11 +3130,11 @@ declare const perpendicularPoint: (line: Line, distance: number, amount?: number
  * const rect = Lines.bbox(line);
  * ```
  */
-declare const bbox$3: (line: Line) => RectPositioned;
+declare const bbox$2: (line: Line) => RectPositioned;
 //# sourceMappingURL=bbox.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/distance-single-line.d.ts
+//#region ../geometry/src/line/distance-single-line.d.ts
 /**
  * Returns the distance of `point` to the nearest point on `line`
  *
@@ -2679,7 +3149,7 @@ declare const distanceSingleLine: (line: Line, point: Point) => number;
 //# sourceMappingURL=distance-single-line.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/divide.d.ts
+//#region ../geometry/src/line/divide.d.ts
 /**
  * Divides both start and end points by given x,y
  * ```js
@@ -2697,7 +3167,7 @@ declare const distanceSingleLine: (line: Line, point: Point) => number;
 declare const divide$3: (line: Line, point: Point) => Line;
 //# sourceMappingURL=divide.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/from-flat-array.d.ts
+//#region ../geometry/src/line/from-flat-array.d.ts
 /**
  * Returns a line from four numbers [x1,y1,x2,y2].
  *
@@ -2713,7 +3183,7 @@ declare const divide$3: (line: Line, point: Point) => Line;
 declare const fromFlatArray$1: (array: readonly number[]) => Line;
 //# sourceMappingURL=from-flat-array.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/from-numbers.d.ts
+//#region ../geometry/src/line/from-numbers.d.ts
 /**
  * Returns a line from a basis of coordinates (x1, y1, x2, y2)
  *
@@ -2730,7 +3200,7 @@ declare const fromFlatArray$1: (array: readonly number[]) => Line;
 declare const fromNumbers$1: (x1: number, y1: number, x2: number, y2: number) => Line;
 //# sourceMappingURL=from-numbers.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/from-points.d.ts
+//#region ../geometry/src/line/from-points.d.ts
 /**
  * Returns a line from two points
  *
@@ -2743,11 +3213,11 @@ declare const fromNumbers$1: (x1: number, y1: number, x2: number, y2: number) =>
  * @param b End point
  * @returns
  */
-declare const fromPoints$1: (a: Point, b: Point) => Line;
+declare const fromPoints$2: (a: Point, b: Point) => Line;
 //# sourceMappingURL=from-points.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/from-pivot.d.ts
+//#region ../geometry/src/line/from-pivot.d.ts
 /**
  * Creates a line from an origin point.
  * ```js
@@ -2776,7 +3246,7 @@ declare const fromPivot: (origin?: Point, length?: number, angleRadian?: number,
 }>;
 //# sourceMappingURL=from-pivot.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/line-path-type.d.ts
+//#region ../geometry/src/line/line-path-type.d.ts
 type LinePath = Line & Path & {
   toFlatArray(): ReadonlyArray<number>;
   toPoints(): ReadonlyArray<Point>;
@@ -2795,7 +3265,7 @@ type LinePath = Line & Path & {
 };
 //# sourceMappingURL=line-path-type.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/from-points-to-path.d.ts
+//#region ../geometry/src/line/from-points-to-path.d.ts
 /**
  * Returns a {@link LinePath} from two points
  *
@@ -2809,7 +3279,7 @@ type LinePath = Line & Path & {
 declare const fromPointsToPath: (a: Point, b: Point) => LinePath;
 //# sourceMappingURL=from-points-to-path.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/get-points-parameter.d.ts
+//#region ../geometry/src/line/get-points-parameter.d.ts
 /**
  * Returns [a,b] points from either a line parameter, or two points.
  * It additionally applies the guardPoint function to ensure validity.
@@ -2822,7 +3292,7 @@ declare const fromPointsToPath: (a: Point, b: Point) => LinePath;
 declare const getPointParameter$1: (aOrLine: Point | Line, b?: Point) => readonly [Point, Point];
 //# sourceMappingURL=get-points-parameter.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/guard.d.ts
+//#region ../geometry/src/line/guard.d.ts
 /**
  * Returns true if `p` is a valid line, containing `a` and `b` Points.
  * ```js
@@ -2848,10 +3318,10 @@ declare const isPolyLine: (p: any) => p is PolyLine;
  * @param line
  * @param name
  */
-declare const guard$4: (line: Line, name?: string) => void;
+declare const guard$3: (line: Line, name?: string) => void;
 //# sourceMappingURL=guard.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/interpolate.d.ts
+//#region ../geometry/src/line/interpolate.d.ts
 /**
  * Calculates a point in-between `a` and `b`.
  *
@@ -2872,7 +3342,7 @@ declare const guard$4: (line: Line, name?: string) => void;
  * @param pointB End
  * @returns Point between a and b
  */
-declare function interpolate$2(amount: number, a: Point, pointB: Point, allowOverflow?: boolean): Point;
+declare function interpolate$1(amount: number, a: Point, pointB: Point, allowOverflow?: boolean): Point;
 /**
  * Calculates a point in-between `line`'s start and end points.
  *
@@ -2886,7 +3356,7 @@ declare function interpolate$2(amount: number, a: Point, pointB: Point, allowOve
  * @param line Line
  * @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line
  */
-declare function interpolate$2(amount: number, line: Line, allowOverflow?: boolean): Point;
+declare function interpolate$1(amount: number, line: Line, allowOverflow?: boolean): Point;
 /**
  * Returns the point along a line from its start (A)
  * @param line Line
@@ -2897,7 +3367,7 @@ declare function interpolate$2(amount: number, line: Line, allowOverflow?: boole
 declare function pointAtDistance(line: Line, distance: number, fromA?: boolean): Point;
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/is-equal.d.ts
+//#region ../geometry/src/line/is-equal.d.ts
 /**
  * Returns true if the lines have the same value. Note that only
  * the line start and end points are compared. So the lines might
@@ -2914,10 +3384,10 @@ declare function pointAtDistance(line: Line, distance: number, fromA?: boolean):
  * @param {Line} b
  * @returns {boolean}
  */
-declare const isEqual$3: (a: Line, b: Line) => boolean;
+declare const isEqual$2: (a: Line, b: Line) => boolean;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/join-points-to-lines.d.ts
+//#region ../geometry/src/line/join-points-to-lines.d.ts
 /**
  * Returns an array of lines that connects provided points. Note that line is not closed.
  *
@@ -2933,7 +3403,7 @@ declare const isEqual$3: (a: Line, b: Line) => boolean;
 declare const joinPointsToLines: (...points: readonly Point[]) => PolyLine;
 //# sourceMappingURL=join-points-to-lines.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/length.d.ts
+//#region ../geometry/src/line/length.d.ts
 /**
  * Returns the length between two points
  * ```js
@@ -2943,7 +3413,7 @@ declare const joinPointsToLines: (...points: readonly Point[]) => PolyLine;
  * @param b Second point
  * @returns
  */
-declare function length$1(a: Point, b: Point): number;
+declare function length(a: Point, b: Point): number;
 /**
  * Returns length of line. If a polyline (array of lines) is provided,
  * it is the sum total that is returned.
@@ -2954,10 +3424,10 @@ declare function length$1(a: Point, b: Point): number;
  * ```
  * @param line Line
  */
-declare function length$1(line: Line | PolyLine): number;
+declare function length(line: Line | PolyLine): number;
 //# sourceMappingURL=length.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/midpoint.d.ts
+//#region ../geometry/src/line/midpoint.d.ts
 /**
  * Returns the mid-point of a line (same as `interpolate` with an amount of 0.5)
  *
@@ -2971,13 +3441,13 @@ declare function length$1(line: Line | PolyLine): number;
 declare const midpoint: (aOrLine: Point | Line, pointB?: Point) => Point;
 //# sourceMappingURL=midpoint.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/abs.d.ts
+//#region ../geometry/src/point/abs.d.ts
 declare function abs(pt: Point3d): Point3d;
 declare function abs(pt: Point): Point;
 //# sourceMappingURL=abs.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/angle.d.ts
+//#region ../geometry/src/point/angle.d.ts
 /**
  * Returns the angle in radians between `a` and `b`.
  *
@@ -3015,14 +3485,14 @@ declare const angleRadian$1: (a: Point, b?: Point, c?: Point) => number;
 declare const angleRadianCircle: (a: Point, b?: Point, c?: Point) => number;
 //# sourceMappingURL=angle.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/apply.d.ts
+//#region ../geometry/src/point/apply.d.ts
 type PointApplyFn = (v: number, field: `x` | `y`) => number;
 type Point3dApplyFn = (v: number, field: `x` | `y` | `z`) => number;
 declare function apply$2(pt: Point3d, fn: Point3dApplyFn): Point3d;
 declare function apply$2(pt: Point, fn: PointApplyFn): Point;
 //# sourceMappingURL=apply.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/averager.d.ts
+//#region ../geometry/src/point/averager.d.ts
 type PointAverager = (point: Point) => Point;
 type PointAverageKinds = `moving-average-light`;
 /**
@@ -3044,18 +3514,18 @@ declare function averager(kind: `moving-average-light`, opts: Partial<{
 }>): PointAverager;
 //# sourceMappingURL=averager.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/bbox.d.ts
+//#region ../geometry/src/point/bbox.d.ts
 /**
  * Returns the minimum rectangle that can enclose all provided points
  * @param points
  * @returns
  */
-declare const bbox$2: (...points: ReadonlyArray<Point>) => RectPositioned;
+declare const bbox$1: (...points: ReadonlyArray<Point>) => RectPositioned;
 declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
 //# sourceMappingURL=bbox.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/centroid.d.ts
+//#region ../geometry/src/point/centroid.d.ts
 /**
  * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
  * Undefined values are skipped over.
@@ -3073,13 +3543,13 @@ declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
 declare const centroid$1: (...points: ReadonlyArray<Point | undefined>) => Point;
 //# sourceMappingURL=centroid.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/clamp.d.ts
+//#region ../geometry/src/point/clamp.d.ts
 declare function clamp(a: Point, min?: number, max?: number): Point;
 declare function clamp(a: Point3d, min?: number, max?: number): Point3d;
 //# sourceMappingURL=clamp.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/compare.d.ts
+//#region ../geometry/src/point/compare.d.ts
 /**
  * Returns -2 if both x & y of a is less than b
  * Returns -1 if either x/y of a is less than b
@@ -3145,7 +3615,7 @@ declare const compareByY: (a: Point, b: Point) => number;
 declare const compareByZ: (a: Point3d, b: Point3d) => number;
 //# sourceMappingURL=compare.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/convex-hull.d.ts
+//#region ../geometry/src/point/convex-hull.d.ts
 /**
  * Simple convex hull impementation. Returns a set of points which
  * enclose `pts`.
@@ -3157,13 +3627,137 @@ declare const compareByZ: (a: Point3d, b: Point3d) => number;
 declare const convexHull: (...pts: ReadonlyArray<Point>) => ReadonlyArray<Point>;
 //# sourceMappingURL=convex-hull.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/distance.d.ts
+//#region ../geometry/src/point/distance.d.ts
 declare function distance$1(a: Point, b?: Point): number;
 declare function distance$1(a: Point, x: number, y: number): number;
 //# sourceMappingURL=distance.d.ts.map
+//#endregion
+//#region ../geometry/src/shape/shape-type.d.ts
+type ShapePositioned = CirclePositioned | RectPositioned;
+type ContainsResult = `none` | `contained`;
+type Sphere = Point3d & {
+  readonly radius: number;
+};
+type PointCalculableShape = PolyLine | Line | RectPositioned | Point | CirclePositioned;
+//# sourceMappingURL=shape-type.d.ts.map
+//#endregion
+//#region ../geometry/src/shape/arrow.d.ts
+type ArrowOpts = {
+  readonly arrowSize?: number;
+  readonly tailLength?: number;
+  readonly tailThickness?: number;
+  readonly angleRadian?: number;
+};
+/**
+ * Returns the points forming an arrow.
+ *
+ * @example Create an arrow anchored by its tip at 100,100
+ * ```js
+ * const opts = {
+ *  tailLength: 10,
+ *  arrowSize: 20,
+ *  tailThickness: 5,
+ *  angleRadian: degreeToRadian(45)
+ * }
+ * const arrow = Shapes.arrow({x:100, y:100}, `tip`, opts); // Yields an array of points
+ *
+ * // Eg: draw points
+ * Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
+ * ```
+ *
+ * @param origin Origin of arrow
+ * @param from Does origin describe the tip, tail or middle?
+ * @param opts Options for arrow
+ * @returns
+ */
+declare const arrow: (origin: Point, from: `tip` | `tail` | `middle`, opts?: ArrowOpts) => ReadonlyArray<Point>;
+//# sourceMappingURL=arrow.d.ts.map
+//#endregion
+//#region ../geometry/src/triangle/triangle-type.d.ts
+type Triangle = {
+  readonly a: Point;
+  readonly b: Point;
+  readonly c: Point;
+};
+type BarycentricCoord = {
+  readonly a: number;
+  readonly b: number;
+  readonly c: number;
+};
+//# sourceMappingURL=triangle-type.d.ts.map
+//#endregion
+//#region ../geometry/src/shape/etc.d.ts
+type ShapeRandomPointOpts = {
+  readonly randomSource: RandomSource;
+};
+/**
+ * Returns a random point within a shape.
+ * `shape` can be {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
+ * @param shape
+ * @param opts
+ * @returns
+ */
+declare const randomPoint: (shape: ShapePositioned, opts?: Partial<ShapeRandomPointOpts>) => Point;
+/**
+ * Returns the center of a shape
+ * Shape can be: rectangle, triangle, circle
+ * @param shape
+ * @returns
+ */
+declare const center: (shape?: Rect | Triangle | Circle) => Point;
+//# sourceMappingURL=etc.d.ts.map
+//#endregion
+//#region ../geometry/src/shape/is-intersecting.d.ts
+/**
+ * Returns the intersection result between a and b.
+ * `a` can be a {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
+ * `b` can be as above or a {@link Point}.
+ * @param a
+ * @param b
+ */
+declare const isIntersecting: (a: ShapePositioned, b: ShapePositioned | Point) => boolean;
+//# sourceMappingURL=is-intersecting.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/distance-to-center.d.ts
+//#region ../geometry/src/shape/starburst.d.ts
+/**
+ * Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
+ *
+ * ```
+ * // Generate a starburst with four spikes
+ * const pts = starburst(4, 100, 200);
+ * ```
+ *
+ * `points` of two produces a lozenge shape.
+ * `points` of three produces a triangle shape.
+ * `points` of five is the familiar 'star' shape.
+ *
+ * Note that the path will need to be closed back to the first point to enclose the shape.
+ *
+ * @example Create starburst and draw it. Note use of 'loop' flag to close the path
+ * ```
+ * const points = starburst(4, 100, 200);
+ * Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
+ * ```
+ *
+ * Options:
+ * * initialAngleRadian: angle offset to begin from. This overrides the `-Math.PI/2` default.
+ *
+ * @param points Number of points in the starburst. Defaults to five, which produces a typical star
+ * @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
+ * @param outerRadius Outer radius. Maximum radius of a spike to origin
+ * @param opts Options
+ * @param origin Origin, or `{ x:0, y:0 }` by default.
+ */
+declare const starburst: (outerRadius: number, points?: number, innerRadius?: number, origin?: Point, opts?: {
+  readonly initialAngleRadian?: number;
+}) => readonly Point[];
+//# sourceMappingURL=starburst.d.ts.map
+declare namespace index_d_exports$9 {
+  export { ArrowOpts, ContainsResult, PointCalculableShape, ShapePositioned, ShapeRandomPointOpts, Sphere, arrow, center, isIntersecting, randomPoint, starburst };
+}
+//#endregion
+//#region ../geometry/src/point/distance-to-center.d.ts
 /**
  * Returns the distance from point `a` to the center of `shape`.
  * @param a Point
@@ -3174,7 +3768,7 @@ declare const distanceToCenter: (a: Point, shape: PointCalculableShape) => numbe
 //# sourceMappingURL=distance-to-center.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/distance-to-exterior.d.ts
+//#region ../geometry/src/point/distance-to-exterior.d.ts
 /**
  * Returns the distance from point `a` to the exterior of `shape`.
  *
@@ -3201,7 +3795,7 @@ declare const distanceToCenter: (a: Point, shape: PointCalculableShape) => numbe
 declare const distanceToExterior: (a: Point, shape: PointCalculableShape) => number;
 //# sourceMappingURL=distance-to-exterior.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/divider.d.ts
+//#region ../geometry/src/point/divider.d.ts
 declare function divide$2(a: Point, b: Point): Point;
 declare function divide$2(a: Point3d, b: Point3d): Point3d;
 declare function divide$2(a: Point, x: number, y: number): Point;
@@ -3238,12 +3832,12 @@ declare function divide$2(ax: number, ay: number, az: number, bx: number, by: nu
 declare function divider(a: Point3d | Point | number | number[], b?: number, c?: number): (aa: Point3d | Point | number | number[], bb?: number, cc?: number) => Point;
 //# sourceMappingURL=divider.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/dot-product.d.ts
+//#region ../geometry/src/point/dot-product.d.ts
 declare const dotProduct$2: (...pts: readonly Point[]) => number;
 //# sourceMappingURL=dot-product.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/empty.d.ts
+//#region ../geometry/src/point/empty.d.ts
 /**
  * An empty point of `{ x: 0, y: 0 }`.
  *
@@ -3281,12 +3875,12 @@ declare const Unit3d: {
 };
 //# sourceMappingURL=empty.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/find-minimum.d.ts
+//#region ../geometry/src/point/find-minimum.d.ts
 declare function findMinimum(comparer: (a: Point, b: Point) => Point, ...points: ReadonlyArray<Point>): Point;
 declare function findMinimum(comparer: (a: Point3d, b: Point3d) => Point3d, ...points: ReadonlyArray<Point3d>): Point3d;
 //# sourceMappingURL=find-minimum.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/from.d.ts
+//#region ../geometry/src/point/from.d.ts
 declare function from(x: number, y: number, z: number): Point3d;
 declare function from(x: number, y: number): Point;
 declare function from(array: [x: number, y: number, z: number]): Point3d;
@@ -3324,7 +3918,7 @@ declare const fromString: (string_: string) => Point;
 declare const fromNumbers: (...coords: readonly (readonly number[])[] | readonly number[]) => readonly Point[];
 //# sourceMappingURL=from.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/get-point-parameter.d.ts
+//#region ../geometry/src/point/get-point-parameter.d.ts
 declare function getTwoPointParameters(a: Point, b: Point): [a: Point, b: Point];
 declare function getTwoPointParameters(a: Point3d, b: Point3d): [a: Point3d, b: Point3d];
 declare function getTwoPointParameters(a: Point, x: number, y: number): [a: Point, b: Point];
@@ -3342,7 +3936,7 @@ declare function getTwoPointParameters(ax: number, ay: number, az: number, bx: n
 declare function getPointParameter(a?: Point3d | Point | number | Array<number> | ReadonlyArray<number>, b?: number | boolean, c?: number): Point | Point3d;
 //# sourceMappingURL=get-point-parameter.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/guard.d.ts
+//#region ../geometry/src/point/guard.d.ts
 /**
  * Returns true if xy (and z, if present) are _null_.
  * @param p
@@ -3358,7 +3952,7 @@ declare const isNaN: (p: Point) => boolean;
  * @param p
  * @param name
  */
-declare function guard$3(p: Point, name?: string): void;
+declare function guard$2(p: Point, name?: string): void;
 /**
  * Throws if parameter is not a valid point, or either x or y is 0
  * @param pt
@@ -3398,7 +3992,7 @@ declare const isEmpty$2: (p: Point) => boolean;
 declare const isPlaceholder$2: (p: Point) => boolean;
 //# sourceMappingURL=guard.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/interpolate.d.ts
+//#region ../geometry/src/point/interpolate.d.ts
 /**
  * Returns a relative point between two points.
  *
@@ -3414,10 +4008,10 @@ declare const isPlaceholder$2: (p: Point) => boolean;
  * @param allowOverflow If true, length of line can be exceeded for `amount` of below 0 and above `1`.
  * @returns {@link Point}
  */
-declare const interpolate$1: (amount: number, a: Point, b: Point, allowOverflow?: boolean) => Point;
+declare const interpolate: (amount: number, a: Point, b: Point, allowOverflow?: boolean) => Point;
 //# sourceMappingURL=interpolate.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/invert.d.ts
+//#region ../geometry/src/point/invert.d.ts
 /**
  * Inverts one or more axis of a point
  * ```js
@@ -3431,7 +4025,7 @@ declare const interpolate$1: (amount: number, a: Point, b: Point, allowOverflow?
 declare const invert$1: (pt: Point | Point3d, what?: `both` | `x` | `y` | `z`) => Point;
 //# sourceMappingURL=invert.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/is-equal.d.ts
+//#region ../geometry/src/point/is-equal.d.ts
 /**
  * Returns _true_ if the points have identical values
  *
@@ -3444,10 +4038,10 @@ declare const invert$1: (pt: Point | Point3d, what?: `both` | `x` | `y` | `z`) =
  * @param p Points
  * @returns _True_ if points are equal
  */
-declare const isEqual$2: (...p: ReadonlyArray<Point>) => boolean;
+declare const isEqual$1: (...p: ReadonlyArray<Point>) => boolean;
 //# sourceMappingURL=is-equal.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/magnitude.d.ts
+//#region ../geometry/src/point/magnitude.d.ts
 /**
  * Clamps the magnitude of a point.
  * This is useful when using a Point as a vector, to limit forces.
@@ -3460,7 +4054,7 @@ declare const clampMagnitude$2: (pt: Point, max?: number, min?: number) => Point
 //# sourceMappingURL=magnitude.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/most.d.ts
+//#region ../geometry/src/point/most.d.ts
 /**
  * Returns the left-most of the provided points.
  *
@@ -3493,7 +4087,7 @@ declare const leftmost: (...points: ReadonlyArray<Point>) => Point;
 declare const rightmost: (...points: ReadonlyArray<Point>) => Point;
 //# sourceMappingURL=most.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/multiply.d.ts
+//#region ../geometry/src/point/multiply.d.ts
 declare function multiply$3(a: Point, b: Point): Point;
 declare function multiply$3(a: Point3d, b: Point3d): Point3d;
 declare function multiply$3(a: Point, x: number, y: number): Point;
@@ -3515,7 +4109,7 @@ declare function multiply$3(ax: number, ay: number, az: number, bx: number, by: 
 declare const multiplyScalar: (pt: Point | Point3d, v: number) => Point | Point3d;
 //# sourceMappingURL=multiply.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/normalise.d.ts
+//#region ../geometry/src/point/normalise.d.ts
 /**
  * Normalise point as a unit vector.
  *
@@ -3530,7 +4124,7 @@ declare const multiplyScalar: (pt: Point | Point3d, v: number) => Point | Point3
 declare const normalise$2: (ptOrX: Point | number, y?: number) => Point;
 //# sourceMappingURL=normalise.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/normalise-by-rect.d.ts
+//#region ../geometry/src/point/normalise-by-rect.d.ts
 /**
  * Normalises a point by a given width and height
  *
@@ -3566,7 +4160,7 @@ declare function normaliseByRect$1(pt: Point, rect: Rect): Point;
 declare function normaliseByRect$1(x: number, y: number, width: number, height: number): Point;
 //# sourceMappingURL=normalise-by-rect.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/pipeline.d.ts
+//#region ../geometry/src/point/pipeline.d.ts
 /**
  * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
  * ```js
@@ -3597,7 +4191,7 @@ declare const pipelineApply: (point: Point, ...pipelineFns: ReadonlyArray<(pt: P
 declare const pipeline: (...pipeline: ReadonlyArray<(pt: Point) => Point>) => (pt: Point) => Point;
 //# sourceMappingURL=pipeline.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/point-relation-types.d.ts
+//#region ../geometry/src/point/point-relation-types.d.ts
 type PointRelation = (a: Point | number, b?: number) => PointRelationResult;
 type PointRelationResult = {
   /**
@@ -3628,7 +4222,7 @@ type PointRelationResult = {
 };
 //# sourceMappingURL=point-relation-types.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/types.d.ts
+//#region ../geometry/src/polar/types.d.ts
 /**
  * Converts to Cartesian coordiantes
  */
@@ -3669,7 +4263,7 @@ type Coord = {
 };
 //# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/angles.d.ts
+//#region ../geometry/src/polar/angles.d.ts
 /**
  * Returns a rotated coordinate
  * @param c Coordinate
@@ -3713,7 +4307,7 @@ declare const isAntiParallel: (a: Coord, b: Coord) => boolean;
 declare const rotateDegrees: (c: Coord, amountDeg: number) => Coord;
 //# sourceMappingURL=angles.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/conversions.d.ts
+//#region ../geometry/src/polar/conversions.d.ts
 /**
  * Converts to Cartesian coordinate from polar.
  *
@@ -3765,7 +4359,7 @@ declare const toPoint: (v: Coord, origin?: {
 }) => Point;
 //# sourceMappingURL=conversions.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/guard.d.ts
+//#region ../geometry/src/polar/guard.d.ts
 /**
  * Returns true if `p` seems to be a {@link Polar.Coord} (ie has both distance & angleRadian fields)
  * @param p
@@ -3777,10 +4371,10 @@ declare const isPolarCoord: (p: unknown) => p is Coord;
  * @param p
  * @param name
  */
-declare const guard$2: (p: Coord, name?: string) => void;
+declare const guard$1: (p: Coord, name?: string) => void;
 //# sourceMappingURL=guard.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/math.d.ts
+//#region ../geometry/src/polar/math.d.ts
 declare const normalise$1: (c: Coord) => Coord;
 /**
  * Clamps the magnitude of a vector
@@ -3854,7 +4448,7 @@ declare const toString$3: (ray: PolarRay) => string;
 declare const fromLine: (line: Line, origin?: Point) => PolarRay;
 //# sourceMappingURL=ray.d.ts.map
 //#endregion
-//#region packages/geometry/src/polar/spiral.d.ts
+//#region ../geometry/src/polar/spiral.d.ts
 declare function spiral(smoothness: number, zoom: number): IterableIterator<Coord & {
   readonly step: number;
 }>;
@@ -3868,10 +4462,10 @@ declare function spiral(smoothness: number, zoom: number): IterableIterator<Coor
 declare const spiralRaw: (step: number, smoothness: number, zoom: number) => Coord;
 //# sourceMappingURL=spiral.d.ts.map
 declare namespace index_d_exports$7 {
-  export { Coord, PolarRay, PolarRayWithOrigin, PolarToCartesian, ray_d_exports as Ray, clampMagnitude$1 as clampMagnitude, divide$1 as divide, dotProduct$1 as dotProduct, fromCartesian, guard$2 as guard, invert, isAntiParallel, isOpposite, isParallel, isPolarCoord, multiply$2 as multiply, normalise$1 as normalise, rotate$3 as rotate, rotateDegrees, spiral, spiralRaw, toCartesian$2 as toCartesian, toPoint, toString$4 as toString };
+  export { Coord, PolarRay, PolarRayWithOrigin, PolarToCartesian, ray_d_exports as Ray, clampMagnitude$1 as clampMagnitude, divide$1 as divide, dotProduct$1 as dotProduct, fromCartesian, guard$1 as guard, invert, isAntiParallel, isOpposite, isParallel, isPolarCoord, multiply$2 as multiply, normalise$1 as normalise, rotate$3 as rotate, rotateDegrees, spiral, spiralRaw, toCartesian$2 as toCartesian, toPoint, toString$4 as toString };
 }
 //#endregion
-//#region packages/geometry/src/point/point-tracker.d.ts
+//#region ../geometry/src/point/point-tracker.d.ts
 /**
  * Information about seen points
  */
@@ -4069,7 +4663,7 @@ declare class PointsTracker extends TrackedValueMap<Point, PointTracker, PointTr
 }
 //# sourceMappingURL=point-tracker.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/progress-between.d.ts
+//#region ../geometry/src/point/progress-between.d.ts
 /**
  * Computes the progress between two waypoints, given `position`.
  *
@@ -4083,7 +4677,7 @@ declare const progressBetween: (position: Point | Point3d, waypointA: Point | Po
 //# sourceMappingURL=progress-between.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/project.d.ts
+//#region ../geometry/src/point/project.d.ts
 /**
  * Project `origin` by `distance` and `angle` (radians).
  *
@@ -4108,13 +4702,13 @@ declare const project: (origin: Point, distance: number, angle: number) => {
 };
 //# sourceMappingURL=project.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/quantise.d.ts
+//#region ../geometry/src/point/quantise.d.ts
 declare function quantiseEvery(pt: Point3d, snap: Point3d, middleRoundsUp?: boolean): Point3d;
 declare function quantiseEvery(pt: Point, snap: Point, middleRoundsUp?: boolean): Point;
 //# sourceMappingURL=quantise.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/random.d.ts
+//#region ../geometry/src/point/random.d.ts
 /**
  * Returns a random 2D point on a 0..1 scale.
  * ```js
@@ -4131,7 +4725,7 @@ declare function quantiseEvery(pt: Point, snap: Point, middleRoundsUp?: boolean)
  * @param rando
  * @returns
  */
-declare const random: (rando?: RandomSource) => Point;
+declare const random$1: (rando?: RandomSource) => Point;
 /**
  * Returns a random 3D point on a 0..1 scale.
  * ```js
@@ -4151,7 +4745,7 @@ declare const random: (rando?: RandomSource) => Point;
 declare const random3d: (rando?: RandomSource) => Point3d;
 //# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/reduce.d.ts
+//#region ../geometry/src/point/reduce.d.ts
 /**
  * Reduces over points, treating _x_ and _y_ separately.
  *
@@ -4170,7 +4764,7 @@ declare const reduce: (pts: ReadonlyArray<Point>, fn: (p: Point, accumulated: Po
 //# sourceMappingURL=reduce.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/relation.d.ts
+//#region ../geometry/src/point/relation.d.ts
 /**
  * Tracks the relation between two points.
  *
@@ -4211,7 +4805,7 @@ declare const reduce: (pts: ReadonlyArray<Point>, fn: (p: Point, accumulated: Po
 declare const relation: (a: Point | number, b?: number) => PointRelation;
 //# sourceMappingURL=relation.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/rotate.d.ts
+//#region ../geometry/src/point/rotate.d.ts
 /**
  * Rotate a single point by a given amount in radians
  * @param pt
@@ -4228,12 +4822,12 @@ declare function rotate$2(pt: Point, amountRadian: number, origin?: Point): Poin
 declare function rotate$2(pt: readonly Point[], amountRadian: number, origin?: Point): readonly Point[];
 //# sourceMappingURL=rotate.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/rotate-point-array.d.ts
+//#region ../geometry/src/point/rotate-point-array.d.ts
 declare const rotatePointArray: (v: ReadonlyArray<ReadonlyArray<number>>, amountRadian: number) => Array<Array<number>>;
 //# sourceMappingURL=rotate-point-array.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/round.d.ts
+//#region ../geometry/src/point/round.d.ts
 /**
  * Round the point's _x_ and _y_ to given number of digits
  * @param ptOrX
@@ -4244,7 +4838,7 @@ declare const rotatePointArray: (v: ReadonlyArray<ReadonlyArray<number>>, amount
 declare const round: (ptOrX: Point | number, yOrDigits?: number, digits?: number) => Point;
 //# sourceMappingURL=round.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/subtract.d.ts
+//#region ../geometry/src/point/subtract.d.ts
 declare function subtract$2(a: Point, b: Point): Point;
 declare function subtract$2(a: Point3d, b: Point3d): Point3d;
 declare function subtract$2(a: Point, x: number, y: number): Point;
@@ -4253,7 +4847,7 @@ declare function subtract$2(ax: number, ay: number, bx: number, by: number): Poi
 declare function subtract$2(ax: number, ay: number, az: number, bx: number, by: number, bz: number): Point3d;
 //# sourceMappingURL=subtract.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/sum.d.ts
+//#region ../geometry/src/point/sum.d.ts
 declare function sum$2(a: Point, b: Point): Point;
 declare function sum$2(a: Point3d, b: Point3d): Point3d;
 declare function sum$2(a: Point, x: number, y: number): Point;
@@ -4263,7 +4857,7 @@ declare function sum$2(ax: number, ay: number, az: number, bx: number, by: numbe
 //# sourceMappingURL=sum.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/To.d.ts
+//#region ../geometry/src/point/To.d.ts
 /**
  * Returns a point with rounded x,y coordinates. By default uses `Math.round` to round.
  * ```js
@@ -4302,7 +4896,7 @@ declare const to3d: (pt: Point, z?: number) => Point3d;
 declare function toString$2(p: Point, digits?: number): string;
 //# sourceMappingURL=To.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/to-array.d.ts
+//#region ../geometry/src/point/to-array.d.ts
 /**
  * Returns point as an array in the form [x,y]. This can be useful for some libraries
  * that expect points in array form.
@@ -4318,7 +4912,7 @@ declare const toArray: (p: Point) => ReadonlyArray<number>;
 //# sourceMappingURL=to-array.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/point/within-range.d.ts
+//#region ../geometry/src/point/within-range.d.ts
 /**
  * Returns true if two points are within a specified range on both axes.
  *
@@ -4341,7 +4935,7 @@ declare const toArray: (p: Point) => ReadonlyArray<number>;
 declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => boolean;
 //# sourceMappingURL=within-range.d.ts.map
 //#endregion
-//#region packages/geometry/src/point/wrap.d.ts
+//#region ../geometry/src/point/wrap.d.ts
 /**
  * Wraps a point to be within `ptMin` and `ptMax`.
  * Note that max values are _exclusive_, meaning the return value will always be one less.
@@ -4365,10 +4959,10 @@ declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => b
 declare const wrap: (pt: Point, ptMax?: Point, ptMin?: Point) => Point;
 //# sourceMappingURL=wrap.d.ts.map
 declare namespace index_d_exports$6 {
-  export { Empty$2 as Empty, Empty3d, Placeholder$3 as Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$2 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$3 as guard, guardNonZeroPoint, interpolate$1 as interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$2 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
+  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
 }
 //#endregion
-//#region packages/geometry/src/line/multiply.d.ts
+//#region ../geometry/src/line/multiply.d.ts
 /**
  * Multiplies start and end of line by point.x, point.y.
  *
@@ -4386,7 +4980,7 @@ declare namespace index_d_exports$6 {
 declare const multiply$1: (line: Line, point: Point) => Line;
 //# sourceMappingURL=multiply.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/nearest.d.ts
+//#region ../geometry/src/line/nearest.d.ts
 /**
  * Returns the nearest point on `line` closest to `point`.
  *
@@ -4402,7 +4996,7 @@ declare const multiply$1: (line: Line, point: Point) => Line;
 declare const nearest: (line: Line | readonly Line[], point: Point) => Point;
 //# sourceMappingURL=nearest.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/relative-position.d.ts
+//#region ../geometry/src/line/relative-position.d.ts
 /**
  * Returns the relative position of `pt` along `line`.
  * Warning: assumes `pt` is actually on `line`. Results may be bogus if not.
@@ -4413,7 +5007,7 @@ declare const relativePosition: (line: Line, pt: Point) => number;
 //# sourceMappingURL=relative-position.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/reverse.d.ts
+//#region ../geometry/src/line/reverse.d.ts
 /**
  * Reverses a line.
  * ````js
@@ -4429,7 +5023,7 @@ declare function reverse(line: Line): Line;
 //# sourceMappingURL=reverse.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/rotate.d.ts
+//#region ../geometry/src/line/rotate.d.ts
 /**
  * Returns a line that is rotated by `angleRad`. By default it rotates
  * around its center, but an arbitrary `origin` point can be provided.
@@ -4456,7 +5050,7 @@ declare function reverse(line: Line): Line;
 declare const rotate$1: (line: Line, amountRadian?: number, origin?: Point | number) => Line;
 //# sourceMappingURL=rotate.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/subtract.d.ts
+//#region ../geometry/src/line/subtract.d.ts
 /**
  * Subtracts both start and end points by given x,y
  * ```js
@@ -4472,7 +5066,7 @@ declare const rotate$1: (line: Line, amountRadian?: number, origin?: Point | num
 declare const subtract$1: (line: Line, point: Point) => Line;
 //# sourceMappingURL=subtract.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/sum.d.ts
+//#region ../geometry/src/line/sum.d.ts
 /**
  * Adds both start and end points by given x,y
  * ```js
@@ -4490,7 +5084,7 @@ declare const sum$1: (line: Line, point: Point) => Line;
 //# sourceMappingURL=sum.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/line/to-path.d.ts
+//#region ../geometry/src/line/to-path.d.ts
 /**
  * Returns a path wrapper around a line instance. This is useful if there are a series
  * of operations you want to do with the same line because you don't have to pass it
@@ -4513,10 +5107,10 @@ declare const sum$1: (line: Line, point: Point) => Line;
  * @param line
  * @returns
  */
-declare const toPath$2: (line: Line) => LinePath;
+declare const toPath: (line: Line) => LinePath;
 //# sourceMappingURL=to-path.d.ts.map
 //#endregion
-//#region packages/geometry/src/line/to-string.d.ts
+//#region ../geometry/src/line/to-string.d.ts
 /**
  * Returns a string representation of two points
  * ```js
@@ -4537,7 +5131,7 @@ declare function toString$1(a: Point, b: Point): string;
 declare function toString$1(line: Line): string;
 //# sourceMappingURL=to-string.d.ts.map
 declare namespace index_d_exports$4 {
-  export { Empty$1 as Empty, Line, LinePath, Placeholder$1 as Placeholder, PolyLine, angleRadian, apply$1 as apply, asPoints, bbox$3 as bbox, distance, distanceSingleLine, divide$3 as divide, extendFromA, fromFlatArray$1 as fromFlatArray, fromNumbers$1 as fromNumbers, fromPivot, fromPoints$1 as fromPoints, fromPointsToPath, getPointParameter$1 as getPointParameter, guard$4 as guard, interpolate$2 as interpolate, isEmpty$1 as isEmpty, isEqual$3 as isEqual, isLine, isPlaceholder$1 as isPlaceholder, isPolyLine, joinPointsToLines, length$1 as length, midpoint, multiply$1 as multiply, nearest, normaliseByRect, parallel, perpendicularPoint, pointAtDistance, pointAtX, pointsOf, relativePosition, reverse, rotate$1 as rotate, scaleFromMidpoint, slope, subtract$1 as subtract, sum$1 as sum, toFlatArray$1 as toFlatArray, toPath$2 as toPath, toString$1 as toString, toSvgString, withinRange };
+  export { Empty$1 as Empty, Line, LinePath, Placeholder$2 as Placeholder, PolyLine, angleRadian, apply$1 as apply, asPoints, bbox$2 as bbox, distance, distanceSingleLine, divide$3 as divide, extendFromA, fromFlatArray$1 as fromFlatArray, fromNumbers$1 as fromNumbers, fromPivot, fromPoints$2 as fromPoints, fromPointsToPath, getPointParameter$1 as getPointParameter, guard$3 as guard, interpolate$1 as interpolate, isEmpty$1 as isEmpty, isEqual$2 as isEqual, isLine, isPlaceholder$1 as isPlaceholder, isPolyLine, joinPointsToLines, length, midpoint, multiply$1 as multiply, nearest, normaliseByRect, parallel, perpendicularPoint, pointAtDistance, pointAtX, pointsOf, relativePosition, reverse, rotate$1 as rotate, scaleFromMidpoint, slope, subtract$1 as subtract, sum$1 as sum, toFlatArray$1 as toFlatArray, toPath, toString$1 as toString, toSvgString, withinRange };
 }
 declare const Empty$1: Readonly<{
   a: Readonly<{
@@ -4549,7 +5143,7 @@ declare const Empty$1: Readonly<{
     y: 0;
   }>;
 }>;
-declare const Placeholder$1: Readonly<{
+declare const Placeholder$2: Readonly<{
   a: Readonly<{
     x: number;
     y: number;
@@ -4743,75 +5337,91 @@ declare function asPoints(lines: Iterable<Line>): Generator<Point, void, unknown
  */
 declare const toSvgString: (a: Point, b: Point) => readonly string[];
 //# sourceMappingURL=index.d.ts.map
-//#endregion
-//#region packages/geometry/src/bezier/bezier-type.d.ts
-type QuadraticBezier = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly quadratic: Point;
-};
-type QuadraticBezierPath = Path & QuadraticBezier;
-type CubicBezier = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly cubic1: Point;
-  readonly cubic2: Point;
-};
-type CubicBezierPath = Path & CubicBezier;
-//# sourceMappingURL=bezier-type.d.ts.map
-//#endregion
-//#region packages/geometry/src/bezier/guard.d.ts
-declare const isQuadraticBezier: (path: Path | QuadraticBezier | CubicBezier) => path is QuadraticBezier;
-declare const isCubicBezier: (path: Path | CubicBezier | QuadraticBezier) => path is CubicBezier;
-//# sourceMappingURL=guard.d.ts.map
-declare namespace index_d_exports$1 {
-  export { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath, cubic, interpolator, isCubicBezier, isQuadraticBezier, quadratic, quadraticSimple, quadraticToSvgString, toPath$1 as toPath };
+declare namespace waypoint_d_exports {
+  export { Waypoint, WaypointOpts, WaypointResult, Waypoints, fromPoints$1 as fromPoints, init };
 }
+type Waypoint = CirclePositioned;
+type WaypointOpts = {
+  readonly maxDistanceFromLine: number;
+  readonly enforceOrder: boolean;
+};
 /**
- * Returns a new quadratic bezier with specified bend amount
- *
- * @param {QuadraticBezier} b Curve
- * @param {number} [bend=0] Bend amount, from -1 to 1
- * @returns {QuadraticBezier}
- */
-/**
- * Creates a simple quadratic bezier with a specified amount of 'bend'.
- * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
- *
- * Use {@link interpolator} to calculate a point along the curve.
- * @param {Point} start Start of curve
- * @param {Point} end End of curve
- * @param {number} [bend=0] Bend amount, -1 to 1
- * @returns {QuadraticBezier}
- */
-declare const quadraticSimple: (start: Point, end: Point, bend?: number) => QuadraticBezier;
-/**
- * Returns a relative point on a simple quadratic
- * @param start Start
- * @param end  End
- * @param bend Bend (-1 to 1)
- * @param amt Amount
- * @returns Point
- */
-/**
- * Interpolate cubic or quadratic bezier
- * ```js
- * const i = interpolator(myBezier);
- *
- * // Get point at 50%
- * i(0.5); // { x, y }
- * ```
- * @param q
+ * Create from set of points, connected in order starting at array position 0.
+ * @param waypoints
+ * @param opts
  * @returns
  */
-declare const interpolator: (q: QuadraticBezier | CubicBezier) => (amount: number) => Point;
-declare const quadraticToSvgString: (start: Point, end: Point, handle: Point) => ReadonlyArray<string>;
-declare const toPath$1: (cubicOrQuadratic: CubicBezier | QuadraticBezier) => CubicBezierPath | QuadraticBezierPath;
-declare const cubic: (start: Point, end: Point, cubic1: Point, cubic2: Point) => CubicBezier;
-declare const quadratic: (start: Point, end: Point, handle: Point) => QuadraticBezier;
-//# sourceMappingURL=index.d.ts.map
+declare const fromPoints$1: (waypoints: readonly Point[], opts?: Partial<WaypointOpts>) => Waypoints;
+/**
+ * Result
+ */
+type WaypointResult = {
+  /**
+   * Path being compared against
+   */
+  path: Path;
+  /**
+   * Index of this path in original `paths` array
+   */
+  index: number;
+  /**
+   * Nearest point on path. See also {@link distance}
+   */
+  nearest: Point;
+  /**
+   * Closest distance to path. See also {@link nearest}
+   */
+  distance: number;
+  /**
+   * Rank of this result, 0 being highest.
+   */
+  rank: number;
+  /**
+   * Relative position on this path segment
+   * 0 being start, 0.5 middle and so on.
+   */
+  positionRelative: number;
+};
+/**
+ * Given point `pt`, returns a list of {@link WaypointResult}, comparing
+ * this point to a set of paths.
+ * ```js
+ * // Init once with a set of paths
+ * const w = init(paths);
+ * // Now call with a point to get results
+ * const results = w({ x: 10, y: 20 });
+ * ```
+ */
+type Waypoints = (pt: Point) => WaypointResult[];
+/**
+ * Initialise
+ *
+ * Options:
+ * * maxDistanceFromLine: Distances greater than this are not matched. Default 0.1
+ * @param paths
+ * @param opts
+ * @returns
+ */
+declare const init: (paths: readonly Path[], opts?: Partial<WaypointOpts>) => Waypoints;
+//# sourceMappingURL=waypoint.d.ts.map
+declare namespace circle_packing_d_exports {
+  export { RandomOpts, random };
+}
+type RandomOpts = {
+  readonly attempts?: number;
+  readonly randomSource?: RandomSource;
+};
+/**
+ * Naive randomised circle packing.
+ * [Algorithm by Taylor Hobbs](https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing)
+ */
+declare const random: (circles: readonly Circle[], container: ShapePositioned, opts?: RandomOpts) => CirclePositioned[];
+//# sourceMappingURL=circle-packing.d.ts.map
+declare namespace layout_d_exports {
+  export { circle_packing_d_exports as CirclePacking };
+}
 declare namespace ellipse_d_exports {
-  export { Ellipse, EllipsePositioned, EllipticalPath, fromDegrees$1 as fromDegrees };
+  export { Ellipse, EllipsePositioned, EllipticalPath, fromDegrees };
 }
 /**
  * An ellipse
@@ -4830,13 +5440,13 @@ type Ellipse = {
  * A {@link Ellipse} with position
  */
 type EllipsePositioned = Point & Ellipse;
-declare const fromDegrees$1: (radiusX: number, radiusY: number, rotationDeg?: number, startAngleDeg?: number, endAngleDeg?: number) => Ellipse;
+declare const fromDegrees: (radiusX: number, radiusY: number, rotationDeg?: number, startAngleDeg?: number, endAngleDeg?: number) => Ellipse;
 type EllipticalPath = Ellipse & Path & {
   readonly kind: `elliptical`;
 };
 //# sourceMappingURL=ellipse.d.ts.map
 //#endregion
-//#region packages/geometry/src/angles.d.ts
+//#region ../geometry/src/angles.d.ts
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees
@@ -5187,7 +5797,7 @@ declare class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
 }
 //# sourceMappingURL=quad-tree.d.ts.map
 //#endregion
-//#region packages/geometry/src/scaler.d.ts
+//#region ../geometry/src/scaler.d.ts
 /**
  * A scale function that takes an input value to scale.
  * Input can be in the form of `{ x, y }` or two number parameters.
@@ -5258,229 +5868,6 @@ type ScaleBy = `both` | `min` | `max` | `width` | `height`;
  */
 declare const scaler: (scaleBy?: ScaleBy, defaultRect?: Rect) => ScalerCombined;
 //# sourceMappingURL=scaler.d.ts.map
-//#endregion
-//#region packages/geometry/src/arc/arc-type.d.ts
-/**
- * Arc, defined by radius, start and end point in radians and direction
- */
-type Arc = {
-  /**
-   * Radius of arc
-   */
-  readonly radius: number;
-  /**
-   * Start radian
-   */
-  readonly startRadian: number;
-  /**
-   * End radian
-   */
-  readonly endRadian: number;
-  /**
-   * If true, arc runs in clockwise direction
-   */
-  readonly clockwise: boolean;
-};
-/**
- * An {@link Arc} that also has a center position, given in x, y
- */
-type ArcPositioned = Point & Arc;
-/**
- * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
- */
-type ArcInterpolate = {
-  (amount: number, arc: Arc, allowOverflow: boolean, origin: Point): Point;
-  (amount: number, arc: ArcPositioned, allowOverflow?: boolean): Point;
-};
-/**
- * Function to convert an arc to SVG segments
- */
-type ArcToSvg = {
-  /**
-   * SVG path for arc description
-   * @param origin Origin of arc
-   * @param radius Radius
-   * @param startRadian Start
-   * @param endRadian End
-   */
-  (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: ArcSvgOpts): readonly string[];
-  /**
-   * SVG path for non-positioned arc.
-   * If `arc` does have a position, `origin` will override it.
-   */
-  (arc: Arc, origin: Point, opts?: ArcSvgOpts): readonly string[];
-  /**
-   * SVG path for positioned arc
-   */
-  (arc: ArcPositioned, opts?: ArcSvgOpts): readonly string[];
-};
-type ArcSvgOpts = {
-  /**
-   * "If the arc should be greater or less than 180 degrees"
-   * ie. tries to maximise arc length
-   */
-  readonly largeArc?: boolean;
-  /**
-   * "If the arc should begin moving at positive angles"
-   * ie. the kind of bend it makes to reach end point
-   */
-  readonly sweep?: boolean;
-};
-//# sourceMappingURL=arc-type.d.ts.map
-declare namespace index_d_exports {
-  export { Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, angularSize, bbox$1 as bbox, distanceCenter, fromCircle, fromCircleAmount, fromDegrees, getStartEnd, guard$1 as guard, interpolate, isArc, isEqual$1 as isEqual, isPositioned, length, point, toLine, toPath, toSvg };
-}
-/**
- * Returns true if parameter is an arc
- * @param p Arc or number
- * @returns
- */
-declare const isArc: (p: unknown) => p is Arc;
-/**
- * Returns true if parameter has a positioned (x,y)
- * @param p Point, Arc or ArcPositiond
- * @returns
- */
-declare const isPositioned: (p: Point | Arc | ArcPositioned) => p is Point;
-/**
- * Returns an arc from degrees, rather than radians
- * @param radius Radius of arc
- * @param startDegrees Start angle in degrees
- * @param endDegrees End angle in degrees
- * @returns Arc
- */
-declare function fromDegrees(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean): Arc;
-/**
- * Returns an arc from degrees, rather than radians
- * @param radius Radius of arc
- * @param startDegrees Start angle in degrees
- * @param endDegrees End angle in degrees
- * @param origin Optional center of arc
- * @param clockwise Whether arc moves in clockwise direction
- * @returns Arc
- */
-declare function fromDegrees(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean, origin: Point): ArcPositioned;
-/**
- * Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
- *
- * @param arc
- * @returns Line from start to end of arc
- */
-declare const toLine: (arc: ArcPositioned) => Line;
-/**
- * Return start and end points of `arc`.
- * `origin` will override arc's origin, if defined.
- *
- * See also:
- * * {@link point} - get point on arc by angle
- * * {@link interpolate} - get point on arc by interpolation percentage
- * @param arc
- * @param origin
- * @returns
- */
-declare const getStartEnd: (arc: ArcPositioned | Arc, origin?: Point) => [start: Point, end: Point];
-/**
- * Calculates a coordinate on an arc, based on an angle.
- * `origin` will override arc's origin, if defined.
- *
- * See also:
- * * {@link getStartEnd} - get start and end of arc
- * * {@link interpolate} - get point on arc by interpolation percentage
- * @param arc Arc
- * @param angleRadian Angle of desired coordinate
- * @param origin Origin of arc (0,0 used by default)
- * @returns Coordinate
- */
-declare const point: (arc: Arc | ArcPositioned, angleRadian: number, origin?: Point) => Point;
-/**
- * Throws an error if arc instance is invalid
- * @param arc
- */
-declare const guard$1: (arc: Arc | ArcPositioned) => void;
-/**
- * Compute relative position on arc.
- *
- * See also:
- * * {@link getStartEnd} - get start and end of arc
- * * {@link point} - get point on arc by angle
- * @param arc Arc
- * @param amount Relative position 0-1
- * @param origin If arc is not positioned, pass in an origin
- * @param allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
- * @returns
- */
-declare const interpolate: ArcInterpolate;
-/**
- * Returns the angular size of arc.
- * Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
- * @param arc
- */
-declare const angularSize: (arc: Arc) => number;
-/**
- * Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.
- * @param arc
- * @returns Path
- */
-declare const toPath: (arc: ArcPositioned) => Path;
-/**
- * Returns an arc based on a circle using start and end angles.
- * If you don't have the end angle, but rather the size of the arc, use {@link fromCircleAmount}
- * @param circle Circle
- * @param startRadian Start radian
- * @param endRadian End radian
- * @param clockwise Whether arc goes in a clockwise direction (default: true)
- * @returns
- */
-declare const fromCircle: (circle: CirclePositioned, startRadian: number, endRadian: number, clockwise?: boolean) => ArcPositioned;
-/**
- * Returns an arc based on a circle, a start angle, and the size of the arc.
- * See {@link fromCircle} if you already have start and end angles.
- * @param circle Circle to base off
- * @param startRadian Starting angle
- * @param sizeRadian Size of arc
- * @param clockwise Whether arc moves in clockwise direction (default: true)
- * @returns
- */
-declare const fromCircleAmount: (circle: CirclePositioned, startRadian: number, sizeRadian: number, clockwise?: boolean) => ArcPositioned;
-/**
- * Calculates the length of the arc
- * @param arc
- * @returns Length
- */
-declare const length: (arc: Arc) => number;
-/**
- * Calculates a {@link Rect} bounding box for arc.
- * @param arc
- * @returns Rectangle encompassing arc.
- */
-declare const bbox$1: (arc: ArcPositioned | Arc) => RectPositioned | Rect;
-/**
- * Creates an SV path snippet for arc
- * @returns
- */
-declare const toSvg: ArcToSvg;
-/**
- * Calculates the distance between the centers of two arcs
- * @param a
- * @param b
- * @returns Distance
- */
-declare const distanceCenter: (a: ArcPositioned, b: ArcPositioned) => number;
-/**
- * Returns true if the two arcs have the same values
- *
- * ```js
- * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
- * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
- * arcA === arcB; // false, because object identities are different
- * Arcs.isEqual(arcA, arcB); // true, because values are identical
- * ```
- * @param a
- * @param b
- * @returns {boolean}
- */
-declare const isEqual$1: (a: Arc | ArcPositioned, b: Arc | ArcPositioned) => boolean;
-//# sourceMappingURL=index.d.ts.map
 declare namespace vector_d_exports {
   export { Vector, clampMagnitude, divide, dotProduct, fromLineCartesian, fromLinePolar, fromPointPolar, fromRadians, multiply, normalise, quadrantOffsetAngle, subtract, sum, toCartesian, toPolar, toRadians, toString };
 }
@@ -5706,7 +6093,7 @@ declare function circleRings(circle?: Circle | CirclePositioned, opts?: CircleRi
 declare function sphereFibonacci(samples?: number, rotationRadians?: number, sphere?: Sphere): IterableIterator<Point3d>;
 //# sourceMappingURL=surface-points.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/angles.d.ts
+//#region ../geometry/src/triangle/angles.d.ts
 /**
  * Return the three interior angles of the triangle, in radians.
  * @param t
@@ -5721,7 +6108,7 @@ declare const angles: (t: Triangle) => ReadonlyArray<number>;
 declare const anglesDegrees: (t: Triangle) => ReadonlyArray<number>;
 //# sourceMappingURL=angles.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/area.d.ts
+//#region ../geometry/src/triangle/area.d.ts
 /**
  * Calculates the area of a triangle
  * @param t
@@ -5731,7 +6118,7 @@ declare const area$3: (t: Triangle) => number;
 //# sourceMappingURL=area.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/triangle/barycentric.d.ts
+//#region ../geometry/src/triangle/barycentric.d.ts
 /**
  * Returns the [Barycentric coordinate](https://en.wikipedia.org/wiki/Barycentric_coordinate_system) of a point within a triangle
  *
@@ -5750,7 +6137,7 @@ declare const barycentricCoord: (t: Triangle, a: Point | number, b?: number) => 
 declare const barycentricToCartestian: (t: Triangle, bc: BarycentricCoord) => Point;
 //# sourceMappingURL=barycentric.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/bbox.d.ts
+//#region ../geometry/src/triangle/bbox.d.ts
 /**
  * Returns the bounding box that encloses the triangle.
  * @param t
@@ -5760,7 +6147,7 @@ declare const barycentricToCartestian: (t: Triangle, bc: BarycentricCoord) => Po
 declare const bbox: (t: Triangle, inflation?: number) => RectPositioned;
 //# sourceMappingURL=bbox.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/centroid.d.ts
+//#region ../geometry/src/triangle/centroid.d.ts
 /**
  * Returns simple centroid of triangle
  * @param t
@@ -5769,7 +6156,7 @@ declare const bbox: (t: Triangle, inflation?: number) => RectPositioned;
 declare const centroid: (t: Triangle) => Point;
 //# sourceMappingURL=centroid.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/corners.d.ts
+//#region ../geometry/src/triangle/corners.d.ts
 /**
  * Returns the corners (vertices) of the triangle as an array of points
  * @param t
@@ -5778,7 +6165,7 @@ declare const centroid: (t: Triangle) => Point;
 declare const corners: (t: Triangle) => ReadonlyArray<Point>;
 //# sourceMappingURL=corners.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/create.d.ts
+//#region ../geometry/src/triangle/create.d.ts
 /**
  * A triangle consisting of three empty points (Points.Empty)
  */
@@ -5799,7 +6186,7 @@ declare const Empty: Readonly<{
 /**
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
-declare const Placeholder: Readonly<{
+declare const Placeholder$1: Readonly<{
   a: {
     x: number;
     y: number;
@@ -5824,7 +6211,7 @@ declare const Placeholder: Readonly<{
 declare const equilateralFromVertex: (origin?: Point, length?: number, angleRadian?: number) => Triangle;
 //# sourceMappingURL=create.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/edges.d.ts
+//#region ../geometry/src/triangle/edges.d.ts
 /**
  * Returns the edges (ie sides) of the triangle as an array of lines
  * @param t
@@ -5834,7 +6221,7 @@ declare const edges: (t: Triangle) => PolyLine;
 //# sourceMappingURL=edges.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/triangle/from.d.ts
+//#region ../geometry/src/triangle/from.d.ts
 /**
  * Returns an equilateral triangle centered at the origin.
  *
@@ -5869,7 +6256,7 @@ declare const fromFlatArray: (coords: readonly number[]) => Triangle;
 declare const fromPoints: (points: readonly Point[]) => Triangle;
 //# sourceMappingURL=from.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/inner-circle.d.ts
+//#region ../geometry/src/triangle/inner-circle.d.ts
 /**
  * Returns the largest circle enclosed by triangle `t`.
  * @param t
@@ -5877,7 +6264,7 @@ declare const fromPoints: (points: readonly Point[]) => Triangle;
 declare const innerCircle: (t: Triangle) => CirclePositioned;
 //# sourceMappingURL=inner-circle.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/intersects.d.ts
+//#region ../geometry/src/triangle/intersects.d.ts
 /**
  * Returns true if point is within or on the boundary of triangle
  * @param t
@@ -5887,7 +6274,7 @@ declare const innerCircle: (t: Triangle) => CirclePositioned;
 declare const intersectsPoint: (t: Triangle, a: Point | number, b?: number) => boolean;
 //# sourceMappingURL=intersects.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/kinds.d.ts
+//#region ../geometry/src/triangle/kinds.d.ts
 /**
  * Returns true if it is an equilateral triangle
  * @param t
@@ -5926,7 +6313,7 @@ declare const isAcute: (t: Triangle) => boolean;
 declare const isObtuse: (t: Triangle) => boolean;
 //# sourceMappingURL=kinds.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/lengths.d.ts
+//#region ../geometry/src/triangle/lengths.d.ts
 /**
  * Returns the lengths of the triangle sides
  * @param t
@@ -5936,7 +6323,7 @@ declare const lengths: (t: Triangle) => ReadonlyArray<number>;
 //# sourceMappingURL=lengths.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/triangle/math.d.ts
+//#region ../geometry/src/triangle/math.d.ts
 /**
  * Applies `fn` to each of a triangle's corner points, returning the result.
  *
@@ -5957,7 +6344,7 @@ declare const lengths: (t: Triangle) => ReadonlyArray<number>;
 declare const apply: (t: Triangle, fn: (p: Point, label?: string) => Point) => Readonly<Triangle>;
 //# sourceMappingURL=math.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/outer-circle.d.ts
+//#region ../geometry/src/triangle/outer-circle.d.ts
 /**
  * Returns the largest circle touching the corners of triangle `t`.
  * @param t
@@ -5966,7 +6353,7 @@ declare const apply: (t: Triangle, fn: (p: Point, label?: string) => Point) => R
 declare const outerCircle: (t: Triangle) => CirclePositioned;
 //# sourceMappingURL=outer-circle.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/perimeter.d.ts
+//#region ../geometry/src/triangle/perimeter.d.ts
 /**
  * Calculates perimeter of a triangle
  * @param t
@@ -5976,7 +6363,7 @@ declare const perimeter$3: (t: Triangle) => number;
 //# sourceMappingURL=perimeter.d.ts.map
 
 //#endregion
-//#region packages/geometry/src/triangle/rotate.d.ts
+//#region ../geometry/src/triangle/rotate.d.ts
 /**
  * Returns a triangle that is rotated by `angleRad`. By default it rotates
  * around its center but an arbitrary `origin` point can be provided.
@@ -6012,7 +6399,7 @@ declare const rotate: (triangle: Triangle, amountRadian?: number, origin?: Point
 declare const rotateByVertex: (triangle: Triangle, amountRadian: number, vertex?: `a` | `b` | `c`) => Triangle;
 //# sourceMappingURL=rotate.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/to.d.ts
+//#region ../geometry/src/triangle/to.d.ts
 /**
  * Returns the coordinates of triangle in a flat array form:
  * [xA, yA, xB, yB, xC, yC]
@@ -6022,7 +6409,7 @@ declare const rotateByVertex: (triangle: Triangle, amountRadian: number, vertex?
 declare const toFlatArray: (t: Triangle) => readonly number[];
 //# sourceMappingURL=to.d.ts.map
 //#endregion
-//#region packages/geometry/src/triangle/guard.d.ts
+//#region ../geometry/src/triangle/guard.d.ts
 /**
  * Throws an exception if the triangle is invalid
  * @param t
@@ -6399,8 +6786,8 @@ declare const fromB: (t: Isosceles, origin?: Point) => Triangle;
 declare const fromC: (t: Isosceles, origin?: Point) => Triangle;
 //# sourceMappingURL=isosceles.d.ts.map
 declare namespace index_d_exports$10 {
-  export { BarycentricCoord, Empty, equilateral_d_exports as Equilateral, isosceles_d_exports as Isosceles, Placeholder, right_d_exports as Right, Triangle, angles, anglesDegrees, apply, area$3 as area, barycentricCoord, barycentricToCartestian, bbox, centroid, corners, edges, equilateralFromVertex, fromFlatArray, fromPoints, fromRadius, guard, innerCircle, intersectsPoint, isAcute, isEmpty, isEqual, isEquilateral, isIsosceles, isOblique, isObtuse, isPlaceholder, isRightAngle, isTriangle, lengths, outerCircle, perimeter$3 as perimeter, rotate, rotateByVertex, toFlatArray };
+  export { BarycentricCoord, Empty, equilateral_d_exports as Equilateral, isosceles_d_exports as Isosceles, Placeholder$1 as Placeholder, right_d_exports as Right, Triangle, angles, anglesDegrees, apply, area$3 as area, barycentricCoord, barycentricToCartestian, bbox, centroid, corners, edges, equilateralFromVertex, fromFlatArray, fromPoints, fromRadius, guard, innerCircle, intersectsPoint, isAcute, isEmpty, isEqual, isEquilateral, isIsosceles, isOblique, isObtuse, isPlaceholder, isRightAngle, isTriangle, lengths, outerCircle, perimeter$3 as perimeter, rotate, rotateByVertex, toFlatArray };
 }
 //#endregion
-export { Angle, index_d_exports as Arcs, index_d_exports$1 as Beziers, index_d_exports$2 as Circles, compound_path_d_exports as Compound, curve_simplification_d_exports as CurveSimplification, ellipse_d_exports as Ellipses, index_d_exports$3 as Grids, layout_d_exports as Layouts, index_d_exports$4 as Lines, index_d_exports$5 as Paths, PointTrack, PointTracker, PointTrackerResults, index_d_exports$6 as Points, PointsTracker, index_d_exports$7 as Polar, quad_tree_d_exports as QuadTree, index_d_exports$8 as Rects, ScaleBy, Scaler, ScalerCombined, index_d_exports$9 as Shapes, surface_points_d_exports as SurfacePoints, index_d_exports$10 as Triangles, vector_d_exports as Vectors, waypoint_d_exports as Waypoints, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
+export { Angle, Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, index_d_exports as Arcs, BarycentricCoord, index_d_exports$1 as Beziers, Circle, CirclePositioned, CircleRandomPointOpts, CircleToSvg, index_d_exports$2 as Circles, compound_path_d_exports as Compound, CompoundPath, ContainsResult, Coord, CubicBezier, CubicBezierPath, curve_simplification_d_exports as CurveSimplification, Dimensions, ellipse_d_exports as Ellipses, Grid, GridArray1d, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridCreateVisitor, GridIdentifyNeighbours, GridNeighbour, GridNeighbourMaybe, GridNeighbourSelectionLogic, GridNeighbourSelector, GridNeighbours, GridReadable, GridVisitorOpts, GridVisual, GridWritable, index_d_exports$3 as Grids, layout_d_exports as Layouts, Line, LinePath, index_d_exports$4 as Lines, Path, index_d_exports$5 as Paths, Placeholder, Placeholder3d, type Point, type Point3d, PointCalculableShape, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, index_d_exports$6 as Points, PointsTracker, index_d_exports$7 as Polar, PolarRay, PolarRayWithOrigin, PolarToCartesian, PolyLine, quad_tree_d_exports as QuadTree, QuadraticBezier, QuadraticBezierPath, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, index_d_exports$8 as Rects, ScaleBy, Scaler, ScalerCombined, ShapePositioned, index_d_exports$9 as Shapes, Sphere, surface_points_d_exports as SurfacePoints, Triangle, index_d_exports$10 as Triangles, vector_d_exports as Vectors, waypoint_d_exports as Waypoints, WithBeziers, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
 //# sourceMappingURL=geometry.d.ts.map

@@ -1,4 +1,4 @@
-//#region packages/debug/src/types.d.ts
+//#region ../debug/src/types.d.ts
 type LogSet = {
   readonly log: MessageLogger;
   readonly warn: MessageLogger;
@@ -14,7 +14,7 @@ type LogMessage = {
 //# sourceMappingURL=types.d.ts.map
 
 //#endregion
-//#region packages/debug/src/logger.d.ts
+//#region ../debug/src/logger.d.ts
 /**
  * Returns a console logging function which prefixes messages. This is
  * useful for tracing messages from different components. Each prefix
@@ -92,7 +92,7 @@ declare const resolveLogOption: (l?: LogOption, defaults?: {
 declare const logColours: (key: string, args?: unknown) => string;
 //# sourceMappingURL=logger.d.ts.map
 //#endregion
-//#region packages/debug/src/fps-counter.d.ts
+//#region ../debug/src/fps-counter.d.ts
 /**
  * Calculates frames per second.
  *
@@ -115,7 +115,7 @@ declare const logColours: (key: string, args?: unknown) => string;
 declare const fpsCounter: (autoDisplay?: boolean, computeAfterFrames?: number) => () => number;
 //# sourceMappingURL=fps-counter.d.ts.map
 //#endregion
-//#region packages/debug/src/error-message.d.ts
+//#region ../debug/src/error-message.d.ts
 /**
  * Returns a string representation of an error
  * @param ex

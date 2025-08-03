@@ -1,4 +1,4 @@
-//#region packages/guards/src/result.ts
+//#region ../guards/src/result.ts
 const getErrorMessage = (ex) => {
 	if (typeof ex === `string`) return ex;
 	if (ex instanceof Error) return ex.message;
@@ -120,7 +120,7 @@ const resultWithFail = (result, callback) => {
 };
 
 //#endregion
-//#region packages/guards/src/numbers.ts
+//#region ../guards/src/numbers.ts
 /**
 * Returns true if `x` is a power of two
 * @param x
@@ -427,7 +427,7 @@ const numberInclusiveRangeTest = (value, min, max, parameterName = `?`) => {
 };
 
 //#endregion
-//#region packages/guards/src/arrays.ts
+//#region ../guards/src/arrays.ts
 /**
 * Throws an error if parameter is not an array
 * @param value
@@ -473,7 +473,7 @@ const arrayStringsTest = (value) => {
 };
 
 //#endregion
-//#region packages/guards/src/empty.ts
+//#region ../guards/src/empty.ts
 const nullUndefTest = (value, parameterName = `?`) => {
 	if (typeof value === `undefined`) return {
 		success: false,
@@ -491,7 +491,7 @@ const nullUndefTest = (value, parameterName = `?`) => {
 const isDefined = (argument) => argument !== void 0;
 
 //#endregion
-//#region packages/guards/src/function.ts
+//#region ../guards/src/function.ts
 const isFunction = (object) => object instanceof Function;
 const functionTest = (value, parameterName = `?`) => {
 	if (value === void 0) return {
@@ -513,7 +513,7 @@ const functionTest = (value, parameterName = `?`) => {
 };
 
 //#endregion
-//#region packages/guards/src/object.ts
+//#region ../guards/src/object.ts
 /**
 * Tests_if `value` is a plain object
 * 
@@ -576,7 +576,7 @@ const testPlainObjectOrPrimitive = (value) => {
 };
 
 //#endregion
-//#region packages/guards/src/range.ts
+//#region ../guards/src/range.ts
 const rangeIntegerTest = (v, expected) => {
 	return resultsCollate(rangeTest(v, expected), integerArrayTest(v));
 };
@@ -622,7 +622,7 @@ const rangeTest = (numbers, expected) => {
 };
 
 //#endregion
-//#region packages/guards/src/string.ts
+//#region ../guards/src/string.ts
 /**
 * Throws an error if parameter is not an string
 * @param value
