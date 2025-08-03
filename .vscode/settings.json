@@ -2,20 +2,23 @@
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
-  "editor.formatOnPaste": false,
-  "editor.formatOnType": false,
-  "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "file",
-  "eslint.format.enable": true,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.rules.customizations": [
+    {
+      "rule": "@stylistic/*",
+      "fixable":true,
+      "severity": "off"
+    }
+  ],
   "js/ts.implicitProjectConfig.checkJs": true,
   "search.exclude": {
     "**/node_modules": true,
     "**/_lib": true,
     "ml/**/*": true,
     "**/*.code-search": true
-  },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
   },
   "files.eol": "\n",
   "editor.inlayHints.enabled": "on",
@@ -27,11 +30,21 @@
   "javascript.suggest.enabled": true,
   "javascript.suggest.jsdoc.generateReturns": true,
   "javascript.suggest.paths": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+  "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+  "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+  "javascript.format.insertSpaceAfterCommaDelimiter": true,
+  "javascript.format.insertSpaceAfterSemicolonInForStatements": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "javascript.format.indentSwitchCase": true,
   "javascript.preferences.importModuleSpecifier": "shortest",
   "javascript.preferences.importModuleSpecifierEnding": "js",
   "typescript.preferences.importModuleSpecifierEnding": "js",
   "typescript.preferences.importModuleSpecifier": "shortest",
-  "javascript.inlayHints.enumMemberValues.enabled": false,
   "javascript.inlayHints.functionLikeReturnTypes.enabled": false,
   "javascript.inlayHints.parameterNames.enabled": "all",
   "javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
@@ -77,6 +90,7 @@
     "Arduino",
     "crosshair",
     "Espruino",
+    "grayscale",
     "importmap",
     "ixfx",
     "WLED"

@@ -1,9 +1,9 @@
 import { wave, jitter } from '@ixfx/modulation.js';
 
 /** @typedef {{
- * acceleration: {x:number,y:number,z:number}
- * accelerationIncludingGravity: {x:number,y:number,z:number}
- * rotationRate: { alpha: number, beta: number, gamma: number}
+ * accel: {x:number,y:number,z:number}
+ * accelGrav: {x:number,y:number,z:number}
+ * rotRate: { alpha: number, beta: number, gamma: number}
  * faked:boolean
  * }} MotionData
  **/
@@ -63,16 +63,16 @@ const startFake = (handler) => {
   setInterval(() => {
     handler({
       faked: true,
-      acceleration: {
+      accel: {
         x: w1(),
         y: w2(),
         z: w3()
       },
-      accelerationIncludingGravity: {
+      accelGrav: {
         x: j1(1 - w1()),
         y: j2(1 - w2()),
         z: j3(1 - w3())
-      }, rotationRate: {
+      }, rotRate: {
         alpha: Math.random(),
         beta: Math.random(),
         gamma: Math.random()
@@ -103,9 +103,9 @@ export const listen = async (handler, useFakeDataAsFallback = false) => {
       if (useFakeDataAsFallback) startFake(handler);
     }
     handler({
-      acceleration: getXyz(e.acceleration),
-      accelerationIncludingGravity: getXyz(e.accelerationIncludingGravity),
-      rotationRate: getAbg(e.rotationRate),
+      accel: getXyz(e.acceleration),
+      accelGrav: getXyz(e.accelerationIncludingGravity),
+      rotRate: getAbg(e.rotationRate),
       faked: false
     });
   };

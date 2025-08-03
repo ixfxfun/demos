@@ -96,7 +96,7 @@ function setup() {
     window.requestAnimationFrame(loop);
   };
   loop();
-};
+}
 
 const windowBounds = () => ({
   width: window.innerWidth,

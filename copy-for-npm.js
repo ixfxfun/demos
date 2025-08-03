@@ -8,34 +8,33 @@ const destinationRoot = `../demos-npm`;
 const destination = `${destinationRoot}/src`;
 
 // Delete previous src
-deleteSync([destination], { force: true });
+deleteSync([ destination ], { force: true });
 
 const categories = `audio camera data dom flow geometry io ml modulation pointer starters visuals`.split(` `);
 
 // Copy sketches
 for (const c of categories) {
-  await cpy([`${c}/**/*`], `${destination}/${c}`);
+  await cpy([ `${c}/**/*` ], `${destination}/${c}`);
 }
 
 // Re-write imports
 replaceInFileSync({
   files: `${destination}/**/*.js`,
   from: /^(import.*?["'])((?:@ixfx[^"']+))\.js(["'])/gm,
-  to: `$1$2$3`
+  to: `$1$2$3`,
 });
 
 replaceInFileSync({
   files: `${destination}/**/*.js`,
-  //from: /^import.*['"]@ixfx['"]/,
+  // from: /^import.*['"]@ixfx['"]/,
   from: /from\s+['"]@ixfx['"]/g,
-  to: `from '@ixfx/bundle'`
+  to: `from '@ixfx/bundle'`,
 });
 
-
 // Copy loose files
-await cpy([`index.html`, `eslint.config.mjs`, `favicon.ico`, `demos.css`], `${destination}/`);
-//await cpy([`.eslintrc.json`], `${destinationRoot}/`);
+await cpy([ `index.html`, `eslint.config.mjs`, `favicon.ico`, `demos.css` ], `${destination}/`);
+// await cpy([`.eslintrc.json`], `${destinationRoot}/`);
 
-await cpy([`${destinationRoot}/jsconfig.json`], `${destination}/`, { flat: true });
+await cpy([ `${destinationRoot}/jsconfig.json` ], `${destination}/`, { flat: true });
 
 console.log(`copy-for-npm done`);

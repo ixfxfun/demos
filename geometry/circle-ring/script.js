@@ -22,7 +22,7 @@ const use = () => {
     y: window.innerHeight / 2
   };
 
-  for (const [index, pt] of points.entries()) {
+  for (const [ index, pt ] of points.entries()) {
     const element = document.querySelector(`#pt-${index}`);
     if (element === null) continue;
     const absPolar = Polar.multiply(pt, scaleBy());
@@ -54,7 +54,7 @@ function setup() {
     document.body.append(element);
   }
   saveState({ points });
-};
+}
 setup();
 
 // Call continuously

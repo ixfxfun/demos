@@ -111,7 +111,7 @@ function setup() {
     // Range slider is 0-500, normalise to 0..1
     saveState({ orbitSpeedFactor: Number.parseInt(element.value) / 500 });
   });
-};
+}
 setup();
 
 /**

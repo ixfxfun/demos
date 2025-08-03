@@ -65,7 +65,7 @@ const updateSvg = () => {
   // Delete all existing lines
   svg.innerHTML = ``;
 
-  for (const [id, p] of Object.entries(pointers)) {
+  for (const [ id, p ] of Object.entries(pointers)) {
     // Create line for pointer
     const line = { a: originAbs, b: p };
 
@@ -123,7 +123,7 @@ function setup() {
     window.requestAnimationFrame(loop);
   };
   window.requestAnimationFrame(loop);
-};
+}
 
 const windowBounds = () => ({
   width: window.innerWidth,

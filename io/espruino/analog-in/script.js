@@ -1,6 +1,6 @@
 
 import { delay } from '@ixfx/flow.js';
-import { Espruino } from '@ixfx/io.js'
+import { Espruino } from '@ixfx/io.js';
 import { setCssDisplay } from './util.js';
 
 const scripts = Object.freeze({
@@ -116,7 +116,7 @@ function setup() {
     const { espruino } = state;
     espruino?.write(`sampleData()\n`);
   });
-};
+}
 setup();
 
 /**

@@ -1,7 +1,7 @@
 /**
  * Receives JSON from a microcontroller
  */
-import { Serial } from '@ixfx/io.js'
+import { Serial } from '@ixfx/io.js';
 import { scale } from '@ixfx/numbers.js';
 
 const settings = Object.freeze({
@@ -94,7 +94,7 @@ function setup() {
     }
   });
 
-};
+}
 setup();
 
 /**

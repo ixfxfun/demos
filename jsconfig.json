@@ -21,7 +21,9 @@
     },
     "lib": [
       "DOM",
-      "ESNext"
+      "ESNext",
+      "DOM.AsyncIterable",
+      "DOM.Iterable"
     ]
   },
   "include": [

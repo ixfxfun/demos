@@ -67,7 +67,7 @@ const update = async () => {
 function generateThing() {
   const thing = Things.generate();
   saveState({
-    things: [...state.things, thing]
+    things: [ ...state.things, thing ]
   });
   return thing;
 }

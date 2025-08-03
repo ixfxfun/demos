@@ -15,7 +15,7 @@ let state = Object.freeze({
  * Use state
  * @param {State} state 
  */
-function use(state) {};
+function use(state) {}
 
 function update() {
   // Compute state
@@ -28,7 +28,7 @@ function update() {
 function setup() {
   // Call every half a second
   setInterval(update, 500);
-};
+}
 
 /**
  * Save state

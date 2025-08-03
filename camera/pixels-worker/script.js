@@ -1,6 +1,6 @@
 import { Camera } from '@ixfx/io.js';
 import { Video } from '@ixfx/visual.js';
-import * as Trackers from '@ixfx/trackers.js'
+import * as Trackers from '@ixfx/trackers.js';
 import { defaultErrorHandler } from '@ixfx/dom.js';
 import * as Util from './util.js';
 
@@ -37,8 +37,7 @@ const use = () => {
 
   // Update HTML labels
   if (lblFps) lblFps.textContent = `FPS: ${fps}`;
-  if (lblDifferences)
-    lblDifferences.textContent = `Differences: ${Util.percentage(differences)}`;
+  if (lblDifferences) lblDifferences.textContent = `Differences: ${Util.percentage(differences)}`;
   if (lblDiffVu) lblDiffVu.innerHTML = diffVu;
 };
 
@@ -57,7 +56,7 @@ const startVideo = async () => {
         width: frame.width,
         height: frame.height,
         channels: 4
-      }, [frame.data.buffer]);
+      }, [ frame.data.buffer ]);
 
       // Keep track of how long it takes us to process frames
       frameIntervalTracker.mark();
@@ -103,12 +102,12 @@ function setup() {
 
     use();
   });
-};
+}
 setup();
 
 /**
  * Save state
- * @param {Partial<State>} s 
+ * @param {Partial<State>} s
  */
 function saveState(s) {
   state = Object.freeze({

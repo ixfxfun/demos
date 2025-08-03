@@ -3,9 +3,9 @@ import * as Mod from '@ixfx/modulation.js';
 import * as Util from './util.js';
 
 /** @type Mod.Easings.EasingOptions */
-let y
+let y;
 /** @type Mod.Easings.EasingOptions */
-let z
+let z;
 
 const settings = Object.freeze({
   easing: /** @type Mod.Easings.EasingOptions */({
@@ -39,7 +39,7 @@ async function use(computed) {
 
   // Update UI
   fillElement.style.width = `${x * 100}%`;
-};
+}
 
 
 /**
@@ -96,7 +96,7 @@ function setup() {
   slider.addEventListener(`pointerup`, onPointerUp);
 
   update();
-};
+}
 setup();
 
 /**
