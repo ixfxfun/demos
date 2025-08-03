@@ -2,6 +2,12 @@
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
+   "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
@@ -72,12 +78,7 @@
   "typescript.format.insertSpaceAfterTypeAssertion": true,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
   "typescript.format.indentSwitchCase": true,
-  "chat.agent.enabled": false,
-  "chat.commandCenter.enabled": false,
-  "chat.mcp.enabled": false,
-  "chat.extensionTools.enabled": false,
-  "chat.sendElementsToChat.enabled": false,
-  "livePreview.showServerStatusNotifications": false,
+
   "json.schemas": [
     {
       "fileMatch": [
@@ -94,5 +95,19 @@
     "importmap",
     "ixfx",
     "WLED"
-  ]
+  ],
+  "chat.agent.enabled": false,
+  "chat.commandCenter.enabled": false,
+  "chat.mcp.enabled": false,
+  "chat.extensionTools.enabled": false,
+  "chat.sendElementsToChat.enabled": false,
+  "livePreview.showServerStatusNotifications": false,
+  "workbench.activityBar.location": "top",
+  "workbench.sideBar.location": "right",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+    "workbench.editor.limit.enabled":true,
+  "workbench.editor.limit.value":5
 }

@@ -2,11 +2,6 @@ import * as Core from '@ixfx/core.js';
 import * as Mod from '@ixfx/modulation.js';
 import * as Util from './util.js';
 
-/** @type Mod.Easings.EasingOptions */
-let y;
-/** @type Mod.Easings.EasingOptions */
-let z;
-
 const settings = Object.freeze({
   easing: /** @type Mod.Easings.EasingOptions */({
     name: `quintIn`,

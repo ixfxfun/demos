@@ -33,17 +33,17 @@
   },
   "homepage": "https://github.com/ixfxfun/demos#readme",
   "dependencies": {
-    "@stylistic/eslint-plugin": "5.2.2"
-  },
-  "devDependencies": {
+    "@stylistic/eslint-plugin": "5.2.2",
     "@html-eslint/eslint-plugin": "0.44.0",
     "@html-eslint/parser": "0.44.0",
+    "eslint": "9.32.0"
+  },
+  "devDependencies": {
     "body-parser": "^2.2.0",
     "concurrently": "^9.1.2",
     "copyfiles": "^2.4.1",
     "cpy": "^11.1.0",
     "del": "^8.0.0",
-    "eslint": "9.32.0",
     "express": "^5.1.0",
     "express-ws": "^5.0.2",
     "replace-in-file": "8.3.0",
