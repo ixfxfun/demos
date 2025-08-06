@@ -1,435 +1,15 @@
-import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
-import { Point, Rect, RectPositioned } from "./rect-types-d5I5ouwR.js";
-import { RandomSource } from "./types-DFWrctU4.js";
-import { Grid, GridCellAccessor, GridCellSetter, GridReadable, GridWritable } from "./types-Bzjzk4dE.js";
-import { Path } from "./path-type-WKYt1VfQ.js";
+import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
+import "./is-equal-BzhoT7pd.js";
+import "./types-CcY4GIC4.js";
+import "./maps-Di0k-jsW.js";
+import "./index-Dg03qze4.js";
+import "./key-value-ww1DZidG.js";
+import { IStackImmutable, RandomSource } from "./index-BD4Xy9K5.js";
+import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
+import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-DM6SFyeA.js";
+import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-D-YGqcwN.js";
+import "./index-pdF5CCTk.js";
 
-//#region ../geometry/dist/src/circle/circle-type.d.ts
-/**
- * A circle
- */
-type Circle = {
-  readonly radius: number;
-};
-/**
- * A {@link Circle} with position
- */
-type CirclePositioned = Point & Circle;
-//#endregion
-//#region ../geometry/dist/src/line/line-type.d.ts
-/**
- * A line, which consists of an `a` and `b` {@link Point}.
- */
-type Line = {
-  readonly a: Point;
-  readonly b: Point;
-};
-/**
- * A PolyLine, consisting of more than one line.
- */
-//#endregion
-//#region ../geometry/dist/src/triangle/triangle-type.d.ts
-type Triangle = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly c: Point;
-};
-//#endregion
-//#region ../geometry/dist/src/polar/types.d.ts
-/**
- * A polar ray is a line in polar coordinates
- * It consists of an angle (in radians) with a given offset and length.
- */
-type PolarRay = Readonly<{
-  /**
-   * Angle of ray
-   */
-  angleRadian: number;
-  /**
-   * Starting point of a ray, defined as an
-   * offset from the polar origin.
-   */
-  offset: number;
-  /**
-   * Length of ray
-   */
-  length: number;
-  origin?: Point;
-}>;
-//#endregion
-//#region ../collections/dist/src/stack/IStack.d.ts
-/**
- * Stack (immutable)
- *
- * @example Overview
- * ```js
- * stack.push(item); // Return a new stack with item(s) added
- * stack.pop();      // Return a new stack with top-most item removed (ie. newest)
- * stack.peek;       // Return what is at the top of the stack or undefined if empty
- * stack.isEmpty;
- * stack.isFull;
- * stack.length;     // How many items in stack
- * stack.data;       // Get the underlying array
- * ```
- *
- * @example
- * ```js
- * let sanga = new Stack();
- * sanga = sanga.push(`bread`, `tomato`, `cheese`);
- * sanga.peek;  // `cheese`
- * sanga = sanga.pop(); // removes `cheese`
- * sanga.peek;  // `tomato`
- * const sangaAlt = sanga.push(`lettuce`, `cheese`); // sanga stays [`bread`, `tomato`], while sangaAlt is [`bread`, `tomato`, `lettuce`, `cheese`]
- * ```
- *
- * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @class Stack
- * @typeParam V - Type of stored items
- */
-interface IStack<V> {
-  /**
-   * Enumerates stack from bottom-to-top
-   *
-   */
-  forEach(fn: (v: V) => void): void;
-  /**
-   * Enumerates stack from top-to-bottom
-   * @param fn
-   */
-  forEachFromTop(fn: (v: V) => void): void;
-  get data(): readonly V[];
-  /**
-   * _True_ if stack is empty
-   */
-  get isEmpty(): boolean;
-  /**
-   * _True_ if stack is at its capacity. _False_ if not, or if there is no capacity.
-   */
-  get isFull(): boolean;
-  /**
-   * Get the item at the top of the stack without removing it (like `pop` would do)
-   * @returns Item at the top of the stack, or _undefined_ if empty.
-   */
-  get peek(): V | undefined;
-  /**
-   * Number of items in stack
-   */
-  get length(): number;
-}
-//# sourceMappingURL=IStack.d.ts.map
-//#endregion
-//#region ../collections/dist/src/stack/IStackImmutable.d.ts
-interface IStackImmutable<V> extends IStack<V> {
-  push(...toAdd: readonly V[]): IStackImmutable<V>;
-  pop(): IStackImmutable<V>;
-}
-//# sourceMappingURL=IStackImmutable.d.ts.map
-//#endregion
-//#region ../geometry/dist/src/arc/arc-type.d.ts
-/**
- * Arc, defined by radius, start and end point in radians and direction
- */
-type Arc = {
-  /**
-   * Radius of arc
-   */
-  readonly radius: number;
-  /**
-   * Start radian
-   */
-  readonly startRadian: number;
-  /**
-   * End radian
-   */
-  readonly endRadian: number;
-  /**
-   * If true, arc runs in clockwise direction
-   */
-  readonly clockwise: boolean;
-};
-/**
- * An {@link Arc} that also has a center position, given in x, y
- */
-type ArcPositioned = Point & Arc;
-/**
- * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
- */
-//#endregion
-//#region ../geometry/dist/src/bezier/bezier-type.d.ts
-type QuadraticBezier = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly quadratic: Point;
-};
-type CubicBezier = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly cubic1: Point;
-  readonly cubic2: Point;
-};
-//#endregion
-//#region ../geometry/dist/src/ellipse.d.ts
-/**
- * An ellipse
- */
-type Ellipse = {
-  readonly radiusX: number;
-  readonly radiusY: number;
-  /**
-   * Rotation, in radians
-   */
-  readonly rotation?: number;
-  readonly startAngle?: number;
-  readonly endAngle?: number;
-};
-/**
- * A {@link Ellipse} with position
- */
-type EllipsePositioned = Point & Ellipse;
-//#endregion
-//#region ../geometry/dist/src/angles.d.ts
-
-type Angle = {
-  value: number;
-  unit: `deg` | `rad` | `turn` | `grad`;
-};
-/**
- * Parses CSS-style angle strings. By default assumes degrees.
- *
- * ```js
- * angleParse(`100`);     // { value: 100, unit: `deg` }
- * angleParse(100);       // { value: 100, unit: `deg` }
- * angleParse(`100deg`);   // { value: 100, unit: `deg` }
- *
- * // More exotic units:
- * angleParse(`100rad`);  // { value: 100, unit: `rad` }
- * angleParse(`100turn`); // { value: 100, unit: `turn` }
- * angleParse(`100grad`); // { value: 100, unit: `grad` }
- * ```
- *
- * Once parsed in this format, use {@link angleConvert} to convert to
- * a different unit.
- * @param value
- * @returns
- */
-//#endregion
-//#region ../geometry/dist/src/scaler.d.ts
-/**
- * A scale function that takes an input value to scale.
- * Input can be in the form of `{ x, y }` or two number parameters.
- *
- * ```js
- * scale(10, 20);
- * scale({ x:10, y:20 });
- * ```
- *
- * Output range can be specified as a `{ width, height }` or two number parameters.
- * If omitted, the default range
- * is used.
- *
- * ```js
- * // Scale 10,20 with range w:800 h:600
- * scale(10, 20, 800, 600);
- * scale({x:10, y:20}, 800, 600);
- * scale({x:10, y:20}, {width: 800, height: 600});
- * ```
- */
-type Scaler = (a: number | Point, b?: number | Rect, c?: number | Rect, d?: number) => Point;
-/**
- * A scaler than can convert to a from an output range
- */
-
-type ScaleBy = `both` | `min` | `max` | `width` | `height`;
-/**
- * Returns a set of scaler functions, to convert to and from ranges.
- *
- * ```js
- * const scaler = Scaler.scaler(`both`, {width:window.innerWidth, height:window.innerHeight});
- * // Assuming screen of 800x400...
- * scaler.abs(400,200);          // Yields { x:0.5, y:0.5 }
- * scaler.abs({ x:400, y:200 }); // Yields { x:0.5, y:0.5 }
- *
- * scaler.rel(0.5, 0.5);         // Yields: { x:400, y:200 }
- * scaler.rel({ x:0.5, y:0.5 }); // Yields: { x:400, y:200 }
- * ```
- *
- * If no default range is provided, it must be given each time the scale function is used.
- *
- * ```js
- * const scaler = Scaler.scaler(`both`);
- *
- * scaler.abs(400, 200, 800, 400);
- * scaler.abs(400, 200, { width: 800, height: 400 });
- * scaler.abs({ x:400, y: 200}, { width: 800, height: 400 });
- * scaler.abs({ x:400, y: 200}, 800, 400);
- * // All are the same, yielding { x:0.5, y:0.5 }
- *
- * scaler.abs(400, 200); // Throws an exception because there is no scale
- * ```
- * @param scaleBy Dimension to scale by
- * @param defaultRect Default range
- * @returns
- */
-//#endregion
-//#region ../dom/dist/src/element-sizing.d.ts
-/**
- * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
- * * height: use height of parent, set width based on original aspect ratio of element. Assumes parent has a determined height.
- * * both: use height & width of parent, so the element adopts the ratio of the parent. Be sure that parent has a width and height set.
- * * min: use the smallest dimension of parent
- * * max: use the largest dimension of parent
- */
-type ElementResizeLogic = `width` | `height` | `both` | `none` | `min` | `max`;
-/**
- * Options
- */
-//#endregion
-//#region ../../node_modules/.pnpm/colorizr@3.0.7/node_modules/colorizr/dist/index.d.mts
-type ColorType = 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb';
-type Alpha = number;
-type Amount = number;
-type Degrees = number;
-type HEX = `#${string}`;
-interface HSL {
-  h: number;
-  s: number;
-  l: number;
-  alpha?: Alpha;
-}
-interface LAB {
-  l: number;
-  a: number;
-  b: number;
-  alpha?: Alpha;
-}
-interface LCH {
-  l: number;
-  c: number;
-  h: number;
-  alpha?: Alpha;
-}
-interface RGB {
-  r: number;
-  g: number;
-  b: number;
-  alpha?: Alpha;
-}
-interface Analysis {
-  brightnessDifference: number;
-  colorDifference: number;
-  compliant: number;
-  contrast: number;
-  largeAA: boolean;
-  largeAAA: boolean;
-  normalAA: boolean;
-  normalAAA: boolean;
-}
-interface ColorizrOptions {
-  /**
-   * Output color format.
-   *
-   * If not specified, the output will use the same format as the input color.
-   */
-  format?: ColorType;
-}
-declare class Colorizr {
-  alpha: Alpha;
-  hex: HEX;
-  hsl: HSL;
-  oklab: LAB;
-  oklch: LCH;
-  rgb: RGB;
-  type: ColorType;
-  constructor(color: string | HSL | LAB | LCH | RGB, options?: ColorizrOptions);
-  /**
-   * Get css string
-   */
-  get css(): string;
-  /**
-   * Get the red value
-   */
-  get red(): number;
-  /**
-   * Get the green value
-   */
-  get green(): number;
-  /**
-   * Get the blue value
-   */
-  get blue(): number;
-  /**
-   * Get the hue value
-   */
-  get hue(): number;
-  /**
-   * Get the saturation value
-   */
-  get saturation(): number;
-  /**
-   * Get the lightness value
-   */
-  get lightness(): number;
-  /**
-   * Get the luminance value
-   */
-  get luminance(): number;
-  /**
-   * Get the chroma value
-   */
-  get chroma(): number;
-  get opacity(): number;
-  /**
-   * Get the contrasted color
-   */
-  get textColor(): string;
-  private get selectedColor();
-  brightnessDifference(input: string): number;
-  colorDifference(input: string): number;
-  /**
-   * Test 2 colors for compliance
-   */
-  compare(input: string): Analysis;
-  contrast(input: string): number;
-  format(type: ColorType, precision?: number): string;
-  /**
-   * Increase lightness
-   */
-  lighten(amount: Amount): string;
-  /**
-   * Decrease lightness
-   */
-  darken(amount: Amount): string;
-  /**
-   * Increase saturation
-   */
-  saturate(amount: Amount): string;
-  /**
-   * Decrease saturation
-   */
-  desaturate(amount: Amount): string;
-  /**
-   * Invert color
-   */
-  invert(): string;
-  /**
-   * Add opacity to the color.
-   */
-  opacify(alpha?: Alpha): string;
-  /**
-   * Rotate color
-   */
-  rotate(degrees: Degrees): string;
-  /**
-   * Make the color more transparent
-   */
-  transparentize(alpha?: Alpha): string;
-}
-
-/**
- * Get the brightness difference between 2 colors.
- */
-//#endregion
 //#region ../visual/src/colour/types.d.ts
 type HslBase = {
   /**
@@ -868,6 +448,290 @@ declare class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   };
 }
 //# sourceMappingURL=canvas-helper.d.ts.map
+//#endregion
+//#region ../visual/src/canvas-region.d.ts
+type CanvasRegionSpecRelativePositioned = {
+  relativePositioned: RectPositioned;
+  scale?: `independent`;
+};
+type CanvasRegionSpecAbsolutePositioned = {
+  absPositioned: RectPositioned;
+};
+type CanvasRegionSpecRelativeSized = {
+  relativeSize: Rect;
+  scale?: `independent`;
+  /**
+   * Cardinal directions, or 'center' (default)
+   */
+  position: `center` | `n` | `s`;
+};
+type CanvasRegionSpecMatched = {
+  match: HTMLElement | string;
+};
+type CanvasRegionSpec = {
+  marginPx?: number;
+} & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
+/**
+ * Manges the drawing for a region of a canvas
+ */
+declare class CanvasSource {
+  #private;
+  constructor(canvasElementOrQuery: HTMLCanvasElement | string, sizeBasis?: `min` | `max`);
+  /**
+   * Set logical size for region
+   * @param size
+   * @returns
+   */
+  setLogicalSize(size: Rect): Rect;
+  /**
+   * Causes drawing context to be re-created
+   */
+  invalidateContext(): void;
+  /**
+   * Convert relative to absolute
+   * @param pt
+   * @param kind
+   * @returns
+   */
+  toAbsPoint(pt: Point, kind?: `independent`): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Gets the offset x,y
+   */
+  get offset(): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Converts an absolute point to relative
+   * @param pt
+   * @param source
+   * @param kind
+   * @param clamped
+   * @returns
+   */
+  toRelPoint(pt: Point, source: `screen` | `source`, kind?: `independent` | `skip`, clamped?: boolean): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Converts a rectangle to absolute coordinates
+   * @param rect
+   * @param kind
+   * @returns
+   */
+  toAbsRect(rect: Rect | RectPositioned, kind?: `independent`): {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  } | {
+    width: number;
+    height: number;
+  };
+  /**
+   * Creates a region
+   *
+   * Absolute positioned. Uses source coordinates which don't change
+   * ```js
+   * source.createRegion({
+   *  absPositioned: { x: 0, y: 0, width: 100, height: 100}
+   * });
+   * ```
+   *
+   * Relative positioned. Uses coordiantes relative to source dimensions.
+   * Updated if source changes.
+   * ```js
+   * source.createRegion({
+   *  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
+   *  scale: `independent`
+   * });
+   * ```
+   *
+   * Relative sized. Uses size relative to source dimension. By default centers.
+   * ```js
+   * source.createRegion({
+   *  relativeSize: { width: 0.5, height: 0.5 }
+   *  position: `center`
+   * })
+   * ```
+   * @param spec
+   * @returns
+   */
+  createRegion(spec: CanvasRegionSpec): CanvasRegion;
+  /**
+   * Clears the region of the canvas
+   */
+  clear(): void;
+  /**
+   * Gets - or creates - the drawing context
+   */
+  get context(): CanvasRenderingContext2D;
+  /**
+   * Gets a scaler for size
+   */
+  get sizeScaler(): any;
+  /**
+   * Gets the logical width
+   */
+  get width(): number;
+  /**
+   * Gets the logical height
+   */
+  get height(): number;
+}
+/**
+ * Draws on a canvas, constrained to a specific region
+ */
+declare class CanvasRegion {
+  #private;
+  source: CanvasSource;
+  /**
+   * Creates, using coordinate in canvas coordinates
+   */
+  constructor(source: CanvasSource, regionCompute: (parent: CanvasSource) => RectPositioned);
+  /**
+   * Calls the original `regionCompute` function passed in to the constructor
+   * to recompute the absolute region
+   */
+  recomputeRegion(): void;
+  /**
+   * Converts a region-relative point (0..1) to an absolute
+   * point, which uses region-relative coordinates.
+   *
+   * Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
+   * will return 0,0.
+   *
+   * @param regionRel
+   * @param scaleBy
+   * @returns
+   */
+  toAbsRegion(regionRel: Point, scaleBy?: `both`): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Returns a copy of `p` offset by the region's x & y
+   * @param p
+   * @returns
+   */
+  applyRegionOffset(p: Point): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Draws a line from a series of points.
+   * Assumes region-relative, % coordinates (ie 0..1 scale)
+   * @param relativePoints Points to connect, in region-relative coordinates
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line with
+   */
+  drawConnectedPointsRelative(relativePoints: Point[], strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Draws connected points in absolute coordinates,
+   * however with 0,0 being the top-left of the region.
+   *
+   * Thus, this will apply the region offset before drawing.
+   * @param points Points to draw
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line width
+   */
+  drawConnectedPoints(points: Point[], strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Fills text at a relative position
+   * @param text
+   * @param relPos Relative, meaning 0.5,0.5 is the middle of the region
+   * @param fillStyle
+   * @param baseline
+   * @param align
+   */
+  fillTextRelative(text: string, relPos: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
+  /**
+   * Fills text at a region-relative position
+   * @param text
+   * @param point Region relative, meaning 0,0 is top-left of region
+   * @param fillStyle
+   * @param baseline
+   * @param align
+   */
+  fillText(text: string, point: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
+  drawCircles(relativeCircles: CirclePositioned[], fillStyle: string, strokeStyle?: string, lineWidth?: number): void;
+  /**
+   * Clears the region
+   */
+  clear(): void;
+  /**
+   * Fills the region
+   * @param fillStyle
+   */
+  fill(fillStyle?: string): void;
+  /**
+   * For debugging, draws an outline of the bounds
+   * @param strokeStyle
+   * @param lineWidth
+   */
+  drawBounds(strokeStyle: string, lineWidth?: number): void;
+  /**
+   * Converts a  point to a region-relative one.
+   * @param pt
+   * @param kind
+   * @returns
+   */
+  toRelPoint(pt: Point, source?: `screen` | `source`, kind?: `independent`, clamped?: boolean): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Converts absolute to region point
+   * @param pt
+   * @param source
+   * @param clamped
+   * @returns
+   */
+  absToRegionPoint(pt: Point, source: `screen`, clamped: boolean): {
+    x: number;
+    y: number;
+  };
+  /**
+   * Get center of region
+   */
+  get center(): Point;
+  /**
+   * Gets the drawing context
+   */
+  get context(): CanvasRenderingContext2D;
+  /**
+   * SEts the region
+   */
+  set region(value: RectPositioned);
+  /**
+   * Gets the region
+   */
+  get region(): RectPositioned;
+  /**
+   * Gets the width
+   */
+  get width(): number;
+  /**
+   * Gets the height
+   */
+  get height(): number;
+  /**
+   * Gets the x offset
+   */
+  get x(): number;
+  /**
+   * Gets they y offset
+   */
+  get y(): number;
+  /**
+   * Gets the width/height, whichever is smaller
+   */
+  get dimensionMin(): number;
+}
+//# sourceMappingURL=canvas-region.d.ts.map
 //#endregion
 //#region ../visual/src/pointer-visualise.d.ts
 type Opts = {
@@ -1582,6 +1446,49 @@ declare const textBlockAligned: (ctx: CanvasRenderingContext2D, text: readonly s
 //#region ../visual/src/types.d.ts
 type DrawingHelper = ReturnType<typeof makeHelper>;
 //# sourceMappingURL=types.d.ts.map
+declare namespace convolve_2d_d_exports {
+  export { CellValueScalar, Kernel, Kernel2dArray, KernelCompute, KernelReduce, boxBlurKernel, convolve, convolveCell, convolveImage, edgeDetectionKernel, gaussianBlur3Kernel, gaussianBlur5Kernel, identityKernel, kernel2dToArray, multiply, rgbReducer, sharpenKernel, unsharpMasking5Kernel };
+}
+type Kernel<T> = readonly (readonly T[])[];
+type CellValueScalar<TCell, TKernel> = GridCellAndValue<TCell> & {
+  kernel: TKernel;
+};
+type KernelCompute = <V>(offset: GridCell, value: V) => V;
+type KernelReduce<TCell, TKernel> = (values: CellValueScalar<TCell, TKernel>[]) => TCell | undefined;
+/**
+ * Multiply every element of kernel by the same `scalar` value.
+ * Returns new result, input is unmodified
+ * @param kernel
+ * @param scalar
+ * @returns
+ */
+declare const multiply: (kernel: Kernel<number>, scalar: number) => Kernel<number>;
+declare function convolveCell<TCell, TKernel>(cell: GridCell, kernel: Kernel2dArray<TKernel>, source: GridReadable<TCell>, reduce: KernelReduce<TCell, TKernel>): TCell | undefined;
+/**
+ * Performs kernel-based convolution over `image`.
+ * @param kernel
+ * @param image
+ */
+declare function convolveImage(kernel: Kernel<number>, image: ImageData): Generator<GridCellAndValue<Rgb8Bit>, void, any>;
+declare function convolve<TCell, TKernel>(kernel: Kernel<TKernel>, source: GridReadable<TCell>, visitor: Iterable<GridCell>, reduce: KernelReduce<TCell, TKernel>, origin?: GridCell): IterableIterator<GridCellAndValue<TCell>>;
+type Kernel2dArray<T> = GridCellAndValue<T>[];
+/**
+ * For a given kernel, returns an array of offsets. These
+ * consist of a cell offset (eg `{x:-1,y:-1}`) and the value at that kernel position.
+ * @param kernel
+ * @param origin
+ * @returns
+ */
+declare const kernel2dToArray: <T>(kernel: Kernel<T>, origin?: GridCell) => Kernel2dArray<T>;
+declare const rgbReducer: KernelReduce<Rgb8Bit, number>;
+declare const identityKernel: number[][];
+declare const edgeDetectionKernel: number[][];
+declare const sharpenKernel: number[][];
+declare const boxBlurKernel: Kernel<number>;
+declare const gaussianBlur3Kernel: Kernel<number>;
+declare const gaussianBlur5Kernel: Kernel<number>;
+declare const unsharpMasking5Kernel: Kernel<number>;
+//# sourceMappingURL=convolve-2d.d.ts.map
 //#endregion
 //#region ../visual/src/colour/conversion.d.ts
 type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
@@ -2051,10 +1958,43 @@ declare namespace oklch_d_exports {
 }
 declare const OKLCH_CHROMA_MAX = 0.4;
 declare const guard$1: (lch: OkLch) => void;
-declare function fromLibrary<T extends ParsingOptions<OkLch>>(lch: LCH, options: T): T extends {
+/**
+ * Coverts from the Colorizr library
+ * Tests ranges:
+ * * l: 0..1
+ * * c: 0..1
+ * * h: 0..360
+ * * alpha: 0..1
+ *
+ * Default option: { scalar: true }
+ * @param lch LCH value
+ * @param parsingOptions Options for parsing
+ * @returns
+ */
+declare function fromLibrary<T extends ParsingOptions<OkLch>>(lch: LCH, parsingOptions: T): T extends {
   scalar: true;
 } ? OkLchScalar : OkLchAbsolute;
+/**
+ * Parse a HEX-formatted colour into OkLch structured format
+ * @param hexString
+ * @param options
+ * @returns
+ */
 declare const fromHexString$1: (hexString: string, options?: ParsingOptions<OkLch>) => OkLch;
+/**
+ * Converts from some CSS-representation of colour to a structured OkLch format.
+ *
+ * ```js
+ * fromCss(`yellow`);
+ * fromCss(`rgb(100,200,90)`);
+ * fromCss(`#ff00ff`);
+ * ```
+ *
+ * By default returns a {@link OkLchScalar} (relative) representation. Use the flag 'scalar:true' to get back
+ * {@link OkLchAbsolute}.
+ * @param value
+ * @param options
+ */
 declare function fromCss$1<T extends ParsingOptions<OkLch>>(value: string, options: T): T extends {
   scalar: true;
 } ? OkLchScalar : OkLchAbsolute;
@@ -2122,8 +2062,8 @@ declare const guard: (rgb: Rgb) => void;
  * * 'pdelta': proportion of current value to change by ('percentage delta')
  *
  * Use negative values to decrease
- * @param value
- * @param amount
+ * @param rgb Colour
+ * @param amount Amount to change
  */
 declare const changeLightness: (rgb: Rgb, amount: Partial<{
   pdelta: number;
@@ -2188,7 +2128,7 @@ declare namespace image_data_grid_d_exports {
   export { accessor, byColumn, byRow, grid, setter, wrap };
 }
 /**
- * Returns a {@link @ixfx/geometry/Grids.Grid} based on the provided `image`
+ * Returns a {@link https://api.ixfx.fun/_ixfx/geometry/Grids/Grid/} based on the provided `image`
  * @param image ImageData
  * @returns Grid
  */
@@ -2434,195 +2374,6 @@ declare class DataSet<TValue, TSeriesMeta> {
   add(value: TValue, series?: string): void;
 }
 //# sourceMappingURL=DataSet.d.ts.map
-//#endregion
-//#region ../visual/src/canvas-region.d.ts
-type CanvasRegionSpecRelativePositioned = {
-  relativePositioned: RectPositioned;
-  scale?: `independent`;
-};
-type CanvasRegionSpecAbsolutePositioned = {
-  absPositioned: RectPositioned;
-};
-type CanvasRegionSpecRelativeSized = {
-  relativeSize: Rect;
-  scale?: `independent`;
-  /**
-   * Cardinal directions, or 'center' (default)
-   */
-  position: `center` | `n` | `s`;
-};
-type CanvasRegionSpecMatched = {
-  match: HTMLElement | string;
-};
-type CanvasRegionSpec = {
-  marginPx?: number;
-} & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
-declare class CanvasSource {
-  #private;
-  constructor(canvasElementOrQuery: HTMLCanvasElement | string, sizeBasis?: `min` | `max`);
-  setLogicalSize(size: Rect): Rect;
-  invalidateContext(): void;
-  toAbsPoint(pt: Point, kind?: `independent`): {
-    x: number;
-    y: number;
-  };
-  get offset(): {
-    x: number;
-    y: number;
-  };
-  toRelPoint(pt: Point, source: `screen` | `source`, kind?: `independent` | `skip`, clamped?: boolean): {
-    x: number;
-    y: number;
-  };
-  toAbsRect(rect: Rect | RectPositioned, kind?: `independent`): {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  } | {
-    width: number;
-    height: number;
-  };
-  /**
-   * Creates a region
-   *
-   * Absolute positioned. Uses source coordinates which don't change
-   * ```js
-   * source.createRegion({
-   *  absPositioned: { x: 0, y: 0, width: 100, height: 100}
-   * });
-   * ```
-   *
-   * Relative positioned. Uses coordiantes relative to source dimensions.
-   * Updated if source changes.
-   * ```js
-   * source.createRegion({
-   *  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
-   *  scale: `independent`
-   * });
-   * ```
-   *
-   * Relative sized. Uses size relative to source dimension. By default centers.
-   * ```js
-   * source.createRegion({
-   *  relativeSize: { width: 0.5, height: 0.5 }
-   *  position: `center`
-   * })
-   * ```
-   * @param spec
-   * @returns
-   */
-  createRegion(spec: CanvasRegionSpec): CanvasRegion;
-  clear(): void;
-  get context(): CanvasRenderingContext2D;
-  get sizeScaler(): any;
-  get width(): number;
-  get height(): number;
-}
-/**
- * Draws on a canvas, constrained to a specific region
- */
-declare class CanvasRegion {
-  #private;
-  source: CanvasSource;
-  /**
-   * Creates, using coordinate in canvas coordinates
-   */
-  constructor(source: CanvasSource, regionCompute: (parent: CanvasSource) => RectPositioned);
-  /**
-   * Calls the original `regionCompute` function passed in to the constructor
-   * to recompute the absolute region
-   */
-  recomputeRegion(): void;
-  /**
-   * Converts a region-relative point (0..1) to an absolute
-   * point, which uses region-relative coordinates.
-   *
-   * Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
-   * will return 0,0.
-   *
-   * @param regionRel
-   * @param scaleBy
-   * @returns
-   */
-  toAbsRegion(regionRel: Point, scaleBy?: `both`): {
-    x: number;
-    y: number;
-  };
-  /**
-   * Returns a copy of `p` offset by the region's x & y
-   * @param p
-   * @returns
-   */
-  applyRegionOffset(p: Point): {
-    x: number;
-    y: number;
-  };
-  /**
-   * Draws a line from a series of points.
-   * Assumes region-relative, % coordinates (ie 0..1 scale)
-   * @param relativePoints Points to connect, in region-relative coordinates
-   * @param strokeStyle Stroke style
-   * @param lineWidth Line with
-   */
-  drawConnectedPointsRelative(relativePoints: Point[], strokeStyle: string, lineWidth?: number): void;
-  /**
-   * Draws connected points in absolute coordinates,
-   * however with 0,0 being the top-left of the region.
-   *
-   * Thus, this will apply the region offset before drawing.
-   * @param points Points to draw
-   * @param strokeStyle Stroke style
-   * @param lineWidth Line width
-   */
-  drawConnectedPoints(points: Point[], strokeStyle: string, lineWidth?: number): void;
-  /**
-   * Fills text at a relative position
-   * @param text
-   * @param relPos Relative, meaning 0.5,0.5 is the middle of the region
-   * @param fillStyle
-   * @param baseline
-   * @param align
-   */
-  fillTextRelative(text: string, relPos: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
-  /**
-   * Fills text at a region-relative position
-   * @param text
-   * @param point Region relative, meaning 0,0 is top-left of region
-   * @param fillStyle
-   * @param baseline
-   * @param align
-   */
-  fillText(text: string, point: Point, fillStyle: string | undefined, font: string, baseline?: CanvasTextBaseline, align?: CanvasTextAlign): void;
-  drawCircles(relativeCircles: CirclePositioned[], fillStyle: string, strokeStyle?: string, lineWidth?: number): void;
-  clear(): void;
-  fill(fillStyle?: string): void;
-  drawBounds(strokeStyle: string, lineWidth?: number): void;
-  /**
-   * Converts a  point to a region-relative one.
-   * @param pt
-   * @param kind
-   * @returns
-   */
-  toRelPoint(pt: Point, source?: `screen` | `source`, kind?: `independent`, clamped?: boolean): {
-    x: number;
-    y: number;
-  };
-  absToRegionPoint(pt: Point, source: `screen`, clamped: boolean): {
-    x: number;
-    y: number;
-  };
-  get center(): Point;
-  get context(): CanvasRenderingContext2D;
-  set region(value: RectPositioned);
-  get region(): RectPositioned;
-  get width(): number;
-  get height(): number;
-  get x(): number;
-  get y(): number;
-  get dimensionMin(): number;
-}
-//# sourceMappingURL=canvas-region.d.ts.map
 //#endregion
 //#region ../visual/src/plot/cartesian-canvas-plot.d.ts
 type InsertOptions = {
@@ -2890,5 +2641,5 @@ declare const manualCapture: (sourceVideoEl: HTMLVideoElement, opts?: ManualCapt
 //# sourceMappingURL=video.d.ts.map
 
 //#endregion
-export { CanvasEvents, CanvasHelper, CanvasHelperOptions, index_d_exports as Colour, drawing_d_exports as Drawing, DrawingHelper, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Plot, index_d_exports$2 as Svg, video_d_exports as Video, pointerVisualise };
+export { CanvasEvents, CanvasHelper, CanvasHelperOptions, CanvasRegion, CanvasRegionSpec, CanvasRegionSpecAbsolutePositioned, CanvasRegionSpecMatched, CanvasRegionSpecRelativePositioned, CanvasRegionSpecRelativeSized, CanvasSource, index_d_exports as Colour, convolve_2d_d_exports as Convolve2d, drawing_d_exports as Drawing, DrawingHelper, image_data_grid_d_exports as ImageDataGrid, Opts, index_d_exports$1 as Plot, index_d_exports$2 as Svg, video_d_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.d.ts.map

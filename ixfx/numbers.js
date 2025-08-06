@@ -1,47 +1,7 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
-import "./arrays-yH_qBmt0.js";
-import "./is-equal-y9du2FWU.js";
-import { containsIdenticalValues } from "./equality-Bufi-LTm.js";
-import "./clamp-BXRKKkSg.js";
-import "./wrap-CbW4pe4i.js";
-import { interpolate } from "./interpolate-BoOK0bgP.js";
-import { scale, scaler } from "./scale-DHjtm9T-.js";
+import { integerTest, numberTest, resultThrow } from "./src-CadJtgeN.js";
+import { interpolate, scale, scaler, zip } from "./src-8IiDfq42.js";
 
-//#region ../arrays/dist/src/zip.js
-/**
-* Zip combines the elements of two or more arrays based on their index.
-*
-* ```js
-* const a = [1,2,3];
-* const b = [`red`, `blue`, `green`];
-*
-* const c = Arrays.zip(a, b);
-* // Yields:
-* // [
-* //   [1, `red`],
-* //   [2, `blue`],
-* //   [3, `green`]
-* // ]
-* ```
-*
-* Typically the arrays you zip together are all about the same logical item. Eg, in the above example
-* perhaps `a` is size and `b` is colour. So thing #1 (at array index 0) is a red thing of size 1. Before
-* zipping we'd access it by `a[0]` and `b[0]`. After zipping, we'd have c[0], which is array of [1, `red`].
-* @param arrays
-* @returns Zipped together array
-*/
-const zip = (...arrays) => {
-	if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
-	const lengths = arrays.map((a) => a.length);
-	if (!containsIdenticalValues(lengths)) throw new Error(`Arrays must be of same length`);
-	const returnValue = [];
-	const length = lengths[0];
-	for (let index = 0; index < length; index++) returnValue.push(arrays.map((a) => a[index]));
-	return returnValue;
-};
-
-//#endregion
 //#region ../numbers/src/apply-to-values.ts
 /**
 * Apples `fn` to every key of `obj` which is numeric.
@@ -326,7 +286,7 @@ const averageWeighted = (data, weightings) => {
 * ```
 *
 * For clamping integer ranges, consider {@link clampIndex }
-* For clamping `{ x, y }` points, consider {@link @ixfx/geometry.Points.clamp}.
+* For clamping `{ x, y }` points, consider {@link https://api.ixfx.fun/_ixfx/geometry/Points/clamp/ @ixfx/geometry/Points.clamp}.
 * For clamping bipolar values: {@link Bipolar.clamp}
 * @param value Value to clamp
 * @param min value (inclusive)
@@ -1205,7 +1165,7 @@ const piPi = Math.PI * 2;
 * interpolate(0.5, 30, 60);
 * ```
 *
-* See also {@link interpolatorStepped} and {@link @ixfx/modulation.interpolatorInterval} for functions
+* See also {@link interpolatorStepped} and {@link https://api.ixfx.fun/_ixfx/modulation/interpolatorInterval/} for functions
 * which help to manage progression from A->B over steps or interval.
 * 
 * Usually interpolation amount is on a 0...1 scale, inclusive. What is the interpolation result
@@ -1275,7 +1235,7 @@ function interpolate$1(pos1, pos2, pos3, pos4) {
 * Returns a function that interpolates from A to B.
 * It steps through the interpolation with each call to the returned function.
 * This means that the `incrementAmount` will hinge on the rate
-* at which the function is called. Alternatively, consider {@link @ixfx/numbers.interpolatorInterval}
+* at which the function is called. Alternatively, consider {@link https://api.ixfx.fun/_ixfx/modulation/interpolatorInterval/}
 * which steps on the basis of clock time.
 * 
 * ```js

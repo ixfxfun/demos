@@ -1,192 +1,15 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./numbers-C359_5A6.js";
-import { arrayTest } from "./arrays-yH_qBmt0.js";
-import "./to-string-Dg1sJUf1.js";
-import "./comparers-BtlnApnB.js";
-import "./is-equal-edylSnsn.js";
-import { zipKeyValue } from "./maps-a_ogDHUT.js";
-import { defaultKeyer } from "./default-keyer-CnxB2rd_.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
-import { dotProduct, minFast, minIndex } from "./numeric-arrays-DwffyOZ3.js";
-import { clamp, clampIndex } from "./clamp-BXRKKkSg.js";
-import { round } from "./round-DuQ_VRis.js";
-import { wrap } from "./wrap-CbW4pe4i.js";
-import { movingAverageLight } from "./moving-average-BpnIcIs9.js";
-import { scale } from "./scale-DHjtm9T-.js";
-import { ObjectTracker, TrackedValueMap, quantiseEvery } from "./tracked-value-BgYnLxEF.js";
-import "./tracker-base-DcT12hen.js";
-import { Bezier } from "./bezier-C-OUPtNe.js";
+import { integerTest, numberTest, percentTest, resultThrow } from "./src-CadJtgeN.js";
+import "./is-primitive-eBwrK4Yg.js";
+import "./interval-type-CYct6719.js";
+import { zipKeyValue } from "./basic-TkGxs8ni.js";
+import "./src-CHxoOwyb.js";
+import "./key-value-xMXxsVY5.js";
+import "./resolve-core-BwRmfzav.js";
+import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-8IiDfq42.js";
+import { mutable } from "./src-DyRMnxm7.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-CZvpytLt.js";
 
-//#region ../arrays/dist/src/sort.js
-/**
-* Sorts an array of objects in ascending order
-* by the given property name, assuming it is a number.
-*
-* ```js
-* const data = [
-*  { size: 10, colour: `red` },
-*  { size: 20, colour: `blue` },
-*  { size: 5, colour: `pink` }
-* ];
-* const sorted = Arrays.sortByNumericProperty(data, `size`);
-*
-* Yields items ascending order:
-* [ { size: 5, colour: `pink` }, { size: 10, colour: `red` }, { size: 20, colour: `blue` } ]
-* ```
-* @param data
-* @param propertyName
-*/
-const sortByNumericProperty = (data, propertyName) => [...data].sort((a, b) => {
-	resultThrow(arrayTest(data, `data`));
-	const av = a[propertyName];
-	const bv = b[propertyName];
-	if (av < bv) return -1;
-	if (av > bv) return 1;
-	return 0;
-});
-
-//#endregion
-//#region ../numbers/dist/src/linear-space.js
-/**
-* Generates a `step`-length series of values between `start` and `end` (inclusive).
-* Each value will be equally spaced.
-*
-* ```js
-* for (const v of linearSpace(1, 5, 6)) {
-*  // Yields: [ 1, 1.8, 2.6, 3.4, 4.2, 5 ]
-* }
-* ```
-*
-* Numbers can be produced from large to small as well
-* ```js
-* const values = [...linearSpace(10, 5, 3)];
-* // Yields: [10, 7.5, 5]
-* ```
-* @param start Start number (inclusive)
-* @param end  End number (inclusive)
-* @param steps How many steps to make from start -> end
-* @param precision Number of decimal points to round to
-*/
-function* linearSpace(start, end, steps, precision) {
-	resultThrow(numberTest(start, ``, `start`), numberTest(end, ``, `end`), numberTest(steps, ``, `steps`));
-	const r = precision ? round(precision) : (v) => v;
-	const step = (end - start) / (steps - 1);
-	resultThrow(numberTest(step, ``, `step`));
-	if (!Number.isFinite(step)) throw new TypeError(`Calculated step value is infinite`);
-	for (let index = 0; index < steps; index++) {
-		const v = start + step * index;
-		yield r(v);
-	}
-}
-
-//#endregion
-//#region ../random/dist/src/arrays.js
-/**
-* Returns random element.
-*
-* ```js
-* const v = [`blue`, `red`, `orange`];
-* randomElement(v); // Yields `blue`, `red` or `orange`
-* ```
-*
-* Use {@link randomIndex} if you want a random index within `array`.
-*
-* @param array
-* @param rand Random generator. `Math.random` by default.
-* @returns
-*/
-const randomElement = (array, rand = Math.random) => {
-	resultThrow(arrayTest(array, `array`));
-	return array[Math.floor(rand() * array.length)];
-};
-
-//#endregion
-//#region ../collections/dist/src/set/set-mutable.js
-/**
-* Creates a {@link ISetMutable}.
-* @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
-* @returns
-*/
-const mutable = (keyString) => new SetStringMutable(keyString);
-/**
-* Mutable string set
-*/
-var SetStringMutable = class extends SimpleEventEmitter {
-	store = /* @__PURE__ */ new Map();
-	keyString;
-	/**
-	* Constructor
-	* @param keyString Function which returns a string version of added items. If unspecified `JSON.stringify`
-	*/
-	constructor(keyString) {
-		super();
-		this.keyString = keyString ?? defaultKeyer;
-	}
-	/**
-	* Number of items stored in set
-	*/
-	get size() {
-		return this.store.size;
-	}
-	/**
-	* Adds one or more items to set. `add` event is fired for each item
-	* @param values items to add
-	*/
-	add(...values$1) {
-		let somethingAdded = false;
-		for (const value of values$1) {
-			const isUpdated = this.has(value);
-			this.store.set(this.keyString(value), value);
-			super.fireEvent(`add`, {
-				value,
-				updated: isUpdated
-			});
-			if (!isUpdated) somethingAdded = true;
-		}
-		return somethingAdded;
-	}
-	/**
-	* Returns values from set as an iterable
-	* @returns
-	*/
-	values() {
-		return this.store.values();
-	}
-	/**
-	* Clear items from set
-	*/
-	clear() {
-		this.store.clear();
-		super.fireEvent(`clear`, true);
-	}
-	/**
-	* Delete value from set.
-	* @param v Value to delete
-	* @returns _True_ if item was found and removed
-	*/
-	delete(v) {
-		const isDeleted = this.store.delete(this.keyString(v));
-		if (isDeleted) super.fireEvent(`delete`, v);
-		return isDeleted;
-	}
-	/**
-	* Returns _true_ if item exists in set
-	* @param v
-	* @returns
-	*/
-	has(v) {
-		return this.store.has(this.keyString(v));
-	}
-	/**
-	* Returns array copy of set
-	* @returns Array copy of set
-	*/
-	toArray() {
-		return [...this.store.values()];
-	}
-};
-
-//#endregion
 //#region ../geometry/src/pi.ts
 const piPi = Math.PI * 2;
 
@@ -1041,6 +864,26 @@ const Unit3d = {
 //#endregion
 //#region ../geometry/src/polar/conversions.ts
 /**
+* Converts a polar coordinate to a Line.
+* 
+* ```js
+* const line = toLine({ angleRadian: Math.Pi, distance: 0.5 }, { x: 0.2, y: 0.1 });
+* // Yields { a: { x, y}, b: { x, y } }
+* ```
+* 
+* The 'start' parameter is taken to be the origin of the Polar coordinate.
+* @param c 
+* @param start 
+* @returns 
+*/
+const toLine$1 = (c, start) => {
+	const b = toCartesian(c, start);
+	return {
+		a: start,
+		b
+	};
+};
+/**
 * Converts to Cartesian coordinate from polar.
 *
 * ```js
@@ -1069,7 +912,7 @@ const toCartesian = (a, b, c) => {
 		throw new Error(`Expecting (Coord, Point). Second parameter is not a point`);
 	} else if (typeof a === `object`) throw new TypeError(`First param is an object, but not a Coord: ${JSON.stringify(a)}`);
 	else if (typeof a === `number` && typeof b === `number`) {
-		if (c === void 0) c = Empty;
+		if (typeof c === `undefined`) c = Empty;
 		if (!isPoint(c)) throw new Error(`Expecting (number, number, Point). Point param wrong type`);
 		return polarToCartesian(a, b, c);
 	} else throw new TypeError(`Expecting parameters of (number, number). Got: (${typeof a}, ${typeof b}, ${typeof c}). a: ${JSON.stringify(a)}`);
@@ -1089,13 +932,19 @@ const toCartesian = (a, b, c) => {
 * @returns
 */
 const fromCartesian = (point$1, origin) => {
+	if (typeof point$1 === `undefined`) throw new Error(`Param 'point' missing. Expecting a Point`);
+	if (typeof origin === `undefined`) throw new Error(`Param 'origin' missing. Expecting a Point`);
 	point$1 = subtract$2(point$1, origin);
 	const angle = Math.atan2(point$1.y, point$1.x);
-	return Object.freeze({
+	const distance$2 = Math.hypot(point$1.x, point$1.y);
+	const polar = {
 		...point$1,
 		angleRadian: angle,
-		distance: Math.hypot(point$1.x, point$1.y)
-	});
+		distance: distance$2
+	};
+	delete polar.x;
+	delete polar.y;
+	return Object.freeze(polar);
 };
 /**
 * Converts a polar coordinate to Cartesian
@@ -1354,7 +1203,10 @@ __export(ray_exports, {
 /**
 * Converts a ray to a Line in cartesian coordinates.
 * 
-* @param ray 
+* By default, the ray's origin is taken to be 0,0.
+* Passing in an origin will override this default, or whatever
+* the ray's origin property is.
+* @param ray Ray
 * @param origin Override or provide origin point
 * @returns 
 */
@@ -1384,7 +1236,11 @@ const getOrigin = (ray, origin) => {
 * @returns 
 */
 /**
-* Returns a string representation of the ray
+* Returns a string representation of the ray, useful for debugging.
+* 
+* ```
+* "PolarRay(angle: ... offset: ... len: ... origin: ...)"
+* ```
 * @param ray 
 * @returns 
 */
@@ -1396,7 +1252,9 @@ const toString$4 = (ray) => {
 };
 /**
 * Returns a PolarRay based on a line and origin.
+* 
 * If `origin` is omitted, the origin is taken to be the 'a' point of the line.
+* Otherwise, the origin value is used to determine the 'offset' of the ray.
 * @param line 
 * @param origin 
 * @returns 
@@ -1461,6 +1319,7 @@ __export(polar_exports, {
 	spiral: () => spiral,
 	spiralRaw: () => spiralRaw,
 	toCartesian: () => toCartesian,
+	toLine: () => toLine$1,
 	toPoint: () => toPoint,
 	toString: () => toString$5
 });
@@ -7648,6 +7507,42 @@ const cardinal = (rect, card) => {
 };
 
 //#endregion
+//#region ../geometry/src/rect/center-origin.ts
+/**
+* Perform basic point translation using a rectangle where its center is the origin.
+* 
+* Thus the relative coordinate { x: 0, y: 0} corresponds to the absolute middle of the
+* rectangle.
+* 
+* The relative coordinate { x: -1, y: -1 } corresponds to the rectangle's {x,y} properties, and so on.
+* @param rectAbsolute 
+* @returns 
+*/
+const centerOrigin = (rectAbsolute) => {
+	const c = center$1(rectAbsolute);
+	const w = rectAbsolute.width / 2;
+	const h = rectAbsolute.height / 2;
+	const relativeToAbsolute = (point$1) => {
+		return {
+			...point$1,
+			x: point$1.x * w + c.x,
+			y: point$1.y * h + c.y
+		};
+	};
+	const absoluteToRelative = (point$1) => {
+		return {
+			...point$1,
+			x: (point$1.x - rectAbsolute.x) / w - 1,
+			y: (point$1.y - rectAbsolute.y) / h - 1
+		};
+	};
+	return {
+		relativeToAbsolute,
+		absoluteToRelative
+	};
+};
+
+//#endregion
 //#region ../geometry/src/rect/divide.ts
 const divideOp = (a, b) => a / b;
 /**
@@ -8327,6 +8222,7 @@ __export(rect_exports, {
 	area: () => area$4,
 	cardinal: () => cardinal,
 	center: () => center$1,
+	centerOrigin: () => centerOrigin,
 	corners: () => corners$1,
 	distanceFromCenter: () => distanceFromCenter,
 	distanceFromExterior: () => distanceFromExterior,

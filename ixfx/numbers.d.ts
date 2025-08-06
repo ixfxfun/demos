@@ -74,7 +74,7 @@ declare const averageWeighted: (data: number[] | readonly number[], weightings: 
  * ```
  *
  * For clamping integer ranges, consider {@link clampIndex }
- * For clamping `{ x, y }` points, consider {@link @ixfx/geometry.Points.clamp}.
+ * For clamping `{ x, y }` points, consider {@link https://api.ixfx.fun/_ixfx/geometry/Points/clamp/ @ixfx/geometry/Points.clamp}.
  * For clamping bipolar values: {@link Bipolar.clamp}
  * @param value Value to clamp
  * @param min value (inclusive)
@@ -721,7 +721,7 @@ declare function interpolate(a: number, b: number, options?: Partial<BasicInterp
  * Returns a function that interpolates from A to B.
  * It steps through the interpolation with each call to the returned function.
  * This means that the `incrementAmount` will hinge on the rate
- * at which the function is called. Alternatively, consider {@link @ixfx/numbers.interpolatorInterval}
+ * at which the function is called. Alternatively, consider {@link https://api.ixfx.fun/_ixfx/modulation/interpolatorInterval/}
  * which steps on the basis of clock time.
  *
  * ```js

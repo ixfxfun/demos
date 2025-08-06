@@ -1,7 +1,7 @@
-import { IsEqual, IsEqualContext } from "./is-equal-aUE7iVHd.js";
-import { BasicType, Interval, ToString } from "./types-BEAJ_GOH.js";
-import { Result } from "./types-CePLSdIj.js";
-import { ReactiveNonInitial, ResolveToValue } from "./resolve-core-p1htK_C7.js";
+import { IsEqual, IsEqualContext } from "./is-equal-BzhoT7pd.js";
+import { BasicType, Interval, ToString } from "./types-CcY4GIC4.js";
+import { Result } from "./index-Dg03qze4.js";
+import { ReactiveNonInitial, ResolveToValue } from "./resolve-core-Cji7XRWY.js";
 
 //#region ../core/src/types-compare.d.ts
 /**
@@ -949,7 +949,7 @@ declare const addObjectEntriesMutate: <V>(map: Map<string, V>, data: object) => 
  * To get an entry see {@link findEntryByPredicate}
  *
  * Use {@link some} if you don't care about the value, just whether it appears.
- * Use {@link filter} to get all value(s) that match `predicate`.
+ * Use {@link filterValue} to get all value(s) that match `predicate`.
  *
  * @example First person over thirty
  * ```js

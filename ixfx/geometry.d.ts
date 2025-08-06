@@ -1,395 +1,11 @@
-import "./is-equal-aUE7iVHd.js";
-import "./types-BEAJ_GOH.js";
-import { GetOrGenerate } from "./maps-DpHdi7xH.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
-import { RandomSource } from "./types-DFWrctU4.js";
+import "./is-equal-BzhoT7pd.js";
+import "./types-CcY4GIC4.js";
+import "./maps-Di0k-jsW.js";
+import "./key-value-ww1DZidG.js";
+import { ISetMutable, ObjectTracker, RandomSource, TimestampedObject, TrackedValueMap, TrackedValueOpts, TraversableTree, TrimReason } from "./index-BD4Xy9K5.js";
+import "./index-CZIsUroQ.js";
+import "./index-pdF5CCTk.js";
 
-//#region ../trackers/dist/src/types.d.ts
-type Timestamped = {
-  readonly at: number;
-};
-type TimestampedObject<V> = V & Timestamped;
-/**
- * Options
- */
-type TrackedValueOpts = {
-  readonly id?: string;
-  /**
-   * If true, intermediate points are stored. False by default
-   */
-  readonly storeIntermediate?: boolean;
-  /**
-   * If above zero, tracker will reset after this many samples
-   */
-  readonly resetAfterSamples?: number;
-  /**
-   * If above zero, there will be a limit to intermediate values kept.
-   *
-   * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
-   * to `sampleLimit`. We only do this when the values are double the size so that
-   * the collections do not need to be trimmed repeatedly whilst we are at the limit.
-   *
-   * Automatically implies storeIntermediate
-   */
-  readonly sampleLimit?: number;
-  /**
-   * If _true_, prints debug info
-   */
-  readonly debug?: boolean;
-};
-type TrimReason = `reset` | `resize`;
-//#endregion
-//#region ../trackers/dist/src/tracker-base.d.ts
-/**
- * Base tracker class
- */
-declare abstract class TrackerBase<V, SeenResultType> {
-  /**
-   * @ignore
-   */
-  seenCount: number;
-  /**
-   * @ignore
-   */
-  protected storeIntermediate: boolean;
-  /**
-   * @ignore
-   */
-  protected resetAfterSamples: number;
-  /**
-   * @ignore
-   */
-  protected sampleLimit: number;
-  readonly id: string;
-  protected debug: boolean;
-  constructor(opts?: TrackedValueOpts);
-  /**
-   * Reset tracker
-   */
-  reset(): void;
-  /**
-   * Adds a value, returning computed result.
-   *
-   * At this point, we check if the buffer is larger than `resetAfterSamples`. If so, `reset()` is called.
-   * If not, we check `sampleLimit`. If the buffer is twice as large as sample limit, `trimStore()` is
-   * called to take it down to sample limit, and `onTrimmed()` is called.
-   * @param p
-   * @returns
-   */
-  seen(...p: V[]): SeenResultType;
-  /**
-   * @ignore
-   * @param p
-   */
-  abstract filterData(p: V[]): Timestamped[];
-  abstract get last(): V | undefined;
-  /**
-   * Returns the initial value, or undefined
-   */
-  abstract get initial(): V | undefined;
-  /**
-   * Returns the elapsed milliseconds since the initial value
-   */
-  abstract get elapsed(): number;
-  /**
-   * @ignore
-   */
-  abstract computeResults(_p: Timestamped[]): SeenResultType;
-  /**
-   * @ignore
-   */
-  abstract onReset(): void;
-  /**
-   * Notification that buffer has been trimmed
-   */
-  abstract onTrimmed(reason: TrimReason): void;
-  abstract trimStore(limit: number): number;
-}
-//# sourceMappingURL=tracker-base.d.ts.map
-//#endregion
-//#region ../trackers/dist/src/object-tracker.d.ts
-/**
- * A tracked value of type `V`.
- */
-declare abstract class ObjectTracker<V extends object, SeenResultType> extends TrackerBase<V, SeenResultType> {
-  values: TimestampedObject<V>[];
-  constructor(opts?: TrackedValueOpts);
-  onTrimmed(reason: TrimReason): void;
-  /**
-   * Reduces size of value store to `limit`.
-   * Returns number of remaining items
-   * @param limit
-   */
-  trimStore(limit: number): number;
-  /**
-   * Allows sub-classes to be notified when a reset happens
-   * @ignore
-   */
-  onReset(): void;
-  /**
-   * Tracks a value
-   * @ignore
-   */
-  filterData(p: V[] | TimestampedObject<V>[]): TimestampedObject<V>[];
-  /**
-   * Last seen value. If no values have been added, it will return the initial value
-   */
-  get last(): TimestampedObject<V>;
-  /**
-   * Returns the oldest value in the buffer
-   */
-  get initial(): TimestampedObject<V> | undefined;
-  /**
-   * Returns number of recorded values (includes the initial value in the count)
-   */
-  get size(): number;
-  /**
-   * Returns the elapsed time, in milliseconds since the initial value
-   */
-  get elapsed(): number;
-}
-//# sourceMappingURL=object-tracker.d.ts.map
-//#endregion
-//#region ../trackers/dist/src/tracked-value.d.ts
-/**
- * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
- * must extend from `TrackerBase<V>`, eg `PointTracker`.
- *
- * The `creator` function passed in to the constructor is responsible for instantiating
- * the appropriate `TrackerBase` sub-class.
- *
- * @example Sub-class
- * ```js
- * export class PointsTracker extends TrackedValueMap<Points.Point> {
- *  constructor(opts:TrackOpts = {}) {
- *   super((key, start) => {
- *    if (start === undefined) throw new Error(`Requires start point`);
- *    const p = new PointTracker(key, opts);
- *    p.seen(start);
- *    return p;
- *   });
- *  }
- * }
- * ```
- *
- */
-declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
-  store: Map<string, T>;
-  gog: GetOrGenerate<string, T, V>;
-  constructor(creator: (key: string, start: V | undefined) => T);
-  /**
-   * Number of named values being tracked
-   */
-  get size(): number;
-  /**
-   * Returns _true_ if `id` is stored
-   * @param id
-   * @returns
-   */
-  has(id: string): boolean;
-  /**
-   * For a given id, note that we have seen one or more values.
-   * @param id Id
-   * @param values Values(s)
-   * @returns Information about start to last value
-   */
-  seen(id: string, ...values: V[]): Promise<TResult>;
-  /**
-   * Creates or returns a TrackedValue instance for `id`.
-   * @param id
-   * @param values
-   * @returns
-   */
-  protected getTrackedValue(id: string, ...values: V[]): Promise<T>;
-  /**
-   * Remove a tracked value by id.
-   * Use {@link reset} to clear them all.
-   * @param id
-   */
-  delete(id: string): void;
-  /**
-   * Remove all tracked values.
-   * Use {@link delete} to remove a single value by id.
-   */
-  reset(): void;
-  /**
-   * Enumerate ids
-   */
-  ids(): Generator<string, void, unknown>;
-  /**
-   * Enumerate tracked values
-   */
-  tracked(): Generator<T, void, unknown>;
-  /**
-   * Iterates TrackedValues ordered with oldest first
-   * @returns
-   */
-  trackedByAge(): Generator<T, void, unknown>;
-  /**
-   * Iterates underlying values, ordered by age (oldest first)
-   * First the named values are sorted by their `elapsed` value, and then
-   * we return the last value for that group.
-   */
-  valuesByAge(): Generator<V | undefined, void, unknown>;
-  /**
-   * Enumerate last received values
-   *
-   * @example Calculate centroid of latest-received values
-   * ```js
-   * const pointers = pointTracker();
-   * const c = Points.centroid(...Array.from(pointers.lastPoints()));
-   * ```
-   */
-  last(): Generator<V | undefined, void, unknown>;
-  /**
-   * Enumerate starting values
-   */
-  initialValues(): Generator<V | undefined, void, unknown>;
-  /**
-   * Returns a tracked value by id, or undefined if not found
-   * @param id
-   * @returns
-   */
-  get(id: string): TrackerBase<V, TResult> | undefined;
-}
-//# sourceMappingURL=tracked-value.d.ts.map
-//#endregion
-//#region ../collections/dist/src/tree/types.d.ts
-/**
- * Traversable Tree
- */
-type TraversableTree<TValue> = {
-  /**
-   * Direct children of node
-   */
-  children(): IterableIterator<TraversableTree<TValue>>;
-  /**
-   * Direct parent of node
-   */
-  getParent(): TraversableTree<TValue> | undefined;
-  /**
-   * Value of node
-   */
-  getValue(): TValue;
-  /**
-   * Object reference that acts as the identity of the node
-   */
-  getIdentity(): any;
-};
-//#endregion
-//#region ../collections/dist/src/set/Types.d.ts
-type ValueSetEventMap<V> = {
-  readonly add: {
-    readonly value: V;
-    readonly updated: boolean;
-  };
-  readonly clear: boolean;
-  readonly delete: V;
-};
-//# sourceMappingURL=Types.d.ts.map
-
-//#endregion
-//#region ../collections/dist/src/set/ISetMutable.d.ts
-/**
- * A Set which stores unique items determined by their value, rather
- * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Mutable.
- *
- * By default the `JSON.stringify()` representation is considered the 'key' for an object.
- * Pass in a function to `Sets.mutable` to define your own way of creating keys for values. The principle should
- * be that objects that you consider identical should have the same string key value.
- *
- * ISetMutable fires `add`, `clear` and `delete` events.
- *
- * @example Overview of functions
- * ```js
- * const s = Sets.mutable();
- * s.add(item);    // Add one or more items. Items with same key are overriden.
- * s.has(item);    // Returns true if item value is present
- * s.clear();      // Remove everything
- * s.delete(item); // Delete item by value
- * s.toArray();    // Returns values as an array
- * s.values();     // Returns an iterator over values
- * s.size;         // Number of items stored in set
- * ```
- *
- * @example Example usage
- * ```js
- * // Data to add
- * const people = [
- *  {name: `Barry`, city: `London`}
- *  {name: `Sally`, city: `Bristol`}
- * ];
- *
- * // Create a set, defining how keys will be generated
- * const set = Sets.mutable(person => {
- *    // Key person objects by name and city.
- *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
- *    return `${person.name}-${person.city}`
- * });
- *
- * // Add list
- * set.add(...people);
- *
- * // Demo:
- * set.has({name:`Barry`, city:`Manchester`})); // False, key is different (Barry-Manchester)
- * set.has({name:`Barry`, city:`London`}));     // True, we have Barry-London as a key
- * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
- * ```
- *
- * @example
- * Events
- * ```js
- * set.addEventListener(`add`, ev => {
- *  console.log(`New item added: ${ev.value}`);
- * });
- * ```
- *
- * @typeParam V - Type of data stored
- */
-interface ISetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
-  /**
-   * Add `values` to set.
-   * Corresponding keys will be generated according to the
-   * function provided to `setMutable`, or `JSON.stringify` by default.
-   * @param values Value(s) to add
-   * @returns _true_ if something new was added
-   */
-  add(...values: readonly V[]): boolean;
-  /**
-   * Iterate over values
-   * ```js
-   * for (let value of set.values()) {
-   *    // use value...
-   * }
-   * ```
-   */
-  values(): IterableIterator<V>;
-  /**
-   * Clears set
-   */
-  clear(): void;
-  /**
-   * Deletes specified value, if present.
-   * @param value
-   * @returns True if value was found
-   */
-  delete(value: V): boolean;
-  /**
-   * Returns _true_ if _value_ is contained in Set
-   * @param value
-   */
-  has(value: V): boolean;
-  /**
-   * Returns an array of values
-   */
-  toArray(): readonly V[];
-  /**
-   * Returns the number of items stored in the set
-   */
-  get size(): number;
-}
-//# sourceMappingURL=ISetMutable.d.ts.map
-//#endregion
 //#region ../geometry/src/point/point-type.d.ts
 /**
  * A point, consisting of x, y and maybe z fields.
@@ -638,7 +254,7 @@ type CircleRandomPointOpts = {
 };
 //# sourceMappingURL=circle-type.d.ts.map
 declare namespace index_d_exports {
-  export { Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, angularSize, bbox$5 as bbox, distanceCenter$1 as distanceCenter, fromCircle, fromCircleAmount, fromDegrees$1 as fromDegrees, getStartEnd, guard$6 as guard, interpolate$4 as interpolate, isArc, isEqual$6 as isEqual, isPositioned$2 as isPositioned, length$2 as length, point, toLine, toPath$3 as toPath, toSvg$1 as toSvg };
+  export { Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, angularSize, bbox$5 as bbox, distanceCenter$1 as distanceCenter, fromCircle, fromCircleAmount, fromDegrees$1 as fromDegrees, getStartEnd, guard$6 as guard, interpolate$4 as interpolate, isArc, isEqual$6 as isEqual, isPositioned$2 as isPositioned, length$2 as length, point, toLine$1 as toLine, toPath$3 as toPath, toSvg$1 as toSvg };
 }
 /**
  * Returns true if parameter is an arc
@@ -676,7 +292,7 @@ declare function fromDegrees$1(radius: number, startDegrees: number, endDegrees:
  * @param arc
  * @returns Line from start to end of arc
  */
-declare const toLine: (arc: ArcPositioned) => Line;
+declare const toLine$1: (arc: ArcPositioned) => Line;
 /**
  * Return start and end points of `arc`.
  * `origin` will override arc's origin, if defined.
@@ -1265,8 +881,8 @@ type GridNeighbour = readonly [keyof GridNeighbours, GridCell];
  * A function that returns a value (or _undefined_) based on a _cell_
  *
  * Implementations:
- * * {@link Array1d.access}: For accessing a single-dimension array as a grid
- * * {@link Array2d.access}: For accessing a two-dimension array as a grid
+ * * {@link Grids.Array1d.access}: For accessing a single-dimension array as a grid
+ * * {@link Grids.Array2d.access}: For accessing a two-dimension array as a grid
  *
  */
 type GridCellAccessor<TValue> = (cell: GridCell, wrap?: GridBoundsLogic) => TValue | undefined;
@@ -2036,6 +1652,31 @@ declare namespace index_d_exports$3 {
  */
 declare const cardinal: (rect: RectPositioned, card: GridCardinalDirection | `center`) => Point;
 //# sourceMappingURL=cardinal.d.ts.map
+//#endregion
+//#region ../geometry/src/rect/center-origin.d.ts
+/**
+ * Perform basic point translation using a rectangle where its center is the origin.
+ *
+ * Thus the relative coordinate { x: 0, y: 0} corresponds to the absolute middle of the
+ * rectangle.
+ *
+ * The relative coordinate { x: -1, y: -1 } corresponds to the rectangle's {x,y} properties, and so on.
+ * @param rectAbsolute
+ * @returns
+ */
+declare const centerOrigin: (rectAbsolute: RectPositioned) => {
+  relativeToAbsolute: (point: Point) => {
+    x: number;
+    y: number;
+    z?: number;
+  };
+  absoluteToRelative: (point: Point) => {
+    x: number;
+    y: number;
+    z?: number;
+  };
+};
+//# sourceMappingURL=center-origin.d.ts.map
 //#endregion
 //#region ../geometry/src/rect/center.d.ts
 /**
@@ -2892,7 +2533,7 @@ declare function toArray$1(rect: Rect): RectArray;
 declare function toArray$1(rect: RectPositioned): RectPositionedArray;
 //# sourceMappingURL=to-array.d.ts.map
 declare namespace index_d_exports$8 {
-  export { ApplyFieldOp, ApplyMergeOp, Empty$3 as Empty, EmptyPositioned, Placeholder$3 as Placeholder, PlaceholderPositioned, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, RectRandomPointOpts, applyDim, applyFields, applyMerge, applyScalar, area$4 as area, cardinal, center$1 as center, corners$1 as corners, distanceFromCenter, distanceFromExterior, divide$4 as divide, divideDim, divideScalar, dividerByLargestDimension, edges$1 as edges, encompass, fromCenter$2 as fromCenter, fromElement, fromNumbers$2 as fromNumbers, fromTopLeft, getEdgeX, getEdgeY, getRectPositioned, getRectPositionedParameter, guard$4 as guard, guardDim, guardPositioned, intersectsPoint$1 as intersectsPoint, isEmpty$3 as isEmpty, isEqual$4 as isEqual, isEqualSize, isIntersecting$2 as isIntersecting, isPlaceholder$3 as isPlaceholder, isPositioned, isRect, isRectPositioned, lengths$1 as lengths, maxFromCorners, multiply$4 as multiply, multiplyDim, multiplyScalar$2 as multiplyScalar, nearestInternal, perimeter$4 as perimeter, random$2 as random, randomPoint$2 as randomPoint, subtract$3 as subtract, subtractOffset, subtractSize, sum$3 as sum, sumOffset, toArray$1 as toArray };
+  export { ApplyFieldOp, ApplyMergeOp, Empty$3 as Empty, EmptyPositioned, Placeholder$3 as Placeholder, PlaceholderPositioned, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, RectRandomPointOpts, applyDim, applyFields, applyMerge, applyScalar, area$4 as area, cardinal, center$1 as center, centerOrigin, corners$1 as corners, distanceFromCenter, distanceFromExterior, divide$4 as divide, divideDim, divideScalar, dividerByLargestDimension, edges$1 as edges, encompass, fromCenter$2 as fromCenter, fromElement, fromNumbers$2 as fromNumbers, fromTopLeft, getEdgeX, getEdgeY, getRectPositioned, getRectPositionedParameter, guard$4 as guard, guardDim, guardPositioned, intersectsPoint$1 as intersectsPoint, isEmpty$3 as isEmpty, isEqual$4 as isEqual, isEqualSize, isIntersecting$2 as isIntersecting, isPlaceholder$3 as isPlaceholder, isPositioned, isRect, isRectPositioned, lengths$1 as lengths, maxFromCorners, multiply$4 as multiply, multiplyDim, multiplyScalar$2 as multiplyScalar, nearestInternal, perimeter$4 as perimeter, random$2 as random, randomPoint$2 as randomPoint, subtract$3 as subtract, subtractOffset, subtractSize, sum$3 as sum, sumOffset, toArray$1 as toArray };
 }
 //#endregion
 //#region ../geometry/src/circle/intersecting.d.ts
@@ -4231,8 +3872,14 @@ type PolarToCartesian = {
   (distance: number, angleRadians: number, origin?: Point): Point;
 };
 /**
- * A polar ray is a line in polar coordinates
+ * A polar ray is allows you to express a line in polar coordinates
+ *
  * It consists of an angle (in radians) with a given offset and length.
+ *
+ * * angleRadian: Angle of line
+ * * Offset: distance from the polar origin (default: 0)
+ * * Length: length of ray
+ * * Origin: Start Cartesian coordinate of line
  */
 type PolarRay = Readonly<{
   /**
@@ -4248,6 +3895,9 @@ type PolarRay = Readonly<{
    * Length of ray
    */
   length: number;
+  /**
+   * Optional origin point of ray (ie start)
+   */
   origin?: Point;
 }>;
 type PolarRayWithOrigin = PolarRay & Readonly<{
@@ -4308,6 +3958,23 @@ declare const rotateDegrees: (c: Coord, amountDeg: number) => Coord;
 //# sourceMappingURL=angles.d.ts.map
 //#endregion
 //#region ../geometry/src/polar/conversions.d.ts
+/**
+ * Converts a polar coordinate to a Line.
+ *
+ * ```js
+ * const line = toLine({ angleRadian: Math.Pi, distance: 0.5 }, { x: 0.2, y: 0.1 });
+ * // Yields { a: { x, y}, b: { x, y } }
+ * ```
+ *
+ * The 'start' parameter is taken to be the origin of the Polar coordinate.
+ * @param c
+ * @param start
+ * @returns
+ */
+declare const toLine: (c: Coord, start: Point) => {
+  a: Point;
+  b: Point;
+};
 /**
  * Converts to Cartesian coordinate from polar.
  *
@@ -4419,7 +4086,10 @@ declare namespace ray_d_exports {
 /**
  * Converts a ray to a Line in cartesian coordinates.
  *
- * @param ray
+ * By default, the ray's origin is taken to be 0,0.
+ * Passing in an origin will override this default, or whatever
+ * the ray's origin property is.
+ * @param ray Ray
  * @param origin Override or provide origin point
  * @returns
  */
@@ -4433,14 +4103,20 @@ declare const toCartesian$1: (ray: PolarRay, origin?: Point) => Line;
  * @returns
  */
 /**
- * Returns a string representation of the ray
+ * Returns a string representation of the ray, useful for debugging.
+ *
+ * ```
+ * "PolarRay(angle: ... offset: ... len: ... origin: ...)"
+ * ```
  * @param ray
  * @returns
  */
 declare const toString$3: (ray: PolarRay) => string;
 /**
  * Returns a PolarRay based on a line and origin.
+ *
  * If `origin` is omitted, the origin is taken to be the 'a' point of the line.
+ * Otherwise, the origin value is used to determine the 'offset' of the ray.
  * @param line
  * @param origin
  * @returns
@@ -4462,7 +4138,7 @@ declare function spiral(smoothness: number, zoom: number): IterableIterator<Coor
 declare const spiralRaw: (step: number, smoothness: number, zoom: number) => Coord;
 //# sourceMappingURL=spiral.d.ts.map
 declare namespace index_d_exports$7 {
-  export { Coord, PolarRay, PolarRayWithOrigin, PolarToCartesian, ray_d_exports as Ray, clampMagnitude$1 as clampMagnitude, divide$1 as divide, dotProduct$1 as dotProduct, fromCartesian, guard$1 as guard, invert, isAntiParallel, isOpposite, isParallel, isPolarCoord, multiply$2 as multiply, normalise$1 as normalise, rotate$3 as rotate, rotateDegrees, spiral, spiralRaw, toCartesian$2 as toCartesian, toPoint, toString$4 as toString };
+  export { Coord, PolarRay, PolarRayWithOrigin, PolarToCartesian, ray_d_exports as Ray, clampMagnitude$1 as clampMagnitude, divide$1 as divide, dotProduct$1 as dotProduct, fromCartesian, guard$1 as guard, invert, isAntiParallel, isOpposite, isParallel, isPolarCoord, multiply$2 as multiply, normalise$1 as normalise, rotate$3 as rotate, rotateDegrees, spiral, spiralRaw, toCartesian$2 as toCartesian, toLine, toPoint, toString$4 as toString };
 }
 //#endregion
 //#region ../geometry/src/point/point-tracker.d.ts

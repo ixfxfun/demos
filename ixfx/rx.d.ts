@@ -1,11 +1,20 @@
-import { ChangeRecord, PathDataChange } from "./pathed-DGKJECMt.js";
-import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
-import { IsEqual, IsEqualContext } from "./is-equal-aUE7iVHd.js";
-import { Interval, Primitive, RankFunction, RankOptions } from "./types-BEAJ_GOH.js";
-import "./types-CePLSdIj.js";
-import "./simple-event-emitter-Dy8H-OK9.js";
-import { BasicInterpolateOptions } from "./interpolate-DM7lLXIU.js";
-import { IQueueMutableWithEvents } from "./iqueue-mutable-DvKBPw5h.js";
+import { ChangeRecord, InterpolateOptions, PathDataChange, Processors } from "./index-Ci6D7uRH.js";
+import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
+import { IsEqual, IsEqualContext } from "./is-equal-BzhoT7pd.js";
+import { Interval, Primitive, RankFunction, RankOptions } from "./types-CcY4GIC4.js";
+import "./maps-Di0k-jsW.js";
+import "./index-Dg03qze4.js";
+import "./comparers-C6kfLE-t.js";
+import "./index-Bne6KcmH.js";
+import "./key-value-ww1DZidG.js";
+import "./resolve-core-Cji7XRWY.js";
+import "./sleep-DiuAJS4P.js";
+import { IQueueMutableWithEvents } from "./index-BD4Xy9K5.js";
+import "./index-CZIsUroQ.js";
+import "./index-D-YGqcwN.js";
+import "./index-pdF5CCTk.js";
+import "./index-ConXQr7F.js";
+import "./index-1oZyS9hM.js";
 
 //#region ../rx/src/ops/types.d.ts
 type SyncOptions = {
@@ -450,20 +459,6 @@ type SetHtmlOptions = (SetHtmlOptionsQuery | SetHtmlOptionsElement) & {
  */
 declare const setHtmlText: (rxOrSource: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement) => Unsubscriber;
 //# sourceMappingURL=dom.d.ts.map
-//#endregion
-//#region ../process/dist/src/types.d.ts
-type Process<TIn, TOut> = (value: TIn) => TOut;
-type Processors1<T1, T2> = [Process<T1, T2>];
-type Processors2<T1, T2, T3> = [Process<T1, T2>, Process<T2, T3>];
-type Processors3<T1, T2, T3, T4> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>];
-type Processors4<T1, T2, T3, T4, T5> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>];
-type Processors5<T1, T2, T3, T4, T5, T6> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6>];
-type Processors<T1, T2, T3, T4, T5, T6> = Processors1<T1, T2> | Processors2<T1, T2, T3> | Processors3<T1, T2, T3, T4> | Processors4<T1, T2, T3, T4, T5> | Processors5<T1, T2, T3, T4, T5, T6>;
-/**
- * A rank function that compares A and B.
- * Returns the highest value, 'a' or 'b'.
- * Returns 'eq' if values are equal
- */
 //#endregion
 //#region ../rx/src/ops/math.d.ts
 declare function max(input: ReactiveOrSource<any>, options: OpMathOptions): Reactive<number>;
@@ -1204,96 +1199,6 @@ declare function filter<In>(input: ReactiveOrSource<In>, predicate: FilterPredic
  */
 declare function drop<In>(input: ReactiveOrSource<In>, predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): Reactive<In>;
 //# sourceMappingURL=filter.d.ts.map
-declare namespace easings_named_d_exports {
-  export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };
-}
-declare const bounceOut: (x: number) => number;
-declare const quintIn: (x: number) => number;
-declare const quintOut: (x: number) => number;
-declare const arch: (x: number) => number;
-declare const smoothstep: (x: number) => number;
-declare const smootherstep: (x: number) => number;
-declare const sineIn: (x: number) => number;
-declare const sineOut: (x: number) => number;
-declare const quadIn: (x: number) => number;
-declare const quadOut: (x: number) => number;
-declare const sineInOut: (x: number) => number;
-declare const quadInOut: (x: number) => number;
-declare const cubicIn: (x: number) => number;
-declare const cubicOut: (x: number) => number;
-declare const quartIn: (x: number) => number;
-declare const quartOut: (x: number) => number;
-declare const expoIn: (x: number) => number;
-declare const expoOut: (x: number) => number;
-declare const quintInOut: (x: number) => number;
-declare const expoInOut: (x: number) => number;
-declare const circIn: (x: number) => number;
-declare const circOut: (x: number) => number;
-declare const backIn: (x: number) => number;
-declare const backOut: (x: number) => number;
-declare const circInOut: (x: number) => number;
-declare const backInOut: (x: number) => number;
-declare const elasticIn: (x: number) => number;
-declare const elasticOut: (x: number) => number;
-declare const bounceIn: (x: number) => number;
-declare const bell: (t: number) => number;
-declare const elasticInOut: (x: number) => number;
-declare const bounceInOut: (x: number) => number;
-//# sourceMappingURL=easings-named.d.ts.map
-//#endregion
-//#region ../modulation/dist/src/easing/types.d.ts
-/**
- * Easing name
- */
-type EasingName = keyof typeof easings_named_d_exports;
-//#endregion
-//#region ../modulation/dist/src/interpolate.d.ts
-/**
- * Interpolation options.
- *
- * Limit: What to do if interpolation amount exceeds 0..1 range
- * * clamp: lock to A & B (inclusive) Default.
- * * wrap: wrap from end to start again
- * * ignore: allow return values outside of A..B range
- *
- * Easing: name of easing function for non-linear interpolation
- *
- * Transform: name of function to transform `amount` prior to interpolate. This is useful for creating non-linear interpolation results.
- *
- * For example:
- * ```js
- * // Divide interpolation amount in half
- * const interpolatorInterval({ mins: 1 }, 10, 100, {
- *  transform: (amount) => amount * Math.random()
- * });
- * ```
- * In the above example, the results would get more random over time.
- * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result.
- *
- */
-type InterpolateOptions = BasicInterpolateOptions & {
-  easing: EasingName;
-};
-/**
- * Returns an interpolation function with a fixed interpolation amount. This
- * function will need the A and B values to interpolate between (ie start and end)
- *
- * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * import { interpolate } from '@ixfx/numbers.js';
- *
- * // Create function
- * const fn = interpolate(0.1);
- *
- * // Later, use to interpolate between a and b
- * fn(50, 100); // 10% of 50..100 range
- * ```
- *
- * This is useful if you have a fixed interpolation amount, but varying A and B values.
- * @param amount Interpolation value (0..1 usually)
- * @param options Options
- */
 //#endregion
 //#region ../rx/src/ops/interpolate.d.ts
 type OpInterpolateOptions = InterpolateOptions & {

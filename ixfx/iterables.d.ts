@@ -1,7 +1,7 @@
-import { IsEqual } from "./is-equal-aUE7iVHd.js";
-import { Interval, RankArrayOptions, RankFunction, RankOptions, ToString } from "./types-BEAJ_GOH.js";
-import { SleepOpts } from "./sleep-h6i9m9g1.js";
-import { NumbersComputeOptions, NumbersComputeResult } from "./types-DhvE0DAd.js";
+import { IsEqual } from "./is-equal-BzhoT7pd.js";
+import { Interval, RankArrayOptions, RankFunction, RankOptions, ToString } from "./types-CcY4GIC4.js";
+import { SleepOpts } from "./sleep-DiuAJS4P.js";
+import { NumbersComputeOptions, NumbersComputeResult } from "./index-pdF5CCTk.js";
 
 //#region ../iterables/src/types.d.ts
 type WithEvents = {
@@ -84,7 +84,7 @@ declare const until$2: (it: AsyncIterable<any> | Iterable<any>, callback: () => 
  * This generator will repeat another generator up until some condition. This is the version
  * that can handle async generators.
  *
- * For example, {@link @ixfx/numbers.count} will count from 0..number and then finish:
+ * For example, {@link https://api.ixfx.fun/_ixfx/numbers/count/ @ixfx/numbers.count} will count from 0..number and then finish:
  * ```js
  * import { count } from '@ixfx/numbers'
  * for (const v of count(5)) {
@@ -432,7 +432,7 @@ declare function fill$1<V>(it: Iterable<V>, v: V): Generator<V, void, unknown>;
  * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
  *
  * Alternatives:
- * * {@link @ixfx/flow.repeat}/{@link @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
+ * * {@link https://api.ixfx.fun/_ixfx/flow/repeat/ @ixfx/flow.repeat}/{@link https://api.ixfx.fun/_ixfx/flow/repeatSync/ @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
  * @param iterator Iterable or array
  * @typeParam T Type of iterable's values
  * @param fn Function to call for each item. If function returns _false_, iteration cancels
@@ -1495,7 +1495,7 @@ declare const isIterable: (v: any) => v is Iterable<any>;
  * // Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
  * ```
  *
- * Use {@link @ixfx/numbers.average}, {@link @ixfx/numbers.max}, {@link @ixfx/numbers.min} or {@link @ixfx/numers.total} if you only need one of these.
+ * Use {@link https://api.ixfx.fun/_ixfx/numbers/average/ @ixfx/numbers.average}, {@link https://api.ixfx.fun/_ixfx/numbers/max/ @ixfx/numbers.max}, {@link https://api.ixfx.fun/_ixfx/numbers/min/ @ixfx/numbers.min} or {@link https://api.ixfx.fun/_ixfx/numbers/total/ @ixfx/numers.total} if you only need one of these.
  *
  * A start and end range can be provided if the calculation should be restricted to a part
  * of the input array. By default the whole array is used.

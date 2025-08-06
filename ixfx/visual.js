@@ -1,2053 +1,20 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./numbers-C359_5A6.js";
-import { arrayTest } from "./arrays-yH_qBmt0.js";
-import "./is-primitive-BDz6cwtd.js";
-import { cloneFromFields } from "./records-XG4QHVXn.js";
-import "./to-string-Dg1sJUf1.js";
-import "./comparers-BtlnApnB.js";
-import { isEqualDefault } from "./is-equal-edylSnsn.js";
-import "./maps-a_ogDHUT.js";
-import { continuously } from "./continuously-CFHq8KyU.js";
-import { defaultKeyer } from "./default-keyer-CnxB2rd_.js";
-import "./iterable-compare-values-shallow-DOeUS4hy.js";
-import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
-import { clamp, clampIndex } from "./clamp-BXRKKkSg.js";
-import { round } from "./round-DuQ_VRis.js";
-import "./wrap-CbW4pe4i.js";
-import { interpolate } from "./interpolate-BoOK0bgP.js";
-import { scaler, scalerTwoWay } from "./scale-DHjtm9T-.js";
-import { ObjectTracker, TrackedValueMap, quantiseEvery } from "./tracked-value-BgYnLxEF.js";
-import { Placeholder, getPointParameter, getRectPositioned, guard, guard$1, isPoint, isPositioned, isRect, isRectPositioned, subtract } from "./multiply-C6BAKtKA.js";
-import { angleConvert, angleParse, angleRadian, corners, distance, fromPoints, guard as guard$2, isCubicBezier, isLine, isQuadraticBezier, joinPointsToLines, length, toCartesian } from "./guard-DPX_PMKU.js";
-import { Empty, EmptyPositioned, Placeholder as Placeholder$1, PlaceholderPositioned } from "./placeholder-DiSgOrWJ.js";
-import "./tracker-base-DcT12hen.js";
-import { dequeue, enqueue, isEmpty, isFull, peek } from "./queue-fns-C19iGLvT.js";
-import { resolveEl, resolveElementTry } from "./resolve-el-BdUlUJGi.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, oklab2rgb, rgb2hsl, rgb2oklch, toColour, toCssColour, withOpacity as withOpacity$1, withOpacity$1 as withOpacity$2, withOpacity$2 as withOpacity } from "./conversion-7HnuMJUS.js";
+import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./src-CadJtgeN.js";
+import { cloneFromFields } from "./records-Cn6hYPY7.js";
+import "./is-primitive-eBwrK4Yg.js";
+import "./interval-type-CYct6719.js";
+import { continuously } from "./basic-TkGxs8ni.js";
+import { SimpleEventEmitter } from "./src-CHxoOwyb.js";
+import "./key-value-xMXxsVY5.js";
+import "./dist-Xk39SmDr.js";
+import "./resolve-core-BwRmfzav.js";
+import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-8IiDfq42.js";
+import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-DyRMnxm7.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-B2kbVsuL.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-3_bazhBA.js";
+import "./bezier-CZvpytLt.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch } from "./src-55FnN2we.js";
 
-//#region ../arrays/dist/src/pairwise.js
-/**
-* Yields pairs made up of overlapping items from the input array.
-*
-* Throws an error if there are less than two entries.
-*
-* ```js
-* pairwise([1, 2, 3, 4, 5]);
-* Yields:
-* [ [1,2], [2,3], [3,4], [4,5] ]
-* ```
-* @param values
-*/
-function* pairwise(values) {
-	resultThrow(arrayTest(values, `values`));
-	if (values.length < 2) throw new Error(`Array needs to have at least two entries. Length: ${values.length}`);
-	for (let index = 1; index < values.length; index++) yield [values[index - 1], values[index]];
-}
-
-//#endregion
-//#region ../numbers/dist/src/bipolar.js
-/**
-* Clamp a bipolar value
-* ```js
-* Bipolar.clamp(-1);   // -1
-* Bipolar.clamp(-1.1); // -1
-* ```
-*
-* Throws an error if `bipolarValue` is not a number or NaN.
-* @param bipolarValue Value to clamp
-* @returns Clamped value on -1..1 scale
-*/
-const clamp$1 = (bipolarValue) => {
-	if (typeof bipolarValue !== `number`) throw new Error(`Param 'bipolarValue' must be a number. Got: ${typeof bipolarValue}`);
-	if (Number.isNaN(bipolarValue)) throw new Error(`Param 'bipolarValue' is NaN`);
-	if (bipolarValue > 1) return 1;
-	if (bipolarValue < -1) return -1;
-	return bipolarValue;
-};
-
-//#endregion
-//#region ../geometry/dist/src/rect/apply.js
-/**
-* Applies an operation over each field of a rectangle.
-* ```js
-* // Convert x,y,width,height to integer values
-* applyFields(v => Number.floor(v), someRect);
-* ```
-* @param op
-* @param rectOrWidth
-* @param heightValue
-* @returns
-*/
-function applyFields(op, rectOrWidth, heightValue) {
-	let width = typeof rectOrWidth === `number` ? rectOrWidth : rectOrWidth.width;
-	let height = typeof rectOrWidth === `number` ? heightValue : rectOrWidth.height;
-	if (width === void 0) throw new Error(`Param 'width' undefined`);
-	if (height === void 0) throw new Error(`Param 'height' undefined`);
-	width = op(width, `width`);
-	height = op(height, `height`);
-	if (typeof rectOrWidth === `object`) if (isPositioned(rectOrWidth)) {
-		const x = op(rectOrWidth.x, `x`);
-		const y = op(rectOrWidth.y, `y`);
-		return {
-			...rectOrWidth,
-			width,
-			height,
-			x,
-			y
-		};
-	} else return {
-		...rectOrWidth,
-		width,
-		height
-	};
-	return {
-		width,
-		height
-	};
-}
-function applyScalar(op, rect$1, parameter) {
-	return isPositioned(rect$1) ? Object.freeze({
-		...rect$1,
-		x: op(rect$1.x, parameter),
-		y: op(rect$1.y, parameter),
-		width: op(rect$1.width, parameter),
-		height: op(rect$1.height, parameter)
-	}) : Object.freeze({
-		...rect$1,
-		width: op(rect$1.width, parameter),
-		height: op(rect$1.height, parameter)
-	});
-}
-
-//#endregion
-//#region ../geometry/dist/src/rect/center.js
-/**
-* Returns the center of a rectangle as a {@link Point}.
-*  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
-*
-* ```js
-* const p = Rects.center({x:10, y:20, width:100, height:50});
-* const p2 = Rects.center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
-* ```
-* @param rect Rectangle
-* @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
-* @returns
-*/
-const center = (rect$1, origin) => {
-	guard(rect$1);
-	if (origin === void 0 && isPoint(rect$1)) origin = rect$1;
-	else if (origin === void 0) origin = {
-		x: 0,
-		y: 0
-	};
-	const r = getRectPositioned(rect$1, origin);
-	return Object.freeze({
-		x: origin.x + rect$1.width / 2,
-		y: origin.y + rect$1.height / 2
-	});
-};
-
-//#endregion
-//#region ../geometry/dist/src/point/is-equal.js
-/**
-* Returns _true_ if the points have identical values
-*
-* ```js
-* const a = {x: 10, y: 10};
-* const b = {x: 10, y: 10;};
-* a === b        // False, because a and be are different objects
-* isEqual(a, b)   // True, because a and b are same value
-* ```
-* @param p Points
-* @returns _True_ if points are equal
-*/
-const isEqual = (...p) => {
-	if (p === void 0) throw new Error(`parameter 'p' is undefined`);
-	if (p.length < 2) return true;
-	for (let index = 1; index < p.length; index++) {
-		if (p[index].x !== p[0].x) return false;
-		if (p[index].y !== p[0].y) return false;
-	}
-	return true;
-};
-
-//#endregion
-//#region ../geometry/dist/src/rect/is-equal.js
-/**
-* Returns _true_ if two rectangles have identical values.
-* Both rectangles must be positioned or not.
-*
-* ```js
-* const rectA = { width: 10, height: 10, x: 10, y: 10 };
-* const rectB = { width: 10, height: 10, x: 20, y: 20 };
-*
-* // False, because coordinates are different
-* Rects.isEqual(rectA, rectB)
-*
-* // True, even though x,y are different
-* Rects.isEqualSize(rectA, rectB);
-* ```
-* @param a
-* @param b
-* @returns
-*/
-const isEqual$1 = (a, b) => {
-	if (isPositioned(a) && isPositioned(b)) {
-		if (!isEqual(a, b)) return false;
-		return a.width === b.width && a.height === b.height;
-	} else if (!isPositioned(a) && !isPositioned(b)) return a.width === b.width && a.height === b.height;
-	else return false;
-};
-
-//#endregion
-//#region ../geometry/dist/src/rect/multiply.js
-const multiplyOp = (a, b) => a * b;
-/**
-* Multiplies all components of `rect` by `amount`.
-* This includes x,y if present.
-*
-* ```js
-* multiplyScalar({ width:10, height:20 }, 2); // { width:20, height: 40 }
-* multiplyScalar({ x: 1, y: 2, width:10, height:20 }, 2); // { x: 2, y: 4, width:20, height: 40 }
-* ```
-*
-* Use {@link multiplyDim} to only multiply width & height.
-* @param rect
-* @param amount
-*/
-function multiplyScalar(rect$1, amount) {
-	return applyScalar(multiplyOp, rect$1, amount);
-}
-
-//#endregion
-//#region ../geometry/dist/src/rect/subtract.js
-function subtractSize(a, b, c) {
-	const w = typeof b === `number` ? b : b.width;
-	const h = typeof b === `number` ? c : b.height;
-	if (h === void 0) throw new Error(`Expected height as third parameter`);
-	const r = {
-		...a,
-		width: a.width - w,
-		height: a.height - h
-	};
-	return r;
-}
-
-//#endregion
-//#region ../geometry/dist/src/point/centroid.js
-/**
-* Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
-* Undefined values are skipped over.
-*
-* ```js
-* // Find centroid of a list of points
-* const c1 = centroid(p1, p2, p3, ...);
-*
-* // Find centroid of an array of points
-* const c2 = centroid(...pointsArray);
-* ```
-* @param points
-* @returns A single point
-*/
-const centroid = (...points) => {
-	if (!Array.isArray(points)) throw new Error(`Expected list of points`);
-	const sum = points.reduce((previous, p) => {
-		if (p === void 0) return previous;
-		if (Array.isArray(p)) throw new TypeError(`'points' list contains an array. Did you mean: centroid(...myPoints)?`);
-		if (!isPoint(p)) throw new Error(`'points' contains something which is not a point: ${JSON.stringify(p)}`);
-		return {
-			x: previous.x + p.x,
-			y: previous.y + p.y
-		};
-	}, {
-		x: 0,
-		y: 0
-	});
-	return Object.freeze({
-		x: sum.x / points.length,
-		y: sum.y / points.length
-	});
-};
-
-//#endregion
-//#region ../flow/dist/src/delay.js
-/**
-* Iterate over a source iterable with some delay between results.
-* Delay can be before, after or both before and after each result from the
-* source iterable.
-*
-* Since it's an async iterable, `for await ... of` is needed.
-*
-* ```js
-* const opts = { intervalMs: 1000, delay: 'before' };
-* const iterable = count(10);
-* for await (const i of delayIterable(iterable, opts)) {
-*  // Prints 0..9 with one second between
-* }
-* ```
-*
-* Use {@link delay} to return a result after some delay
-*
-* @param iter
-* @param opts
-*/
-/**
-* Async generator that loops via `requestAnimationFrame`.
-*
-* We can use `for await of` to run code:
-* ```js
-* const loop = delayAnimationLoop();
-* for await (const o of loop) {
-*  // Do something...
-*  // Warning: loops forever
-* }
-* // Warning: execution doesn't continue to this point
-* // unless there is a 'break' in loop.
-* ```
-*
-* Or use the generator in manually:
-* ```js
-* // Loop forever
-* (async () => {
-*  const loop = delayAnimationLoop();
-*  while (true) {
-*    await loop.next();
-*
-*    // Do something...
-*    // Warning: loops forever
-*  }
-* })();
-* ```
-*
-* Practically, these approaches are not so useful
-* because execution blocks until the loop finishes.
-*
-* Instead, we might want to continually loop a bit
-* of code while other bits of code continue to run.
-*
-* The below example shows how to do this.
-*
-* ```js
-* setTimeout(async () => {
-*  for await (const _ of delayAnimationLoop()) {
-*    // Do soething at animation speed
-*  }
-* });
-*
-* // Execution continues while loop also runs
-* ```
-*
-*/
-async function* delayAnimationLoop() {
-	let resolve;
-	let p = new Promise((r) => resolve = r);
-	let timer = 0;
-	const callback = () => {
-		if (resolve) resolve();
-		p = new Promise((r) => resolve = r);
-	};
-	try {
-		while (true) {
-			timer = globalThis.requestAnimationFrame(callback);
-			const _ = await p;
-			yield _;
-		}
-	} finally {
-		if (resolve) resolve();
-		globalThis.cancelAnimationFrame(timer);
-	}
-}
-/**
-* Async generator that loops at a given interval.
-*
-* @example
-* For Await loop every second
-* ```js
-* const loop = delayLoop(1000);
-* // Or: const loop = delayLoop({ secs: 1 });
-* for await (const o of loop) {
-*  // Do something...
-*  // Warning: loops forever
-* }
-* ```
-*
-* @example
-* Loop runs every second
-* ```js
-* (async () => {
-*  const loop = delayLoop(1000);
-*  // or: loop = delayLoop({ secs: 1 });
-*  while (true) {
-*    await loop.next();
-*
-*    // Do something...
-*    // Warning: loops forever
-*  }
-* })();
-* ```
-*
-* Alternatives:
-* * {@link delay} to run a single function after a delay
-* * {@link sleep} pause execution
-* * {@link continuously} to start/stop/adjust a constantly running loop
-*
-* @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
-*/
-async function* delayLoop(timeout) {
-	const timeoutMs = intervalToMs(timeout);
-	if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
-	if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);
-	if (timeoutMs === 0) return yield* delayAnimationLoop();
-	let resolve;
-	let p = new Promise((r) => resolve = r);
-	let timer;
-	const callback = () => {
-		if (resolve) resolve();
-		p = new Promise((r) => resolve = r);
-	};
-	try {
-		while (true) {
-			timer = globalThis.setTimeout(callback, timeoutMs);
-			const _ = await p;
-			yield _;
-		}
-	} finally {
-		if (resolve) resolve();
-		if (timer !== void 0) globalThis.clearTimeout(timer);
-		timer = void 0;
-	}
-}
-
-//#endregion
-//#region ../collections/dist/src/stack/StackFns.js
-const trimStack = (opts, stack, toAdd) => {
-	const potentialLength = stack.length + toAdd.length;
-	const policy = opts.discardPolicy ?? `additions`;
-	const capacity = opts.capacity ?? potentialLength;
-	const toRemove = potentialLength - capacity;
-	if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy}`);
-	switch (policy) {
-		case `additions`: {
-			if (opts.debug) console.log(`Stack.push:DiscardAdditions: stackLen: ${stack.length} slice: ${potentialLength - capacity} toAddLen: ${toAdd.length}`);
-			if (stack.length === opts.capacity) return stack;
-			else return [...stack, ...toAdd.slice(0, toAdd.length - toRemove)];
-		}
-		case `newer`: if (toRemove >= stack.length) return toAdd.slice(Math.max(0, toAdd.length - capacity), Math.min(toAdd.length, capacity) + 1);
-		else {
-			if (opts.debug) console.log(` from orig: ${JSON.stringify(stack.slice(0, stack.length - toRemove))}`);
-			return [...stack.slice(0, stack.length - toRemove), ...toAdd.slice(0, Math.min(toAdd.length, capacity - toRemove + 1))];
-		}
-		case `older`: return [...stack, ...toAdd].slice(toRemove);
-		default: throw new Error(`Unknown discard policy ${policy}`);
-	}
-};
-const push = (opts, stack, ...toAdd) => {
-	const potentialLength = stack.length + toAdd.length;
-	const overSize = opts.capacity && potentialLength > opts.capacity;
-	const toReturn = overSize ? trimStack(opts, stack, toAdd) : [...stack, ...toAdd];
-	return toReturn;
-};
-const pop = (opts, stack) => {
-	if (stack.length === 0) throw new Error(`Stack is empty`);
-	return stack.slice(0, -1);
-};
-/**
-* Peek at the top of the stack (end of array)
-*
-* @typeParam V - Type of stored items
-* @param {StackOpts} opts
-* @param {V[]} stack
-* @returns {(V | undefined)}
-*/
-const peek$1 = (opts, stack) => stack.at(-1);
-const isEmpty$2 = (opts, stack) => stack.length === 0;
-const isFull$1 = (opts, stack) => {
-	if (opts.capacity) return stack.length >= opts.capacity;
-	return false;
-};
-
-//#endregion
-//#region ../collections/dist/src/stack/StackImmutable.js
-var StackImmutable = class StackImmutable {
-	opts;
-	data;
-	constructor(opts = {}, data = []) {
-		this.opts = opts;
-		this.data = data;
-	}
-	push(...toAdd) {
-		return new StackImmutable(this.opts, push(this.opts, this.data, ...toAdd));
-	}
-	pop() {
-		return new StackImmutable(this.opts, pop(this.opts, this.data));
-	}
-	forEach(fn) {
-		this.data.forEach(fn);
-	}
-	forEachFromTop(fn) {
-		[...this.data].reverse().forEach(fn);
-	}
-	get isEmpty() {
-		return isEmpty$2(this.opts, this.data);
-	}
-	get isFull() {
-		return isFull$1(this.opts, this.data);
-	}
-	get peek() {
-		return peek$1(this.opts, this.data);
-	}
-	get length() {
-		return this.data.length;
-	}
-};
-
-//#endregion
-//#region ../collections/dist/src/queue/queue-immutable.js
-var QueueImmutable = class QueueImmutable {
-	opts;
-	#data;
-	/**
-	* Creates an instance of Queue.
-	* @param {QueueOpts} opts Options foor queue
-	* @param {V[]} data Initial data. Index 0 is front of queue
-	*/
-	constructor(opts = {}, data = []) {
-		if (opts === void 0) throw new Error(`opts parameter undefined`);
-		this.opts = opts;
-		this.#data = data;
-	}
-	forEach(fn) {
-		for (let index = this.#data.length - 1; index >= 0; index--) fn(this.#data[index]);
-	}
-	forEachFromFront(fn) {
-		this.#data.forEach((item) => {
-			fn(item);
-		});
-	}
-	enqueue(...toAdd) {
-		return new QueueImmutable(this.opts, enqueue(this.opts, this.#data, ...toAdd));
-	}
-	dequeue() {
-		return new QueueImmutable(this.opts, dequeue(this.opts, this.#data));
-	}
-	get isEmpty() {
-		return isEmpty(this.opts, this.#data);
-	}
-	get isFull() {
-		return isFull(this.opts, this.#data);
-	}
-	get length() {
-		return this.#data.length;
-	}
-	get peek() {
-		return peek(this.opts, this.#data);
-	}
-	toArray() {
-		return [...this.#data];
-	}
-};
-
-//#endregion
-//#region ../collections/dist/src/map/map-multi-fns.js
-/**
-* Finds first entry by iterable value. Expects a map with an iterable as values.
-*
-* ```js
-* const map = new Map();
-* map.set('hello', ['a', 'b', 'c']);
-* map.set('there', ['d', 'e', 'f']);
-*
-* const entry = firstEntryByValue(map, 'e');
-* // Entry is: ['there', ['d', 'e', 'f']]
-* ```
-*
-* An alternative is {@link firstEntry} to search by predicate function.
-* @param map Map to search
-* @param value Value to seek
-* @param isEqual Filter function which checks equality. Uses JS comparer by default.
-* @returns Entry, or _undefined_ if `value` not found.
-*/
-const firstEntryByValue = (map, value, isEqual$2 = isEqualDefault) => {
-	for (const e of map.entries()) {
-		const value_ = e[1];
-		for (const subValue of value_) if (isEqual$2(subValue, value)) return e;
-	}
-};
-
-//#endregion
-//#region ../collections/dist/src/map/map-of-simple-base.js
-var MapOfSimpleBase = class {
-	map;
-	groupBy;
-	valueEq;
-	/**
-	* Constructor
-	* @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
-	* @param valueEq Compare values. By default uses JS logic for equality
-	*/
-	constructor(groupBy = defaultKeyer, valueEq = isEqualDefault, initial = []) {
-		this.groupBy = groupBy;
-		this.valueEq = valueEq;
-		this.map = new Map(initial);
-	}
-	/**
-	* Returns _true_ if `key` exists
-	* @param key
-	* @returns
-	*/
-	has(key) {
-		return this.map.has(key);
-	}
-	/**
-	* Returns _true_ if `value` exists under `key`.
-	* @param key Key
-	* @param value Value to seek under `key`
-	* @returns _True_ if `value` exists under `key`.
-	*/
-	hasKeyValue(key, value) {
-		const values = this.map.get(key);
-		if (!values) return false;
-		for (const v of values) if (this.valueEq(v, value)) return true;
-		return false;
-	}
-	/**
-	* Debug dump of contents
-	* @returns
-	*/
-	debugString() {
-		let r = ``;
-		const keys = [...this.map.keys()];
-		keys.every((k) => {
-			const v = this.map.get(k);
-			if (v === void 0) return;
-			r += k + ` (${v.length}) = ${JSON.stringify(v)}\r\n`;
-		});
-		return r;
-	}
-	/**
-	* Return number of values stored under `key`.
-	* Returns 0 if `key` is not found.
-	* @param key
-	* @returns
-	*/
-	count(key) {
-		const values = this.map.get(key);
-		if (!values) return 0;
-		return values.length;
-	}
-	/**
-	* Returns first key that contains `value`
-	* @param value
-	* @param eq
-	* @returns
-	*/
-	firstKeyByValue(value, eq = isEqualDefault) {
-		const entry = firstEntryByValue(this, value, eq);
-		if (entry) return entry[0];
-	}
-	/**
-	* Iterate over all entries
-	*/
-	*entriesFlat() {
-		for (const key of this.map.keys()) for (const value of this.map.get(key)) yield [key, value];
-	}
-	/**
-	* Iterate over keys and array of values for that key
-	*/
-	*entries() {
-		for (const [k, v] of this.map.entries()) yield [k, [...v]];
-	}
-	/**
-	* Get all values under `key`
-	* @param key
-	* @returns
-	*/
-	*get(key) {
-		const m = this.map.get(key);
-		if (!m) return;
-		yield* m.values();
-	}
-	/**
-	* Iterate over all keys
-	*/
-	*keys() {
-		yield* this.map.keys();
-	}
-	/**
-	* Iterate over all values (regardless of key).
-	* Use {@link values} to iterate over a set of values per key
-	*/
-	*valuesFlat() {
-		for (const entries of this.map) yield* entries[1];
-	}
-	/**
-	* Yields the values for each key in sequence, returning an array.
-	* Use {@link valuesFlat} to iterate over all keys regardless of key.
-	*/
-	*values() {
-		for (const entries of this.map) yield entries[1];
-	}
-	/**
-	* Iterate over keys and length of values stored under keys
-	*/
-	*keysAndCounts() {
-		for (const entries of this.map) yield [entries[0], entries[1].length];
-	}
-	/**
-	* Returns the count of keys.
-	*/
-	get lengthKeys() {
-		return this.map.size;
-	}
-	/**
-	* _True_ if empty
-	*/
-	get isEmpty() {
-		return this.map.size === 0;
-	}
-};
-
-//#endregion
-//#region ../collections/dist/src/map/map-of-simple-mutable.js
-/**
-* A simple mutable map of arrays, without events. It can store multiple values
-* under the same key.
-*
-* For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
-*
-* @example
-* ```js
-* const m = mapOfSimpleMutable();
-* m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
-* m.delete(`hello`);       // Deletes everything under `hello`
-*
-* const hellos = m.get(`hello`); // Get list of items under `hello`
-* ```
-*
-* Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the
-* basis by which values are keyed when using `addValues`.
-*
-* Constructor takes a `valueEq` parameter, which compares values. This is used when checking
-* if a value exists under a key, for example.
-* @typeParam V - Type of items
-*/
-var MapOfSimpleMutable = class extends MapOfSimpleBase {
-	addKeyedValues(key, ...values) {
-		const existing = this.map.get(key);
-		if (existing === void 0) this.map.set(key, values);
-		else this.map.set(key, [...existing, ...values]);
-	}
-	/**
-	* Set `values` to `key`.
-	* Previous data stored under `key` is thrown away.
-	* @param key
-	* @param values
-	*/
-	setValues(key, values) {
-		this.map.set(key, values);
-	}
-	/**
-	* Adds a value, automatically extracting a key via the
-	* `groupBy` function assigned in the constructor options.
-	* @param values Adds several values
-	*/
-	addValue(...values) {
-		for (const v of values) {
-			const key = this.groupBy(v);
-			this.addKeyedValues(key, v);
-		}
-	}
-	/**
-	* Delete `value` under a particular `key`
-	* @param key
-	* @param value
-	* @returns _True_ if `value` was found under `key`
-	*/
-	deleteKeyValue(key, value) {
-		const existing = this.map.get(key);
-		if (existing === void 0) return false;
-		const without = existing.filter((existingValue) => !this.valueEq(existingValue, value));
-		this.map.set(key, without);
-		return without.length < existing.length;
-	}
-	/**
-	* Deletes `value` regardless of key.
-	*
-	* Uses the constructor-defined equality function.
-	* @param value Value to delete
-	* @returns
-	*/
-	deleteByValue(value) {
-		let del = false;
-		const entries = [...this.map.entries()];
-		for (const keyEntries of entries) for (const values of keyEntries[1]) if (this.valueEq(values, value)) {
-			del = true;
-			this.deleteKeyValue(keyEntries[0], value);
-		}
-		return del;
-	}
-	/**
-	* Deletes all values under `key`,
-	* @param key
-	* @returns _True_ if `key` was found and values stored
-	*/
-	delete(key) {
-		const values = this.map.get(key);
-		if (!values) return false;
-		if (values.length === 0) return false;
-		this.map.delete(key);
-		return true;
-	}
-	/**
-	* Clear contents
-	*/
-	clear() {
-		this.map.clear();
-	}
-};
-
-//#endregion
-//#region ../geometry/dist/src/polar/ray.js
-/**
-* Converts a ray to a Line in cartesian coordinates.
-*
-* @param ray
-* @param origin Override or provide origin point
-* @returns
-*/
-const toCartesian$1 = (ray, origin) => {
-	const o = getOrigin(ray, origin);
-	const a = toCartesian(ray.offset, ray.angleRadian, o);
-	const b = toCartesian(ray.offset + ray.length, ray.angleRadian, o);
-	return {
-		a,
-		b
-	};
-};
-const getOrigin = (ray, origin) => {
-	if (origin !== void 0) return origin;
-	if (ray.origin !== void 0) return ray.origin;
-	return {
-		x: 0,
-		y: 0
-	};
-};
-/**
-* Returns a PolarRay based on a line and origin.
-* If `origin` is omitted, the origin is taken to be the 'a' point of the line.
-* @param line
-* @param origin
-* @returns
-*/
-const fromLine = (line$2, origin) => {
-	const o = origin ?? line$2.a;
-	return {
-		angleRadian: angleRadian(line$2.b, o),
-		offset: distance(line$2.a, o),
-		length: distance(line$2.b, line$2.a),
-		origin: o
-	};
-};
-
-//#endregion
-//#region ../geometry/dist/src/vector.js
-const EmptyCartesian = Object.freeze({
-	x: 0,
-	y: 0
-});
-const piPi$1 = Math.PI * 2;
-const pi = Math.PI;
-/**
-* Create a vector from a point
-*
-* If `unipolar` normalisation is used, direction will be fixed to 0..2π
-* if `bipolar` normalisation is used, direction will be fixed to -π...π
-* @param pt Point
-* @param angleNormalisation Technique to normalise angle
-* @param origin Origin to calculate vector from or 0,0 if left empty
-* @returns
-*/
-const fromPointPolar = (pt, angleNormalisation = ``, origin = EmptyCartesian) => {
-	pt = subtract(pt, origin);
-	let direction = Math.atan2(pt.y, pt.x);
-	if (angleNormalisation === `unipolar` && direction < 0) direction += piPi$1;
-	else if (angleNormalisation === `bipolar`) {
-		if (direction > pi) direction -= piPi$1;
-		else if (direction <= -pi) direction += piPi$1;
-	}
-	return Object.freeze({
-		distance: distance(pt),
-		angleRadian: direction
-	});
-};
-/**
-* Returns a Cartesian-coordinate vector from a line a -> b
-* @param line
-* @returns
-*/
-const fromLineCartesian = (line$2) => subtract(line$2.b, line$2.a);
-/**
-* Returns a polar-coordinate vector from a line a -> b
-* @param line
-* @returns
-*/
-const fromLinePolar = (line$2) => {
-	guard$2(line$2, `line`);
-	const pt = subtract(line$2.b, line$2.a);
-	return fromPointPolar(pt);
-};
-
-//#endregion
-//#region ../geometry/dist/src/line/from-numbers.js
-/**
-* Returns a line from a basis of coordinates (x1, y1, x2, y2)
-*
-* ```js
-* // Line from 0,1 -> 10,15
-* Lines.fromNumbers(0, 1, 10, 15);
-* ```
-* @param x1
-* @param y1
-* @param x2
-* @param y2
-* @returns
-*/
-const fromNumbers = (x1, y1, x2, y2) => {
-	if (Number.isNaN(x1)) throw new Error(`x1 is NaN`);
-	if (Number.isNaN(x2)) throw new Error(`x2 is NaN`);
-	if (Number.isNaN(y1)) throw new Error(`y1 is NaN`);
-	if (Number.isNaN(y2)) throw new Error(`y2 is NaN`);
-	const a = {
-		x: x1,
-		y: y1
-	};
-	const b = {
-		x: x2,
-		y: y2
-	};
-	return fromPoints(a, b);
-};
-
-//#endregion
-//#region ../geometry/dist/src/line/index.js
-const Empty$1 = Object.freeze({
-	a: Object.freeze({
-		x: 0,
-		y: 0
-	}),
-	b: Object.freeze({
-		x: 0,
-		y: 0
-	})
-});
-const Placeholder$2 = Object.freeze({
-	a: Object.freeze({
-		x: NaN,
-		y: NaN
-	}),
-	b: Object.freeze({
-		x: NaN,
-		y: NaN
-	})
-});
-
-//#endregion
-//#region ../geometry/dist/src/point/relation.js
-/**
-* Tracks the relation between two points.
-*
-* 1. Call `Points.relation` with the initial reference point
-* 2. You get back a function
-* 3. Call the function with a new point to compute relational information.
-*
-* It computes angle, average, centroid, distance and speed.
-*
-* ```js
-* // Reference point: 50,50
-* const t = Points.relation({x:50,y:50}); // t is a function
-*
-* // Invoke the returned function with a point
-* const relation = t({ x:0, y:0 }); // Juicy relational data
-* ```
-*
-* Or with destructuring:
-*
-* ```js
-* const { angle, distanceFromStart, distanceFromLast, average, centroid, speed } = t({ x:0,y:0 });
-* ```
-*
-* x & y coordinates can also be used as parameters:
-* ```js
-* const t = Points.relation(50, 50);
-* const result = t(0, 0);
-* // result.speed, result.angle ...
-* ```
-*
-* Note that intermediate values are not stored. It keeps the initial
-* and most-recent point. If you want to compute something over a set
-* of prior points, you may want to use {@link PointsTracker}
-* @param a Initial point, or x value
-* @param b y value, if first option is a number.
-* @returns
-*/
-const relation = (a, b) => {
-	const start = getPointParameter(a, b);
-	let totalX = 0;
-	let totalY = 0;
-	let count = 0;
-	let lastUpdate = performance.now();
-	let lastPoint = start;
-	const update = (aa, bb) => {
-		const p = getPointParameter(aa, bb);
-		totalX += p.x;
-		totalY += p.y;
-		count++;
-		const distanceFromStart = distance(p, start);
-		const distanceFromLast = distance(p, lastPoint);
-		const now = performance.now();
-		const speed = distanceFromLast / (now - lastUpdate);
-		lastUpdate = now;
-		lastPoint = p;
-		return Object.freeze({
-			angle: angleRadian(p, start),
-			distanceFromStart,
-			distanceFromLast,
-			speed,
-			centroid: centroid(p, start),
-			average: {
-				x: totalX / count,
-				y: totalY / count
-			}
-		});
-	};
-	return update;
-};
-
-//#endregion
-//#region ../geometry/dist/src/point/point-tracker.js
-/**
-* A tracked point. Mutable. Useful for monitoring how
-* it changes over time. Eg. when a pointerdown event happens, to record the start position and then
-* track the pointer as it moves until pointerup.
-*
-* See also
-* * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
-* * {@link PointsTracker}: Track several points, useful for multi-touch.
-* * [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/tracking/)
-*
-* ```js
-* // Create a tracker on a pointerdown
-* const t = new PointTracker();
-*
-* // ...and later, tell it when a point is seen (eg. pointermove)
-* const nfo = t.seen({x: evt.x, y:evt.y});
-* // nfo gives us some details on the relation between the seen point, the start, and points inbetween
-* // nfo.angle, nfo.centroid, nfo.speed etc.
-* ```
-*
-* Compute based on last seen point
-* ```js
-* t.angleFromStart();
-* t.distanceFromStart();
-* t.x / t.y
-* t.length; // Total length of accumulated points
-* t.elapsed; // Total duration since start
-* t.lastResult; // The PointSeenInfo for last seen point
-* ```
-*
-* Housekeeping
-* ```js
-* t.reset(); // Reset tracker
-* ```
-*
-* By default, the tracker only keeps track of the initial point and
-* does not store intermediate 'seen' points. To use the tracker as a buffer,
-* set `storeIntermediate` option to _true_.
-*
-* ```js
-* // Keep only the last 10 points
-* const t = new PointTracker({
-*  sampleLimit: 10
-* });
-*
-* // Store all 'seen' points
-* const t = new PointTracker({
-*  storeIntermediate: true
-* });
-*
-* // In this case, the whole tracker is automatically
-* // reset after 10 samples
-* const t = new PointTracker({
-*  resetAfterSamples: 10
-* })
-* ```
-*
-* When using a buffer limited by `sampleLimit`, the 'initial' point will be the oldest in the
-* buffer, not actually the very first point seen.
-*/
-var PointTracker = class extends ObjectTracker {
-	initialRelation;
-	markRelation;
-	lastResult;
-	constructor(opts = {}) {
-		super(opts);
-	}
-	/**
-	* Notification that buffer has been knocked down to `sampleLimit`.
-	*
-	* This will reset the `initialRelation`, which will use the new oldest value.
-	*/
-	onTrimmed(_reason) {
-		this.initialRelation = void 0;
-	}
-	/**
-	* @ignore
-	*/
-	onReset() {
-		super.onReset();
-		this.lastResult = void 0;
-		this.initialRelation = void 0;
-		this.markRelation = void 0;
-	}
-	/**
-	* Adds a PointerEvent along with its
-	* coalesced events, if available.
-	* @param p
-	* @returns
-	*/
-	seenEvent(p) {
-		if (`getCoalescedEvents` in p) {
-			const events = p.getCoalescedEvents();
-			const asPoints = events.map((event) => ({
-				x: event.clientX,
-				y: event.clientY
-			}));
-			return this.seen(...asPoints);
-		} else return this.seen({
-			x: p.clientX,
-			y: p.clientY
-		});
-	}
-	/**
-	* Makes a 'mark' in the tracker, allowing you to compare values
-	* to this point.
-	*/
-	mark() {
-		this.markRelation = relation(this.last);
-	}
-	/**
-	* Tracks a point, returning data on its relation to the
-	* initial point and the last received point.
-	*
-	* Use {@link seenEvent} to track a raw `PointerEvent`.
-	*
-	* @param _p Point
-	*/
-	computeResults(_p) {
-		const currentLast = this.last;
-		const previousLast = this.values.at(-2);
-		if (this.initialRelation === void 0 && this.initial) this.initialRelation = relation(this.initial);
-		else if (this.initialRelation === void 0) throw new Error(`Bug: No initialRelation, and this.inital is undefined?`);
-		const lastRelation = previousLast === void 0 ? relation(currentLast) : relation(previousLast);
-		const initialRel = this.initialRelation(currentLast);
-		const markRel = this.markRelation !== void 0 ? this.markRelation(currentLast) : void 0;
-		const speed = previousLast === void 0 ? 0 : length(previousLast, currentLast) / (currentLast.at - previousLast.at);
-		const lastRel = {
-			...lastRelation(currentLast),
-			speed
-		};
-		const r = {
-			fromInitial: initialRel,
-			fromLast: lastRel,
-			fromMark: markRel,
-			values: [...this.values]
-		};
-		this.lastResult = r;
-		return r;
-	}
-	/**
-	* Returns a polyline representation of stored points.
-	* Returns an empty array if points were not saved, or there's only one.
-	*/
-	get line() {
-		if (this.values.length === 1) return [];
-		return joinPointsToLines(...this.values);
-	}
-	/**
-	* Returns a vector of the initial/last points of the tracker.
-	* Returns as a polar coordinate
-	*/
-	get vectorPolar() {
-		return fromLinePolar(this.lineStartEnd);
-	}
-	/**
-	* Returns a vector of the initial/last points of the tracker.
-	* Returns as a Cartesian coordinate
-	*/
-	get vectorCartesian() {
-		return fromLineCartesian(this.lineStartEnd);
-	}
-	/**
-	* Returns a line from initial point to last point.
-	*
-	* If there are less than two points, Lines.Empty is returned
-	*/
-	get lineStartEnd() {
-		const initial = this.initial;
-		if (this.values.length < 2 || !initial) return Empty$1;
-		return {
-			a: initial,
-			b: this.last
-		};
-	}
-	/**
-	* Returns distance from latest point to initial point.
-	* If there are less than two points, zero is returned.
-	*
-	* This is the direct distance from initial to last,
-	* not the accumulated length.
-	* @returns Distance
-	*/
-	distanceFromStart() {
-		const initial = this.initial;
-		return this.values.length >= 2 && initial !== void 0 ? distance(initial, this.last) : 0;
-	}
-	/**
-	* Difference between last point and the initial point, calculated
-	* as a simple subtraction of x,y & z.
-	*
-	* `Points.Placeholder` is returned if there's only one point so far.
-	*/
-	difference() {
-		const initial = this.initial;
-		return this.values.length >= 2 && initial !== void 0 ? subtract(this.last, initial) : Placeholder;
-	}
-	/**
-	* Returns angle (in radians) from latest point to the initial point
-	* If there are less than two points, undefined is return.
-	* @returns Angle in radians
-	*/
-	angleFromStart() {
-		const initial = this.initial;
-		if (initial !== void 0 && this.values.length > 2) return angleRadian(initial, this.last);
-	}
-	/**
-	* Returns the total length of accumulated points.
-	* Returns 0 if points were not saved, or there's only one
-	*/
-	get length() {
-		if (this.values.length === 1) return 0;
-		const l = this.line;
-		return length(l);
-	}
-	/**
-	* Returns the last x coord
-	*/
-	get x() {
-		return this.last.x;
-	}
-	/**
-	* Returns the last y coord
-	*/
-	get y() {
-		return this.last.y;
-	}
-	/**
-	* Returns the last z coord (or _undefined_ if not available)
-	*/
-	get z() {
-		return this.last.z;
-	}
-};
-/**
-* A {@link TrackedValueMap} for points. Uses {@link PointTracker} to
-* track added values.
-*/
-var PointsTracker = class extends TrackedValueMap {
-	constructor(opts = {}) {
-		super((key, start) => {
-			if (start === void 0) throw new Error(`Requires start point`);
-			const p = new PointTracker({
-				...opts,
-				id: key
-			});
-			p.seen(start);
-			return p;
-		});
-	}
-	/**
-	* Track a PointerEvent
-	* @param event
-	*/
-	seenEvent(event) {
-		if (`getCoalescedEvents` in event) {
-			const events = event.getCoalescedEvents();
-			const seens = events.map((subEvent) => super.seen(subEvent.pointerId.toString(), subEvent));
-			return Promise.all(seens);
-		} else return Promise.all([super.seen(event.pointerId.toString(), event)]);
-	}
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/inside.js
-/**
-* Returns _true_ if cell coordinates are above zero and within bounds of grid
-*
-* @param grid
-* @param cell
-* @return
-*/
-const inside = (grid$2, cell) => {
-	if (cell.x < 0 || cell.y < 0) return false;
-	if (cell.x >= grid$2.cols || cell.y >= grid$2.rows) return false;
-	return true;
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/guards.js
-/**
-* Throws an exception if any of the cell's parameters are invalid
-* @private
-* @param cell
-* @param parameterName
-* @param grid
-*/
-const guardCell = (cell, parameterName = `Param`, grid$2) => {
-	if (cell === void 0) throw new Error(parameterName + ` is undefined. Expecting {x,y}`);
-	if (cell.x === void 0) throw new Error(parameterName + `.x is undefined`);
-	if (cell.y === void 0) throw new Error(parameterName + `.y is undefined`);
-	if (Number.isNaN(cell.x)) throw new Error(parameterName + `.x is NaN`);
-	if (Number.isNaN(cell.y)) throw new Error(parameterName + `.y is NaN`);
-	if (!Number.isInteger(cell.x)) throw new TypeError(parameterName + `.x is non-integer`);
-	if (!Number.isInteger(cell.y)) throw new TypeError(parameterName + `.y is non-integer`);
-	if (grid$2 !== void 0 && !inside(grid$2, cell)) throw new Error(`${parameterName} is outside of grid. Cell: ${cell.x},${cell.y} Grid: ${grid$2.cols}, ${grid$2.rows}`);
-};
-/**
-* Throws an exception if any of the grid's parameters are invalid
-* @param grid
-* @param parameterName
-*/
-const guardGrid = (grid$2, parameterName = `Param`) => {
-	if (grid$2 === void 0) throw new Error(`${parameterName} is undefined. Expecting grid.`);
-	if (!(`rows` in grid$2)) throw new Error(`${parameterName}.rows is undefined`);
-	if (!(`cols` in grid$2)) throw new Error(`${parameterName}.cols is undefined`);
-	if (!Number.isInteger(grid$2.rows)) throw new TypeError(`${parameterName}.rows is not an integer`);
-	if (!Number.isInteger(grid$2.cols)) throw new TypeError(`${parameterName}.cols is not an integer`);
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/apply-bounds.js
-/**
-* Calculates a legal position for a cell based on
-* `grid` size and `bounds` wrapping logic.
-* @param grid
-* @param cell
-* @param wrap
-* @returns
-*/
-const applyBounds = function(grid$2, cell, wrap$1 = `undefined`) {
-	guardGrid(grid$2, `grid`);
-	guardCell(cell, `cell`);
-	let x = cell.x;
-	let y = cell.y;
-	switch (wrap$1) {
-		case `wrap`: {
-			x = x % grid$2.cols;
-			y = y % grid$2.rows;
-			if (x < 0) x = grid$2.cols + x;
-			else if (x >= grid$2.cols) x -= grid$2.cols;
-			if (y < 0) y = grid$2.rows + y;
-			else if (y >= grid$2.rows) y -= grid$2.rows;
-			x = Math.abs(x);
-			y = Math.abs(y);
-			break;
-		}
-		case `stop`: {
-			x = clampIndex(x, grid$2.cols);
-			y = clampIndex(y, grid$2.rows);
-			break;
-		}
-		case `undefined`: {
-			if (x < 0 || y < 0) return;
-			if (x >= grid$2.cols || y >= grid$2.rows) return;
-			break;
-		}
-		case `unbounded`: break;
-		default: throw new Error(`Unknown BoundsLogic '${wrap$1}'. Expected: wrap, stop, undefined or unbounded`);
-	}
-	return Object.freeze({
-		x,
-		y
-	});
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/enumerators/cells.js
-/**
-* Enumerate all cell coordinates in an efficient manner.
-* Runs left-to-right, top-to-bottom.
-*
-* If end of grid is reached, behaviour depends on `wrap`:
-* * _true_ (default): iterator will wrap to ensure all are visited.
-* * _false_: iterator stops at end of grid
-*
-* ```js
-* import { Grids } from 'ixfx/geometry.js';
-*
-* // Enumerate each cell position, left-to-right, top-to-bottom
-* for (const cell of Grids.By.cells(grid)) {
-*  // cell will be { x, y }
-* }
-* ```
-*
-* See also:
-* * {@link cellValues}: Iterate over cell values
-* * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
-* @param grid Grid to iterate over
-* @param start Starting cell position (default: {x:0,y:0})
-* @param wrap If true (default), iteration will wrap around through (0,0) when end of grid is reached.
-*/
-function* cells(grid$2, start, wrap$1 = true) {
-	if (!start) start = {
-		x: 0,
-		y: 0
-	};
-	guardGrid(grid$2, `grid`);
-	guardCell(start, `start`, grid$2);
-	let { x, y } = start;
-	let canMove = true;
-	do {
-		yield {
-			x,
-			y
-		};
-		x++;
-		if (x === grid$2.cols) {
-			y++;
-			x = 0;
-		}
-		if (y === grid$2.rows) if (wrap$1) {
-			y = 0;
-			x = 0;
-		} else canMove = false;
-		if (x === start.x && y === start.y) canMove = false;
-	} while (canMove);
-}
-
-//#endregion
-//#region ../geometry/dist/src/grid/as.js
-/**
-* Enumerate rows of grid, returning all the cells in the row
-* as an array
-*
-* ```js
-* for (const row of Grid.As.rows(shape)) {
-*  // row is an array of Cells.
-*  // [ {x:0, y:0}, {x:1, y:0} ... ]
-* }
-* ```
-*
-* Use `Grid.values` to convert the returned iterator into values:
-* ```js
-* for (const v of Grid.values(Grid.rows(shape))) {
-* }
-* ```
-* @param grid
-* @param start
-*/
-const rows = function* (grid$2, start) {
-	if (!start) start = {
-		x: 0,
-		y: 0
-	};
-	let row = start.y;
-	let rowCells = [];
-	for (const c of cells(grid$2, start)) if (c.y === row) rowCells.push(c);
-	else {
-		yield rowCells;
-		rowCells = [c];
-		row = c.y;
-	}
-	if (rowCells.length > 0) yield rowCells;
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/offset.js
-/**
-* Returns a coordinate offset from `start` by `vector` amount.
-*
-* Different behaviour can be specified for how to handle when coordinates exceed the bounds of the grid
-*
-* Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift up/down a line.
-*
-* Use {@link Grids.applyBounds} if you need to calculate a wrapped coordinate without adding two together.
-* @param grid Grid to traverse
-* @param vector Offset in x/y
-* @param start Start point
-* @param bounds
-* @returns Cell
-*/
-const offset = function(grid$2, start, vector, bounds = `undefined`) {
-	return applyBounds(grid$2, {
-		x: start.x + vector.x,
-		y: start.y + vector.y
-	}, bounds);
-};
-
-//#endregion
-//#region ../geometry/dist/src/grid/indexing.js
-/**
-* Returns the index for a given cell.
-* This is useful if a grid is stored in an array.
-*
-* ```js
-* const data = [
-*  1, 2,
-*  3, 4,
-*  5, 6 ];
-* const cols = 2; // Grid of 2 columns wide
-* const index = indexFromCell(cols, {x: 1, y: 1});
-* // Yields an index of 3
-* console.log(data[index]); // Yields 4
-* ```
-*
-* Bounds logic is applied to cell.x/y separately. Wrapping
-* only ever happens in same col/row.
-* @see cellFromIndex
-* @param grid Grid
-* @param cell Cell to get index for
-* @param wrap Logic for if we hit bounds of grid
-* @returns
-*/
-const indexFromCell = (grid$2, cell, wrap$1) => {
-	guardGrid(grid$2, `grid`);
-	if (cell.x < 0) switch (wrap$1) {
-		case `stop`: {
-			cell = {
-				...cell,
-				x: 0
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = offset(grid$2, {
-				x: 0,
-				y: cell.y
-			}, {
-				x: cell.x,
-				y: 0
-			}, `wrap`);
-			break;
-		}
-	}
-	if (cell.y < 0) switch (wrap$1) {
-		case `stop`: {
-			cell = {
-				...cell,
-				y: 0
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				y: grid$2.rows + cell.y
-			};
-			break;
-		}
-	}
-	if (cell.x >= grid$2.cols) switch (wrap$1) {
-		case `stop`: {
-			cell = {
-				...cell,
-				x: grid$2.cols - 1
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				x: cell.x % grid$2.cols
-			};
-			break;
-		}
-	}
-	if (cell.y >= grid$2.rows) switch (wrap$1) {
-		case `stop`: {
-			cell = {
-				...cell,
-				y: grid$2.rows - 1
-			};
-			break;
-		}
-		case `unbounded`: throw new Error(`unbounded not supported`);
-		case `undefined`: return void 0;
-		case `wrap`: {
-			cell = {
-				...cell,
-				y: cell.y % grid$2.rows
-			};
-			break;
-		}
-	}
-	const index = cell.y * grid$2.cols + cell.x;
-	return index;
-};
-
-//#endregion
-//#region ../geometry/dist/src/triangle/guard.js
-/**
-* Throws an exception if the triangle is invalid
-* @param t
-* @param name
-*/
-const guard$7 = (t, name = `t`) => {
-	if (t === void 0) throw new Error(`{$name} undefined`);
-	guard$1(t.a, name + `.a`);
-	guard$1(t.b, name + `.b`);
-	guard$1(t.c, name + `.c`);
-};
-
-//#endregion
-//#region ../geometry/dist/src/scaler.js
-/**
-* Returns a set of scaler functions, to convert to and from ranges.
-*
-* ```js
-* const scaler = Scaler.scaler(`both`, {width:window.innerWidth, height:window.innerHeight});
-* // Assuming screen of 800x400...
-* scaler.abs(400,200);          // Yields { x:0.5, y:0.5 }
-* scaler.abs({ x:400, y:200 }); // Yields { x:0.5, y:0.5 }
-*
-* scaler.rel(0.5, 0.5);         // Yields: { x:400, y:200 }
-* scaler.rel({ x:0.5, y:0.5 }); // Yields: { x:400, y:200 }
-* ```
-*
-* If no default range is provided, it must be given each time the scale function is used.
-*
-* ```js
-* const scaler = Scaler.scaler(`both`);
-*
-* scaler.abs(400, 200, 800, 400);
-* scaler.abs(400, 200, { width: 800, height: 400 });
-* scaler.abs({ x:400, y: 200}, { width: 800, height: 400 });
-* scaler.abs({ x:400, y: 200}, 800, 400);
-* // All are the same, yielding { x:0.5, y:0.5 }
-*
-* scaler.abs(400, 200); // Throws an exception because there is no scale
-* ```
-* @param scaleBy Dimension to scale by
-* @param defaultRect Default range
-* @returns
-*/
-const scaler$1 = (scaleBy = `both`, defaultRect) => {
-	const defaultBounds = defaultRect ?? Placeholder$1;
-	let sw = 1;
-	let sh = 1;
-	let s = {
-		x: 1,
-		y: 1
-	};
-	const computeScale = () => {
-		switch (scaleBy) {
-			case `height`: return {
-				x: sh,
-				y: sh
-			};
-			case `width`: return {
-				x: sw,
-				y: sw
-			};
-			case `min`: return {
-				x: Math.min(sw, sh),
-				y: Math.min(sw, sh)
-			};
-			case `max`: return {
-				x: Math.max(sw, sh),
-				y: Math.max(sw, sh)
-			};
-			default: return {
-				x: sw,
-				y: sh
-			};
-		}
-	};
-	const normalise = (a, b, c, d) => {
-		let inX = NaN;
-		let inY = NaN;
-		let outW = defaultBounds.width;
-		let outH = defaultBounds.height;
-		if (typeof a === `number`) {
-			inX = a;
-			if (typeof b === `number`) {
-				inY = b;
-				if (c === void 0) return [
-					inX,
-					inY,
-					outW,
-					outH
-				];
-				if (isRect(c)) {
-					outW = c.width;
-					outH = c.height;
-				} else if (typeof c === `number`) {
-					outW = c;
-					if (typeof d === `number`) outH = d;
-					else throw new TypeError(`Missing final height value`);
-				} else throw new Error(`Missing valid output range`);
-			} else if (isRect(b)) {
-				outW = b.width;
-				outH = b.height;
-			} else throw new Error(`Expected input y or output Rect to follow first number parameter`);
-		} else if (isPoint(a)) {
-			inX = a.x;
-			inY = a.y;
-			if (b === void 0) return [
-				inX,
-				inY,
-				outW,
-				outH
-			];
-			if (isRect(b)) {
-				outW = b.width;
-				outH = b.height;
-			} else if (typeof b === `number`) {
-				outW = b;
-				if (typeof c === `number`) outH = c;
-				else throw new TypeError(`Expected height as third parameter after Point and output width`);
-			} else throw new TypeError(`Expected Rect or width as second parameter when first parameter is a Point`);
-		} else throw new Error(`Expected input Point or x value as first parameter`);
-		return [
-			inX,
-			inY,
-			outW,
-			outH
-		];
-	};
-	const scaleAbs = (a, b, c, d) => {
-		const n = normalise(a, b, c, d);
-		return scaleNormalised(true, ...n);
-	};
-	const scaleRel = (a, b, c, d) => {
-		const n = normalise(a, b, c, d);
-		return scaleNormalised(false, ...n);
-	};
-	const scaleNormalised = (abs, x, y, w, h) => {
-		if (Number.isNaN(w)) throw new Error(`Output width range missing`);
-		if (Number.isNaN(h)) throw new Error(`Output height range missing`);
-		if (w !== sw || h !== sh) {
-			sw = w;
-			sh = h;
-			s = computeScale();
-		}
-		return abs ? {
-			x: x * s.x,
-			y: y * s.y
-		} : {
-			x: x / s.x,
-			y: y / s.y
-		};
-	};
-	return {
-		computeScale,
-		rel: scaleRel,
-		abs: scaleAbs,
-		width: defaultBounds.width,
-		height: defaultBounds.height
-	};
-};
-
-//#endregion
-//#region ../geometry/dist/src/triangle/corners.js
-/**
-* Returns the corners (vertices) of the triangle as an array of points
-* @param t
-* @returns Array of length three
-*/
-const corners$1 = (t) => {
-	guard$7(t);
-	return [
-		t.a,
-		t.b,
-		t.c
-	];
-};
-
-//#endregion
-//#region ../dom/dist/src/css.js
-/**
-* Returns the computed measurements of CSS properties via [getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle).
-*
-* ```js
-* const v = getComputedPixels(`#some-el`, `borderTopWidth`, `borderLeftWidth`);
-* v.borderTopWidth;  // number
-* b.borderLeftWidth; // number
-* ```
-*
-* Throws an error if value from `getComputedStyle` is not a string or does not end in 'px'.
-* @param elOrQuery
-* @param properties
-* @returns
-*/
-const getComputedPixels = (elOrQuery, ...properties) => {
-	const s = getComputedStyle(resolveEl(elOrQuery));
-	const returnValue = {};
-	for (const property of properties) {
-		const v = s[property];
-		if (typeof v === `string`) if (v.endsWith(`px`)) returnValue[property] = Number.parseFloat(v.substring(0, v.length - 2));
-		else throw new Error(`Property '${String(property)}' does not end in 'px'. Value: ${v}`);
-		else throw new Error(`Property '${String(property)}' is not type string. Got: ${typeof v} Value: ${v}`);
-	}
-	return returnValue;
-};
-
-//#endregion
-//#region ../dom/dist/src/internal/debounce.js
-const debounce = (callback, interval) => {
-	let timer;
-	const ms = intervalToMs(interval, 100);
-	return () => {
-		if (timer) clearTimeout(timer);
-		timer = setTimeout(callback, ms);
-	};
-};
-
-//#endregion
-//#region ../dom/dist/src/element-sizing.js
-/**
-* Consider using static methods:
-*
-* ```js
-* // Resize an <SVG> element to match viewport
-* Dom.ElementSizer.svgViewport(svg);
-*
-* // Resize canvas to match its parent
-* Dom.ElementSizer.canvasParent(canvas);
-*
-* // Resize canvas to match viewport
-* Dom.ElementSizer.canvasViewport(canvas);
-* ```
-*/
-var ElementSizer = class ElementSizer {
-	#stretch;
-	#size;
-	#naturalSize;
-	#naturalRatio;
-	#viewport;
-	#onSizeChanging;
-	#el;
-	#containerEl;
-	#disposed = false;
-	#resizeObservable;
-	#sizeDebounce = () => ({});
-	constructor(elOrQuery, options) {
-		this.#el = resolveEl(elOrQuery);
-		this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement;
-		this.#stretch = options.stretch ?? `none`;
-		this.#onSizeChanging = options.onSizeChanging;
-		this.#size = Empty;
-		const onSizeDone = options.onSizeDone;
-		if (typeof onSizeDone !== `undefined`) this.#sizeDebounce = debounce(() => {
-			onSizeDone(this.size, this.#el);
-		}, options.debounceTimeout);
-		let naturalSize = options.naturalSize;
-		naturalSize ??= this.#el.getBoundingClientRect();
-		this.#naturalRatio = 1;
-		this.#naturalSize = naturalSize;
-		this.setNaturalSize(naturalSize);
-		this.#viewport = EmptyPositioned;
-		if (this.#containerEl === document.body) this.#byViewport();
-		else this.#byContainer();
-	}
-	dispose(reason) {
-		if (this.#disposed) return;
-		this.#disposed = true;
-		if (this.#resizeObservable) {
-			this.#resizeObservable.disconnect();
-			this.#resizeObservable = void 0;
-		}
-	}
-	static canvasParent(canvasElementOrQuery, options) {
-		const el = resolveEl(canvasElementOrQuery);
-		const er = new ElementSizer(el, {
-			...options,
-			onSizeChanging(size, el$1) {
-				el$1.width = size.width;
-				el$1.height = size.height;
-				if (options.onSizeChanging) options.onSizeChanging(size, el$1);
-			}
-		});
-		return er;
-	}
-	static canvasViewport(canvasElementOrQuery, options) {
-		const el = resolveEl(canvasElementOrQuery);
-		el.style.position = `absolute`;
-		el.style.zIndex = (options.zIndex ?? 0).toString();
-		el.style.left = `0px`;
-		el.style.top = `0px`;
-		const opts = {
-			...options,
-			containerEl: document.body
-		};
-		return this.canvasParent(canvasElementOrQuery, opts);
-	}
-	/**
-	* Size an SVG element to match viewport
-	* @param svg
-	* @returns
-	*/
-	static svgViewport(svg, onSizeSet) {
-		const er = new ElementSizer(svg, {
-			containerEl: document.body,
-			stretch: `both`,
-			onSizeChanging(size) {
-				svg.setAttribute(`width`, size.width.toString());
-				svg.setAttribute(`height`, size.height.toString());
-				if (onSizeSet) onSizeSet(size);
-			}
-		});
-		return er;
-	}
-	#byContainer() {
-		const c = this.#containerEl;
-		if (!c) throw new Error(`No container element`);
-		const r = new ResizeObserver((entries) => {
-			this.#onParentResize(entries);
-		});
-		r.observe(c);
-		const current = this.#computeSizeBasedOnParent(c.getBoundingClientRect());
-		this.size = current;
-		this.#resizeObservable = r;
-	}
-	#byViewport() {
-		const r = new ResizeObserver((entries) => {
-			this.#onViewportResize();
-		});
-		r.observe(document.documentElement);
-		this.#resizeObservable = r;
-		this.#onViewportResize();
-	}
-	#onViewportResize() {
-		this.size = {
-			width: window.innerWidth,
-			height: window.innerHeight
-		};
-		this.#viewport = {
-			x: 0,
-			y: 0,
-			...this.size
-		};
-	}
-	/**
-	* Sets the 'natural' size of an element.
-	* This can also be specified when creating ElementSizer.
-	* @param size
-	*/
-	setNaturalSize(size) {
-		this.#naturalSize = size;
-		this.#naturalRatio = size.width / size.height;
-	}
-	get naturalSize() {
-		return this.#naturalSize;
-	}
-	get viewport() {
-		return this.#viewport;
-	}
-	#computeSizeBasedOnParent(parentSize) {
-		let { width, height } = parentSize;
-		let stretch = this.#stretch;
-		if (stretch === `min`) stretch = width < height ? `width` : `height`;
-		else if (stretch === `max`) stretch = width > height ? `width` : `height`;
-		if (stretch === `width`) height = width / this.#naturalRatio;
-		else if (stretch === `height`) width = height * this.#naturalRatio;
-		if (this.#el instanceof HTMLElement) {
-			const b = getComputedPixels(this.#el, `borderTopWidth`, `borderLeftWidth`, `borderRightWidth`, `borderBottomWidth`);
-			width -= b.borderLeftWidth + b.borderRightWidth;
-			height -= b.borderTopWidth + b.borderBottomWidth;
-		}
-		return {
-			width,
-			height
-		};
-	}
-	#onParentResize(args) {
-		const box = args[0].contentBoxSize[0];
-		const parentSize = {
-			width: box.inlineSize,
-			height: box.blockSize
-		};
-		this.size = this.#computeSizeBasedOnParent(parentSize);
-		this.#viewport = {
-			x: 0,
-			y: 0,
-			width: parentSize.width,
-			height: parentSize.height
-		};
-	}
-	set size(size) {
-		guard(size, `size`);
-		this.#size = size;
-		this.#onSizeChanging(size, this.#el);
-		this.#sizeDebounce();
-	}
-	get size() {
-		return this.#size;
-	}
-};
-
-//#endregion
-//#region ../visual/dist/src/colour/math.js
-/**
-* Multiplies the opacity of a colour by `amount`, returning a computed CSS colour.
-*
-* ```js
-* multiplyOpacity(`red`, 0.5); // Returns a colour string
-* ```
-*
-* For example, to half the opacity, use `amount: 0.5`.
-* Clamps the result to ensure it's between 0..1
-* @param colourish Colour
-* @param amount Amount
-* @returns
-*/
-function multiplyOpacity$1(colourish, amount) {
-	return withOpacity$7(colourish, (o) => clamp(o * amount));
-}
-/**
-* Does a computation with the opacity of a colour, returning colour.
-*
-* Passes operation to `HslSpace` or `SrgbSpace` depending on space of `colourish`.
-* @param colourish Colour
-* @param fn Function that takes original opacity as input and returns output opacity
-*/
-function withOpacity$7(colourish, fn) {
-	const colour = toColour(colourish);
-	let result;
-	switch (colour.space) {
-		case `hsl`:
-			result = withOpacity(colour, fn);
-			break;
-		case `srgb`:
-			result = withOpacity$1(colour, fn);
-			break;
-		case `oklch`:
-			result = withOpacity$2(colour, fn);
-			break;
-		default: throw new Error(`Unknown space: '${colour.space}'. Expected hsl, srgb, oklch`);
-	}
-	if (!result) throw new Error(`Is colour in correct form?`);
-	if (typeof colourish === `string`) return toCssColour(result);
-	return result;
-}
-
-//#endregion
 //#region ../visual/src/drawing.ts
 var drawing_exports = {};
 __export(drawing_exports, {
@@ -2200,13 +167,13 @@ const lineOp = (lineWidth, lineJoin, lineCap) => {
 */
 const drawingStack = (ctx, stk) => {
 	stk ??= new StackImmutable();
-	const push$1 = (...ops) => {
+	const push = (...ops) => {
 		stk ??= new StackImmutable();
 		const s = stk.push(...ops);
 		for (const o of ops) o(ctx);
 		return drawingStack(ctx, s);
 	};
-	const pop$1 = () => {
+	const pop = () => {
 		const s = stk?.pop();
 		return drawingStack(ctx, s);
 	};
@@ -2216,8 +183,8 @@ const drawingStack = (ctx, stk) => {
 		return drawingStack(ctx, stk);
 	};
 	return {
-		push: push$1,
-		pop: pop$1,
+		push,
+		pop,
 		apply
 	};
 };
@@ -2324,7 +291,7 @@ const connectedPoints = (ctx, pts, opts = {}) => {
 	const shouldLoop = opts.loop ?? false;
 	resultThrow(arrayTest(pts, `pts`));
 	if (pts.length === 0) return;
-	for (const [index, pt] of pts.entries()) guard$1(pt, `Index ${index}`);
+	for (const [index, pt] of pts.entries()) guard(pt, `Index ${index}`);
 	applyOpts$1(ctx, opts);
 	if (opts.lineWidth) ctx.lineWidth = opts.lineWidth;
 	ctx.beginPath();
@@ -2343,7 +310,7 @@ const connectedPoints = (ctx, pts, opts = {}) => {
 */
 const pointLabels = (ctx, pts, opts = {}, labels) => {
 	if (pts.length === 0) return;
-	for (const [index, pt] of pts.entries()) guard$1(pt, `Index ${index}`);
+	for (const [index, pt] of pts.entries()) guard(pt, `Index ${index}`);
 	applyOpts$1(ctx, opts);
 	for (const [index, pt] of pts.entries()) {
 		const label = labels !== void 0 && index < labels.length ? labels[index] : index.toString();
@@ -2424,8 +391,8 @@ const cubicBezier = (ctx, bezierToDraw, opts = {}) => {
 	if (isDebug) {
 		stack = stack.push(optsOp({
 			...opts,
-			strokeStyle: multiplyOpacity$1(opts.strokeStyle ?? `silver`, .6),
-			fillStyle: multiplyOpacity$1(opts.fillStyle ?? `yellow`, .4)
+			strokeStyle: multiplyOpacity(opts.strokeStyle ?? `silver`, .6),
+			fillStyle: multiplyOpacity(opts.fillStyle ?? `yellow`, .4)
 		}));
 		stack.apply();
 		ctx.moveTo(a.x, a.y);
@@ -2457,8 +424,8 @@ const quadraticBezier = (ctx, bezierToDraw, opts = {}) => {
 	if (isDebug) {
 		stack = stack.push(optsOp({
 			...opts,
-			strokeStyle: multiplyOpacity$1(opts.strokeStyle ?? `silver`, .6),
-			fillStyle: multiplyOpacity$1(opts.fillStyle ?? `yellow`, .4)
+			strokeStyle: multiplyOpacity(opts.strokeStyle ?? `silver`, .6),
+			fillStyle: multiplyOpacity(opts.fillStyle ?? `yellow`, .4)
 		}));
 		connectedPoints(ctx, [
 			a,
@@ -2521,11 +488,11 @@ const line$1 = (ctx, toDraw, opts = {}) => {
 const triangle = (ctx, toDraw, opts = {}) => {
 	applyOpts$1(ctx, opts);
 	const draw = (t) => {
-		connectedPoints(ctx, corners$1(t), {
+		connectedPoints(ctx, corners(t), {
 			...opts,
 			loop: true
 		});
-		if (opts.debug) pointLabels(ctx, corners$1(t), void 0, [
+		if (opts.debug) pointLabels(ctx, corners(t), void 0, [
 			`a`,
 			`b`,
 			`c`
@@ -2562,7 +529,7 @@ const rect = (ctx, toDraw, opts = {}) => {
 			ctx.lineTo(d.width, 0);
 			ctx.stroke();
 		}
-		if (opts.debug) pointLabels(ctx, corners(d), void 0, [
+		if (opts.debug) pointLabels(ctx, corners$1(d), void 0, [
 			`NW`,
 			`NE`,
 			`SE`,
@@ -2774,7 +741,7 @@ __export(hsl_exports, {
 	fromCss: () => fromCss$2,
 	fromHexString: () => fromHexString$2,
 	generateScalar: () => generateScalar$1,
-	guard: () => guard$6,
+	guard: () => guard$5,
 	interpolator: () => interpolator$3,
 	parseCssHslFunction: () => parseCssHslFunction,
 	scalar: () => scalar,
@@ -2782,7 +749,7 @@ __export(hsl_exports, {
 	toCssString: () => toCssString,
 	toLibraryRgb: () => toLibraryRgb,
 	toScalar: () => toScalar$2,
-	withOpacity: () => withOpacity$6
+	withOpacity: () => withOpacity$3
 });
 /**
 * Scales the opacity value of an input HSL value
@@ -2793,7 +760,7 @@ __export(hsl_exports, {
 * @param fn Function that calcules opacity based on input scalar value
 * @returns 
 */
-const withOpacity$6 = (value, fn) => {
+const withOpacity$3 = (value, fn) => {
 	switch (value.unit) {
 		case `absolute`: return {
 			...value,
@@ -2912,7 +879,7 @@ const toAbsolute$1 = (hslOrString) => {
 	if (typeof hslOrString === `string`) return fromCss$2(hslOrString, { scalar: false });
 	if (isRgb(hslOrString)) return toAbsolute$1(fromLibrary$2(toLibraryHsl(hslOrString), { scalar: false }));
 	const hsl = hslOrString;
-	guard$6(hsl);
+	guard$5(hsl);
 	if (hsl.unit === `absolute`) return hsl;
 	return {
 		h: hsl.h * 360,
@@ -2973,7 +940,7 @@ const toScalar$2 = (hslOrString) => {
 	if (typeof hslOrString === `string`) return fromCss$2(hslOrString, { scalar: true });
 	if (isRgb(hslOrString)) return toScalar$2(fromLibrary$2(toLibraryHsl(hslOrString), { scalar: true }));
 	const hsl = hslOrString;
-	guard$6(hsl);
+	guard$5(hsl);
 	if (hsl.unit === `scalar`) return hsl;
 	return {
 		h: hsl.h / 360,
@@ -2984,7 +951,7 @@ const toScalar$2 = (hslOrString) => {
 		space: `hsl`
 	};
 };
-const guard$6 = (hsl) => {
+const guard$5 = (hsl) => {
 	const { h, s, l, opacity, space, unit } = hsl;
 	if (space !== `hsl`) throw new Error(`Space is expected to be 'hsl'. Got: ${space}`);
 	if (unit === `absolute`) resultThrow(numberTest(h, `finite`, `h`), numberInclusiveRangeTest(s, 0, 100, `s`), numberInclusiveRangeTest(l, 0, 100, `l`), () => {
@@ -3032,7 +999,7 @@ function scalar(hue = .5, sat = 1, lightness$1 = .5, opacity = 1) {
 		l: lightness$1,
 		opacity
 	};
-	guard$6(hsl);
+	guard$5(hsl);
 	return hsl;
 }
 function absolute$1(hue = 200, sat = 100, lightness$1 = 50, opacity = 100) {
@@ -3044,7 +1011,7 @@ function absolute$1(hue = 200, sat = 100, lightness$1 = 50, opacity = 100) {
 		l: lightness$1,
 		opacity
 	};
-	guard$6(hsl);
+	guard$5(hsl);
 	return hsl;
 }
 /**
@@ -3126,16 +1093,16 @@ __export(oklch_exports, {
 	fromHexString: () => fromHexString$1,
 	fromLibrary: () => fromLibrary$1,
 	generateScalar: () => generateScalar,
-	guard: () => guard$5,
+	guard: () => guard$4,
 	interpolator: () => interpolator$2,
 	scalar: () => scalar$2,
 	toAbsolute: () => toAbsolute,
 	toCssString: () => toCssString$2,
 	toScalar: () => toScalar$1,
-	withOpacity: () => withOpacity$5
+	withOpacity: () => withOpacity$2
 });
 const OKLCH_CHROMA_MAX = .4;
-const guard$5 = (lch) => {
+const guard$4 = (lch) => {
 	const { l, c, h, opacity, space, unit } = lch;
 	if (space !== `oklch`) throw new Error(`Space is expected to be 'oklch'. Got: ${space}`);
 	if (unit === `absolute`) resultThrow(percentTest(l, `l`), () => {
@@ -3146,19 +1113,6 @@ const guard$5 = (lch) => {
 	else if (unit === `scalar`) resultThrow(percentTest(l, `l`), percentTest(c, `c`), percentTest(h, `h`), percentTest(lch.opacity ?? 1, `opacity`));
 	else throw new Error(`Unit is expected to be 'absolute' or 'scalar'. Got: ${unit}`);
 };
-/**
-* Coverts from the Colorizr library
-* Tests ranges:
-* * l: 0..1
-* * c: 0..1
-* * h: 0..360
-* * alpha: 0..1
-* 
-* Default option: { scalar: true }
-* @param lch LCH value
-* @param parsingOptions Options for parsing 
-* @returns 
-*/
 function fromLibrary$1(lch, parsingOptions = {}) {
 	if (typeof lch === `undefined` || lch === null) {
 		if (parsingOptions.fallbackColour) return parsingOptions.fallbackColour;
@@ -3168,6 +1122,12 @@ function fromLibrary$1(lch, parsingOptions = {}) {
 	if (scalarReturn) return scalar$2(lch.l, lch.c / OKLCH_CHROMA_MAX, lch.h / 360, lch.alpha ?? 1);
 	else return absolute(lch.l, lch.c, lch.h, lch.alpha ?? 1);
 }
+/**
+* Parse a HEX-formatted colour into OkLch structured format
+* @param hexString 
+* @param options 
+* @returns 
+*/
 const fromHexString$1 = (hexString, options = {}) => {
 	return fromLibrary$1(hex2oklch(hexString), options);
 };
@@ -3216,7 +1176,7 @@ function fromCss$1(value, options = {}) {
 */
 const toAbsolute = (lchOrString) => {
 	if (typeof lchOrString === `string`) return toAbsolute(fromCss$1(lchOrString, { scalar: true }));
-	guard$5(lchOrString);
+	guard$4(lchOrString);
 	if (lchOrString.unit === `absolute`) return lchOrString;
 	return {
 		space: `oklch`,
@@ -3230,7 +1190,7 @@ const toAbsolute = (lchOrString) => {
 const toScalar$1 = (lchOrString) => {
 	if (typeof lchOrString === `string`) return toScalar$1(fromCss$1(lchOrString, { scalar: true }));
 	const lch = lchOrString;
-	guard$5(lch);
+	guard$4(lch);
 	if (lch.unit === `scalar`) return lch;
 	return {
 		l: lch.l,
@@ -3249,7 +1209,7 @@ const toScalar$1 = (lchOrString) => {
 * @returns CSS colour string
 */
 const toCssString$2 = (lch, precision = 3) => {
-	guard$5(lch);
+	guard$4(lch);
 	const { l, c, h, opacity } = lch;
 	let css = ``;
 	switch (lch.unit) {
@@ -3291,7 +1251,7 @@ const generateScalar = (absoluteHslOrVariable, chroma = 1, lightness$1 = .5, opa
 * @param fn 
 * @returns 
 */
-const withOpacity$5 = (value, fn) => {
+const withOpacity$2 = (value, fn) => {
 	switch (value.unit) {
 		case `absolute`: return {
 			...value,
@@ -3332,7 +1292,7 @@ function scalar$2(lightness$1 = .7, chroma = .1, hue = .5, opacity = 1) {
 		h: hue,
 		opacity
 	};
-	guard$5(lch);
+	guard$4(lch);
 	return lch;
 }
 /**
@@ -3352,7 +1312,7 @@ const absolute = (l, c, h, opacity = 1) => {
 		c,
 		h
 	};
-	guard$5(lch);
+	guard$4(lch);
 	return lch;
 };
 
@@ -3564,7 +1524,7 @@ __export(srgb_exports, {
 	eightBit: () => eightBit,
 	fromCss: () => fromCss,
 	fromHexString: () => fromHexString,
-	guard: () => guard$4,
+	guard: () => guard$3,
 	interpolator: () => interpolator$1,
 	lightness: () => lightness,
 	parseCssRgbFunction: () => parseCssRgbFunction,
@@ -3573,9 +1533,9 @@ __export(srgb_exports, {
 	toCssString: () => toCssString$1,
 	toLibraryHsl: () => toLibraryHsl,
 	toScalar: () => toScalar,
-	withOpacity: () => withOpacity$4
+	withOpacity: () => withOpacity$1
 });
-const withOpacity$4 = (value, fn) => {
+const withOpacity$1 = (value, fn) => {
 	switch (value.unit) {
 		case `8bit`: return {
 			...value,
@@ -3640,7 +1600,7 @@ function fromCss(value, options = {}) {
 	}
 }
 const toCssString$1 = (rgb) => {
-	guard$4(rgb);
+	guard$3(rgb);
 	switch (rgb.unit) {
 		case `8bit`:
 			if (rgb.opacity === void 0 || rgb.opacity === 255) return `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
@@ -3672,7 +1632,7 @@ function fromLibrary(rgb, parsingOptions = {}) {
 const to8bit = (rgbOrString) => {
 	if (typeof rgbOrString === `string`) return fromCss(rgbOrString, { scalar: false });
 	if (isHsl(rgbOrString)) return to8bit(fromLibrary(toLibraryRgb(rgbOrString), { scalar: false }));
-	guard$4(rgbOrString);
+	guard$3(rgbOrString);
 	if (rgbOrString.unit === `8bit`) return rgbOrString;
 	return {
 		r: rgbOrString.r * 255,
@@ -3686,7 +1646,7 @@ const to8bit = (rgbOrString) => {
 const toScalar = (rgbOrString) => {
 	if (typeof rgbOrString === `string`) return fromCss(rgbOrString, { scalar: true });
 	if (isHsl(rgbOrString)) return toScalar(fromLibrary(toLibraryRgb(rgbOrString), { scalar: true }));
-	guard$4(rgbOrString);
+	guard$3(rgbOrString);
 	if (rgbOrString.unit === `scalar`) return rgbOrString;
 	return {
 		r: rgbOrString.r / 255,
@@ -3697,7 +1657,7 @@ const toScalar = (rgbOrString) => {
 		space: `srgb`
 	};
 };
-const guard$4 = (rgb) => {
+const guard$3 = (rgb) => {
 	const { r, g, b, opacity, space, unit } = rgb;
 	if (space !== `srgb`) throw new Error(`Space is expected to be 'srgb'. Got: ${space}`);
 	if (unit === `8bit`) resultThrow(numberInclusiveRangeTest(r, 0, 255, `r`), numberInclusiveRangeTest(g, 0, 255, `g`), numberInclusiveRangeTest(b, 0, 255, `b`), () => {
@@ -3717,8 +1677,8 @@ const guard$4 = (rgb) => {
 * * 'pdelta': proportion of current value to change by ('percentage delta')
 * 
 * Use negative values to decrease
-* @param value 
-* @param amount 
+* @param rgb Colour
+* @param amount Amount to change
 */
 const changeLightness = (rgb, amount) => {
 	let newL = 0;
@@ -3768,7 +1728,7 @@ function eightBit(red = 100, green = 100, blue = 100, opacity = 255) {
 		b: blue,
 		opacity
 	};
-	guard$4(rgb);
+	guard$3(rgb);
 	return rgb;
 }
 /**
@@ -3788,7 +1748,7 @@ function scalar$1(red = .5, green = .5, blue = .5, opacity = 1) {
 		b: blue,
 		opacity
 	};
-	guard$4(rgb);
+	guard$3(rgb);
 	return rgb;
 }
 /**
@@ -3886,7 +1846,7 @@ __export(image_data_grid_exports, {
 	wrap: () => wrap
 });
 /**
-* Returns a {@link @ixfx/geometry/Grids.Grid} based on the provided `image`
+* Returns a {@link https://api.ixfx.fun/_ixfx/geometry/Grids/Grid/} based on the provided `image`
 * @param image ImageData
 * @returns Grid
 */
@@ -4121,7 +2081,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 		});
 	}
 	setLogicalSize(logicalSize) {
-		guard(logicalSize, `logicalSize`);
+		guard$1(logicalSize, `logicalSize`);
 		const logicalSizeInteger = applyFields((v) => Math.floor(v), logicalSize);
 		const ratio = this.opts.pixelZoom;
 		this.#scaler = scaler$1(this.opts.coordinateScale, logicalSize);
@@ -4161,7 +2121,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 		else {
 			const resizerOptions = {
 				onSizeChanging: (size) => {
-					if (isEqual$1(this.#logicalSize, size)) return;
+					if (isEqual(this.#logicalSize, size)) return;
 					this.setLogicalSize(size);
 				},
 				onSizeDone: (size, el) => {
@@ -4416,6 +2376,600 @@ var CanvasHelper = class extends SimpleEventEmitter {
 };
 
 //#endregion
+//#region ../visual/src/pi-pi.ts
+const piPi = Math.PI * 2;
+
+//#endregion
+//#region ../visual/src/canvas-region.ts
+/**
+* Manges the drawing for a region of a canvas
+*/
+var CanvasSource = class {
+	#canvasEl;
+	#ctx;
+	#sizeBasis;
+	#sizeScaler;
+	#logicalSize;
+	#pixelScaling;
+	#regions = [];
+	constructor(canvasElementOrQuery, sizeBasis = `min`) {
+		this.#canvasEl = resolveEl(canvasElementOrQuery);
+		this.#sizeBasis = sizeBasis;
+		this.#pixelScaling = window.devicePixelRatio || 1;
+		this.#sizeScaler = this.#createSizeScaler();
+		this.#logicalSize = this.setLogicalSize({
+			width: this.#canvasEl.width,
+			height: this.#canvasEl.height
+		});
+	}
+	/**
+	* Set logical size for region
+	* @param size
+	* @returns 
+	*/
+	setLogicalSize(size) {
+		this.#logicalSize = size;
+		const el = this.#canvasEl;
+		el.width = size.width * this.#pixelScaling;
+		el.height = size.height * this.#pixelScaling;
+		el.style.width = `${size.width.toString()}px`;
+		el.style.height = `${size.height.toString()}px`;
+		this.#sizeScaler = this.#createSizeScaler();
+		this.invalidateContext();
+		return size;
+	}
+	#createSizeScaler() {
+		let inMax = 1;
+		switch (this.#sizeBasis) {
+			case `min`:
+				inMax = Math.min(this.#canvasEl.width, this.#canvasEl.height);
+				break;
+			case `max`:
+				inMax = Math.max(this.#canvasEl.width, this.#canvasEl.height);
+				break;
+		}
+		const s = scalerTwoWay(0, inMax, 0, 1);
+		return {
+			abs: s.in,
+			rel: s.out
+		};
+	}
+	/**
+	* Causes drawing context to be re-created
+	*/
+	invalidateContext() {
+		this.#ctx = void 0;
+	}
+	#add(region) {
+		if (!region) throw new Error(`Param 'region' is undefined/null`);
+		if (this.#regions.includes(region)) throw new Error(`Region already exists`);
+		this.#regions.push(region);
+		return region;
+	}
+	/**
+	* Convert relative to absolute
+	* @param pt 
+	* @param kind 
+	* @returns 
+	*/
+	toAbsPoint(pt, kind = `independent`) {
+		let { x, y } = pt;
+		switch (kind) {
+			case `independent`:
+				x *= this.width;
+				y *= this.height;
+		}
+		return {
+			x,
+			y
+		};
+	}
+	/**
+	* Gets the offset x,y
+	*/
+	get offset() {
+		const b = this.#canvasEl.getBoundingClientRect();
+		return {
+			x: b.left,
+			y: b.top
+		};
+	}
+	/**
+	* Converts an absolute point to relative
+	* @param pt 
+	* @param source 
+	* @param kind 
+	* @param clamped 
+	* @returns 
+	*/
+	toRelPoint(pt, source, kind = `independent`, clamped = true) {
+		let { x, y } = pt;
+		if (source === `screen`) {
+			const b = this.#canvasEl.getBoundingClientRect();
+			x -= b.x;
+			y -= b.y;
+		}
+		switch (kind) {
+			case `independent`:
+				x /= this.width;
+				y /= this.height;
+				break;
+			case `skip`: break;
+		}
+		if (clamped) {
+			x = clamp(x);
+			y = clamp(y);
+		}
+		return {
+			x,
+			y
+		};
+	}
+	/**
+	* Converts a rectangle to absolute coordinates
+	* @param rect 
+	* @param kind 
+	* @returns 
+	*/
+	toAbsRect(rect$1, kind = `independent`) {
+		let { width, height } = rect$1;
+		switch (kind) {
+			case `independent`:
+				width *= this.width;
+				height *= this.height;
+				if (isRectPositioned(rect$1)) return {
+					...this.toAbsPoint(rect$1),
+					width,
+					height
+				};
+		}
+		return {
+			width,
+			height
+		};
+	}
+	/**
+	* Creates a region
+	* 
+	* Absolute positioned. Uses source coordinates which don't change
+	* ```js
+	* source.createRegion({ 
+	*  absPositioned: { x: 0, y: 0, width: 100, height: 100} 
+	* });
+	* ```
+	* 
+	* Relative positioned. Uses coordiantes relative to source dimensions.
+	* Updated if source changes.
+	* ```js
+	* source.createRegion({
+	*  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
+	*  scale: `independent`
+	* });
+	* ```
+	* 
+	* Relative sized. Uses size relative to source dimension. By default centers.
+	* ```js
+	* source.createRegion({
+	*  relativeSize: { width: 0.5, height: 0.5 }
+	*  position: `center`
+	* })
+	* ```
+	* @param spec 
+	* @returns 
+	*/
+	createRegion(spec) {
+		const marginPx = spec.marginPx ?? 0;
+		const marginPx2 = marginPx * 2;
+		if (`absPositioned` in spec) {
+			const rect$1 = subtractSize(spec.absPositioned, marginPx, marginPx);
+			return this.#add(new CanvasRegion(this, () => rect$1));
+		}
+		if (`relativePositioned` in spec) {
+			let compute;
+			const rect$1 = spec.relativePositioned;
+			switch (spec.scale) {
+				case `independent`:
+					compute = (source) => ({
+						x: rect$1.x * source.width + marginPx,
+						y: rect$1.y * source.height + marginPx,
+						width: rect$1.width * source.width - marginPx2,
+						height: rect$1.height * source.height - marginPx2
+					});
+					break;
+				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
+			}
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		if (`relativeSize` in spec) {
+			let compute;
+			const rect$1 = spec.relativeSize;
+			const position = spec.position;
+			switch (spec.scale) {
+				case `independent`:
+					compute = (source) => {
+						const width = rect$1.width * source.width - marginPx2;
+						const height = rect$1.height * source.height - marginPx2;
+						let x = source.width / 2 - width / 2;
+						let y = source.height / 2 - height / 2;
+						switch (position) {
+							case `n`:
+								y = 0;
+								break;
+							case `s`:
+								y = source.height - height;
+								break;
+							default:
+						}
+						x += marginPx;
+						y += marginPx;
+						return {
+							width,
+							height,
+							x,
+							y
+						};
+					};
+					break;
+				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
+			}
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		if (`match` in spec) {
+			const result = resolveElementTry(spec.match);
+			if (!result.success) throw new Error(`Could not resolve match element. ${resultErrorToString(result)}`);
+			const compute = (_source) => {
+				const bounds = result.value.getBoundingClientRect();
+				return {
+					x: bounds.x + marginPx,
+					y: bounds.y + marginPx,
+					width: bounds.width - marginPx2,
+					height: bounds.height - marginPx2
+				};
+			};
+			return this.#add(new CanvasRegion(this, compute));
+		}
+		throw new Error(`Spec doesn't seem valid`);
+	}
+	/**
+	* Clears the region of the canvas
+	*/
+	clear() {
+		const c = this.context;
+		c.clearRect(0, 0, this.width, this.height);
+	}
+	/**
+	* Gets - or creates - the drawing context
+	*/
+	get context() {
+		if (this.#ctx) return this.#ctx;
+		const c = this.#canvasEl.getContext(`2d`);
+		if (!c) throw new Error(`Could not create 2d context`);
+		c.setTransform(1, 0, 0, 1, 0, 0);
+		c.scale(this.#pixelScaling, this.#pixelScaling);
+		this.#ctx = c;
+		for (const r of this.#regions) r.recomputeRegion();
+		return this.#ctx;
+	}
+	/**
+	* Gets a scaler for size
+	*/
+	get sizeScaler() {
+		return this.#sizeScaler;
+	}
+	/**
+	* Gets the logical width
+	*/
+	get width() {
+		return this.#logicalSize.width;
+	}
+	/**
+	* Gets the logical height
+	*/
+	get height() {
+		return this.#logicalSize.height;
+	}
+};
+/**
+* Draws on a canvas, constrained to a specific region
+*/
+var CanvasRegion = class {
+	source;
+	#regionCompute;
+	#r;
+	/**
+	* Creates, using coordinate in canvas coordinates
+	*/
+	constructor(source, regionCompute) {
+		this.source = source;
+		this.#regionCompute = regionCompute;
+		this.#r = regionCompute(source);
+	}
+	/**
+	* Calls the original `regionCompute` function passed in to the constructor
+	* to recompute the absolute region
+	*/
+	recomputeRegion() {
+		this.#r = this.#regionCompute(this.source);
+	}
+	/**
+	* Converts a region-relative point (0..1) to an absolute
+	* point, which uses region-relative coordinates.
+	* 
+	* Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
+	* will return 0,0.
+	*
+	* @param regionRel 
+	* @param scaleBy 
+	* @returns 
+	*/
+	toAbsRegion(regionRel, scaleBy = `both`) {
+		switch (scaleBy) {
+			case `both`: return {
+				x: regionRel.x * this.#r.width,
+				y: regionRel.y * this.#r.height
+			};
+		}
+	}
+	/**
+	* Returns a copy of `p` offset by the region's x & y
+	* @param p 
+	* @returns 
+	*/
+	applyRegionOffset(p) {
+		return {
+			x: p.x + this.#r.x,
+			y: p.y + this.#r.y
+		};
+	}
+	/**
+	* Draws a line from a series of points.
+	* Assumes region-relative, % coordinates (ie 0..1 scale)
+	* @param relativePoints Points to connect, in region-relative coordinates
+	* @param strokeStyle Stroke style
+	* @param lineWidth Line with
+	*/
+	drawConnectedPointsRelative(relativePoints, strokeStyle, lineWidth = 1) {
+		const points = relativePoints.map((p) => this.toAbsRegion(p));
+		this.drawConnectedPoints(points, strokeStyle, lineWidth);
+	}
+	/**
+	* Draws connected points in absolute coordinates,
+	* however with 0,0 being the top-left of the region.
+	* 
+	* Thus, this will apply the region offset before drawing.
+	* @param points Points to draw
+	* @param strokeStyle Stroke style
+	* @param lineWidth Line width
+	*/
+	drawConnectedPoints(points, strokeStyle, lineWidth = 1) {
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		c.beginPath();
+		c.strokeStyle = strokeStyle;
+		c.lineWidth = lineWidth;
+		for (let index = 0; index < points.length; index++) if (index === 0) c.moveTo(points[index].x, points[index].y);
+		else c.lineTo(points[index].x, points[index].y);
+		c.stroke();
+		c.restore();
+	}
+	/**
+	* Fills text at a relative position
+	* @param text 
+	* @param relPos Relative, meaning 0.5,0.5 is the middle of the region
+	* @param fillStyle 
+	* @param baseline 
+	* @param align 
+	*/
+	fillTextRelative(text$1, relPos, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+		const point = this.toAbsRegion(relPos);
+		this.fillTextRelative(text$1, point, fillStyle, font, baseline, align);
+	}
+	/**
+	* Fills text at a region-relative position
+	* @param text 
+	* @param point Region relative, meaning 0,0 is top-left of region
+	* @param fillStyle 
+	* @param baseline 
+	* @param align 
+	*/
+	fillText(text$1, point, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		if (font.length > 0) c.font = font;
+		c.textBaseline = baseline;
+		c.textAlign = align;
+		c.fillStyle = fillStyle;
+		c.fillText(text$1, point.x, point.y);
+		c.restore();
+	}
+	drawCircles(relativeCircles, fillStyle, strokeStyle = ``, lineWidth = 1) {
+		const circles = relativeCircles.map((c$1) => {
+			return {
+				...this.toAbsRegion(c$1),
+				radius: this.source.sizeScaler.abs(c$1.radius)
+			};
+		});
+		const c = this.context;
+		c.save();
+		c.translate(this.#r.x, this.#r.y);
+		c.fillStyle = fillStyle;
+		c.strokeStyle = strokeStyle;
+		c.lineWidth = lineWidth;
+		for (const circle$2 of circles) {
+			c.beginPath();
+			c.arc(circle$2.x, circle$2.y, circle$2.radius, 0, piPi);
+			c.closePath();
+			if (fillStyle.length > 0) c.fill();
+			if (strokeStyle.length > 0) c.stroke();
+		}
+		c.restore();
+	}
+	/**
+	* Clears the region
+	*/
+	clear() {
+		const c = this.context;
+		c.clearRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
+	}
+	/**
+	* Fills the region
+	* @param fillStyle
+	*/
+	fill(fillStyle = `white`) {
+		const c = this.context;
+		c.fillStyle = fillStyle;
+		c.fillRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
+	}
+	/**
+	* For debugging, draws an outline of the bounds
+	* @param strokeStyle 
+	* @param lineWidth 
+	*/
+	drawBounds(strokeStyle, lineWidth = 1) {
+		this.drawConnectedPointsRelative([
+			{
+				x: 0,
+				y: 0
+			},
+			{
+				x: 1,
+				y: 0
+			},
+			{
+				x: 1,
+				y: 1
+			},
+			{
+				x: 0,
+				y: 1
+			},
+			{
+				x: 0,
+				y: 0
+			}
+		], strokeStyle, lineWidth);
+		this.drawConnectedPointsRelative([{
+			x: 0,
+			y: 1
+		}, {
+			x: 1,
+			y: 0
+		}], strokeStyle, lineWidth);
+		this.drawConnectedPointsRelative([{
+			x: 0,
+			y: 0
+		}, {
+			x: 1,
+			y: 1
+		}], strokeStyle, lineWidth);
+	}
+	/**
+	* Converts a  point to a region-relative one.
+	* @param pt 
+	* @param kind 
+	* @returns 
+	*/
+	toRelPoint(pt, source = `screen`, kind = `independent`, clamped = true) {
+		pt = this.source.toRelPoint(pt, source, `skip`, false);
+		let { x, y } = pt;
+		x -= this.x;
+		y -= this.y;
+		switch (kind) {
+			case `independent`:
+				x /= this.width;
+				y /= this.height;
+		}
+		if (clamped) {
+			x = clamp(x);
+			y = clamp(y);
+		}
+		return {
+			x,
+			y
+		};
+	}
+	/**
+	* Converts absolute to region point
+	* @param pt 
+	* @param source 
+	* @param clamped 
+	* @returns 
+	*/
+	absToRegionPoint(pt, source, clamped) {
+		if (source === `screen`) pt = subtract(pt, this.source.offset);
+		let { x, y } = pt;
+		x -= this.x;
+		y -= this.y;
+		if (clamped) {
+			if (x < 0) x = 0;
+			if (y < 0) y = 0;
+			if (x > this.width + this.x) x = this.x + this.width;
+			if (y > this.height + this.y) y = this.y + this.height;
+		}
+		return {
+			x,
+			y
+		};
+	}
+	/**
+	* Get center of region
+	*/
+	get center() {
+		return center(this.#r);
+	}
+	/**
+	* Gets the drawing context
+	*/
+	get context() {
+		return this.source.context;
+	}
+	/**
+	* SEts the region
+	*/
+	set region(value) {
+		this.#r = value;
+	}
+	/**
+	* Gets the region
+	*/
+	get region() {
+		return this.#r;
+	}
+	/**
+	* Gets the width
+	*/
+	get width() {
+		return this.#r.width;
+	}
+	/**
+	* Gets the height
+	*/
+	get height() {
+		return this.#r.height;
+	}
+	/**
+	* Gets the x offset
+	*/
+	get x() {
+		return this.#r.x;
+	}
+	/**
+	* Gets they y offset
+	*/
+	get y() {
+		return this.#r.y;
+	}
+	/**
+	* Gets the width/height, whichever is smaller
+	*/
+	get dimensionMin() {
+		return Math.min(this.#r.width, this.#r.height);
+	}
+};
+
+//#endregion
 //#region ../visual/src/svg/apply.ts
 /**
 * Applies drawing options to given SVG element.
@@ -4553,8 +3107,8 @@ const randomHue = (rand = Math.random) => rand() * 360;
 * @param amount Amount
 * @returns 
 */
-function multiplyOpacity(colourish, amount) {
-	return withOpacity$3(colourish, (o) => clamp(o * amount));
+function multiplyOpacity$1(colourish, amount) {
+	return withOpacity(colourish, (o) => clamp(o * amount));
 }
 /**
 * Does a computation with the opacity of a colour, returning colour.
@@ -4563,29 +3117,29 @@ function multiplyOpacity(colourish, amount) {
 * @param colourish Colour
 * @param fn Function that takes original opacity as input and returns output opacity
 */
-function withOpacity$3(colourish, fn) {
-	const colour = toColour$1(colourish);
+function withOpacity(colourish, fn) {
+	const colour = toColour(colourish);
 	let result;
 	switch (colour.space) {
 		case `hsl`:
-			result = withOpacity$6(colour, fn);
+			result = withOpacity$3(colour, fn);
 			break;
 		case `srgb`:
-			result = withOpacity$4(colour, fn);
+			result = withOpacity$1(colour, fn);
 			break;
 		case `oklch`:
-			result = withOpacity$5(colour, fn);
+			result = withOpacity$2(colour, fn);
 			break;
 		default: throw new Error(`Unknown space: '${colour.space}'. Expected hsl, srgb, oklch`);
 	}
 	if (!result) throw new Error(`Is colour in correct form?`);
-	if (typeof colourish === `string`) return toCssColour$1(result);
+	if (typeof colourish === `string`) return toCssColour(result);
 	return result;
 }
 function setOpacity(colourish, opacity) {
-	const colour = toColour$1(colourish);
+	const colour = toColour(colourish);
 	colour.opacity = opacity;
-	if (typeof colourish === `string`) return toCssColour$1(colour);
+	if (typeof colourish === `string`) return toCssColour(colour);
 	return colour;
 }
 
@@ -4606,7 +3160,7 @@ function interpolateInit(colours, destination = `hsl`) {
 * @returns 
 */
 const cssLinearGradient = (colours) => {
-	const c = colours.map((c$1) => toCssColour$1(c$1));
+	const c = colours.map((c$1) => toCssColour(c$1));
 	return `linear-gradient(to right, ${c.join(`, `)})`;
 };
 /**
@@ -4635,7 +3189,7 @@ const interpolator = (colourA, colourB, options = {}) => {
 			break;
 		default: inter = interpolator$2(convert$1(colourA, `oklch-scalar`), convert$1(colourB, `oklch-scalar`), direction);
 	}
-	return (amount) => toCssColour$1(inter(amount));
+	return (amount) => toCssColour(inter(amount));
 };
 /**
 * Produces a stepped scale of colours.
@@ -4679,7 +3233,7 @@ const scale = (colours, opts = {}) => {
 	});
 	const firstPiece = pieces[0];
 	steps.unshift([firstPiece[0]]);
-	return steps.flat().map((c) => toCssColour$1(c));
+	return steps.flat().map((c) => toCssColour(c));
 };
 function createSteps(a, b, options = {}) {
 	const exclusive = options.exclusive ?? false;
@@ -4732,25 +3286,25 @@ __export(colour_exports, {
 	cssLinearGradient: () => cssLinearGradient,
 	fromCssColour: () => fromCssColour,
 	goldenAngleColour: () => goldenAngleColour,
-	guard: () => guard$3,
+	guard: () => guard$2,
 	interpolator: () => interpolator,
 	isColourish: () => isColourish,
 	isHsl: () => isHsl,
 	isOkLch: () => isOkLch,
 	isRgb: () => isRgb,
-	multiplyOpacity: () => multiplyOpacity,
+	multiplyOpacity: () => multiplyOpacity$1,
 	randomHue: () => randomHue,
 	resolveCss: () => resolveCss,
 	rgbToHsl: () => rgbToHsl,
 	scale: () => scale,
 	setOpacity: () => setOpacity,
-	toColour: () => toColour$1,
-	toCssColour: () => toCssColour$1,
+	toColour: () => toColour,
+	toCssColour: () => toCssColour,
 	toLibraryColour: () => toLibraryColour,
 	toStringFirst: () => toStringFirst,
 	tryParseObjectToHsl: () => tryParseObjectToHsl,
 	tryParseObjectToRgb: () => tryParseObjectToRgb,
-	withOpacity: () => withOpacity$3
+	withOpacity: () => withOpacity
 });
 
 //#endregion
@@ -4777,7 +3331,7 @@ function convert$1(colour, destination) {
 	} else if (destination === `srgb-scalar`) {
 		if (typeof colour === `string` || isRgb(colour)) return toScalar(colour);
 	} else throw new Error(`Destination '${destination}' not supported for input: ${JSON.stringify(colour)}`);
-	return convert$1(toCssColour$1(colour), destination);
+	return convert$1(toCssColour(colour), destination);
 }
 /**
 * Like {@link convert}, but result is a CSS colour string
@@ -4787,7 +3341,7 @@ function convert$1(colour, destination) {
 */
 function convertToString(colour, destination) {
 	const c = convert$1(colour, destination);
-	return toCssColour$1(c);
+	return toCssColour(c);
 }
 function convertScalar(colour, destination) {
 	if (destination === `oklch`) return convert$1(colour, `oklch-scalar`);
@@ -4795,7 +3349,7 @@ function convertScalar(colour, destination) {
 	if (destination === `hsl`) return convert$1(colour, `hsl-scalar`);
 	throw new Error(`Unknown destination: '${destination}'`);
 }
-const toCssColour$1 = (colour) => {
+const toCssColour = (colour) => {
 	if (typeof colour === `string`) return colour;
 	if (isHsl(colour)) return toCssString(colour);
 	if (isRgb(colour)) return toCssString$1(colour);
@@ -4807,30 +3361,30 @@ const toCssColour$1 = (colour) => {
 	throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 };
 const toLibraryColour = (colour) => {
-	const asCss = toCssColour$1(colour);
+	const asCss = toCssColour(colour);
 	return new index_default(asCss);
 };
-const guard$3 = (colour) => {
+const guard$2 = (colour) => {
 	switch (colour.space) {
 		case `hsl`:
-			guard$6(colour);
+			guard$5(colour);
 			break;
 		case `srgb`:
-			guard$4(colour);
+			guard$3(colour);
 			break;
 		case `oklch`:
-			guard$5(colour);
+			guard$4(colour);
 			break;
 		default: throw new Error(`Unsupported colour space: '${colour.space}'`);
 	}
 };
-const toColour$1 = (colourish) => {
+const toColour = (colourish) => {
 	if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc. Got: ${JSON.stringify(colourish)}`);
 	let c;
 	if (typeof colourish === `string`) c = fromCssColour(colourish);
 	else c = colourish;
 	if (c === void 0) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc.`);
-	guard$3(c);
+	guard$2(c);
 	return c;
 };
 /**
@@ -4856,8 +3410,8 @@ const toStringFirst = (...colours) => {
 		if (colour === void 0) continue;
 		if (colour === null) continue;
 		try {
-			const c = toColour$1(colour);
-			return toCssColour$1(c);
+			const c = toColour(colour);
+			return toCssColour(c);
 		} catch {}
 	}
 	return `rebeccapurple`;
@@ -5115,7 +3669,7 @@ const lineUpdate = (lineEl, line$2, opts) => {
 	return lineEl;
 };
 const polarRayUpdate = (lineEl, ray, opts) => {
-	const l = toCartesian$1(ray);
+	const l = toCartesian(ray);
 	lineEl.setAttributeNS(null, `x1`, l.a.x.toString());
 	lineEl.setAttributeNS(null, `y1`, l.a.y.toString());
 	lineEl.setAttributeNS(null, `x2`, l.b.x.toString());
@@ -5458,6 +4012,298 @@ const pointerVisualise = (elOrQuery, options = {}) => {
 		event.preventDefault();
 	});
 };
+
+//#endregion
+//#region ../visual/src/convolve-2d.ts
+var convolve_2d_exports = {};
+__export(convolve_2d_exports, {
+	boxBlurKernel: () => boxBlurKernel,
+	convolve: () => convolve,
+	convolveCell: () => convolveCell,
+	convolveImage: () => convolveImage,
+	edgeDetectionKernel: () => edgeDetectionKernel,
+	gaussianBlur3Kernel: () => gaussianBlur3Kernel,
+	gaussianBlur5Kernel: () => gaussianBlur5Kernel,
+	identityKernel: () => identityKernel,
+	kernel2dToArray: () => kernel2dToArray,
+	multiply: () => multiply,
+	rgbReducer: () => rgbReducer,
+	sharpenKernel: () => sharpenKernel,
+	unsharpMasking5Kernel: () => unsharpMasking5Kernel
+});
+/**
+* Multiply every element of kernel by the same `scalar` value.
+* Returns new result, input is unmodified
+* @param kernel 
+* @param scalar 
+* @returns 
+*/
+const multiply = (kernel, scalar$3) => {
+	const rows$1 = kernel.length;
+	const cols = kernel[0].length;
+	const copy = [];
+	for (let row = 0; row < rows$1; row++) {
+		copy[row] = [];
+		for (let col = 0; col < cols; col++) copy[row][col] = kernel[row][col] * scalar$3;
+	}
+	return copy;
+};
+function convolveCell(cell, kernel, source, reduce) {
+	const valuesAtKernelPos = kernel.map((o) => {
+		const pos = offset(source, cell, o.cell, `stop`);
+		let kernelValue;
+		let sourceValue;
+		if (pos) {
+			sourceValue = source.get(pos, `undefined`);
+			kernelValue = o.value;
+		}
+		return {
+			cell: o.cell,
+			value: sourceValue,
+			kernel: o.value
+		};
+	});
+	return reduce(valuesAtKernelPos);
+}
+/**
+* Performs kernel-based convolution over `image`.
+* @param kernel 
+* @param image 
+*/
+function* convolveImage(kernel, image) {
+	const imageDataAsGrid = wrap(image);
+	yield* convolve(kernel, imageDataAsGrid, cells(imageDataAsGrid), rgbReducer);
+}
+function* convolve(kernel, source, visitor, reduce, origin) {
+	if (!origin) {
+		const kernelRows = kernel.length;
+		const kernelCols = kernel[0].length;
+		origin = {
+			x: Math.floor(kernelRows / 2),
+			y: Math.floor(kernelCols / 2)
+		};
+	}
+	const asArray = kernel2dToArray(kernel, origin);
+	for (const cell of visitor) {
+		const value = convolveCell(cell, asArray, source, reduce);
+		yield {
+			cell,
+			value
+		};
+	}
+}
+/**
+* For a given kernel, returns an array of offsets. These
+* consist of a cell offset (eg `{x:-1,y:-1}`) and the value at that kernel position.
+* @param kernel 
+* @param origin 
+* @returns 
+*/
+const kernel2dToArray = (kernel, origin) => {
+	const offsets = [];
+	const rows$1 = kernel.length;
+	const cols = kernel[0].length;
+	if (!origin) origin = {
+		x: Math.floor(rows$1 / 2),
+		y: Math.floor(cols / 2)
+	};
+	for (let xx = 0; xx < rows$1; xx++) for (let yy = 0; yy < cols; yy++) {
+		const v = {
+			cell: {
+				x: xx - origin.x,
+				y: yy - origin.y
+			},
+			value: kernel[xx][yy]
+		};
+		offsets.push(v);
+	}
+	return offsets;
+};
+const rgbReducer = (values) => {
+	let r = 0;
+	let g = 0;
+	let b = 0;
+	let opacity = 0;
+	for (const value of values) {
+		const rgb = value.value;
+		const kernelValue = value.kernel;
+		if (!rgb) continue;
+		if (rgb.opacity === 0) continue;
+		if (kernelValue === 0) continue;
+		r += rgb.r * kernelValue;
+		g += rgb.g * kernelValue;
+		b += rgb.b * kernelValue;
+		opacity += (rgb.opacity ?? 1) * kernelValue;
+	}
+	const result = {
+		r,
+		g,
+		b,
+		unit: `8bit`,
+		space: `srgb`,
+		opacity
+	};
+	return result;
+};
+const identityKernel = [
+	[
+		0,
+		0,
+		0
+	],
+	[
+		0,
+		1,
+		0
+	],
+	[
+		0,
+		0,
+		0
+	]
+];
+const edgeDetectionKernel = [
+	[
+		0,
+		-1,
+		0
+	],
+	[
+		-1,
+		4,
+		-1
+	],
+	[
+		0,
+		-1,
+		0
+	]
+];
+const sharpenKernel = [
+	[
+		0,
+		-1,
+		0
+	],
+	[
+		-1,
+		5,
+		-1
+	],
+	[
+		0,
+		-1,
+		0
+	]
+];
+const boxBlurKernel = multiply([
+	[
+		1,
+		1,
+		1
+	],
+	[
+		1,
+		1,
+		1
+	],
+	[
+		1,
+		1,
+		1
+	]
+], 1 / 9);
+const gaussianBlur3Kernel = multiply([
+	[
+		1,
+		2,
+		1
+	],
+	[
+		2,
+		4,
+		2
+	],
+	[
+		1,
+		2,
+		1
+	]
+], 1 / 16);
+const gaussianBlur5Kernel = multiply([
+	[
+		1,
+		4,
+		6,
+		4,
+		1
+	],
+	[
+		4,
+		16,
+		24,
+		16,
+		4
+	],
+	[
+		6,
+		24,
+		36,
+		24,
+		6
+	],
+	[
+		4,
+		16,
+		24,
+		16,
+		4
+	],
+	[
+		1,
+		4,
+		6,
+		4,
+		1
+	]
+], 1 / 256);
+const unsharpMasking5Kernel = multiply([
+	[
+		1,
+		4,
+		6,
+		4,
+		1
+	],
+	[
+		4,
+		16,
+		24,
+		16,
+		4
+	],
+	[
+		6,
+		24,
+		-476,
+		24,
+		6
+	],
+	[
+		4,
+		16,
+		24,
+		16,
+		4
+	],
+	[
+		1,
+		4,
+		6,
+		4,
+		1
+	]
+], -1 / 256);
 
 //#endregion
 //#region ../visual/src/named-colour-palette.ts
@@ -5824,7 +4670,7 @@ const init = (elementQuery, options = {}) => {
 			const opacityStep = 1 / lastValues.length;
 			let opacity = 1;
 			lastValues.forEach((d) => {
-				const colour = multiplyOpacity(dotColour, opacity);
+				const colour = multiplyOpacity$1(dotColour, opacity);
 				circle$1(ctx, d, { fillStyle: colour });
 				opacity -= opacityStep;
 			});
@@ -5962,505 +4808,6 @@ var DataSet = class {
 	add(value, series = `default`) {
 		this.#data.addKeyedValues(series, value);
 		this.lastChange = performance.now();
-	}
-};
-
-//#endregion
-//#region ../visual/src/pi-pi.ts
-const piPi = Math.PI * 2;
-
-//#endregion
-//#region ../visual/src/canvas-region.ts
-var CanvasSource = class {
-	#canvasEl;
-	#ctx;
-	#sizeBasis;
-	#sizeScaler;
-	#logicalSize;
-	#pixelScaling;
-	#regions = [];
-	constructor(canvasElementOrQuery, sizeBasis = `min`) {
-		this.#canvasEl = resolveEl(canvasElementOrQuery);
-		this.#sizeBasis = sizeBasis;
-		this.#pixelScaling = window.devicePixelRatio || 1;
-		this.#sizeScaler = this.#createSizeScaler();
-		this.#logicalSize = this.setLogicalSize({
-			width: this.#canvasEl.width,
-			height: this.#canvasEl.height
-		});
-	}
-	setLogicalSize(size) {
-		this.#logicalSize = size;
-		const el = this.#canvasEl;
-		el.width = size.width * this.#pixelScaling;
-		el.height = size.height * this.#pixelScaling;
-		el.style.width = `${size.width.toString()}px`;
-		el.style.height = `${size.height.toString()}px`;
-		this.#sizeScaler = this.#createSizeScaler();
-		this.invalidateContext();
-		return size;
-	}
-	#createSizeScaler() {
-		let inMax = 1;
-		switch (this.#sizeBasis) {
-			case `min`:
-				inMax = Math.min(this.#canvasEl.width, this.#canvasEl.height);
-				break;
-			case `max`:
-				inMax = Math.max(this.#canvasEl.width, this.#canvasEl.height);
-				break;
-		}
-		const s = scalerTwoWay(0, inMax, 0, 1);
-		return {
-			abs: s.in,
-			rel: s.out
-		};
-	}
-	invalidateContext() {
-		this.#ctx = void 0;
-	}
-	#add(region) {
-		if (!region) throw new Error(`Param 'region' is undefined/null`);
-		if (this.#regions.includes(region)) throw new Error(`Region already exists`);
-		this.#regions.push(region);
-		return region;
-	}
-	toAbsPoint(pt, kind = `independent`) {
-		let { x, y } = pt;
-		switch (kind) {
-			case `independent`:
-				x *= this.width;
-				y *= this.height;
-		}
-		return {
-			x,
-			y
-		};
-	}
-	get offset() {
-		const b = this.#canvasEl.getBoundingClientRect();
-		return {
-			x: b.left,
-			y: b.top
-		};
-	}
-	toRelPoint(pt, source, kind = `independent`, clamped = true) {
-		let { x, y } = pt;
-		if (source === `screen`) {
-			const b = this.#canvasEl.getBoundingClientRect();
-			x -= b.x;
-			y -= b.y;
-		}
-		switch (kind) {
-			case `independent`:
-				x /= this.width;
-				y /= this.height;
-				break;
-			case `skip`: break;
-		}
-		if (clamped) {
-			x = clamp(x);
-			y = clamp(y);
-		}
-		return {
-			x,
-			y
-		};
-	}
-	toAbsRect(rect$1, kind = `independent`) {
-		let { width, height } = rect$1;
-		switch (kind) {
-			case `independent`:
-				width *= this.width;
-				height *= this.height;
-				if (isRectPositioned(rect$1)) return {
-					...this.toAbsPoint(rect$1),
-					width,
-					height
-				};
-		}
-		return {
-			width,
-			height
-		};
-	}
-	/**
-	* Creates a region
-	* 
-	* Absolute positioned. Uses source coordinates which don't change
-	* ```js
-	* source.createRegion({ 
-	*  absPositioned: { x: 0, y: 0, width: 100, height: 100} 
-	* });
-	* ```
-	* 
-	* Relative positioned. Uses coordiantes relative to source dimensions.
-	* Updated if source changes.
-	* ```js
-	* source.createRegion({
-	*  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
-	*  scale: `independent`
-	* });
-	* ```
-	* 
-	* Relative sized. Uses size relative to source dimension. By default centers.
-	* ```js
-	* source.createRegion({
-	*  relativeSize: { width: 0.5, height: 0.5 }
-	*  position: `center`
-	* })
-	* ```
-	* @param spec 
-	* @returns 
-	*/
-	createRegion(spec) {
-		const marginPx = spec.marginPx ?? 0;
-		const marginPx2 = marginPx * 2;
-		if (`absPositioned` in spec) {
-			const rect$1 = subtractSize(spec.absPositioned, marginPx, marginPx);
-			return this.#add(new CanvasRegion(this, () => rect$1));
-		}
-		if (`relativePositioned` in spec) {
-			let compute;
-			const rect$1 = spec.relativePositioned;
-			switch (spec.scale) {
-				case `independent`:
-					compute = (source) => ({
-						x: rect$1.x * source.width + marginPx,
-						y: rect$1.y * source.height + marginPx,
-						width: rect$1.width * source.width - marginPx2,
-						height: rect$1.height * source.height - marginPx2
-					});
-					break;
-				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
-			}
-			return this.#add(new CanvasRegion(this, compute));
-		}
-		if (`relativeSize` in spec) {
-			let compute;
-			const rect$1 = spec.relativeSize;
-			const position = spec.position;
-			switch (spec.scale) {
-				case `independent`:
-					compute = (source) => {
-						const width = rect$1.width * source.width - marginPx2;
-						const height = rect$1.height * source.height - marginPx2;
-						let x = source.width / 2 - width / 2;
-						let y = source.height / 2 - height / 2;
-						switch (position) {
-							case `n`:
-								y = 0;
-								break;
-							case `s`:
-								y = source.height - height;
-								break;
-							default:
-						}
-						x += marginPx;
-						y += marginPx;
-						return {
-							width,
-							height,
-							x,
-							y
-						};
-					};
-					break;
-				default: throw new Error(`Param 'kind' unknown (${spec.scale})`);
-			}
-			return this.#add(new CanvasRegion(this, compute));
-		}
-		if (`match` in spec) {
-			const result = resolveElementTry(spec.match);
-			if (!result.success) throw new Error(`Could not resolve match element. ${resultErrorToString(result)}`);
-			const compute = (_source) => {
-				const bounds = result.value.getBoundingClientRect();
-				return {
-					x: bounds.x + marginPx,
-					y: bounds.y + marginPx,
-					width: bounds.width - marginPx2,
-					height: bounds.height - marginPx2
-				};
-			};
-			return this.#add(new CanvasRegion(this, compute));
-		}
-		throw new Error(`Spec doesn't seem valid`);
-	}
-	clear() {
-		const c = this.context;
-		c.clearRect(0, 0, this.width, this.height);
-	}
-	get context() {
-		if (this.#ctx) return this.#ctx;
-		const c = this.#canvasEl.getContext(`2d`);
-		if (!c) throw new Error(`Could not create 2d context`);
-		c.setTransform(1, 0, 0, 1, 0, 0);
-		c.scale(this.#pixelScaling, this.#pixelScaling);
-		this.#ctx = c;
-		for (const r of this.#regions) r.recomputeRegion();
-		return this.#ctx;
-	}
-	get sizeScaler() {
-		return this.#sizeScaler;
-	}
-	get width() {
-		return this.#logicalSize.width;
-	}
-	get height() {
-		return this.#logicalSize.height;
-	}
-};
-/**
-* Draws on a canvas, constrained to a specific region
-*/
-var CanvasRegion = class {
-	source;
-	#regionCompute;
-	#r;
-	/**
-	* Creates, using coordinate in canvas coordinates
-	*/
-	constructor(source, regionCompute) {
-		this.source = source;
-		this.#regionCompute = regionCompute;
-		this.#r = regionCompute(source);
-	}
-	/**
-	* Calls the original `regionCompute` function passed in to the constructor
-	* to recompute the absolute region
-	*/
-	recomputeRegion() {
-		this.#r = this.#regionCompute(this.source);
-	}
-	/**
-	* Converts a region-relative point (0..1) to an absolute
-	* point, which uses region-relative coordinates.
-	* 
-	* Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
-	* will return 0,0.
-	*
-	* @param regionRel 
-	* @param scaleBy 
-	* @returns 
-	*/
-	toAbsRegion(regionRel, scaleBy = `both`) {
-		switch (scaleBy) {
-			case `both`: return {
-				x: regionRel.x * this.#r.width,
-				y: regionRel.y * this.#r.height
-			};
-		}
-	}
-	/**
-	* Returns a copy of `p` offset by the region's x & y
-	* @param p 
-	* @returns 
-	*/
-	applyRegionOffset(p) {
-		return {
-			x: p.x + this.#r.x,
-			y: p.y + this.#r.y
-		};
-	}
-	/**
-	* Draws a line from a series of points.
-	* Assumes region-relative, % coordinates (ie 0..1 scale)
-	* @param relativePoints Points to connect, in region-relative coordinates
-	* @param strokeStyle Stroke style
-	* @param lineWidth Line with
-	*/
-	drawConnectedPointsRelative(relativePoints, strokeStyle, lineWidth = 1) {
-		const points = relativePoints.map((p) => this.toAbsRegion(p));
-		this.drawConnectedPoints(points, strokeStyle, lineWidth);
-	}
-	/**
-	* Draws connected points in absolute coordinates,
-	* however with 0,0 being the top-left of the region.
-	* 
-	* Thus, this will apply the region offset before drawing.
-	* @param points Points to draw
-	* @param strokeStyle Stroke style
-	* @param lineWidth Line width
-	*/
-	drawConnectedPoints(points, strokeStyle, lineWidth = 1) {
-		const c = this.context;
-		c.save();
-		c.translate(this.#r.x, this.#r.y);
-		c.beginPath();
-		c.strokeStyle = strokeStyle;
-		c.lineWidth = lineWidth;
-		for (let index = 0; index < points.length; index++) if (index === 0) c.moveTo(points[index].x, points[index].y);
-		else c.lineTo(points[index].x, points[index].y);
-		c.stroke();
-		c.restore();
-	}
-	/**
-	* Fills text at a relative position
-	* @param text 
-	* @param relPos Relative, meaning 0.5,0.5 is the middle of the region
-	* @param fillStyle 
-	* @param baseline 
-	* @param align 
-	*/
-	fillTextRelative(text$1, relPos, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
-		const point = this.toAbsRegion(relPos);
-		this.fillTextRelative(text$1, point, fillStyle, font, baseline, align);
-	}
-	/**
-	* Fills text at a region-relative position
-	* @param text 
-	* @param point Region relative, meaning 0,0 is top-left of region
-	* @param fillStyle 
-	* @param baseline 
-	* @param align 
-	*/
-	fillText(text$1, point, fillStyle = `black`, font, baseline = `alphabetic`, align = `start`) {
-		const c = this.context;
-		c.save();
-		c.translate(this.#r.x, this.#r.y);
-		if (font.length > 0) c.font = font;
-		c.textBaseline = baseline;
-		c.textAlign = align;
-		c.fillStyle = fillStyle;
-		c.fillText(text$1, point.x, point.y);
-		c.restore();
-	}
-	drawCircles(relativeCircles, fillStyle, strokeStyle = ``, lineWidth = 1) {
-		const circles = relativeCircles.map((c$1) => {
-			return {
-				...this.toAbsRegion(c$1),
-				radius: this.source.sizeScaler.abs(c$1.radius)
-			};
-		});
-		const c = this.context;
-		c.save();
-		c.translate(this.#r.x, this.#r.y);
-		c.fillStyle = fillStyle;
-		c.strokeStyle = strokeStyle;
-		c.lineWidth = lineWidth;
-		for (const circle$2 of circles) {
-			c.beginPath();
-			c.arc(circle$2.x, circle$2.y, circle$2.radius, 0, piPi);
-			c.closePath();
-			if (fillStyle.length > 0) c.fill();
-			if (strokeStyle.length > 0) c.stroke();
-		}
-		c.restore();
-	}
-	clear() {
-		const c = this.context;
-		c.clearRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
-	}
-	fill(fillStyle = `white`) {
-		const c = this.context;
-		c.fillStyle = fillStyle;
-		c.fillRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
-	}
-	drawBounds(strokeStyle, lineWidth = 1) {
-		this.drawConnectedPointsRelative([
-			{
-				x: 0,
-				y: 0
-			},
-			{
-				x: 1,
-				y: 0
-			},
-			{
-				x: 1,
-				y: 1
-			},
-			{
-				x: 0,
-				y: 1
-			},
-			{
-				x: 0,
-				y: 0
-			}
-		], strokeStyle, lineWidth);
-		this.drawConnectedPointsRelative([{
-			x: 0,
-			y: 1
-		}, {
-			x: 1,
-			y: 0
-		}], strokeStyle, lineWidth);
-		this.drawConnectedPointsRelative([{
-			x: 0,
-			y: 0
-		}, {
-			x: 1,
-			y: 1
-		}], strokeStyle, lineWidth);
-	}
-	/**
-	* Converts a  point to a region-relative one.
-	* @param pt 
-	* @param kind 
-	* @returns 
-	*/
-	toRelPoint(pt, source = `screen`, kind = `independent`, clamped = true) {
-		pt = this.source.toRelPoint(pt, source, `skip`, false);
-		let { x, y } = pt;
-		x -= this.x;
-		y -= this.y;
-		switch (kind) {
-			case `independent`:
-				x /= this.width;
-				y /= this.height;
-		}
-		if (clamped) {
-			x = clamp(x);
-			y = clamp(y);
-		}
-		return {
-			x,
-			y
-		};
-	}
-	absToRegionPoint(pt, source, clamped) {
-		if (source === `screen`) pt = subtract(pt, this.source.offset);
-		let { x, y } = pt;
-		x -= this.x;
-		y -= this.y;
-		if (clamped) {
-			if (x < 0) x = 0;
-			if (y < 0) y = 0;
-			if (x > this.width + this.x) x = this.x + this.width;
-			if (y > this.height + this.y) y = this.y + this.height;
-		}
-		return {
-			x,
-			y
-		};
-	}
-	get center() {
-		return center(this.#r);
-	}
-	get context() {
-		return this.source.context;
-	}
-	set region(value) {
-		this.#r = value;
-	}
-	get region() {
-		return this.#r;
-	}
-	get width() {
-		return this.#r.width;
-	}
-	get height() {
-		return this.#r.height;
-	}
-	get x() {
-		return this.#r.x;
-	}
-	get y() {
-		return this.#r.y;
-	}
-	get dimensionMin() {
-		return Math.min(this.#r.width, this.#r.height);
 	}
 };
 
@@ -6917,13 +5264,13 @@ var CartesianCanvasPlot = class {
 			if (index === 0) ctx.moveTo(dot$1.x, dot$1.y);
 			ctx.lineTo(dot$1.x, dot$1.y);
 		}
-		ctx.strokeStyle = toCssColour$1(colour);
+		ctx.strokeStyle = toCssColour(colour);
 		ctx.lineWidth = width;
 		ctx.stroke();
 		ctx.closePath();
 	}
 	#drawDot(originalDot, fallbackColour, fallbackRadius) {
-		const colour = toCssColour$1(originalDot.fillStyle ?? fallbackColour);
+		const colour = toCssColour(originalDot.fillStyle ?? fallbackColour);
 		const pos = this.valueToRegionSpace(originalDot);
 		const radius = originalDot.radius ?? fallbackRadius;
 		this.#canvasRegion.drawCircles([{
@@ -6934,11 +5281,11 @@ var CartesianCanvasPlot = class {
 	#drawLineCanvasSpace(line$2, colour, width, debug = false) {
 		if (debug) console.log(line$2);
 		const ctx = this.#canvasRegion.context;
-		colour = toCssColour$1(colour);
+		colour = toCssColour(colour);
 		ctx.beginPath();
 		ctx.moveTo(line$2.a.x, line$2.a.y);
 		ctx.lineTo(line$2.b.x, line$2.b.y);
-		ctx.strokeStyle = toCssColour$1(colour);
+		ctx.strokeStyle = toCssColour(colour);
 		ctx.lineWidth = width;
 		ctx.stroke();
 		ctx.closePath();
@@ -6982,5 +5329,5 @@ try {
 } catch {}
 
 //#endregion
-export { CanvasHelper, colour_exports as Colour, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, plot_exports as Plot, svg_exports as Svg, video_exports as Video, pointerVisualise };
+export { CanvasHelper, CanvasRegion, CanvasSource, colour_exports as Colour, convolve_2d_exports as Convolve2d, drawing_exports as Drawing, image_data_grid_exports as ImageDataGrid, plot_exports as Plot, svg_exports as Svg, video_exports as Video, pointerVisualise };
 //# sourceMappingURL=visual.js.map

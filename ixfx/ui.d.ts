@@ -1,189 +1,24 @@
-import { PathDataChange } from "./pathed-DGKJECMt.js";
-import { RecursivePartial } from "./ts-utility-CuIIcLBC.js";
-import "./is-equal-aUE7iVHd.js";
-import { Interval } from "./types-BEAJ_GOH.js";
-import "./types-CePLSdIj.js";
+import { PathDataChange } from "./index-Ci6D7uRH.js";
+import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
+import "./is-equal-BzhoT7pd.js";
+import { Interval } from "./types-CcY4GIC4.js";
+import "./maps-Di0k-jsW.js";
+import "./index-Dg03qze4.js";
+import "./comparers-C6kfLE-t.js";
+import "./index-Bne6KcmH.js";
+import "./key-value-ww1DZidG.js";
+import "./resolve-core-Cji7XRWY.js";
+import "./sleep-DiuAJS4P.js";
+import "./index-BD4Xy9K5.js";
+import "./index-CZIsUroQ.js";
+import "./index-DM6SFyeA.js";
+import "./index-D-YGqcwN.js";
+import "./index-pdF5CCTk.js";
+import "./index-ConXQr7F.js";
+import "./index-1oZyS9hM.js";
+import { HslScalar } from "./index-CvWFW5t5.js";
+import { EventSourceOptions, ObjectFieldHandler, Reactive, ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveWritable } from "./index-B-ucJ3En.js";
 
-//#region ../visual/dist/src/colour/types.d.ts
-type HslBase = {
-  /**
-   * Hue
-   */
-  h: number;
-  /**
-   * Saturation
-   */
-  s: number;
-  /**
-   * Lightness
-   */
-  l: number;
-  /**
-   * Opacity
-   */
-  opacity?: number;
-  space?: `hsl`;
-};
-/**
- * Scalar values use 0..1 for each field
- */
-type HslScalar = HslBase & {
-  unit: `scalar`;
-};
-/**
- * Absolute values use hue:0..360, all other fields 0..100
- */
-
-//#endregion
-//#region ../rx/dist/src/from/types.d.ts
-
-type EventSourceOptions = {
-  /**
-   * If true, behaves like Source.object where event
-   * properties are compared and source only
-   * emits where there is a change.
-   *
-   * Default: _false_
-   */
-  diff?: boolean;
-  lazy?: Lazy;
-  /**
-   * If true, log messages are emitted
-   * when event handlers are added/removed
-   */
-  debugLifecycle?: boolean;
-  /**
-   * If true, log messages are emitted
-   * when the source event fires
-   */
-  debugFiring?: boolean;
-};
-//#endregion
-//#region ../rx/dist/src/types.d.ts
-
-type SignalKinds = `done` | `warn`;
-type Passed<V> = {
-  value: V | undefined;
-  signal?: SignalKinds;
-  context?: string;
-};
-/**
- * Laziness
- * * start: only begins on first subscriber. Keeps running even when there are no subscribers
- * * very: only begins on first subscriber. Stops looping if there are no subscribers
- * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
- */
-type Lazy = `initial` | `never` | `very`;
-/**
- * A Reactive
- */
-type Reactive<V> = {
-  /**
-   * Subscribes to a reactive. Receives
-   * data as well as signals. Use `onValue` if you
-   * just care about values.
-   *
-   * Return result unsubscribes.
-   *
-   * ```js
-   * const unsub = someReactive.on(msg => {
-   *    // Do something with msg.value
-   * });
-   *
-   * unsub(); // Unsubscribe
-   * ```
-   * @param handler
-   */
-  on(handler: (value: Passed<V>) => void): Unsubscriber;
-  /**
-   * Subscribes to a reactive's values.
-   * Returns a function that unsubscribes.
-   * @param handler
-   */
-  onValue(handler: (value: V) => void): Unsubscriber;
-  /**
-   * Disposes the reactive, providing a reason for debug tracing
-   * @param reason
-   */
-  dispose(reason: string): void;
-  /**
-   * Returns _true_ if Reactive is disposed
-   */
-  isDisposed(): boolean;
-  /**
-   * Optional 'set' to write a value. Use {@link ReactiveWritable} if you want this non-optional
-   * @param value
-   */
-  set?(value: V): void;
-};
-/**
- * A reactive that can be 'pinged' to produce a value.
- *
- * Use {@link isPingable} to check if a reactive is pingable.
- *
- * Pingable reactives are returned from
- * * interpolate
- * * computeWithPrevious
- * * valueToPing
- */
-
-type Unsubscriber = () => void;
-type ReactiveNonInitial<V> = Reactive<V> & {
-  last(): V | undefined;
-};
-/**
- * A stream that can be written to
- */
-type ReactiveWritable<TIn, TOut = TIn> = Reactive<TOut> & {
-  /**
-   * Sets a value
-   * @param value Value to write
-   */
-  set(value: TIn): void;
-};
-type ReactiveInitial<V> = Reactive<V> & {
-  last(): V;
-};
-type ObjectFieldHandler = {
-  value: any;
-  fieldName: string;
-  pattern: string;
-};
-type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
-  /**
-   * Notifies when the value of `fieldName` is changed.
-   *
-   * Use the returned function to unsubscribe.
-   * @param fieldName
-   * @param handler
-   */
-  onField(fieldName: string, handler: (result: ObjectFieldHandler) => void): () => void;
-  /**
-   * Notifies of which field(s) were changed.
-   * If you just care about the whole, changed data use the `value` event.
-   *
-   * Use the returned function to unsubscribe.
-   * @param changes
-   */
-  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void;
-  /**
-   * Updates the reactive with some partial key-value pairs.
-   * Keys omitted are left the same as the current value.
-   * @param changedPart
-   * @returns Returns new value
-   */
-  update(changedPart: RecursivePartial<V>): V;
-  /**
-   * Updates a particular field by its path
-   * @param field
-   * @param value
-   */
-  updateField(field: string, value: any): void;
-};
-/**
- * A reactive stream which can be read and written to
- */
-//#endregion
 //#region ../ui/src/rx/browser-resize.d.ts
 /**
  * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.

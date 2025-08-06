@@ -1,10 +1,18 @@
-import { Interval } from "./types-BEAJ_GOH.js";
-import { HasCompletion } from "./continuously-xAy8Jw7t.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
-import { Point, Rect } from "./rect-types-d5I5ouwR.js";
-import { RandomSource } from "./types-DFWrctU4.js";
-import { BasicInterpolateOptions, interpolate } from "./interpolate-DM7lLXIU.js";
-import { Path } from "./path-type-WKYt1VfQ.js";
+import "./is-equal-BzhoT7pd.js";
+import { Interval } from "./types-CcY4GIC4.js";
+import "./maps-Di0k-jsW.js";
+import "./index-Dg03qze4.js";
+import "./comparers-C6kfLE-t.js";
+import { HasCompletion } from "./index-Bne6KcmH.js";
+import "./key-value-ww1DZidG.js";
+import "./resolve-core-Cji7XRWY.js";
+import "./sleep-DiuAJS4P.js";
+import { RandomSource } from "./index-BD4Xy9K5.js";
+import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
+import { Path, Point, Rect } from "./index-D-YGqcwN.js";
+import { BasicInterpolateOptions, interpolate } from "./index-pdF5CCTk.js";
+import { Timer } from "./index-ConXQr7F.js";
+import "./index-1oZyS9hM.js";
 
 //#region ../modulation/src/types.d.ts
 type ModSettableOptions = {
@@ -233,22 +241,6 @@ declare const perMinute: (amount: number, options?: Partial<{
 declare namespace index_d_exports$2 {
   export { TicksModSettableOptions, bpm, elapsed, hertz, perMinute, perSecond, ticks$2 as ticks };
 }
-//#endregion
-//#region ../flow/dist/src/timer.d.ts
-/**
- * A timer instance.
- * {@link CompletionTimer} also contains an 'isDone' field.
- *
- * Implementations: {@link elapsedMillisecondsAbsolute}, {@link elapsedTicksAbsolute}, {@link frequencyTimer}
- */
-type Timer = {
-  reset(): void;
-  get elapsed(): number;
-};
-/**
- * A {@link Timer} that has a sense of completion, when `isDone` returns _true_.
- * See {@link relative}
- */
 declare namespace oscillator_d_exports {
   export { saw, sine, sineBipolar, square, triangle };
 }
@@ -1475,7 +1467,6 @@ declare const interpolatorStepped: (incrementAmount: number, a?: number, b?: num
  * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
  *
  * ```js
- * import { interpolateAngle } from '@ixfx/data.js';
  * interpolateAngle(0.5, Math.PI, Math.PI/2);
  * ```
  * @param amount
@@ -2055,7 +2046,7 @@ declare function sineBipolarShape(period?: number): ModFunction;
  * @example
  * ```js
  * import { wave } from '@ixfx/modulation.js';
- * import { resolveFields } from '@ixfx/data.js';
+ * import { resolveFields } from '@ixfx/bundle.js';
  *
  * const state = {
  *  intensity: wave({secs: 2, shape: `sine` }),

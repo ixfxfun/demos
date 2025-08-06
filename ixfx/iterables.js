@@ -1,20 +1,8 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, resultThrow } from "./numbers-C359_5A6.js";
-import "./arrays-yH_qBmt0.js";
-import { toStringDefault } from "./to-string-Dg1sJUf1.js";
-import "./comparers-BtlnApnB.js";
-import { isEqualValueIgnoreOrder } from "./is-equal-edylSnsn.js";
-import { some } from "./maps-a_ogDHUT.js";
-import { continuously } from "./continuously-CFHq8KyU.js";
-import { elapsedSince } from "./elapsed-DEWYfvwx.js";
-import { compareIterableValuesShallow } from "./iterable-compare-values-shallow-DOeUS4hy.js";
-import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import { promiseFromEvent } from "./promise-from-event--N3r1LR5.js";
-import { sleep } from "./sleep-C2hKDgCi.js";
-import "./is-equal-y9du2FWU.js";
-import { isEqual } from "./equality-Bufi-LTm.js";
-import { average, max, min, rank, sum, tally } from "./basic-Igpk8-Sv.js";
-import { numberArrayCompute } from "./number-array-compute-CL2ixuue.js";
+import { integerTest, resultThrow } from "./src-CadJtgeN.js";
+import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-CYct6719.js";
+import { average, continuously, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-TkGxs8ni.js";
+import { isEqual, numberArrayCompute } from "./src-8IiDfq42.js";
 
 //#region ../iterables/src/guard.ts
 const isAsyncIterable = (v) => {
@@ -133,7 +121,7 @@ const until$2 = async (it, callback) => {
 * This generator will repeat another generator up until some condition. This is the version
 * that can handle async generators.
 * 
-* For example, {@link @ixfx/numbers.count} will count from 0..number and then finish:
+* For example, {@link https://api.ixfx.fun/_ixfx/numbers/count/ @ixfx/numbers.count} will count from 0..number and then finish:
 * ```js
 * import { count } from '@ixfx/numbers'
 * for (const v of count(5)) {
@@ -770,7 +758,7 @@ function* fill$1(it, v) {
 * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
 * 
 * Alternatives:
-* * {@link @ixfx/flow.repeat}/{@link @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
+* * {@link https://api.ixfx.fun/_ixfx/flow/repeat/ @ixfx/flow.repeat}/{@link https://api.ixfx.fun/_ixfx/flow/repeatSync/ @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
 * @param iterator Iterable or array
 * @typeParam T Type of iterable's values
 * @param fn Function to call for each item. If function returns _false_, iteration cancels
@@ -2534,7 +2522,7 @@ const fromEvent = (eventSource, eventType) => {
 * // Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
 * ```
 *
-* Use {@link @ixfx/numbers.average}, {@link @ixfx/numbers.max}, {@link @ixfx/numbers.min} or {@link @ixfx/numers.total} if you only need one of these.
+* Use {@link https://api.ixfx.fun/_ixfx/numbers/average/ @ixfx/numbers.average}, {@link https://api.ixfx.fun/_ixfx/numbers/max/ @ixfx/numbers.max}, {@link https://api.ixfx.fun/_ixfx/numbers/min/ @ixfx/numbers.min} or {@link https://api.ixfx.fun/_ixfx/numbers/total/ @ixfx/numers.total} if you only need one of these.
 *
 * A start and end range can be provided if the calculation should be restricted to a part
 * of the input array. By default the whole array is used.

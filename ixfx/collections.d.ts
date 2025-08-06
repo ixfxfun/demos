@@ -1,7 +1,7 @@
-import { IsEqual } from "./is-equal-aUE7iVHd.js";
-import { IWithEntries, Interval, ToString } from "./types-BEAJ_GOH.js";
-import { GetOrGenerate, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-DpHdi7xH.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { IsEqual } from "./is-equal-BzhoT7pd.js";
+import { IWithEntries, Interval, ToString } from "./types-CcY4GIC4.js";
+import { GetOrGenerate, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-Di0k-jsW.js";
+import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
 
 //#region ../collections/src/circular-array.d.ts
 interface ICircularArray<V> extends Array<V> {
@@ -87,7 +87,7 @@ type LabelledValues<TValue> = {
 /**
  * Array-backed tree node.
  *
- * Create using {@link root}
+ * Create using {@link Trees.Mutable.root}
  */
 type TreeNode<TValue> = {
   /**
@@ -471,7 +471,7 @@ declare const root: <T>(value?: T) => TreeNode<T>;
 declare const fromPlainObject: (value: Record<string, any>, label?: string, parent?: TreeNode<any>, seen?: any[]) => TreeNode<LabelledSingleValue<any>>;
 /**
  * Creates a tree, returning it as a {@link WrappedNode} for object-oriented access.
- * Use {@link root} alternatively.
+ * Use {@link Trees.Mutable.root} alternatively.
  * @param value
  * @returns
  */

@@ -1,95 +1,13 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./numbers-C359_5A6.js";
-import "./arrays-yH_qBmt0.js";
-import "./to-string-Dg1sJUf1.js";
-import { defaultComparer } from "./comparers-BtlnApnB.js";
-import "./is-equal-edylSnsn.js";
-import { continuously } from "./continuously-CFHq8KyU.js";
-import { elapsedInfinity, elapsedSince } from "./elapsed-DEWYfvwx.js";
-import { elapsedToHumanString, intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import { resolve, resolveSync } from "./resolve-core-cAVLLopl.js";
-import { logSet, resolveLogOption } from "./logger-Dv7_G_bd.js";
-import { getErrorMessage } from "./error-message-B6EPesrV.js";
-import { sleep } from "./sleep-C2hKDgCi.js";
-import "./is-equal-y9du2FWU.js";
-import { unique } from "./unique-GmJPtLE_.js";
-import { randomElement, shuffle } from "./random-DXqMnVbO.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
-import "./numeric-arrays-DwffyOZ3.js";
-import { clamp } from "./clamp-BXRKKkSg.js";
-import { movingAverageLight } from "./moving-average-BpnIcIs9.js";
-import { timeout } from "./timeout-CUZsKULj.js";
-import "./queue-fns-C19iGLvT.js";
-import { mutable } from "./queue-mutable-Bcwm-_Hi.js";
+import { integerTest, numberTest, resultIsError, resultThrow, resultToError } from "./src-CadJtgeN.js";
+import "./is-primitive-eBwrK4Yg.js";
+import { elapsedToHumanString, intervalToMs } from "./interval-type-CYct6719.js";
+import { continuously, defaultComparer, elapsedInfinity, elapsedSince, sleep } from "./basic-TkGxs8ni.js";
+import { SimpleEventEmitter } from "./src-CHxoOwyb.js";
+import { getErrorMessage, logSet, resolve, resolveLogOption, resolveSync } from "./resolve-core-BwRmfzav.js";
+import { clamp$1 as clamp, movingAverageLight, randomElement, shuffle, unique } from "./src-8IiDfq42.js";
+import { mutable$1 as mutable, rateMinimum } from "./src-DyRMnxm7.js";
 
-//#region ../flow/dist/src/rate-minimum.js
-/**
-* Ensures that `whatToCall` is executed with a given tempo.
-*
-* ```js
-* const rm = rateMinimum({
-*  fallback: () => {
-*    return Math.random();
-*  },
-*  whatToCall: (value:number) => {
-*    console.log(value);
-*  },
-*  interval: { secs: 10 }
-* });
-*
-* // Invokes `whatToCall`, resetting timeout
-* rm(10);
-*
-* // If we don't call rm() before 'interval' has elapsed,
-* // 'fallback' will be invoked
-* ```
-*
-* A practical use for this is to update calculations based on firing of events
-* as well as when they don't fire. For example user input.
-*
-* ```js
-* // Average distances
-* const average = movingAverageLight();
-* const rm = rateMinimum({
-*  interval: { secs: 1 },
-*  whatToCall: (distance: number) => {
-*    average(distance);
-*  },
-*  // If there are no pointermove events, distance is 0
-*  fallback() {
-*    return 0;
-*  }
-* })
-*
-* // Report total movemeent
-* document.addEventListener(`pointermove`, event => {
-*  rm(event.movementX + event.movementY);
-* });
-* ```
-*
-* @param options
-* @returns
-*/
-const rateMinimum$1 = (options) => {
-	let disposed = false;
-	const t = timeout(() => {
-		if (disposed) return;
-		t.start();
-		options.whatToCall(options.fallback());
-	}, options.interval);
-	if (options.abort) options.abort.addEventListener(`abort`, (_) => {
-		disposed = true;
-		t.cancel();
-	});
-	t.start();
-	return (args) => {
-		if (disposed) throw new Error(`AbortSignal has been fired`);
-		t.start();
-		options.whatToCall(args);
-	};
-};
-
-//#endregion
 //#region ../flow/src/behaviour-tree.ts
 const getName = (t, defaultValue = ``) => {
 	if (typeof t === `object` && `name` in t && t.name !== void 0) return t.name;
@@ -302,8 +220,8 @@ async function* delayAnimationLoop() {
 *
 * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
 */
-async function* delayLoop(timeout$2) {
-	const timeoutMs = intervalToMs(timeout$2);
+async function* delayLoop(timeout$1) {
+	const timeoutMs = intervalToMs(timeout$1);
 	if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
 	if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);
 	if (timeoutMs === 0) return yield* delayAnimationLoop();
@@ -376,7 +294,7 @@ async function* delayLoop(timeout$2) {
 * @param interval
 * @returns {@link Timeout}
 */
-const timeout$1 = (callback, interval) => {
+const timeout = (callback, interval) => {
 	if (callback === void 0) throw new Error(`callback parameter is undefined`);
 	const intervalMs = intervalToMs(interval);
 	resultThrow(integerTest(intervalMs, `aboveZero`, `interval`));
@@ -509,7 +427,7 @@ const timeout$1 = (callback, interval) => {
 * @returns Debounce function
 */
 const debounce = (callback, interval) => {
-	const t = timeout$1(callback, interval);
+	const t = timeout(callback, interval);
 	return (...args) => {
 		t.start(void 0, args);
 	};
@@ -769,7 +687,7 @@ const eventRace = (target, eventNames, options = {}) => {
 	const signal = options.signal;
 	let triggered = false;
 	let disposed = false;
-	let timeout$2;
+	let timeout$1;
 	const promise = new Promise((resolve$1, reject) => {
 		const onEvent = (event) => {
 			if (`type` in event) if (eventNames.includes(event.type)) {
@@ -785,12 +703,12 @@ const eventRace = (target, eventNames, options = {}) => {
 		for (const name of eventNames) target.addEventListener(name, onEvent);
 		const dispose = () => {
 			if (disposed) return;
-			if (timeout$2 !== void 0) clearTimeout(timeout$2);
-			timeout$2 = void 0;
+			if (timeout$1 !== void 0) clearTimeout(timeout$1);
+			timeout$1 = void 0;
 			disposed = true;
 			for (const name of eventNames) target.removeEventListener(name, onEvent);
 		};
-		timeout$2 = setTimeout(() => {
+		timeout$1 = setTimeout(() => {
 			if (triggered || disposed) return;
 			dispose();
 			reject(/* @__PURE__ */ new Error(`eventRace: Events not fired within interval. Events: ${JSON.stringify(eventNames)} Interval: ${intervalMs}`));
@@ -829,7 +747,7 @@ const eventRace = (target, eventNames, options = {}) => {
 */
 const movingAverageTimed = (options) => {
 	const average = movingAverageLight();
-	const rm = rateMinimum$1({
+	const rm = rateMinimum({
 		...options,
 		whatToCall: (distance) => {
 			average(distance);
@@ -1431,9 +1349,9 @@ function promiseWithResolvers() {
 * @param options 
 * @returns 
 */
-const rateMinimum = (options) => {
+const rateMinimum$1 = (options) => {
 	let disposed = false;
-	const t = timeout$1(() => {
+	const t = timeout(() => {
 		if (disposed) return;
 		t.start();
 		options.whatToCall(options.fallback());
@@ -3552,5 +3470,5 @@ __export(state_machine_exports, {
 });
 
 //#endregion
-export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout$1 as timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { DispatchList, Pool, PoolUser, RequestResponseMatch, Resource, state_machine_exports as StateMachine, SyncWait, TaskQueueMutable, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum$1 as rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
 //# sourceMappingURL=flow.js.map

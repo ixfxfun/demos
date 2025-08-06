@@ -1,5 +1,4 @@
-import { integerTest, numberTest, resultThrow, throwIfFailed } from "./numbers-C359_5A6.js";
-import { arrayIndexTest, arrayTest } from "./arrays-yH_qBmt0.js";
+import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow, throwIfFailed } from "./src-CadJtgeN.js";
 
 //#region ../arrays/src/cycle.ts
 /**

@@ -1,10 +1,10 @@
-import { BasicType, Interval } from "./types-BEAJ_GOH.js";
-import { Result } from "./types-CePLSdIj.js";
-import { Comparer } from "./comparers-CnRxdsEs.js";
-import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, OnStartCalled, continuously } from "./continuously-xAy8Jw7t.js";
-import { ResolveToValue, ResolveToValueSync } from "./resolve-core-p1htK_C7.js";
-import { sleep } from "./sleep-h6i9m9g1.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-Dy8H-OK9.js";
+import { BasicType, Interval } from "./types-CcY4GIC4.js";
+import { Result } from "./index-Dg03qze4.js";
+import { Comparer } from "./comparers-C6kfLE-t.js";
+import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, LogOption, LogSet, OnStartCalled, continuously } from "./index-Bne6KcmH.js";
+import { ResolveToValue, ResolveToValueSync } from "./resolve-core-Cji7XRWY.js";
+import { sleep } from "./sleep-DiuAJS4P.js";
+import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
 
 //#region ../flow/src/behaviour-tree.d.ts
 type TaskState = `Failed` | `Running` | `Success`;
@@ -520,33 +520,6 @@ type MovingAverageTimedOptions = Readonly<{
  */
 declare const movingAverageTimed: (options: MovingAverageTimedOptions) => (v: number) => number;
 //# sourceMappingURL=moving-average.d.ts.map
-//#endregion
-//#region ../debug/dist/src/types.d.ts
-type LogSet = {
-  readonly log: MessageLogger;
-  readonly warn: MessageLogger;
-  readonly error: MessageLogger;
-};
-type MessageLogger = (message: LogMessage | string) => void;
-type LogKind = `info` | `debug` | `error` | `warn`;
-type LogMessage = {
-  readonly kind?: LogKind;
-  readonly msg: any;
-  readonly category?: string;
-};
-//# sourceMappingURL=types.d.ts.map
-
-//#endregion
-//#region ../debug/dist/src/logger.d.ts
-/**
- * Either a flag for default console logging, or a simple log function
- */
-type LogOption = boolean | MessageLogger;
-/**
- * Resolve a LogOption to a function
- * @param l
- * @returns
- */
 //#endregion
 //#region ../flow/src/pool.d.ts
 /**

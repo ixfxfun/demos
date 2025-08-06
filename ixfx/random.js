@@ -1,5 +1,4 @@
-import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
-import { arrayTest } from "./arrays-yH_qBmt0.js";
+import { arrayTest, integerTest, numberTest, resultThrow } from "./src-CadJtgeN.js";
 
 //#region ../random/src/weighted-index.ts
 /**
@@ -713,7 +712,6 @@ const minutesMsSource = (maxMinutesOrOptions) => {
 * // Random time between one minute and 5 minutes
 * minuteMs({ max: 5, min: 1 });
 * ```
-* @inheritDoc minutesMsSource
 *
 * @param maxMinutesOrOptions
 * @see {@link minutesMsSource}
@@ -774,7 +772,6 @@ const secondsMsSource = (maxSecondsOrOptions) => {
 * // Random milliseconds between 1000-4999
 * secondsMs({ max:5, min:1 });
 * ```
-* @inheritDoc secondsMsSource
 * @param maxSecondsOrOptions
 * @returns
 */
@@ -847,7 +844,6 @@ const weightedIntegerSource = (options) => {
 * ```js
 * Random.weightedInteger({ max: 100, easing: `quadIn` })
 * ```
-* @inheritDoc {@link weightedIntegerSource}
 * @param options Options. Default: { max: 1, min: 0 }
 * @returns Random weighted integer
 */

@@ -1,14 +1,10 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultThrow } from "./numbers-C359_5A6.js";
-import { isPrimitive, nullUndefTest } from "./is-primitive-BDz6cwtd.js";
-import { recordEntriesDepthFirst, testPlainObjectOrPrimitive } from "./records-XG4QHVXn.js";
-import { toStringDefault } from "./to-string-Dg1sJUf1.js";
-import { isEqualContextString, isEqualDefault } from "./is-equal-edylSnsn.js";
-import { isInteger } from "./is-integer-D1QCbjZ-.js";
-import { compareIterableValuesShallow } from "./iterable-compare-values-shallow-DOeUS4hy.js";
-import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import { resolve, resolveSync } from "./resolve-core-cAVLLopl.js";
-import { getErrorMessage } from "./error-message-B6EPesrV.js";
+import { integerTest, nullUndefTest, numberTest, resultThrow, testPlainObjectOrPrimitive } from "./src-CadJtgeN.js";
+import { recordEntriesDepthFirst } from "./records-Cn6hYPY7.js";
+import { isPrimitive } from "./is-primitive-eBwrK4Yg.js";
+import { compareIterableValuesShallow, intervalToMs, isEqualContextString, isEqualDefault, toStringDefault } from "./interval-type-CYct6719.js";
+import { isInteger } from "./is-integer-BmMnD0ra.js";
+import { getErrorMessage, resolve, resolveSync } from "./resolve-core-BwRmfzav.js";
 
 //#region ../core/src/records/map-object-keys.ts
 /**
@@ -1362,7 +1358,7 @@ const addObjectEntriesMutate = (map, data) => {
 * To get an entry see {@link findEntryByPredicate}
 *
 * Use {@link some} if you don't care about the value, just whether it appears.
-* Use {@link filter} to get all value(s) that match `predicate`.
+* Use {@link filterValue} to get all value(s) that match `predicate`.
 *
 * @example First person over thirty
 * ```js

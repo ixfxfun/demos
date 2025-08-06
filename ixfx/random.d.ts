@@ -507,7 +507,6 @@ declare const minutesMsSource: (maxMinutesOrOptions: number | RandomNumberOption
  * // Random time between one minute and 5 minutes
  * minuteMs({ max: 5, min: 1 });
  * ```
- * @inheritDoc minutesMsSource
  *
  * @param maxMinutesOrOptions
  * @see {@link minutesMsSource}
@@ -559,7 +558,6 @@ declare const secondsMsSource: (maxSecondsOrOptions: number | RandomNumberOption
  * // Random milliseconds between 1000-4999
  * secondsMs({ max:5, min:1 });
  * ```
- * @inheritDoc secondsMsSource
  * @param maxSecondsOrOptions
  * @returns
  */
@@ -628,7 +626,6 @@ declare const weightedIntegerSource: (options: WeightedOptions) => RandomSource;
  * ```js
  * Random.weightedInteger({ max: 100, easing: `quadIn` })
  * ```
- * @inheritDoc {@link weightedIntegerSource}
  * @param options Options. Default: { max: 1, min: 0 }
  * @returns Random weighted integer
  */

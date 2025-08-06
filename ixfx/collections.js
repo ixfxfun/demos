@@ -1,18 +1,10 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, resultIsError, resultThrow } from "./numbers-C359_5A6.js";
-import { isPrimitive, nullUndefTest } from "./is-primitive-BDz6cwtd.js";
-import { stringTest } from "./string-BeUdcb0y.js";
-import { toStringDefault } from "./to-string-Dg1sJUf1.js";
-import "./comparers-BtlnApnB.js";
-import { isEqualDefault, isEqualValueIgnoreOrder } from "./is-equal-edylSnsn.js";
-import { addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-a_ogDHUT.js";
-import { defaultKeyer } from "./default-keyer-CnxB2rd_.js";
-import { toStringAbbreviate } from "./text-UM1t_CE6.js";
-import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import "./sleep-C2hKDgCi.js";
-import { last as last$1, last$1 as last, map, max, min } from "./src-ibi35IYv.js";
-import { isEqualDefault as isEqualDefault$1 } from "./is-equal-y9du2FWU.js";
-import { SimpleEventEmitter } from "./simple-event-emitter-BWzQsKia.js";
+import { integerTest, nullUndefTest, numberTest, resultIsError, resultThrow, stringTest } from "./src-CadJtgeN.js";
+import { isPrimitive } from "./is-primitive-eBwrK4Yg.js";
+import { intervalToMs, isEqualDefault, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-CYct6719.js";
+import { addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./basic-TkGxs8ni.js";
+import { SimpleEventEmitter, defaultKeyer, last as last$1, last$1 as last, map, max, min, toStringAbbreviate } from "./src-CHxoOwyb.js";
+import { containsDuplicateInstances, without } from "./src-8IiDfq42.js";
 
 //#region ../collections/src/circular-array.ts
 /**
@@ -68,74 +60,6 @@ var CircularArray = class CircularArray extends Array {
 		if (this.#capacity === 0) return false;
 		return this.length === this.#capacity;
 	}
-};
-
-//#endregion
-//#region ../arrays/dist/src/contains.js
-/**
-* Returns _true_ if array contains duplicate instances based on `===` equality checking
-* Use {@link containsDuplicateValues} if you'd rather compare by value.
-* @param array
-* @returns
-*/
-const containsDuplicateInstances = (array) => {
-	if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
-	for (let index = 0; index < array.length; index++) for (let x = 0; x < array.length; x++) {
-		if (index === x) continue;
-		if (array[index] === array[x]) return true;
-	}
-	return false;
-};
-
-//#endregion
-//#region ../arrays/dist/src/without.js
-/**
-* Returns an array with value(s) omitted.
-*
-* If value is not found, result will be a copy of input.
-* Value checking is completed via the provided `comparer` function.
-* By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
-*
-* @example
-* ```js
-* const data = [100, 20, 40];
-* const filtered = without(data, 20); // [100, 40]
-* ```
-*
-* @example Using value-based comparison
-* ```js
-* const data = [{ name: `Alice` }, { name:`Sam` }];
-*
-* // This wouldn't work as expected, because the default comparer uses instance,
-* // not value:
-* without(data, { name: `Alice` });
-*
-* // So instead we can use a value comparer:
-* without(data, { name:`Alice` }, isEqualValueDefault);
-* ```
-*
-* @example Use a function
-* ```js
-* const data = [ { name: `Alice` }, { name:`Sam` }];
-* without(data, { name:`ALICE` }, (a, b) => {
-*  return (a.name.toLowerCase() === b.name.toLowerCase());
-* });
-* ```
-*
-* Consider {@link remove} to remove an item by index.
-*
-* @typeParam V - Type of array items
-* @param sourceArray Source array
-* @param toRemove Value(s) to remove
-* @param comparer Comparison function. If not provided `isEqualDefault` is used, which compares using `===`
-* @return Copy of array without value.
-*/
-const without = (sourceArray, toRemove, comparer = isEqualDefault$1) => {
-	if (Array.isArray(toRemove)) {
-		const returnArray = [];
-		for (const source of sourceArray) if (!toRemove.some((v) => comparer(source, v))) returnArray.push(source);
-		return returnArray;
-	} else return sourceArray.filter((v) => !comparer(v, toRemove));
 };
 
 //#endregion
@@ -1001,7 +925,7 @@ const fromPlainObject = (value$1, label = ``, parent, seen = []) => {
 };
 /**
 * Creates a tree, returning it as a {@link WrappedNode} for object-oriented access.
-* Use {@link root} alternatively.
+* Use {@link Trees.Mutable.root} alternatively.
 * @param value 
 * @returns 
 */

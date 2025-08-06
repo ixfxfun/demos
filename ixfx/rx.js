@@ -1,469 +1,21 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { resultIsError, resultThrow, resultToError, throwIfFailed } from "./numbers-C359_5A6.js";
-import { arrayIndexTest, arrayTest } from "./arrays-yH_qBmt0.js";
-import "./is-primitive-BDz6cwtd.js";
-import { compareArrays, mapObjectShallow, testPlainObjectOrPrimitive } from "./records-XG4QHVXn.js";
-import "./to-string-Dg1sJUf1.js";
-import "./comparers-BtlnApnB.js";
-import { isEqualContextString, isEqualValueDefault } from "./is-equal-edylSnsn.js";
-import { some, zipKeyValue } from "./maps-a_ogDHUT.js";
-import { compareData, getField, updateByPath } from "./pathed-4cNmhNti.js";
-import { continuously } from "./continuously-CFHq8KyU.js";
-import { elapsedInterval } from "./elapsed-DEWYfvwx.js";
-import { wildcard } from "./text-UM1t_CE6.js";
-import "./is-integer-D1QCbjZ-.js";
-import "./iterable-compare-values-shallow-DOeUS4hy.js";
-import { intervalToMs } from "./interval-type-Y39UZyyQ.js";
-import { getErrorMessage } from "./error-message-B6EPesrV.js";
-import { sleep } from "./sleep-C2hKDgCi.js";
-import { isAsyncIterable, isIterable, nextWithTimeout } from "./src-ibi35IYv.js";
-import "./is-equal-y9du2FWU.js";
-import "./unique-GmJPtLE_.js";
-import { shuffle } from "./random-DXqMnVbO.js";
-import "./simple-event-emitter-BWzQsKia.js";
-import { average, max, min, rank, sum, tally } from "./basic-Igpk8-Sv.js";
-import "./clamp-BXRKKkSg.js";
-import "./wrap-CbW4pe4i.js";
-import { interpolate } from "./interpolate-BoOK0bgP.js";
-import { timeout } from "./timeout-CUZsKULj.js";
-import { DispatchList } from "./dispatch-list-Bz1mgWI4.js";
-import "./queue-fns-C19iGLvT.js";
-import { QueueMutable } from "./queue-mutable-Bcwm-_Hi.js";
-import { init, to } from "./state-machine-BUeoIwqN.js";
-import { resolveEls } from "./resolve-el-BdUlUJGi.js";
+import { resultIsError, resultToError, testPlainObjectOrPrimitive } from "./src-CadJtgeN.js";
+import { compareArrays, mapObjectShallow } from "./records-Cn6hYPY7.js";
+import "./is-primitive-eBwrK4Yg.js";
+import { intervalToMs, isEqualContextString, isEqualValueDefault } from "./interval-type-CYct6719.js";
+import { average, continuously, elapsedInterval, max, min, rank, sleep, some, sum, tally, zipKeyValue } from "./basic-TkGxs8ni.js";
+import { compareData, getField, updateByPath } from "./src-C0sZg_hT.js";
+import { isAsyncIterable, isIterable, nextWithTimeout, wildcard } from "./src-CHxoOwyb.js";
+import "./is-integer-BmMnD0ra.js";
+import "./key-value-xMXxsVY5.js";
+import "./dist-Xk39SmDr.js";
+import { getErrorMessage } from "./resolve-core-BwRmfzav.js";
+import { insertAt, interpolate, remove, shuffle } from "./src-8IiDfq42.js";
+import { DispatchList, QueueMutable, connect, graph, init, timeout, to } from "./src-DyRMnxm7.js";
+import { setProperty } from "./src-B2kbVsuL.js";
+import "./src-3_bazhBA.js";
+import "./bezier-CZvpytLt.js";
 
-//#region ../arrays/dist/src/insert-at.js
-/**
-* Inserts `values` at position `index`, shuffling remaining
-* items further down and returning changed result.
-*
-* Does not modify the input array.
-*
-* ```js
-* const data = [ 1, 2, 3 ]
-*
-* // Inserts 20,30,40 at index 1
-* Arrays.insertAt(data, 1, 20, 30, 40);
-*
-* // Yields: 1, 20, 30, 40, 2, 3
-* ```
-* @param data
-* @param index
-* @param values
-* @returns
-*/
-const insertAt = (data, index, ...values) => {
-	throwIfFailed(arrayTest(data, `data`), arrayIndexTest(data, index, `index`));
-	if (index === data.length - 1) return [...data, ...values];
-	if (index === 0) return [...values, ...data];
-	return [
-		...data.slice(0, index),
-		...values,
-		...data.slice(index)
-	];
-};
-
-//#endregion
-//#region ../arrays/dist/src/remove.js
-/**
-* Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
-*
-* ```js
-* const v = [ 100, 20, 50 ];
-* const vv = Arrays.remove(2);
-*
-* Yields:
-*  v: [ 100, 20, 50 ]
-* vv: [ 100, 20 ]
-* ```
-*
-* Consider {@link without} if you want to remove an item by value.
-*
-* Throws an exception if `index` is outside the range of `data` array.
-* @param data Input array
-* @param index Index to remove
-* @typeParam V Type of array
-* @returns
-*/
-const remove = (data, index) => {
-	if (!Array.isArray(data)) throw new TypeError(`'data' parameter should be an array`);
-	resultThrow(arrayIndexTest(data, index, `index`));
-	return [...data.slice(0, index), ...data.slice(index + 1)];
-};
-
-//#endregion
-//#region ../collections/dist/src/map/map-immutable-fns.js
-/**
-* Adds an array o [k,v] to the map, returning a new instance
-* @param map Initial data
-* @param data Data to add
-* @returns New map with data added
-*/
-const addArray = (map, data) => {
-	const x = new Map(map.entries());
-	for (const d of data) {
-		if (d[0] === void 0) throw new Error(`key cannot be undefined`);
-		if (d[1] === void 0) throw new Error(`value cannot be undefined`);
-		x.set(d[0], d[1]);
-	}
-	return x;
-};
-/**
-* Adds objects to the map, returning a new instance
-* @param map Initial data
-* @param data Data to add
-* @returns A new map with data added
-*/
-const addObjects = (map, data) => {
-	const x = new Map(map.entries());
-	for (const d of data) {
-		if (d.key === void 0) throw new Error(`key cannot be undefined`);
-		if (d.value === void 0) throw new Error(`value cannot be undefined`);
-		x.set(d.key, d.value);
-	}
-	return x;
-};
-/**
-* Adds data to a map, returning the new map.
-*
-* Can add items in the form of [key,value] or {key, value}.
-* @example These all produce the same result
-* ```js
-* map.set(`hello`, `samantha`);
-* map.add([`hello`, `samantha`]);
-* map.add({key: `hello`, value: `samantha`})
-* ```
-* @param map Initial data
-* @param data One or more data to add in the form of [key,value] or {key, value}
-* @returns New map with data added
-*/
-const add = (map, ...data) => {
-	if (map === void 0) throw new Error(`map parameter is undefined`);
-	if (data === void 0) throw new Error(`data parameter i.s undefined`);
-	if (data.length === 0) return map;
-	const firstRecord = data[0];
-	const isObject = typeof firstRecord.key !== `undefined` && typeof firstRecord.value !== `undefined`;
-	return isObject ? addObjects(map, data) : addArray(map, data);
-};
-/**
-* Sets data in a copy of the initial map
-* @param map Initial map
-* @param key Key
-* @param value Value to  set
-* @returns New map with data set
-*/
-const set = (map, key, value) => {
-	const x = new Map(map.entries());
-	x.set(key, value);
-	return x;
-};
-/**
-* Delete a key from the map, returning a new map
-* @param map Initial data
-* @param key
-* @returns New map with data deleted
-*/
-const del = (map, key) => {
-	const x = new Map(map.entries());
-	x.delete(key);
-	return x;
-};
-
-//#endregion
-//#region ../collections/dist/src/map/map.js
-/**
-* Returns an {@link IMapImmutable}.
-* Use {@link Maps.mutable} as a mutable alternatve.
-*
-* @example Basic usage
-* ```js
-* // Creating
-* let m = map();
-* // Add
-* m = m.set("name", "sally");
-* // Recall
-* m.get("name");
-* ```
-*
-* @example Enumerating
-* ```js
-* for (const [key, value] of map.entries()) {
-*  console.log(`${key} = ${value}`);
-* }
-* ```
-*
-* @example Overview
-* ```js
-* // Create
-* let m = map();
-* // Add as array or key & value pair
-* m = m.add(["name" , "sally"]);
-* m = m.add({ key: "name", value: "sally" });
-* // Add using the more typical set
-* m = m.set("name", "sally");
-* m.get("name");   // "sally";
-* m.has("age");    // false
-* m.has("name");   // true
-* m.isEmpty;       // false
-* m = m.delete("name");
-* m.entries();     // Iterator of key value pairs
-* ```
-*
-* Since it is immutable, `add()`, `delete()` and `clear()` return a new version with change.
-*
-* @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
-*/
-const immutable = (dataOrMap) => {
-	if (dataOrMap === void 0) return immutable([]);
-	if (Array.isArray(dataOrMap)) return immutable(add(/* @__PURE__ */ new Map(), ...dataOrMap));
-	const data = dataOrMap;
-	return {
-		add: (...itemsToAdd) => {
-			const s = add(data, ...itemsToAdd);
-			return immutable(s);
-		},
-		set: (key, value) => {
-			const s = set(data, key, value);
-			return immutable(s);
-		},
-		get: (key) => data.get(key),
-		delete: (key) => immutable(del(data, key)),
-		clear: () => immutable(),
-		has: (key) => data.has(key),
-		entries: () => data.entries(),
-		values: () => data.values(),
-		isEmpty: () => data.size === 0
-	};
-};
-
-//#endregion
-//#region ../collections/dist/src/graph/directed-graph.js
-/**
-* Create a vertex with given id
-* @param id
-* @returns
-*/
-const createVertex = (id) => {
-	return {
-		id,
-		out: []
-	};
-};
-function graphTest(g, parameterName = `graph`) {
-	if (g === void 0) return {
-		success: false,
-		error: `Param '${parameterName}' is undefined. Expected Graph`
-	};
-	if (g === null) return {
-		success: false,
-		error: `Param '${parameterName}' is null. Expected Graph`
-	};
-	if (typeof g === `object`) {
-		if (!(`vertices` in g)) return {
-			success: false,
-			error: `Param '${parameterName}.vertices' does not exist. Is it a Graph type?`
-		};
-	} else return {
-		success: false,
-		error: `Param '${parameterName} is type '${typeof g}'. Expected an object Graph`
-	};
-	return {
-		success: true,
-		value: g
-	};
-}
-/**
-* Returns _true_ if `vertex` has an outgoing connection to the given vertex.
-* @param graph
-* @param vertex
-* @param outIdOrVertex
-* @returns
-*/
-const hasOut = (graph$1, vertex, outIdOrVertex) => {
-	resultThrow(graphTest(graph$1));
-	const context = resolveVertex(graph$1, vertex);
-	const outId = typeof outIdOrVertex === `string` ? outIdOrVertex : outIdOrVertex.id;
-	return context.out.some((edge) => edge.id === outId);
-};
-/**
-* Gets a vertex by id, creating it if it does not exist.
-* @param graph
-* @param id
-* @returns
-*/
-const getOrCreate = (graph$1, id) => {
-	resultThrow(graphTest(graph$1));
-	const v = graph$1.vertices.get(id);
-	if (v !== void 0) return {
-		graph: graph$1,
-		vertex: v
-	};
-	const vv = createVertex(id);
-	const gg = updateGraphVertex(graph$1, vv);
-	return {
-		graph: gg,
-		vertex: vv
-	};
-};
-/**
-* Updates a vertex by returning a mutated graph
-* @param graph Graph
-* @param vertex Newly changed vertex
-* @returns
-*/
-const updateGraphVertex = (graph$1, vertex) => {
-	resultThrow(graphTest(graph$1));
-	const gr = {
-		...graph$1,
-		vertices: graph$1.vertices.set(vertex.id, vertex)
-	};
-	return gr;
-};
-/**
-* Make a connection between two vertices with a given weight.
-* It returns the new graph as wll as the created edge.
-* @param graph
-* @param from
-* @param to
-* @param weight
-* @returns
-*/
-function connectTo(graph$1, from, to$2, weight) {
-	resultThrow(graphTest(graph$1));
-	const fromResult = getOrCreate(graph$1, from);
-	graph$1 = fromResult.graph;
-	const toResult = getOrCreate(graph$1, to$2);
-	graph$1 = toResult.graph;
-	const edge = {
-		id: to$2,
-		weight
-	};
-	if (!hasOut(graph$1, fromResult.vertex, toResult.vertex)) graph$1 = updateGraphVertex(graph$1, {
-		...fromResult.vertex,
-		out: [...fromResult.vertex.out, edge]
-	});
-	return {
-		graph: graph$1,
-		edge
-	};
-}
-/**
-* Connect from -> to. Same as {@link connectWithEdges}, but this version just returns the graph.
-*
-* By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
-*
-* Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
-* is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
-* @param graph
-* @param options
-* @returns
-*/
-function connect(graph$1, options) {
-	if (typeof graph$1 !== `object`) throw new TypeError(`Param 'graph' is expected to be a DirectedGraph object. Got: ${typeof graph$1}`);
-	if (typeof options !== `object`) throw new TypeError(`Param 'options' is expected to be ConnectOptions object. Got: ${typeof options}`);
-	const result = connectWithEdges(graph$1, options);
-	return result.graph;
-}
-/**
-* Connect from -> to. Same as {@link connect} except you get back the edges as well.
-*
-* By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
-*
-* Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
-* is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
-* @param graph
-* @param options
-* @returns
-*/
-function connectWithEdges(graph$1, options) {
-	resultThrow(graphTest(graph$1));
-	const { to: to$2, weight, from } = options;
-	const bidi = options.bidi ?? false;
-	const toList = Array.isArray(to$2) ? to$2 : [to$2];
-	const edges = [];
-	for (const toSingle of toList) {
-		const result = connectTo(graph$1, from, toSingle, weight);
-		graph$1 = result.graph;
-		edges.push(result.edge);
-	}
-	if (!bidi) return {
-		graph: graph$1,
-		edges
-	};
-	for (const toSingle of toList) {
-		const result = connectTo(graph$1, toSingle, from, weight);
-		graph$1 = result.graph;
-		edges.push(result.edge);
-	}
-	return {
-		graph: graph$1,
-		edges
-	};
-}
-/**
-* Resolves the id or vertex into a Vertex.
-* throws an error if vertex is not found
-* @param graph
-* @param idOrVertex
-* @returns
-*/
-function resolveVertex(graph$1, idOrVertex) {
-	resultThrow(graphTest(graph$1));
-	if (idOrVertex === void 0) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
-	const v = typeof idOrVertex === `string` ? graph$1.vertices.get(idOrVertex) : idOrVertex;
-	if (v === void 0) throw new Error(`Id not found ${idOrVertex}`);
-	return v;
-}
-/**
-* Create a graph
-* ```js
-* let g = graph();
-* ```
-*
-* Can optionally provide initial connections:
-* ```js
-* let g = graph(
-*  { from: `a`, to: `b` },
-*  { from: `b`, to: `c` }
-* )
-* ```
-* @param initialConnections
-* @returns
-*/
-const graph = (...initialConnections) => {
-	let g = { vertices: immutable() };
-	for (const ic of initialConnections) g = connect(g, ic);
-	return g;
-};
-
-//#endregion
-//#region ../dom/dist/src/set-property.js
-/**
-* Sets some property on an element
-*
-* ```js
-* setProperty(`width`, `canvas`, 100); // Set the width property to 100
-* ```
-*
-* If `value` is an object, converts to JSON first.
-* @param property
-* @param selectors
-* @param value
-* @returns
-*/
-function setProperty(property, selectors, value) {
-	let elements = [];
-	const set$1 = (v) => {
-		const typ = typeof v;
-		const vv = typ === `string` || typ === `number` || typ === `boolean` ? v : JSON.stringify(v);
-		if (elements.length === 0) elements = resolveEls(selectors);
-		for (const element of elements) element[property] = vv;
-		return vv;
-	};
-	return value === void 0 ? set$1 : set$1(value);
-}
-
-//#endregion
 //#region ../rx/src/util.ts
 function messageIsSignal(message) {
 	if (message.value !== void 0) return false;
@@ -1363,7 +915,7 @@ function object(initialValue, options = {}) {
 	const fieldChangeEvents = [];
 	let value = initialValue;
 	let disposed = false;
-	const set$1 = (v) => {
+	const set = (v) => {
 		const diff = [...compareData(value ?? {}, v, {
 			...options,
 			includeMissingFromA: true
@@ -1455,7 +1007,7 @@ function object(initialValue, options = {}) {
 			const id = listeners.add(handler);
 			return () => listeners.remove(id);
 		},
-		set: set$1,
+		set,
 		update
 	};
 }
@@ -2507,7 +2059,7 @@ function arrayObject(initialValue = [], options = {}) {
 	const arrayEvent = initStream();
 	let value = initialValue;
 	let disposed = false;
-	const set$1 = (replacement) => {
+	const set = (replacement) => {
 		const diff = compareArrays(value, replacement, eq);
 		value = replacement;
 		setEvent.set([...replacement]);
@@ -2569,7 +2121,7 @@ function arrayObject(initialValue = [], options = {}) {
 		deleteAt,
 		deleteWhere,
 		insertAt: insertAt$1,
-		set: set$1
+		set
 	};
 	return r;
 }
@@ -2579,7 +2131,7 @@ function arrayObject(initialValue = [], options = {}) {
 function boolean(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set$1 = (v) => {
+	const set = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -2589,7 +2141,7 @@ function boolean(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set: set$1
+		set
 	};
 }
 
@@ -2768,16 +2320,16 @@ function event(targetOrQuery, name, initialValue, options = {}) {
 		target.removeEventListener(name, callback);
 		if (debugLifecycle) console.log(`Rx.From.event remove '${name}'`);
 	};
-	const add$1 = () => {
+	const add = () => {
 		if (eventAdded) return;
 		eventAdded = true;
 		target.addEventListener(name, callback);
 		if (debugLifecycle) console.log(`Rx.From.event add '${name}'`);
 	};
-	if (!lazy) add$1();
+	if (!lazy) add();
 	return {
 		last: () => {
-			if (lazy) add$1();
+			if (lazy) add();
 			return rxObject.last();
 		},
 		dispose: (reason) => {
@@ -2790,11 +2342,11 @@ function event(targetOrQuery, name, initialValue, options = {}) {
 			return disposed;
 		},
 		on: (handler) => {
-			if (lazy) add$1();
+			if (lazy) add();
 			return rxObject.on(handler);
 		},
 		onValue: (handler) => {
-			if (lazy) add$1();
+			if (lazy) add();
 			return rxObject.onValue(handler);
 		}
 	};
@@ -2886,7 +2438,7 @@ function mergedWithOptions(sources, options = {}) {
 function number(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set$1 = (v) => {
+	const set = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -2896,7 +2448,7 @@ function number(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set: set$1
+		set
 	};
 }
 
@@ -3085,7 +2637,7 @@ function observableWritable(init$1) {
 function string(initialValue) {
 	let value = initialValue;
 	const events = initStream();
-	const set$1 = (v) => {
+	const set = (v) => {
 		value = v;
 		events.set(v);
 	};
@@ -3095,7 +2647,7 @@ function string(initialValue) {
 		last: () => value,
 		on: events.on,
 		onValue: events.onValue,
-		set: set$1
+		set
 	};
 }
 
@@ -3166,12 +2718,12 @@ function asResponsive(queue) {
 	const onEnqueue = (event$1) => {
 		events.set(event$1.finalData);
 	};
-	const set$1 = (data) => {
+	const set = (data) => {
 		queue.enqueue(...data);
 	};
 	return {
 		...events,
-		set: set$1
+		set
 	};
 }
 
