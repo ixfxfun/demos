@@ -4,7 +4,7 @@ import { Dom, Modulation } from '@ixfx';
 
 const settings = Object.freeze({
   // Colour for text
-  textStyle: `#54BAB9`,
+  textStyle: `var(--fg)`,
   // Radius will be 30% of viewport
   radiusProportion: 0.3,
   text: `Hello there text on a path`,
