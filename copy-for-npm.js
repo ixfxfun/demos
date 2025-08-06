@@ -18,6 +18,12 @@ for (const c of categories) {
 }
 
 // Re-write imports
+// replaceInFileSync({
+//   files: `${destination}/**/*.js`,
+//   from: /^(import.*?["'])((?:@ixfx[^"']+))\.js(["'])/gm,
+//   to: `$1$2$3`,
+// });
+
 replaceInFileSync({
   files: `${destination}/**/*.js`,
   from: /^(import.*?["'])((?:@ixfx[^"']+))\.js(["'])/gm,
@@ -28,13 +34,15 @@ replaceInFileSync({
   files: `${destination}/**/*.js`,
   // from: /^import.*['"]@ixfx['"]/,
   from: /from\s+['"]@ixfx['"]/g,
-  to: `from '@ixfx/bundle'`,
+  to: `from 'ixfx'`,
 });
 
 // Copy loose files
-await cpy([ `index.html`, `eslint.config.mjs`, `favicon.ico`, `demos.css` ], `${destination}/`);
-// await cpy([`.eslintrc.json`], `${destinationRoot}/`);
+await cpy([ `index.html`, `favicon.ico`, `demos.css` ], `${destination}/`);
 
+await cpy([ `eslint.config.mjs` ], `${destinationRoot}/`);
+
+// Copy demos/jsconfig.json to demos/src/jsconfig.json
 await cpy([ `${destinationRoot}/jsconfig.json` ], `${destination}/`, { flat: true });
 
 console.log(`copy-for-npm done`);
