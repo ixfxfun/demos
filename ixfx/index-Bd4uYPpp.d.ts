@@ -1,6 +1,6 @@
 import { Interval } from "./types-CcY4GIC4.js";
 import { Result } from "./index-Dg03qze4.js";
-import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-D-YGqcwN.js";
+import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-qbrs0y4v.js";
 
 //#region ../dom/dist/src/data-table.d.ts
 declare namespace data_table_d_exports {
@@ -752,7 +752,7 @@ type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
   /**
    * If not specified, the element's parent is used
    */
-  containerEl?: HTMLElement | string;
+  containerEl?: HTMLElement | string | null;
   onSizeChanging: (size: Rect, el: T) => void;
   onSizeDone?: (size: Rect, el: T) => void;
   debounceTimeout?: Interval;
@@ -1371,4 +1371,4 @@ declare class Colorizr {
 
 //#endregion
 export { Colorizr, ElementResizeLogic, type HSL, type LCH, type RGB, index_d_exports };
-//# sourceMappingURL=index-DM6SFyeA.d.ts.map
+//# sourceMappingURL=index-Bd4uYPpp.d.ts.map

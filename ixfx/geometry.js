@@ -4926,17 +4926,18 @@ function apply$2(pt, fn) {
 
 //#endregion
 //#region ../geometry/src/point/averager.ts
-function averager(kind, opts) {
+function averager(kind, opts = {}) {
 	let x;
 	let y;
 	let z;
 	switch (kind) {
-		case `moving-average-light`:
+		case `moving-average-light`: {
 			const scaling = opts.scaling ?? 3;
 			x = movingAverageLight(scaling);
 			y = movingAverageLight(scaling);
 			z = movingAverageLight(scaling);
 			break;
+		}
 		default: throw new Error(`Unknown averaging kind '${kind}'. Expected: 'moving-average-light'`);
 	}
 	return (point$1) => {
@@ -5058,7 +5059,8 @@ const compareByX = (a, b) => {
 };
 /**
 * Compares points based on Y value. X value is ignored.
-* Returns values:
+* 
+* Return values:
 * * 0: If a.y === b.y
 * * 1: A is below B (ie. a.y > b.y)
 * * -1: A is above B (ie. a.y < b.y)
@@ -5078,7 +5080,8 @@ const compareByY = (a, b) => {
 };
 /**
 * Compares points based on Z value. XY values are ignored.
-* Returns values:
+* 
+* Return values:
 * * 0: If a.z === b.z
 * * 1: A is below B (ie. a.z > b.z)
 * * -1: A is above B (ie. a.z < b.z)
@@ -5569,6 +5572,7 @@ const normalise = (ptOrX, y) => {
 //#region ../geometry/src/point/pipeline.ts
 /**
 * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+* 
 * ```js
 * const p = Points.pipelineApply(somePoint, Points.normalise, Points.invert);
 * ```

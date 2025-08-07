@@ -2046,17 +2046,18 @@ function apply$2(pt, fn) {
 
 //#endregion
 //#region ../geometry/dist/src/point/averager.js
-function averager(kind, opts) {
+function averager(kind, opts = {}) {
 	let x;
 	let y;
 	let z;
 	switch (kind) {
-		case `moving-average-light`:
+		case `moving-average-light`: {
 			const scaling = opts.scaling ?? 3;
 			x = movingAverageLight(scaling);
 			y = movingAverageLight(scaling);
 			z = movingAverageLight(scaling);
 			break;
+		}
 		default: throw new Error(`Unknown averaging kind '${kind}'. Expected: 'moving-average-light'`);
 	}
 	return (point$1) => {
@@ -2260,7 +2261,8 @@ const compareByX = (a, b) => {
 };
 /**
 * Compares points based on Y value. X value is ignored.
-* Returns values:
+*
+* Return values:
 * * 0: If a.y === b.y
 * * 1: A is below B (ie. a.y > b.y)
 * * -1: A is above B (ie. a.y < b.y)
@@ -2280,7 +2282,8 @@ const compareByY = (a, b) => {
 };
 /**
 * Compares points based on Z value. XY values are ignored.
-* Returns values:
+*
+* Return values:
 * * 0: If a.z === b.z
 * * 1: A is below B (ie. a.z > b.z)
 * * -1: A is above B (ie. a.z < b.z)
@@ -2981,6 +2984,7 @@ function normaliseByRect(a, b, c, d) {
 //#region ../geometry/dist/src/point/pipeline.js
 /**
 * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+*
 * ```js
 * const p = Points.pipelineApply(somePoint, Points.normalise, Points.invert);
 * ```
@@ -10475,4 +10479,4 @@ __export(src_exports, {
 
 //#endregion
 export { Empty, Empty$3 as Empty$1, EmptyPositioned, Placeholder$2 as Placeholder, PlaceholderPositioned, PointsTracker, Unit, abs, angleConvert, angleParse, angleRadian, applyFields, cardinal, cells, center$1 as center, clampMagnitude, compare, corners, corners$1, cubic, distance, divide$1 as divide, fromLine, fromNumbers$1 as fromNumbers, getEdgeX, getEdgeY, getPointParameter, guard$6 as guard, guard$1, indexFromCell, interpolate$4 as interpolate, interpolator, invert$1 as invert, isCubicBezier, isEqual$5 as isEqual, isLine, isPlaceholder$3 as isPlaceholder, isPlaceholder as isPlaceholder$1, isQuadraticBezier, isRectPositioned, multiply$1 as multiply, multiplyScalar, multiplyScalar$2 as multiplyScalar$1, normalise, offset, pipeline, pipelineApply, quadraticSimple, rows, scaler, src_exports, subtract, subtractSize, sum, toCartesian$2 as toCartesian, toCartesian as toCartesian$1, toPath$2 as toPath };
-//# sourceMappingURL=src-3_bazhBA.js.map
+//# sourceMappingURL=src-DlaqNVaT.js.map

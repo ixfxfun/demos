@@ -9,7 +9,7 @@ import "./resolve-core-Cji7XRWY.js";
 import "./sleep-DiuAJS4P.js";
 import { RandomSource } from "./index-BD4Xy9K5.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Path, Point, Rect } from "./index-D-YGqcwN.js";
+import { Path, Point, Rect } from "./index-qbrs0y4v.js";
 import { BasicInterpolateOptions, interpolate } from "./index-pdF5CCTk.js";
 import { Timer } from "./index-ConXQr7F.js";
 import "./index-1oZyS9hM.js";
@@ -319,7 +319,7 @@ declare function saw(timerOrFreq: Timer | number): Generator<number, void, unkno
  * osc.next().value;
  * ```
  */
-declare function square(timerOrFreq: Timer | number): Generator<1 | 0, void, unknown>;
+declare function square(timerOrFreq: Timer | number): Generator<0 | 1, void, unknown>;
 //# sourceMappingURL=oscillator.d.ts.map
 declare namespace easings_named_d_exports {
   export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };

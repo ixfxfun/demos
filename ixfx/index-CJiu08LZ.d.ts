@@ -1,8 +1,8 @@
 import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
 import { IStackImmutable, RandomSource } from "./index-BD4Xy9K5.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-DM6SFyeA.js";
-import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-D-YGqcwN.js";
+import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-Bd4uYPpp.js";
+import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-qbrs0y4v.js";
 
 //#region ../visual/dist/src/colour/types.d.ts
 type HslBase = {
@@ -199,6 +199,7 @@ type CanvasEvents = {
  * CanvasHelper options
  */
 type CanvasHelperOptions = Readonly<{
+  containerEl?: HTMLElement;
   /**
    * Automatic canvas resizing logic.
    */
@@ -1496,6 +1497,7 @@ declare function convert<T extends ConvertDestinations>(colour: Colourish, desti
 declare function convertToString(colour: Colourish, destination: ConvertDestinations): string;
 declare function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T): T extends "oklch" ? OkLchScalar : T extends "hsl" ? HslScalar : T extends "srgb" ? RgbScalar : never;
 declare const toCssColour: (colour: Colourish | object) => string;
+declare const toHexColour: (colour: Colourish | object) => string;
 declare const toLibraryColour: (colour: Colourish) => Colorizr;
 declare const guard$3: (colour: Colour) => void;
 declare const toColour: (colourish: any) => Colour;
@@ -1846,7 +1848,7 @@ declare function createSteps<T extends CreateStepsOptions>(a: Colourish | string
 } ? HslScalar[] : OkLchScalar[];
 //# sourceMappingURL=interpolate.d.ts.map
 declare namespace hsl_d_exports {
-  export { absolute$1 as absolute, changeLightness$1 as changeLightness, fromCss$2 as fromCss, fromHexString$2 as fromHexString, generateScalar$1 as generateScalar, guard$2 as guard, interpolator$2 as interpolator, parseCssHslFunction, scalar$2 as scalar, toAbsolute$1 as toAbsolute, toCssString$2 as toCssString, toLibraryRgb, toScalar$2 as toScalar, withOpacity$2 as withOpacity };
+  export { absolute$1 as absolute, changeLightness$1 as changeLightness, fromCss$2 as fromCss, fromHexString$2 as fromHexString, generateScalar$1 as generateScalar, guard$2 as guard, interpolator$2 as interpolator, parseCssHslFunction, scalar$2 as scalar, toAbsolute$1 as toAbsolute, toCssString$2 as toCssString, toHexString$2 as toHexString, toLibraryRgb, toScalar$2 as toScalar, withOpacity$2 as withOpacity };
 }
 /**
  * Scales the opacity value of an input HSL value
@@ -1892,6 +1894,7 @@ declare function fromCss$2<T extends ParsingOptions<Hsl>>(value: string, options
   scalar: true;
 } ? HslScalar : HslAbsolute;
 declare const toCssString$2: (hsl: Hsl) => string;
+declare const toHexString$2: (hsl: Hsl) => string;
 declare const toAbsolute$1: (hslOrString: Hsl | Rgb | string) => HslAbsolute;
 /**
  * Generates a {@link HslScalar} value.
@@ -1948,7 +1951,7 @@ declare function parseCssHslFunction(value: string): Hsl;
 declare function toLibraryRgb(hsl: Hsl | string): RGB;
 //# sourceMappingURL=hsl.d.ts.map
 declare namespace oklch_d_exports {
-  export { OKLCH_CHROMA_MAX, absolute, fromCss$1 as fromCss, fromHexString$1 as fromHexString, fromLibrary, generateScalar, guard$1 as guard, interpolator$1 as interpolator, scalar$1 as scalar, toAbsolute, toCssString$1 as toCssString, toScalar$1 as toScalar, withOpacity$1 as withOpacity };
+  export { OKLCH_CHROMA_MAX, absolute, fromCss$1 as fromCss, fromHexString$1 as fromHexString, fromLibrary, generateScalar, guard$1 as guard, interpolator$1 as interpolator, scalar$1 as scalar, toAbsolute, toCssString$1 as toCssString, toHexString$1 as toHexString, toScalar$1 as toScalar, withOpacity$1 as withOpacity };
 }
 declare const OKLCH_CHROMA_MAX = 0.4;
 declare const guard$1: (lch: OkLch) => void;
@@ -2012,6 +2015,7 @@ declare const toScalar$1: (lchOrString: OkLch | string) => OkLchScalar;
  * @returns CSS colour string
  */
 declare const toCssString$1: (lch: OkLch, precision?: number) => string;
+declare const toHexString$1: (lch: OkLch) => string;
 declare const generateScalar: (absoluteHslOrVariable: string | number | Angle, chroma?: number, lightness?: number, opacity?: number) => OkLchScalar;
 /**
  * Scales the opacity value of an input Oklch value
@@ -2036,13 +2040,14 @@ declare function scalar$1(lightness?: number, chroma?: number, hue?: number, opa
 declare const absolute: (l: number, c: number, h: number, opacity?: number) => OkLchAbsolute;
 //# sourceMappingURL=oklch.d.ts.map
 declare namespace srgb_d_exports {
-  export { changeLightness, eightBit, fromCss, fromHexString, guard, interpolator, lightness, parseCssRgbFunction, scalar, to8bit, toCssString, toLibraryHsl, toScalar, withOpacity };
+  export { changeLightness, eightBit, fromCss, fromHexString, guard, interpolator, lightness, parseCssRgbFunction, scalar, to8bit, toCssString, toHexString, toLibraryHsl, toScalar, withOpacity };
 }
 declare const withOpacity: <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number) => T;
 declare function fromHexString<T extends boolean>(hexString: string, scalar: T): T extends true ? RgbScalar : Rgb8Bit;
 declare function fromCss<T extends ParsingOptions<Rgb>>(value: string, options: T): T extends {
   scalar: true;
 } ? RgbScalar : Rgb8Bit;
+declare const toHexString: (rgb: Rgb) => string;
 declare const toCssString: (rgb: Rgb) => string;
 declare const to8bit: (rgbOrString: Rgb | string) => Rgb8Bit;
 declare const toScalar: (rgbOrString: Rgb | Hsl | string) => RgbScalar;
@@ -2116,7 +2121,7 @@ declare const interpolator: (colourA: Rgb | string, colourB: Rgb | string) => (a
 declare function toLibraryHsl(rgb: Rgb | string): HSL;
 //# sourceMappingURL=srgb.d.ts.map
 declare namespace index_d_exports$2 {
-  export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, isColourish, isHsl, isOkLch, isRgb, multiplyOpacity, randomHue, resolveCss, rgbToHsl, scale, setOpacity, toColour, toCssColour, toLibraryColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$3 as withOpacity };
+  export { Colour, ColourInterpolationOpts, ColourInterpolator, ColourSpaces, ColourStepOpts, Colourish, ConvertDestinations, CreateStepsOptions, Hsl, HslAbsolute, HslBase, HslScalar, hsl_d_exports as HslSpace, LchBase, OkLch, OkLchAbsolute, OkLchBase, OkLchScalar, oklch_d_exports as OklchSpace, ParsingOptions, Rgb, Rgb8Bit, RgbBase, RgbScalar, srgb_d_exports as SrgbSpace, convert, convertScalar, convertToString, createSteps, cssDefinedHexColours, cssLinearGradient, fromCssColour, goldenAngleColour, guard$3 as guard, interpolator$3 as interpolator, isColourish, isHsl, isOkLch, isRgb, multiplyOpacity, randomHue, resolveCss, rgbToHsl, scale, setOpacity, toColour, toCssColour, toHexColour, toLibraryColour, toStringFirst, tryParseObjectToHsl, tryParseObjectToRgb, withOpacity$3 as withOpacity };
 }
 declare namespace image_data_grid_d_exports {
   export { accessor, byColumn, byRow, grid, setter, wrap };
@@ -2638,4 +2643,4 @@ declare namespace index_d_exports {
 }
 //#endregion
 export { HslScalar, ManualCapturer, index_d_exports };
-//# sourceMappingURL=index-CvWFW5t5.d.ts.map
+//# sourceMappingURL=index-CJiu08LZ.d.ts.map

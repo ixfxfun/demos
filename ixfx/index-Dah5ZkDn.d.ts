@@ -5,7 +5,7 @@ import { Result } from "./index-Dg03qze4.js";
 import { HasCompletion } from "./index-Bne6KcmH.js";
 import { RandomSource } from "./index-BD4Xy9K5.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Path, Point, Rect } from "./index-D-YGqcwN.js";
+import { Path, Point, Rect } from "./index-qbrs0y4v.js";
 import { BasicInterpolateOptions, interpolate } from "./index-pdF5CCTk.js";
 import { Timer } from "./index-ConXQr7F.js";
 
@@ -2942,4 +2942,4 @@ declare namespace index_d_exports {
 }
 //#endregion
 export { ChangeKind, ChangeRecord, CompareChangeSet, InterpolateOptions, PathDataChange, Processors, index_d_exports, index_d_exports$1, index_d_exports$9 as index_d_exports$2, pathed_d_exports };
-//# sourceMappingURL=index-Ci6D7uRH.d.ts.map
+//# sourceMappingURL=index-Dah5ZkDn.d.ts.map

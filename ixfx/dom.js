@@ -9,7 +9,7 @@ import { require_dist, uniqueInstances } from "./dist-Xk39SmDr.js";
 import { getErrorMessage } from "./resolve-core-BwRmfzav.js";
 import { clamp$1 as clamp, round } from "./src-8IiDfq42.js";
 import "./src-DyRMnxm7.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-3_bazhBA.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-DlaqNVaT.js";
 import { shortGuid } from "./bezier-CZvpytLt.js";
 
 //#region ../dom/src/resolve-el.ts
@@ -56,7 +56,7 @@ const resolveElementTry = (domQueryOrEl) => {
 		domQueryOrEl = d;
 	} else if (domQueryOrEl === null) return {
 		success: false,
-		error: `Param 'domQueryOrEl' is null`
+		error: `Param 'domQueryOrEl' is null, cannot resolve.`
 	};
 	else if (domQueryOrEl === void 0) return {
 		success: false,
@@ -1215,7 +1215,7 @@ var ElementSizer = class ElementSizer {
 	#naturalSize;
 	#naturalRatio;
 	#viewport;
-	#onSizeChanging;
+	#onSizeChanging = (size, el$1) => {	/** no-op */};
 	#el;
 	#containerEl;
 	#disposed = false;
@@ -1223,7 +1223,15 @@ var ElementSizer = class ElementSizer {
 	#sizeDebounce = () => ({});
 	constructor(elOrQuery, options) {
 		this.#el = resolveEl(elOrQuery);
-		this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement;
+		const container = options.containerEl;
+		if (container === null || typeof container === `undefined`) {
+			const pe = this.#el.parentElement;
+			if (pe !== null) this.#containerEl = pe;
+			else {
+				const pn = this.#el.parentNode;
+				if (pn !== null) this.#containerEl = pn;
+			}
+		} else if (typeof container === `string` || typeof container === `object`) this.#containerEl = resolveEl(container);
 		this.#stretch = options.stretch ?? `none`;
 		this.#onSizeChanging = options.onSizeChanging;
 		this.#size = Empty$1;

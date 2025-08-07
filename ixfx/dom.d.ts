@@ -5,7 +5,7 @@ import { Result } from "./index-Dg03qze4.js";
 import "./key-value-ww1DZidG.js";
 import "./index-BD4Xy9K5.js";
 import "./index-CZIsUroQ.js";
-import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-D-YGqcwN.js";
+import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-qbrs0y4v.js";
 import "./index-pdF5CCTk.js";
 
 //#region ../dom/src/data-table.d.ts
@@ -758,7 +758,7 @@ type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
   /**
    * If not specified, the element's parent is used
    */
-  containerEl?: HTMLElement | string;
+  containerEl?: HTMLElement | string | null;
   onSizeChanging: (size: Rect, el: T) => void;
   onSizeDone?: (size: Rect, el: T) => void;
   debounceTimeout?: Interval;

@@ -1,4 +1,4 @@
-import { ChangeRecord, InterpolateOptions, PathDataChange, Processors } from "./index-Ci6D7uRH.js";
+import { ChangeRecord, InterpolateOptions, PathDataChange, Processors } from "./index-Dah5ZkDn.js";
 import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
 import { IsEqual, IsEqualContext } from "./is-equal-BzhoT7pd.js";
 import { Interval, Primitive, RankFunction, RankOptions } from "./types-CcY4GIC4.js";
@@ -2379,4 +2379,4 @@ declare const to: <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform?:
 
 //#endregion
 export { EventSourceOptions, ObjectFieldHandler, Reactive, ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveWritable, index_d_exports };
-//# sourceMappingURL=index-B-ucJ3En.d.ts.map
+//# sourceMappingURL=index-Br1u4-CP.d.ts.map

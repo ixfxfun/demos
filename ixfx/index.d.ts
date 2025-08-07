@@ -1,4 +1,4 @@
-import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-Ci6D7uRH.js";
+import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-Dah5ZkDn.js";
 import { ReadonlyRemapObjectPropertyType, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, Rest, Writeable } from "./ts-utility-DZKsU5oa.js";
 import { IsEqual, IsEqualContext, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, toStringOrdered } from "./is-equal-BzhoT7pd.js";
 import { BasicType, IDictionary, IWithEntries, Interval, KeyValue, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, StringOrNumber, ToString } from "./types-CcY4GIC4.js";
@@ -11,13 +11,13 @@ import { Passed, Reactive, ReactiveInitial, ReactiveNonInitial, ResolveFallbackO
 import { SleepOpts, sleep, sleepWhile } from "./sleep-DiuAJS4P.js";
 import { QueueMutable, index_d_exports as index_d_exports$6, index_d_exports$1 as index_d_exports$5, index_d_exports$2 as index_d_exports$7 } from "./index-BD4Xy9K5.js";
 import { ISimpleEventEmitter, SimpleEventEmitter, index_d_exports as index_d_exports$8 } from "./index-CZIsUroQ.js";
-import { index_d_exports as index_d_exports$9 } from "./index-DM6SFyeA.js";
-import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-D-YGqcwN.js";
+import { index_d_exports as index_d_exports$9 } from "./index-Bd4uYPpp.js";
+import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-qbrs0y4v.js";
 import { NumbersComputeOptions, NumbersComputeResult, index_d_exports as index_d_exports$11 } from "./index-pdF5CCTk.js";
 import { index_d_exports as index_d_exports$12 } from "./index-ConXQr7F.js";
 import { StateChangeEvent, StateMachineWithEvents, Transitions } from "./index-1oZyS9hM.js";
-import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-CvWFW5t5.js";
-import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-B-ucJ3En.js";
+import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-CJiu08LZ.js";
+import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-Br1u4-CP.js";
 
 //#region ../core/dist/src/correlate.d.ts
 /**

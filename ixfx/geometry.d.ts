@@ -3137,8 +3137,12 @@ declare function apply$2(pt: Point, fn: PointApplyFn): Point;
 type PointAverager = (point: Point) => Point;
 type PointAverageKinds = `moving-average-light`;
 /**
- * Uses =@ixfx/numbers#movingAverageLight to keep track of
- * average x, y and z values.
+ * Keeps track of average x, y and z values.
+ *
+ * When calling, you have to specify the averaging technique. At the moment
+ * only 'moving-average-light' is supported. This uses @ixfx/numbers.movingAverageLight
+ * under-the-hood.
+ *
  * ```js
  * // Create averager
  * const averager = Points.averager(`moving-average-light`);
@@ -3147,6 +3151,8 @@ type PointAverageKinds = `moving-average-light`;
  * // and return the current average.
  * averager(somePoint); // Yields current average {x,y,z?}
  * ```
+ *
+ * @param kind Averaging strategy
  * @param opts Scaling parameter. Higher means more smoothing, lower means less (minimum: 1). Default: 3
  * @returns
  */
@@ -3224,7 +3230,8 @@ declare const compare: (a: Point, b: Point) => number;
 declare const compareByX: (a: Point, b: Point) => number;
 /**
  * Compares points based on Y value. X value is ignored.
- * Returns values:
+ *
+ * Return values:
  * * 0: If a.y === b.y
  * * 1: A is below B (ie. a.y > b.y)
  * * -1: A is above B (ie. a.y < b.y)
@@ -3240,7 +3247,8 @@ declare const compareByX: (a: Point, b: Point) => number;
 declare const compareByY: (a: Point, b: Point) => number;
 /**
  * Compares points based on Z value. XY values are ignored.
- * Returns values:
+ *
+ * Return values:
  * * 0: If a.z === b.z
  * * 1: A is below B (ie. a.z > b.z)
  * * -1: A is above B (ie. a.z < b.z)
@@ -3804,6 +3812,7 @@ declare function normaliseByRect$1(x: number, y: number, width: number, height: 
 //#region ../geometry/src/point/pipeline.d.ts
 /**
  * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+ *
  * ```js
  * const p = Points.pipelineApply(somePoint, Points.normalise, Points.invert);
  * ```
@@ -3813,7 +3822,7 @@ declare function normaliseByRect$1(x: number, y: number, width: number, height: 
  * @param pipelineFns
  * @returns
  */
-declare const pipelineApply: (point: Point, ...pipelineFns: ReadonlyArray<(pt: Point) => Point>) => Point;
+declare const pipelineApply: (point: Point, ...pipelineFns: readonly ((pt: Point) => Point)[]) => Point;
 /**
  * Returns a pipeline function that takes a point to be transformed through a series of functions
  * ```js
@@ -3829,7 +3838,7 @@ declare const pipelineApply: (point: Point, ...pipelineFns: ReadonlyArray<(pt: P
  * @param pipeline Pipeline of functions
  * @returns
  */
-declare const pipeline: (...pipeline: ReadonlyArray<(pt: Point) => Point>) => (pt: Point) => Point;
+declare const pipeline: (...pipeline: readonly ((pt: Point) => Point)[]) => (pt: Point) => Point;
 //# sourceMappingURL=pipeline.d.ts.map
 //#endregion
 //#region ../geometry/src/point/point-relation-types.d.ts

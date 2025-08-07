@@ -5,8 +5,8 @@ import { continuously } from "./basic-TkGxs8ni.js";
 import { SimpleEventEmitter } from "./src-CHxoOwyb.js";
 import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-8IiDfq42.js";
 import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-DyRMnxm7.js";
-import { ElementSizer, resolveEl, resolveElementTry } from "./src-B2kbVsuL.js";
-import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-3_bazhBA.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-Ccqm6HvP.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-DlaqNVaT.js";
 
 //#region ../visual/dist/src/drawing.js
 var drawing_exports = {};
@@ -1952,6 +1952,15 @@ function calculateHueDistance(a, b, limit$1 = 1) {
 		backward
 	};
 }
+const libraryRgbToHexString = (rgb) => {
+	const componentToHex = (c) => {
+		const hex = Math.floor(c).toString(16);
+		return hex.length == 1 ? "0" + hex : hex;
+	};
+	let part = `#${componentToHex(rgb.r)}${componentToHex(rgb.g)}${componentToHex(rgb.b)}`;
+	if (typeof rgb.alpha !== `undefined` && rgb.alpha !== 255) part += componentToHex(rgb.alpha);
+	return part;
+};
 function wrapScalarHue(value) {
 	value = value % 1;
 	if (value < 0) return (1 - Math.abs(value)) % 1;
@@ -1973,6 +1982,7 @@ __export(hsl_exports, {
 	scalar: () => scalar,
 	toAbsolute: () => toAbsolute$1,
 	toCssString: () => toCssString,
+	toHexString: () => toHexString$2,
 	toLibraryRgb: () => toLibraryRgb,
 	toScalar: () => toScalar$2,
 	withOpacity: () => withOpacity$3
@@ -2091,6 +2101,10 @@ const toCssString = (hsl) => {
 	if (`opacity` in abs$1 && abs$1.opacity !== void 0 && abs$1.opacity < 100) css += ` / ${abs$1.opacity}%`;
 	css += ")";
 	return css;
+};
+const toHexString$2 = (hsl) => {
+	const rgb = toLibraryRgb(hsl);
+	return libraryRgbToHexString(rgb);
 };
 function fromLibrary$2(hsl, parsingOptions = {}) {
 	if (typeof hsl === `undefined` || hsl === null) {
@@ -2324,6 +2338,7 @@ __export(oklch_exports, {
 	scalar: () => scalar$2,
 	toAbsolute: () => toAbsolute,
 	toCssString: () => toCssString$2,
+	toHexString: () => toHexString$1,
 	toScalar: () => toScalar$1,
 	withOpacity: () => withOpacity$2
 });
@@ -2427,6 +2442,15 @@ const toScalar$1 = (lchOrString) => {
 		space: `oklch`
 	};
 };
+const toLibrary$1 = (lch) => {
+	const abs$1 = toAbsolute(lch);
+	return {
+		l: abs$1.l,
+		c: abs$1.c,
+		h: abs$1.h,
+		alpha: abs$1.opacity
+	};
+};
 /**
 * Returns the colour as a CSS colour string: `oklch(l c h / opacity)`.
 *
@@ -2449,6 +2473,11 @@ const toCssString$2 = (lch, precision = 3) => {
 	if (typeof opacity$1 !== `undefined` && opacity$1 !== 1) css += ` / ${opacity$1.toFixed(precision)}`;
 	css += `)`;
 	return css;
+};
+const toHexString$1 = (lch) => {
+	const lch1 = toLibrary$1(lch);
+	const rgb = oklch2rgb(lch1);
+	return libraryRgbToHexString(rgb);
 };
 const generateScalar = (absoluteHslOrVariable, chroma$1 = 1, lightness$1 = .5, opacity$1 = 1) => {
 	if (typeof absoluteHslOrVariable === `string`) {
@@ -2757,6 +2786,7 @@ __export(srgb_exports, {
 	scalar: () => scalar$1,
 	to8bit: () => to8bit,
 	toCssString: () => toCssString$1,
+	toHexString: () => toHexString,
 	toLibraryHsl: () => toLibraryHsl,
 	toScalar: () => toScalar,
 	withOpacity: () => withOpacity$1
@@ -2825,6 +2855,10 @@ function fromCss(value, options = {}) {
 		throw error;
 	}
 }
+const toHexString = (rgb) => {
+	const rgb1 = toLibrary(rgb);
+	return libraryRgbToHexString(rgb1);
+};
 const toCssString$1 = (rgb) => {
 	guard$3(rgb);
 	switch (rgb.unit) {
@@ -2836,6 +2870,15 @@ const toCssString$1 = (rgb) => {
 			return `rgb(${rgb.r * 100}% ${rgb.g * 100}% ${rgb.b * 100}% / ${(rgb.opacity ?? 1) * 100}%)`;
 		default: throw new Error(`Unknown unit: ${rgb.unit}`);
 	}
+};
+const toLibrary = (rgb) => {
+	const abs$1 = to8bit(rgb);
+	return {
+		r: abs$1.r,
+		g: abs$1.g,
+		b: abs$1.b,
+		alpha: abs$1.opacity
+	};
 };
 function fromLibrary(rgb, parsingOptions = {}) {
 	if (parsingOptions.scalar) return {
@@ -3236,7 +3279,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 	#disposed = false;
 	constructor(domQueryOrEl, opts = {}) {
 		super();
-		if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined`);
+		if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined. Expected canvas element.`);
 		this.el = resolveEl(domQueryOrEl);
 		if (this.el.nodeName !== `CANVAS`) throw new Error(`Expected CANVAS HTML element. Got: ${this.el.nodeName}`);
 		const size = this.el.getBoundingClientRect();
@@ -3353,6 +3396,7 @@ var CanvasHelper = class extends SimpleEventEmitter {
 				onSizeDone: (size, el) => {
 					this.#onResizeDone(size);
 				},
+				containerEl: this.opts.containerEl,
 				naturalSize: {
 					width: this.opts.width,
 					height: this.opts.height
@@ -4526,6 +4570,7 @@ __export(colour_exports, {
 	setOpacity: () => setOpacity,
 	toColour: () => toColour,
 	toCssColour: () => toCssColour,
+	toHexColour: () => toHexColour,
 	toLibraryColour: () => toLibraryColour,
 	toStringFirst: () => toStringFirst,
 	tryParseObjectToHsl: () => tryParseObjectToHsl,
@@ -4584,6 +4629,17 @@ const toCssColour = (colour) => {
 	if (asRgb) return toCssString$1(asRgb);
 	const asHsl = tryParseObjectToHsl(colour);
 	if (asHsl) return toCssString(asHsl);
+	throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
+};
+const toHexColour = (colour) => {
+	if (isHsl(colour)) return toHexString$2(colour);
+	if (isRgb(colour)) return toHexString(colour);
+	if (isOkLch(colour)) return toHexString$1(colour);
+	if (typeof colour === `string` && colour.startsWith(`#`)) return colour;
+	const asRgb = tryParseObjectToRgb(colour);
+	if (asRgb) return toHexString(asRgb);
+	const asHsl = tryParseObjectToHsl(colour);
+	if (asHsl) return toHexString$2(asHsl);
 	throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 };
 const toLibraryColour = (colour) => {
@@ -6569,5 +6625,5 @@ try {
 } catch {}
 
 //#endregion
-export { convert$1 as convert, fromCss, fromCss$2 as fromCss$1, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, manualCapture, multiplyOpacity, oklab2rgb, rgb2hsl, rgb2oklch, src_exports, toColour, toCssColour, toCssString };
-//# sourceMappingURL=src-55FnN2we.js.map
+export { convert$1 as convert, fromCss, fromCss$2 as fromCss$1, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, manualCapture, multiplyOpacity, oklab2rgb, oklch2rgb, rgb2hsl, rgb2oklch, src_exports, toColour, toCssColour, toCssString };
+//# sourceMappingURL=src-rxiODRnd.js.map
