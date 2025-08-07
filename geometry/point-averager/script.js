@@ -1,9 +1,5 @@
 import { CanvasHelper } from '@ixfx/visual.js';
-import { repeatSync } from '@ixfx/flow.js';
-import { getCssVariable } from '@ixfx/dom.js';
 import { Points } from '@ixfx/geometry.js';
-import * as Arrays from '@ixfx/arrays.js';
-
 
 const settings = Object.freeze({
   canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both` }),
@@ -29,8 +25,11 @@ function use() {
   const { average, raw } = state;
   const { ctx, width, height } = canvas;
 
-  // Make background transparent
-  ctx.clearRect(0, 0, width, height);
+  //ctx.clearRect(0, 0, width, height); // Completely clear
+
+  // Fade out canvas
+  ctx.fillStyle = `hsl(0 0% 100% / 20%)`;
+  ctx.fillRect(0, 0, width, height);
 
   // Draw each point
   drawPoint(raw, 30, `silver`);
