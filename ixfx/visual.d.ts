@@ -2,12 +2,12 @@ import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
 import "./is-equal-BzhoT7pd.js";
 import "./types-CcY4GIC4.js";
 import "./maps-Di0k-jsW.js";
-import "./index-Dg03qze4.js";
+import "./index-DTe1EM0y.js";
 import "./key-value-ww1DZidG.js";
 import { IStackImmutable, RandomSource } from "./index-BD4Xy9K5.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-Bd4uYPpp.js";
-import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-qbrs0y4v.js";
+import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-OoTuEEFP.js";
+import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-D8PtH9JS.js";
 import "./index-pdF5CCTk.js";
 
 //#region ../visual/src/colour/types.d.ts
@@ -1793,12 +1793,17 @@ declare function setOpacity<T extends Colourish>(colourish: T, amount: number): 
 declare const cssLinearGradient: (colours: Colourish[]) => string;
 /**
  * Returns a function that interpolates between two colours. Returns string colour values.
+ *
+ * By default takes a shorter direction and uses the OkLCH colourspace.
  * ```js
  * const i = interpolator(`blue`, `red`);
  * i(0.5); // Get the colour at 50%, as a string.
  * ```
  *
  * To work with structured colour values, use one of the space's `interpolate` functions.
+ *
+ * If you want to create discrete steps, consider {@link createSteps} or {@link scale}.
+ *
  * @param colourA
  * @param colourB
  * @param options
@@ -1807,6 +1812,8 @@ declare const cssLinearGradient: (colours: Colourish[]) => string;
 declare const interpolator$3: (colourA: Colourish, colourB: Colourish, options?: Partial<ColourInterpolationOpts>) => (amount: number) => string;
 /**
  * Produces a stepped scale of colours.
+ *
+ * Builds off {@link createSteps} which can only step between two colours.
  *
  * ```js
  * // A scale of from red to green, with three colours in-between
@@ -1831,6 +1838,8 @@ type CreateStepsOptions = Partial<{
 }>;
 /**
  * Creates discrete colour steps between two colours.
+ *
+ * Use {@link scale} to create steps between any number of colours.
  *
  * Start and end colours are included (and counted as a step) unless `exclusive` is set to _true_
  *

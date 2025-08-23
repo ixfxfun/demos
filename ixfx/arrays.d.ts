@@ -260,6 +260,27 @@ declare const flatten: (array: ReadonlyArray<any> | Array<any>) => Array<any>;
 //# sourceMappingURL=flatten.d.ts.map
 
 //#endregion
+//#region ../arrays/src/for-each.d.ts
+/**
+ * Returns the array.map() output, or a value if `array`
+ * is not an array or empty.
+ *
+ * ```js
+ * mapWithEmptyFallback([1,2,3], v => v+2, 100); // Yields: [3,4,5]
+ * mapWithEmptyFallback([], v=>v+2, 100); // Yields: [100]
+ * mapWithEmptyFallback({}, v=>v+2, [100]); // Yields: [100]
+ * ```
+ *
+ * If the fallback value is an array, it is returned as an
+ * array if needed. If it's a single value, it is wrapped as an array.
+ * @param array Array of values
+ * @param fn Function to use for mapping values
+ * @param fallback Fallback single value or array of values
+ * @returns
+ */
+declare const mapWithEmptyFallback: <TValue, TReturn>(array: TValue[], fn: (value: TValue) => TReturn, fallback: TReturn | TReturn[]) => TReturn[];
+//# sourceMappingURL=for-each.d.ts.map
+//#endregion
 //#region ../arrays/src/frequency.d.ts
 /**
  * Computes the frequency of values by a grouping function.
@@ -789,5 +810,5 @@ declare const zip: (...arrays: any[][] | readonly any[][] | readonly (readonly a
 //# sourceMappingURL=zip.d.ts.map
 
 //#endregion
-export { type IsEqual, MergeReconcile, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, mergeByKey, pairwise, pairwiseReduce, randomElement, randomIndex, remove, sample, shuffle, sortByNumericProperty, sortByProperty, unique, uniqueDeep, until, without, withoutUndefined, zip };
+export { type IsEqual, MergeReconcile, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, mapWithEmptyFallback, mergeByKey, pairwise, pairwiseReduce, randomElement, randomIndex, remove, sample, shuffle, sortByNumericProperty, sortByProperty, unique, uniqueDeep, until, without, withoutUndefined, zip };
 //# sourceMappingURL=arrays.d.ts.map

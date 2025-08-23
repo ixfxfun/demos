@@ -1,11 +1,11 @@
 import "./is-equal-BzhoT7pd.js";
 import { Interval } from "./types-CcY4GIC4.js";
 import "./maps-Di0k-jsW.js";
-import { Result } from "./index-Dg03qze4.js";
+import { Result } from "./index-DTe1EM0y.js";
 import "./key-value-ww1DZidG.js";
 import "./index-BD4Xy9K5.js";
 import "./index-CZIsUroQ.js";
-import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-qbrs0y4v.js";
+import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-D8PtH9JS.js";
 import "./index-pdF5CCTk.js";
 
 //#region ../dom/src/data-table.d.ts
@@ -759,7 +759,7 @@ type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
    * If not specified, the element's parent is used
    */
   containerEl?: HTMLElement | string | null;
-  onSizeChanging: (size: Rect, el: T) => void;
+  onSizeChanging?: (size: Rect, el: T) => void;
   onSizeDone?: (size: Rect, el: T) => void;
   debounceTimeout?: Interval;
 };

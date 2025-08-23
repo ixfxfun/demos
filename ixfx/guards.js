@@ -95,6 +95,19 @@ function resultErrorToString(result) {
 	return JSON.stringify(result.error);
 }
 /**
+* Returns a {@link ResultError} using 'error' as the message.
+* @param error 
+* @param info 
+* @returns 
+*/
+function errorResult(error, info) {
+	return {
+		success: false,
+		error,
+		info
+	};
+}
+/**
 * Returns first failed result or final value.
 * @param results 
 * @returns 
@@ -648,5 +661,5 @@ const stringTest = (value, range = ``, parameterName = `?`) => {
 };
 
 //#endregion
-export { arrayIndexTest, arrayStringsTest, arrayTest, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };
+export { arrayIndexTest, arrayStringsTest, arrayTest, errorResult, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };
 //# sourceMappingURL=guards.js.map

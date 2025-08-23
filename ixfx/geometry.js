@@ -1,14 +1,14 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, numberTest, percentTest, resultThrow } from "./src-CadJtgeN.js";
+import { errorResult, integerTest, numberTest, percentTest, resultThrow } from "./src-BBD50Kth.js";
 import "./is-primitive-eBwrK4Yg.js";
-import "./interval-type-CYct6719.js";
-import { zipKeyValue } from "./basic-TkGxs8ni.js";
-import "./src-CHxoOwyb.js";
-import "./key-value-xMXxsVY5.js";
+import "./interval-type-DajslxUJ.js";
+import { zipKeyValue } from "./basic-D0XoOdBJ.js";
+import "./src-TlKlGoex.js";
+import "./key-value-JSby0EXT.js";
 import "./resolve-core-BwRmfzav.js";
-import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-8IiDfq42.js";
-import { mutable } from "./src-DyRMnxm7.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-CZvpytLt.js";
+import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-BeVDUOoq.js";
+import { mutable } from "./src-BIfshA2g.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-CITq2XUb.js";
 
 //#region ../geometry/src/pi.ts
 const piPi = Math.PI * 2;
@@ -370,26 +370,34 @@ const isNaN$1 = (p) => {
 	}
 	return Number.isNaN(p.x) || Number.isNaN(p.y);
 };
+function test(p, name = `Point`, extraInfo = ``) {
+	if (p === void 0) return errorResult(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`, extraInfo);
+	if (p === null) return errorResult(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`, extraInfo);
+	if (typeof p !== `object`) return errorResult(`'${name}' is type '${typeof p}'. Expected object.`, extraInfo);
+	if (p.x === void 0) return errorResult(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`, extraInfo);
+	if (p.y === void 0) return errorResult(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`, extraInfo);
+	if (typeof p.x !== `number`) return errorResult(`'${name}.x' must be a number. Got ${typeof p.x}`, extraInfo);
+	if (typeof p.y !== `number`) return errorResult(`'${name}.y' must be a number. Got ${typeof p.y}`, extraInfo);
+	if (p.z !== void 0) {
+		if (typeof p.z !== `number`) return errorResult(`${name}.z must be a number. Got: ${typeof p.z}`, extraInfo);
+		if (Number.isNaN(p.z)) return errorResult(`'${name}.z' is NaN. Got: ${JSON.stringify(p)}`, extraInfo);
+	}
+	if (p.x === null) return errorResult(`'${name}.x' is null`, extraInfo);
+	if (p.y === null) return errorResult(`'${name}.y' is null`, extraInfo);
+	if (Number.isNaN(p.x)) return errorResult(`'${name}.x' is NaN`, extraInfo);
+	if (Number.isNaN(p.y)) return errorResult(`'${name}.y' is NaN`, extraInfo);
+	return {
+		success: true,
+		value: p
+	};
+}
 /**
 * Throws an error if point is invalid
 * @param p
 * @param name
 */
-function guard$1(p, name = `Point`) {
-	if (p === void 0) throw new Error(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p === null) throw new Error(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p.x === void 0) throw new Error(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (p.y === void 0) throw new Error(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-	if (typeof p.x !== `number`) throw new TypeError(`'${name}.x' must be a number. Got ${typeof p.x}`);
-	if (typeof p.y !== `number`) throw new TypeError(`'${name}.y' must be a number. Got ${typeof p.y}`);
-	if (p.z !== void 0) {
-		if (typeof p.z !== `number`) throw new TypeError(`${name}.z must be a number. Got: ${typeof p.z}`);
-		if (Number.isNaN(p.z)) throw new Error(`'${name}.z' is NaN. Got: ${JSON.stringify(p)}`);
-	}
-	if (p.x === null) throw new Error(`'${name}.x' is null`);
-	if (p.y === null) throw new Error(`'${name}.y' is null`);
-	if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
-	if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
+function guard$1(p, name = `Point`, info) {
+	resultThrow(test(p, name, info));
 }
 /**
 * Throws if parameter is not a valid point, or either x or y is 0
@@ -6520,6 +6528,7 @@ __export(point_exports, {
 	round: () => round$1,
 	subtract: () => subtract$2,
 	sum: () => sum$1,
+	test: () => test,
 	to2d: () => to2d,
 	to3d: () => to3d,
 	toArray: () => toArray$1,

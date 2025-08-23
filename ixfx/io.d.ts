@@ -2,16 +2,16 @@ import "./ts-utility-DZKsU5oa.js";
 import "./is-equal-BzhoT7pd.js";
 import { Interval } from "./types-CcY4GIC4.js";
 import "./maps-Di0k-jsW.js";
-import "./index-Dg03qze4.js";
+import "./index-DTe1EM0y.js";
 import { Continuously } from "./index-Bne6KcmH.js";
 import "./key-value-ww1DZidG.js";
 import { QueueMutable } from "./index-BD4Xy9K5.js";
 import { ISimpleEventEmitter, SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import "./index-Bd4uYPpp.js";
-import { Point, Rect } from "./index-qbrs0y4v.js";
+import "./index-OoTuEEFP.js";
+import { Point, Rect } from "./index-D8PtH9JS.js";
 import "./index-pdF5CCTk.js";
 import { StateChangeEvent, StateMachineWithEvents, Transitions } from "./index-1oZyS9hM.js";
-import { ManualCapturer } from "./index-CJiu08LZ.js";
+import { ManualCapturer } from "./index-CUAMztEi.js";
 
 //#region ../io/src/codec.d.ts
 /**
@@ -475,6 +475,447 @@ declare function createOscillator(oscillatorOptions?: Partial<AudioOscillatorOpt
 //# sourceMappingURL=from-oscillator.d.ts.map
 declare namespace index_d_exports {
   export { AudioAnalyser, AudioElements, AudioOscillatorOptions, AudioVisualiser, BasicAudio, BasicAudioElement, BasicAudioOscillator, DataAnalyser, Opts$1 as Opts, analyserBasic, analyserFrequency, analyserPeakLevel, createFromAudioElement, createOscillator };
+}
+//#endregion
+//#region ../io/src/midi/types.d.ts
+type MidiCommands = 'noteon' | 'noteoff' | 'pitchbend' | 'cc' | 'poly-at' | 'progchange' | 'at';
+type MidiMessage = {
+  command: MidiCommands;
+  channel: number;
+  note: number;
+  velocity: number;
+};
+//# sourceMappingURL=types.d.ts.map
+
+//#endregion
+//#region ../io/src/midi/midi-fns.d.ts
+/**
+ * Sends a note on and note off
+ * @param port
+ * @param channel
+ * @param note
+ * @param velocity
+ * @param duration
+ * @param delay
+ */
+declare const sendNote: (port: MIDIOutput, channel: number, note: number, velocity: number, duration?: number, delay?: DOMHighResTimeStamp) => void;
+/**
+ * Parses MIDI data from an array into a MidiMessage
+ *
+ * ```js
+ * function onMidiMessage(event: MIDIMessageEvent) {
+ *  const msg = unpack(event.data);
+ *  // { command, channel, note, velocity }
+ * }
+ *
+ * // Where 'input' is a MIDIInput
+ * input.addEventListener(`midimessage`, onMidiMessage);
+ * ```
+ * @param data
+ * @returns
+ */
+declare const unpack: (data: Uint8Array) => MidiMessage;
+/**
+ * Packs a MidiMessage into an array for sending to a MIDIOutput.
+ *
+ * ```js
+ * const msg: Midi.MidiMessage = {
+ *  command: `cc`,
+ *  channel: 1,
+ *  velocity: 50,
+ *  note: 40
+ * }
+ *
+ * // Where 'output' is a MIDIOutput
+ * output.send(pack(msg));
+ * ```
+ * @param message
+ * @returns
+ */
+declare const pack: (message: MidiMessage) => Uint8Array;
+//# sourceMappingURL=midi-fns.d.ts.map
+//#endregion
+//#region ../io/src/midi/manager.d.ts
+type MidiManagerState = {
+  initialised: boolean;
+  errorReason: string;
+};
+type MidiManagerEvents = {
+  open: {
+    port: MIDIPort;
+  };
+  close: {
+    port: MIDIPort;
+  };
+  deviceConnected: {
+    port: MIDIPort;
+  };
+  deviceDisconnected: {
+    port: MIDIPort;
+  };
+  message: MidiMessage & {
+    port: MIDIInput;
+    raw: Uint8Array;
+  };
+};
+declare class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
+  #private;
+  verbose: boolean;
+  constructor();
+  scan(): Promise<void>;
+  /**
+   * Sends a message to a port.
+   *
+   * If port is omitted, all open output ports are used.
+   * @param message
+   * @param port
+   * @param timestamp
+   */
+  send(message: MidiMessage, port?: MIDIOutput, timestamp?: DOMHighResTimeStamp): void;
+  dumpToStringLines(): string[];
+}
+//# sourceMappingURL=manager.d.ts.map
+//#endregion
+//#region ../io/src/midi/control.d.ts
+type ControlEvents = {
+  change: {
+    velocity: number;
+    velocityScaled: number;
+    control: Control;
+  };
+};
+declare class Feedback {
+  channel: number;
+  cc: number;
+  note: number;
+  output?: MIDIOutput;
+  portName?: string;
+  constructor(options?: Partial<{
+    channel: number;
+    cc: number;
+    note: number;
+    output: MIDIOutput;
+    portName: string;
+  }>);
+  setOutputPort(port: MIDIPort): boolean;
+  sendRaw(value: number): boolean;
+}
+declare class Control extends SimpleEventEmitter<ControlEvents> {
+  #private;
+  static controlCount: number;
+  inputChannel: number;
+  inputCommand?: MidiCommands;
+  inputNote: number;
+  inputVelocityScale: number[];
+  feedbackChannel: number;
+  feedbackCommand?: MidiCommands;
+  feedbackNote: number;
+  feedbackVelocity: number;
+  name: string;
+  lastMessage?: MidiMessage;
+  onInputMessage(message: MidiMessage): boolean;
+  get scaledVelocity(): number;
+}
+//# sourceMappingURL=control.d.ts.map
+//#endregion
+//#region ../io/src/midi/midi-fighter.d.ts
+/**
+ * Events fired by a {@link MidiFighter}} instance
+ */
+type MidiFighterEvents = {
+  /**
+   * Virtual bank has changed
+   */
+  bankChange: {
+    prev: number;
+    current: number;
+    mf: MidiFighter;
+    implicit: boolean;
+  };
+  /**
+   * A side button has been pressed
+   */
+  sideButton: {
+    position: `top` | `bottom`;
+    side: `left` | `right`;
+    bank: number;
+    mf: MidiFighter;
+  };
+  /**
+   * An encoder has been pressed
+   */
+  switch: {
+    previous: number;
+    encoder: MidiFighterEncoder;
+    value: number;
+  };
+  /**
+   * An encoder has been changed
+   */
+  encoder: {
+    previous: number;
+    encoder: MidiFighterEncoder;
+    value: number;
+  };
+  /**
+   * Connection state changed
+   */
+  state: {
+    previous: MidiFighterState;
+    state: MidiFighterState;
+    mf: MidiFighter;
+  };
+};
+/**
+ * Events of a {@link MidiFighterEncoder}
+ */
+type MidiFighterEncoderEvents = {
+  switch: {
+    previous: number;
+    encoder: MidiFighterEncoder;
+    value: number;
+  };
+  encoder: {
+    previous: number;
+    encoder: MidiFighterEncoder;
+    value: number;
+  };
+};
+/**
+ * States for a {@link MidiFighter} instance
+ */
+type MidiFighterState = `ready` | `disconnected`;
+/**
+ * Connects to a DJ Tech Tools Midi Fighter controller.
+ *
+ * Use the 'state' event and wait for state to be 'ready'.
+ *
+ * ```js
+ * const mf = new MidiFighter();
+ * mf.addEventListener(`state`, event => {
+ *  if (event.state === `ready`) {
+ *    // Can work with device now
+ *    mf.bank = 1;
+ *  }
+ * });
+ * mf.addEventListener(`encoder`, event => {
+ *  // Do something with encoder value
+ * });
+ * mf.setPort(someMidiInputPort);
+ * mf.setPort(someMidiOutputPort);
+ * ```
+ * Assumes default settings are loaded on the controller
+ *
+ * Supports
+ * * Listening for encoder moves and button presses
+ * * Changing colour pip below each encoder
+ * * Setting LED bar for each encoder
+ * * Changing banks, or detecting when the user has done so via the physical buttons
+ *
+ * Events:
+ * * bankChange: Current bank has changed
+ * * sideButton: Side button pressed
+ * * switch: Encoder has been pressed
+ * * encoder: Encoder has been moved
+ * * state: Midi Fighter has both input/output ports or not.
+ */
+declare class MidiFighter extends SimpleEventEmitter<MidiFighterEvents> {
+  #private;
+  readonly encoders: MidiFighterEncoder[];
+  /**
+   * If true, messages sent to Midi Fighter are printed to console
+   */
+  logOutgoing: boolean;
+  /**
+   * Channel bank change events are received on
+   */
+  bankChangeChannel: number;
+  /**
+   * Channel side button press events are received on
+   */
+  sideButtonChannel: number;
+  constructor();
+  /**
+   * Sets a port for this instance to use.
+   * This will need to be called separately for the input and output ports
+   * @param port
+   */
+  setPort(port: MIDIPort): void;
+  /**
+   * Sets the current bank (1..4)
+   *
+   * Triggers `bankChange` event.
+   */
+  set bank(bank: number);
+  /**
+   * Gets the current bank number (1-4)
+   */
+  get bank(): number;
+  /**
+   * Yields all encooders within the specified bank number.
+   * If no bank number is given, current bank is used
+   * @param bank
+   */
+  getBank(bank?: number): Generator<MidiFighterEncoder, void, unknown>;
+  /**
+   * Gets an encoder by its index and bank. If no bank is specified,
+   * the current is used.
+   *
+   * ```js
+   * mf.getEncoder(4);    // Get encoder #4 on current bank
+   * mf.getEncoder(4, 2); // Get encoder #4 from bank #2
+   * ```
+   * @param encoder Encoder number (1..16)
+   * @param bank Bank number (1..4)
+   * @returns Encoder
+   */
+  getEncoder(encoder: number, bank?: number): MidiFighterEncoder | undefined;
+  /**
+   * Sends a message to the output port associated with this instance.
+   * If there's no output port, message is dropped and _false_ returned.
+   * @param message
+   */
+  send(message: MidiMessage): boolean;
+  /**
+   * Gets the current output port
+   */
+  get outputPort(): MIDIOutput | undefined;
+  /**
+   * Gets the current input port
+   */
+  get inputPort(): MIDIInput | undefined;
+  /**
+  * Returns the current state
+  */
+  get state(): MidiFighterState;
+}
+/**
+ * Represents a single encoder.
+ */
+declare class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEvents> {
+  readonly mf: MidiFighter;
+  /**
+   * Bank (1..4) of encoder
+   */
+  readonly bank: number;
+  /**
+   * Encoder index (1..16)
+   */
+  readonly encoder: number;
+  /**
+   * Note/CC for received encoder values
+   */
+  inputEncoderNoteOrCc: number;
+  /**
+   * Midi channel for received encoder values
+   */
+  inputEncoderChannel: number;
+  /**
+   * Midi channel for received switch values
+   */
+  inputSwitchChannel: number;
+  /**
+   * Note/CC for received switch values
+   */
+  inputSwitchNoteOrCc: number;
+  /**
+   * Channel to change LED effect (eg strobe)
+   */
+  ledEffectChannel: number;
+  /**
+   * Channel to change LED colour
+   */
+  ledColourChannel: number;
+  /**
+   * Channel to change LED ring value
+   */
+  ledRingChannel: number;
+  /**
+   * Note for this encoder.
+   */
+  encoderStaticNote: number;
+  /**
+   * The last encoder value received
+   */
+  lastEncoderValue: number;
+  /**
+   * The last switch value received
+   */
+  lastSwitchValue: number;
+  /**
+   * Do not create yourself. Access via a {@link MidiFighter} instance.
+   * @private
+   * @param mf
+   * @param options
+   */
+  constructor(mf: MidiFighter, options: {
+    bank: number;
+    encoder: number;
+  });
+  /**
+   * Called by a {@link MidiFighter} instance when a value is received associated with this encoder.
+   * Do not call directly
+   * @private
+   * @param value
+   */
+  onValueSet(value: number): void;
+  /**
+   * Called by a {@link MidiFighter} instance when the switch value for this encoder changes
+   * @private
+   * @param value
+   */
+  onSwitchSet(value: number): void;
+  /**
+   * Set a scalar LED ring value (0..1).
+   *
+   * ```js
+   * encoder.setLedRing(0.5); // Set to 50%
+   * ```
+   * Use {@link setLedRingRaw} to set 0..127 integer value
+   * @param v Scalar (0..1)
+   */
+  setLedRing(v: number): void;
+  /**
+   * Sets the raw (0..127) value for the LED ring feedback. Use {@link setLedRing} for scalar values (0..1)
+   *
+   * ```js
+   * encoder.setLedRingRaw(50);
+   * ```
+   *
+   * @param v Raw value (0..127)
+   */
+  setLedRingRaw(v: number): void;
+  /**
+   * Sets the switch colour based on a 0..1 standard hue degree
+   * ```js
+   * const hsl = Colour.HslSpace.fromCss(`orange`);
+   * encoder.setSwitchColourHue(hsl.hue);
+   * ```
+   * @param v Hue degree (0..1) range
+   */
+  setSwitchColourHue(v: number): void;
+  /**
+   * Set the switch colour based on 0..127 Midi Fighter range (start/end in blue).
+   * Use {@link setSwitchColourHue} to set colour based on hue angle instead
+   *
+   * See page 4 of the MF manual.
+   * @param v
+   * @returns
+   */
+  setSwitchColourRaw(v: number): void;
+  /**
+   * Set the effect of the colour pip
+   * ```js
+   * encoder.setSwitchEffect(`strobe`, 3);
+   * ```
+   * @param kind
+   * @param value
+   */
+  setSwitchEffect(kind: `none` | `strobe` | `pulse` | `rainbow`, value?: number): void;
+}
+//# sourceMappingURL=midi-fighter.d.ts.map
+declare namespace index_d_exports$1 {
+  export { Control, ControlEvents, Feedback, MidiCommands, MidiFighter, MidiFighterEncoder, MidiFighterEncoderEvents, MidiFighterEvents, MidiFighterState, MidiManager, MidiManagerEvents, MidiManagerState, MidiMessage, pack, sendNote, unpack };
 }
 //#endregion
 //#region ../io/src/espruino-ble-device.d.ts
@@ -1371,5 +1812,5 @@ declare const reconnectingWebsocket: (url: string | URL, opts?: Partial<Reconnec
 //# sourceMappingURL=reconnecting-web-socket.d.ts.map
 
 //#endregion
-export { index_d_exports as Audio, BleDeviceOptions, nordic_ble_device_d_exports as Bluetooth, camera_d_exports as Camera, Codec, espruino_d_exports as Espruino, FrameProcessor, type FrameProcessorOpts, FrameProcessorSources, GenericStateTransitions, IoDataEvent, IoEvents, ReconnectingOptions, ReconnectingWebsocket, ReconnectingWebsocketStates, serial_d_exports as Serial, type StateChangeEvent, StringReceiveBuffer, StringWriteBuffer, type Opts as StringWriteBufferOpts, video_file_d_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };
+export { index_d_exports as Audio, BleDeviceOptions, nordic_ble_device_d_exports as Bluetooth, camera_d_exports as Camera, Codec, espruino_d_exports as Espruino, FrameProcessor, type FrameProcessorOpts, FrameProcessorSources, GenericStateTransitions, IoDataEvent, IoEvents, index_d_exports$1 as Midi, ReconnectingOptions, ReconnectingWebsocket, ReconnectingWebsocketStates, serial_d_exports as Serial, type StateChangeEvent, StringReceiveBuffer, StringWriteBuffer, type Opts as StringWriteBufferOpts, video_file_d_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };
 //# sourceMappingURL=io.d.ts.map

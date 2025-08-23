@@ -1,5 +1,5 @@
 import { BasicType, Interval } from "./types-CcY4GIC4.js";
-import { Result } from "./index-Dg03qze4.js";
+import { Result } from "./index-DTe1EM0y.js";
 import { Comparer } from "./comparers-C6kfLE-t.js";
 import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, LogOption, LogSet, OnStartCalled, continuously } from "./index-Bne6KcmH.js";
 import { ResolveToValue, ResolveToValueSync } from "./resolve-core-Cji7XRWY.js";

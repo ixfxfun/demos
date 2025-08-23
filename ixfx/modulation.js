@@ -1,15 +1,15 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-CadJtgeN.js";
+import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "./src-BBD50Kth.js";
 import "./is-primitive-eBwrK4Yg.js";
-import { intervalToMs } from "./interval-type-CYct6719.js";
-import "./basic-TkGxs8ni.js";
-import { SimpleEventEmitter } from "./src-CHxoOwyb.js";
-import "./key-value-xMXxsVY5.js";
+import { intervalToMs } from "./interval-type-DajslxUJ.js";
+import "./basic-D0XoOdBJ.js";
+import { SimpleEventEmitter } from "./src-TlKlGoex.js";
+import "./key-value-JSby0EXT.js";
 import { resolveWithFallbackSync } from "./resolve-core-BwRmfzav.js";
-import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-8IiDfq42.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-DyRMnxm7.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-DlaqNVaT.js";
-import { float, floatSource } from "./bezier-CZvpytLt.js";
+import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-BeVDUOoq.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-BIfshA2g.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-C7XtfIer.js";
+import { float, floatSource } from "./bezier-CITq2XUb.js";
 
 //#region ../modulation/src/source/ticks.ts
 /**

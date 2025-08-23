@@ -1,6 +1,7 @@
 import "./is-equal-BzhoT7pd.js";
 import "./types-CcY4GIC4.js";
 import "./maps-Di0k-jsW.js";
+import { Result } from "./index-DTe1EM0y.js";
 import "./key-value-ww1DZidG.js";
 import { ISetMutable, ObjectTracker, RandomSource, TimestampedObject, TrackedValueMap, TrackedValueOpts, TraversableTree, TrimReason } from "./index-BD4Xy9K5.js";
 import "./index-CZIsUroQ.js";
@@ -3596,12 +3597,13 @@ declare const isNull: (p: Point) => boolean;
  * Returns true if either x, y, z isNaN.
  */
 declare const isNaN: (p: Point) => boolean;
+declare function test(p: Point, name?: string, extraInfo?: string): Result<Point, string>;
 /**
  * Throws an error if point is invalid
  * @param p
  * @param name
  */
-declare function guard$2(p: Point, name?: string): void;
+declare function guard$2(p: Point, name?: string, info?: string): void;
 /**
  * Throws if parameter is not a valid point, or either x or y is 0
  * @param pt
@@ -4644,7 +4646,7 @@ declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => b
 declare const wrap: (pt: Point, ptMax?: Point, ptMin?: Point) => Point;
 //# sourceMappingURL=wrap.d.ts.map
 declare namespace index_d_exports$6 {
-  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
+  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, test, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
 }
 //#endregion
 //#region ../geometry/src/line/multiply.d.ts

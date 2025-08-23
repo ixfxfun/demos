@@ -1,16 +1,16 @@
 import { __export, __toESM } from "./chunk-51aI8Tpl.js";
-import { resultToError } from "./src-CadJtgeN.js";
+import { resultToError } from "./src-BBD50Kth.js";
 import "./is-primitive-eBwrK4Yg.js";
-import { intervalToMs } from "./interval-type-CYct6719.js";
-import "./basic-TkGxs8ni.js";
-import { afterMatch } from "./src-CHxoOwyb.js";
-import "./key-value-xMXxsVY5.js";
-import { require_dist, uniqueInstances } from "./dist-Xk39SmDr.js";
+import { intervalToMs } from "./interval-type-DajslxUJ.js";
+import "./basic-D0XoOdBJ.js";
+import { afterMatch } from "./src-TlKlGoex.js";
+import "./key-value-JSby0EXT.js";
+import { require_dist, uniqueInstances } from "./dist-DE4H3J9W.js";
 import { getErrorMessage } from "./resolve-core-BwRmfzav.js";
-import { clamp$1 as clamp, round } from "./src-8IiDfq42.js";
-import "./src-DyRMnxm7.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-DlaqNVaT.js";
-import { shortGuid } from "./bezier-CZvpytLt.js";
+import { clamp$1 as clamp, round } from "./src-BeVDUOoq.js";
+import "./src-BIfshA2g.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-C7XtfIer.js";
+import { shortGuid } from "./bezier-CITq2XUb.js";
 
 //#region ../dom/src/resolve-el.ts
 /**
@@ -1376,7 +1376,7 @@ var ElementSizer = class ElementSizer {
 	set size(size) {
 		guard(size, `size`);
 		this.#size = size;
-		this.#onSizeChanging(size, this.#el);
+		if (this.#onSizeChanging) this.#onSizeChanging(size, this.#el);
 		this.#sizeDebounce();
 	}
 	get size() {

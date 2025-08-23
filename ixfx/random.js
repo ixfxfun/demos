@@ -1,4 +1,4 @@
-import { arrayTest, integerTest, numberTest, resultThrow } from "./src-CadJtgeN.js";
+import { arrayTest, integerTest, numberTest, resultThrow } from "./src-BBD50Kth.js";
 
 //#region ../random/src/weighted-index.ts
 /**

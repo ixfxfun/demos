@@ -1,4 +1,4 @@
-import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow, throwIfFailed } from "./src-CadJtgeN.js";
+import { arrayIndexTest, arrayTest, integerTest, numberTest, resultThrow, throwIfFailed } from "./src-BBD50Kth.js";
 
 //#region ../arrays/src/cycle.ts
 /**
@@ -417,6 +417,33 @@ function* filterBetween(array, predicate, startIndex, endIndex) {
 * @returns
 */
 const flatten = (array) => [...array].flat();
+
+//#endregion
+//#region ../arrays/src/for-each.ts
+/**
+* Returns the array.map() output, or a value if `array`
+* is not an array or empty.
+* 
+* ```js
+* mapWithEmptyFallback([1,2,3], v => v+2, 100); // Yields: [3,4,5]
+* mapWithEmptyFallback([], v=>v+2, 100); // Yields: [100]
+* mapWithEmptyFallback({}, v=>v+2, [100]); // Yields: [100]
+* ```
+* 
+* If the fallback value is an array, it is returned as an
+* array if needed. If it's a single value, it is wrapped as an array.
+* @param array Array of values
+* @param fn Function to use for mapping values
+* @param fallback Fallback single value or array of values
+* @returns 
+*/
+const mapWithEmptyFallback = (array, fn, fallback) => {
+	if (typeof array !== `object` || !Array.isArray(array) || array.length === 0) {
+		if (Array.isArray(fallback)) return fallback;
+		return [fallback];
+	}
+	return array.map(fn);
+};
 
 //#endregion
 //#region ../arrays/src/frequency.ts
@@ -1090,5 +1117,5 @@ const zip = (...arrays) => {
 };
 
 //#endregion
-export { atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, mergeByKey, pairwise, pairwiseReduce, randomElement, randomIndex, remove, sample, shuffle, sortByNumericProperty, sortByProperty, unique, uniqueDeep, until, without, withoutUndefined, zip };
+export { atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, mapWithEmptyFallback, mergeByKey, pairwise, pairwiseReduce, randomElement, randomIndex, remove, sample, shuffle, sortByNumericProperty, sortByProperty, unique, uniqueDeep, until, without, withoutUndefined, zip };
 //# sourceMappingURL=arrays.js.map

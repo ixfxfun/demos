@@ -278,6 +278,13 @@ declare function resultToValue<TValue, TError>(result: Result<TValue, TError>): 
  */
 declare function resultErrorToString(result: ResultError<any>): string;
 /**
+ * Returns a {@link ResultError} using 'error' as the message.
+ * @param error
+ * @param info
+ * @returns
+ */
+declare function errorResult(error: string, info?: string): ResultError<string>;
+/**
  * Returns first failed result or final value.
  * @param results
  * @returns
@@ -303,5 +310,5 @@ declare const stringTest: (value: unknown, range?: StringGuardRange, parameterNa
 //# sourceMappingURL=string.d.ts.map
 
 //#endregion
-export { ExpectedOpts, NumberGuardRange, Result, ResultError, ResultOk, ResultOrFunction, StringGuardRange, arrayIndexTest, arrayStringsTest, arrayTest, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };
+export { ExpectedOpts, NumberGuardRange, Result, ResultError, ResultOk, ResultOrFunction, StringGuardRange, arrayIndexTest, arrayStringsTest, arrayTest, errorResult, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };
 //# sourceMappingURL=guards.d.ts.map

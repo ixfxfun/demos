@@ -1,19 +1,19 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./src-CadJtgeN.js";
-import { cloneFromFields } from "./records-Cn6hYPY7.js";
+import { arrayTest, numberInclusiveRangeTest, numberTest, percentTest, resultErrorToString, resultThrow } from "./src-BBD50Kth.js";
+import { cloneFromFields } from "./records-Cei7yF1D.js";
 import "./is-primitive-eBwrK4Yg.js";
-import "./interval-type-CYct6719.js";
-import { continuously } from "./basic-TkGxs8ni.js";
-import { SimpleEventEmitter } from "./src-CHxoOwyb.js";
-import "./key-value-xMXxsVY5.js";
-import "./dist-Xk39SmDr.js";
+import "./interval-type-DajslxUJ.js";
+import { continuously } from "./basic-D0XoOdBJ.js";
+import { SimpleEventEmitter } from "./src-TlKlGoex.js";
+import "./key-value-JSby0EXT.js";
+import "./dist-DE4H3J9W.js";
 import "./resolve-core-BwRmfzav.js";
-import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-8IiDfq42.js";
-import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-DyRMnxm7.js";
-import { ElementSizer, resolveEl, resolveElementTry } from "./src-Ccqm6HvP.js";
-import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-DlaqNVaT.js";
-import "./bezier-CZvpytLt.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, oklch2rgb, rgb2hsl, rgb2oklch } from "./src-rxiODRnd.js";
+import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-BeVDUOoq.js";
+import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-BIfshA2g.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-sHR31-XU.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-C7XtfIer.js";
+import "./bezier-CITq2XUb.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, oklch2rgb, rgb2hsl, rgb2oklch } from "./src-DtTSywET.js";
 
 //#region ../visual/src/drawing.ts
 var drawing_exports = {};
@@ -665,6 +665,7 @@ const isRgb = (v) => {
 * @returns 
 */
 const tryParseObjectToRgb = (v) => {
+	if (typeof v !== `object`) throw new TypeError(`Param 'v' is expected to be an object, got: ${typeof v}`);
 	if (!(`r` in v && `g` in v && `b` in v)) return;
 	if (!(`unit` in v)) if (v.r <= 1 && v.g <= 1 && v.b <= 1) v.unit = `scalar`;
 	else if (v.r > 255 && v.g <= 255 && v.b <= 255) return;
@@ -3209,12 +3210,17 @@ const cssLinearGradient = (colours) => {
 };
 /**
 * Returns a function that interpolates between two colours. Returns string colour values.
+* 
+* By default takes a shorter direction and uses the OkLCH colourspace.
 * ```js
 * const i = interpolator(`blue`, `red`);
 * i(0.5); // Get the colour at 50%, as a string.
 * ```
 * 
 * To work with structured colour values, use one of the space's `interpolate` functions.
+* 
+* If you want to create discrete steps, consider {@link createSteps} or {@link scale}.
+* 
 * @param colourA 
 * @param colourB 
 * @param options 
@@ -3237,6 +3243,8 @@ const interpolator = (colourA, colourB, options = {}) => {
 };
 /**
 * Produces a stepped scale of colours.
+* 
+* Builds off {@link createSteps} which can only step between two colours.
 * 
 * ```js
 * // A scale of from red to green, with three colours in-between
@@ -3409,7 +3417,11 @@ const toHexColour = (colour) => {
 	if (isHsl(colour)) return toHexString$2(colour);
 	if (isRgb(colour)) return toHexString(colour);
 	if (isOkLch(colour)) return toHexString$1(colour);
-	if (typeof colour === `string` && colour.startsWith(`#`)) return colour;
+	if (typeof colour === `string`) {
+		if (colour.startsWith(`#`)) return colour;
+		const c = convert$1(colour, `srgb-8bit`);
+		return toHexString(c);
+	}
 	const asRgb = tryParseObjectToRgb(colour);
 	if (asRgb) return toHexString(asRgb);
 	const asHsl = tryParseObjectToHsl(colour);

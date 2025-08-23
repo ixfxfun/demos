@@ -1,19 +1,19 @@
 import { __export } from "./chunk-51aI8Tpl.js";
-import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./src-CadJtgeN.js";
-import "./records-Cn6hYPY7.js";
+import { integerTest, isPowerOfTwo, numberTest, resultThrow } from "./src-BBD50Kth.js";
+import "./records-Cei7yF1D.js";
 import "./is-primitive-eBwrK4Yg.js";
-import { intervalToMs } from "./interval-type-CYct6719.js";
-import { continuously } from "./basic-TkGxs8ni.js";
-import { SimpleEventEmitter, indexOfCharCode, omitChars, splitByLength } from "./src-CHxoOwyb.js";
-import "./key-value-xMXxsVY5.js";
-import "./dist-Xk39SmDr.js";
+import { intervalToMs } from "./interval-type-DajslxUJ.js";
+import { continuously } from "./basic-D0XoOdBJ.js";
+import { SimpleEventEmitter, indexOfCharCode, omitChars, splitByLength } from "./src-TlKlGoex.js";
+import "./key-value-JSby0EXT.js";
+import "./dist-DE4H3J9W.js";
 import { getErrorMessage } from "./resolve-core-BwRmfzav.js";
-import { max, maxFast, numberArrayCompute } from "./src-8IiDfq42.js";
-import { QueueMutable, StateMachineWithEvents, eventRace, init, retryFunction, retryTask, to, waitFor } from "./src-DyRMnxm7.js";
-import { resolveEl } from "./src-Ccqm6HvP.js";
-import "./src-DlaqNVaT.js";
-import { number, shortGuid, string } from "./bezier-CZvpytLt.js";
-import { manualCapture } from "./src-rxiODRnd.js";
+import { clamp$1 as clamp, mapWithEmptyFallback, max, maxFast, numberArrayCompute, scale } from "./src-BeVDUOoq.js";
+import { QueueMutable, StateMachineWithEvents, debounce, eventRace, init, retryFunction, retryTask, to, waitFor } from "./src-BIfshA2g.js";
+import { resolveEl } from "./src-sHR31-XU.js";
+import "./src-C7XtfIer.js";
+import { number, shortGuid, string } from "./bezier-CITq2XUb.js";
+import { manualCapture } from "./src-DtTSywET.js";
 
 //#region ../io/src/codec.ts
 /**
@@ -943,6 +943,939 @@ __export(audio_exports, {
 	analyserPeakLevel: () => analyserPeakLevel,
 	createFromAudioElement: () => createFromAudioElement,
 	createOscillator: () => createOscillator
+});
+
+//#endregion
+//#region ../io/src/midi/midi-fns.ts
+/**
+* Sends a note on and note off
+* @param port 
+* @param channel 
+* @param note 
+* @param velocity 
+* @param duration 
+* @param delay 
+*/
+const sendNote = (port, channel, note, velocity, duration = 200, delay) => {
+	const noteOn = {
+		channel,
+		note,
+		velocity,
+		command: `noteon`
+	};
+	const noteOff = {
+		channel,
+		note,
+		velocity: 0,
+		command: `noteoff`
+	};
+	port.send(pack(noteOn), delay);
+	port.send(pack(noteOff), window.performance.now() + duration);
+};
+/**
+* Parses MIDI data from an array into a MidiMessage
+* 
+* ```js
+* function onMidiMessage(event: MIDIMessageEvent) {
+*  const msg = unpack(event.data);
+*  // { command, channel, note, velocity }
+* }
+* 
+* // Where 'input' is a MIDIInput
+* input.addEventListener(`midimessage`, onMidiMessage);
+* ```
+* @param data 
+* @returns 
+*/
+const unpack = (data) => {
+	let command;
+	const first = data[0];
+	const second = data[1];
+	const third = data[2];
+	let channel = 0;
+	if (first >= 144 && first <= 159) {
+		channel = first - 143;
+		command = third === 0 ? `noteoff` : `noteon`;
+	} else if (first >= 128 && first <= 143) {
+		channel = first - 127;
+		command = `noteoff`;
+	} else if (first >= 160 && first <= 175) {
+		channel = first - 159;
+		command = `poly-at`;
+	} else if (first >= 176 && first <= 191) {
+		channel = first - 175;
+		command = `cc`;
+	} else if (first >= 192 && first <= 207) {
+		channel = first - 191;
+		command = `progchange`;
+	} else if (first >= 208 && first <= 223) {
+		channel = first - 207;
+		command = `at`;
+	} else if (first >= 224 && first <= 239) {
+		channel = first - 223;
+		command = `pitchbend`;
+	}
+	if (command === void 0) throw new Error(`Unknown command: '${command}'`);
+	else return {
+		command,
+		note: second,
+		velocity: third,
+		channel
+	};
+};
+/**
+* Packs a MidiMessage into an array for sending to a MIDIOutput.
+* 
+* ```js
+* const msg: Midi.MidiMessage = {
+*  command: `cc`,
+*  channel: 1,
+*  velocity: 50,
+*  note: 40
+* }
+* 
+* // Where 'output' is a MIDIOutput
+* output.send(pack(msg));
+* ```
+* @param message 
+* @returns 
+*/
+const pack = (message) => {
+	const data = new Uint8Array(3);
+	data[1] = message.note;
+	data[2] = message.velocity;
+	switch (message.command) {
+		case `cc`:
+			data[0] = message.channel + 175;
+			break;
+		case `noteon`:
+			data[0] = message.channel + 143;
+			break;
+		case `noteoff`:
+			data[0] = message.channel + 127;
+			break;
+		case `pitchbend`:
+			data[0] = message.channel + 223;
+			break;
+		case `poly-at`:
+			data[0] = message.channel + 159;
+			break;
+		case `progchange`:
+			data[0] = message.channel + 191;
+			break;
+		case `at`:
+			data[0] = message.channel + 207;
+			break;
+		default: throw new Error(`Command not supported '${message.command}'`);
+	}
+	return data;
+};
+
+//#endregion
+//#region ../io/src/midi/manager.ts
+var MidiManager = class extends SimpleEventEmitter {
+	verbose = true;
+	#state;
+	#access;
+	#inUse = [];
+	#known = [];
+	#omniInput = true;
+	#omniOutput = true;
+	#connectAllInputsDebounced = debounce(() => this.#connectAllInputs(), 1e3);
+	#connectAllOutputsDebounced = debounce(() => this.#connectAllOutputs(), 1e3);
+	constructor() {
+		super();
+		this.#state = {
+			initialised: false,
+			errorReason: ``
+		};
+		this.#throwIfNotSupported();
+	}
+	async scan() {
+		await this.#init();
+		const a = this.#access;
+		if (!a) return;
+		for (const [_name, port] of a.inputs) this.#updatePort(port);
+		for (const [_name, port] of a.outputs) this.#updatePort(port);
+		if (this.#omniInput) this.#connectAllInputsDebounced();
+		if (this.#omniOutput) this.#connectAllOutputsDebounced();
+	}
+	/**
+	* Sends a message to a port.
+	* 
+	* If port is omitted, all open output ports are used.
+	* @param message 
+	* @param port 
+	* @param timestamp 
+	*/
+	send(message, port, timestamp) {
+		const packed = pack(message);
+		if (typeof port === `undefined`) {
+			for (const p of this.#inUse) if (p.type === `output`) p.send(packed, timestamp);
+		} else port.send(packed, timestamp);
+	}
+	#updatePort(p) {
+		if (p.state === `connected`) {
+			this.#onPortConnected(p);
+			if (p.connection === `open`) this.#onPortOpen(p);
+		} else if (p.state === `disconnected`) this.#onPortDisconnected(p);
+	}
+	#onMessage = (event) => {
+		const raw = event.data;
+		const port = event.currentTarget;
+		if (!raw) return;
+		const data = unpack(raw);
+		this.fireEvent(`message`, {
+			...data,
+			port,
+			raw
+		});
+	};
+	#onPortOpen(port) {
+		const inUse = this.#inUse.find((p) => p.id === port.id);
+		this.#logVerbose(`onPortOpen: id: ${port.id} name: ${port.name} (${port.type})`);
+		if (inUse) {
+			this.#logVerbose(`-- bug, port already in use?`);
+			return;
+		}
+		this.#onPortConnected(port);
+		if (port.type === `input`) port.addEventListener(`midimessage`, this.#onMessage);
+		this.#inUse = [...this.#inUse, port];
+		this.fireEvent(`open`, { port });
+	}
+	#onPortClose(port) {
+		const inUse = this.#inUse.find((p) => p.id === port.id);
+		if (!inUse) return;
+		if (port.type === `input`) port.removeEventListener(`midimessage`, this.#onMessage);
+		this.#inUse = this.#inUse.filter((p) => p.id !== port.id);
+		this.fireEvent(`close`, { port });
+	}
+	/**
+	* New device connected, but not necessarily open
+	* @param port 
+	*/
+	#onPortConnected(port) {
+		const known = this.#known.find((p) => p.id === port.id);
+		if (known) return;
+		this.#known = [...this.#known, port];
+		this.fireEvent(`deviceConnected`, { port });
+	}
+	/**
+	* Device disconnected
+	* @param port 
+	* @returns 
+	*/
+	#onPortDisconnected(port) {
+		const known = this.#known.find((p) => p.id === port.id);
+		if (!known) return;
+		this.#onPortClose(port);
+		this.#known = this.#known.filter((p) => p.id !== port.id);
+		this.fireEvent(`deviceDisconnected`, { port });
+	}
+	#isPortInUse(port) {
+		return this.#inUse.find((p) => p.id === port.id) !== void 0;
+	}
+	async #connectAllInputs() {
+		const a = this.#access;
+		if (!a) return;
+		for (const [_name, input] of a.inputs) if (input.connection === `closed`) {
+			if (this.#isPortInUse(input)) throw new Error(`Bug: Input closed, but inUse?`);
+			await input.open();
+		}
+	}
+	async #connectAllOutputs() {
+		const a = this.#access;
+		if (!a) return;
+		for (const [_name, output] of a.outputs) if (output.connection === `closed`) {
+			if (this.#isPortInUse(output)) throw new Error(`Bug: Output closed, but inUse?`);
+			await output.open();
+		}
+	}
+	dumpToStringLines() {
+		const returnValue = [];
+		const portToString = (p) => ` -  ${p.name} (${p.type}) state: ${p.state} conn: ${p.connection} id: ${p.id}`;
+		returnValue.push(`MidiManager`);
+		returnValue.push(`In Use:`);
+		returnValue.push(...mapWithEmptyFallback(this.#inUse, portToString, `  (none)`));
+		returnValue.push(`Known:`);
+		returnValue.push(...mapWithEmptyFallback(this.#known, portToString, `  (none)`));
+		return returnValue;
+	}
+	#onStateChange(event) {
+		const port = event.port;
+		if (port === null) return;
+		const inUse = this.#inUse.find((p) => p.id === port.id);
+		const known = this.#known.find((p) => p.id === port.id);
+		if (port.state === `connected`) {
+			if (port.connection === `open`) this.#onPortOpen(port);
+			else if (port.connection === `closed`) {
+				this.#onPortClose(port);
+				this.#onPortConnected(port);
+				if (this.#omniInput && port.type === `input`) this.#connectAllInputsDebounced();
+				else if (this.#omniOutput && port.type === `output`) this.#connectAllOutputsDebounced();
+			}
+		} else if (port.state === `disconnected`) this.#onPortDisconnected(port);
+	}
+	#logVerbose(message) {
+		if (!this.verbose) return;
+		console.log(`MIDI`, message);
+	}
+	#setState(state) {
+		this.#state = {
+			...this.#state,
+			...state
+		};
+		this.#logVerbose(`State change: ${JSON.stringify(this.#state)}`);
+	}
+	async #init() {
+		if (this.#state.initialised && this.#access !== void 0) return;
+		const q = await navigator.permissions.query({
+			name: "midi",
+			software: true,
+			sysex: false
+		});
+		if (q.state === `denied`) {
+			this.#access = void 0;
+			this.#setState({
+				initialised: false,
+				errorReason: `Permission denied`
+			});
+			return;
+		}
+		this.#access = await navigator.requestMIDIAccess({
+			software: true,
+			sysex: false
+		});
+		this.#access.addEventListener(`statechange`, (event) => {
+			this.#onStateChange(event);
+		});
+		this.#setState({
+			initialised: true,
+			errorReason: ``
+		});
+	}
+	#isSupported() {
+		if (!navigator.requestMIDIAccess) return false;
+		return true;
+	}
+	#throwIfNotSupported() {
+		if (!window.isSecureContext) throw new Error(`Code is not running in a secure context. Load it via https`);
+		if (!this.#isSupported()) throw new Error(`MIDI not supported in this browser`);
+	}
+};
+
+//#endregion
+//#region ../io/src/midi/control.ts
+var Feedback = class {
+	channel = 0;
+	cc = -1;
+	note = -1;
+	output;
+	portName;
+	constructor(options = {}) {
+		this.channel = options.channel ?? -1;
+		this.cc = options.cc ?? -1;
+		this.note = options.note ?? -1;
+		this.output = options.output;
+		this.portName = options.portName;
+	}
+	setOutputPort(port) {
+		if (port.type === `input`) return false;
+		if (this.portName !== void 0) {
+			if (port.name !== port.name) return false;
+		}
+		this.output = port;
+		return true;
+	}
+	sendRaw(value) {
+		if (!this.output) return false;
+		if (this.channel < 0) return false;
+		if (this.cc < 0 && this.note < 0) return false;
+		let message;
+		if (this.cc >= 0) {
+			message = {
+				channel: this.channel,
+				command: `cc`,
+				note: this.cc,
+				velocity: value
+			};
+			console.log(message);
+			this.output.send(pack(message));
+			return true;
+		}
+		console.log(`sendNote: ch: ${this.channel} note: ${this.note} vel: ${value}`);
+		sendNote(this.output, this.channel, this.note, value, 200);
+		return true;
+	}
+};
+var Control = class Control extends SimpleEventEmitter {
+	static controlCount = 0;
+	inputChannel = 1;
+	inputCommand = `cc`;
+	inputNote = -1;
+	inputVelocityScale = [0, 127];
+	feedbackChannel = 1;
+	feedbackCommand = `cc`;
+	feedbackNote = -1;
+	feedbackVelocity = 1;
+	name = `Control-${Control.controlCount++}`;
+	lastMessage;
+	onInputMessage(message) {
+		if (this.inputChannel >= 0 && message.channel !== this.inputChannel) return false;
+		if (this.inputNote >= 0 && message.note !== this.inputNote) return false;
+		if (this.inputCommand !== void 0 && message.command !== this.inputCommand) return false;
+		this.lastMessage = message;
+		this.fireEvent(`change`, {
+			velocity: message.velocity,
+			velocityScaled: this.#scaleVelocity(message.velocity),
+			control: this
+		});
+		return true;
+	}
+	#scaleVelocity(v) {
+		return scale(v, this.inputVelocityScale[0], this.inputVelocityScale[1]);
+	}
+	get scaledVelocity() {
+		if (this.lastMessage) return this.#scaleVelocity(this.lastMessage.velocity);
+		return NaN;
+	}
+};
+
+//#endregion
+//#region ../io/src/midi/midi-fighter.ts
+/**
+* Connects to a DJ Tech Tools Midi Fighter controller. 
+* 
+* Use the 'state' event and wait for state to be 'ready'.
+* 
+* ```js
+* const mf = new MidiFighter();
+* mf.addEventListener(`state`, event => {
+*  if (event.state === `ready`) {
+*    // Can work with device now
+*    mf.bank = 1;
+*  }
+* });
+* mf.addEventListener(`encoder`, event => {
+*  // Do something with encoder value
+* });
+* mf.setPort(someMidiInputPort);
+* mf.setPort(someMidiOutputPort);
+* ```
+* Assumes default settings are loaded on the controller
+* 
+* Supports
+* * Listening for encoder moves and button presses
+* * Changing colour pip below each encoder
+* * Setting LED bar for each encoder
+* * Changing banks, or detecting when the user has done so via the physical buttons
+* 
+* Events:
+* * bankChange: Current bank has changed
+* * sideButton: Side button pressed
+* * switch: Encoder has been pressed
+* * encoder: Encoder has been moved
+* * state: Midi Fighter has both input/output ports or not.
+*/
+var MidiFighter = class extends SimpleEventEmitter {
+	encoders = [];
+	#currentBank = -1;
+	#state = `disconnected`;
+	#inputPort;
+	#outputPort;
+	/**
+	* If true, messages sent to Midi Fighter are printed to console
+	*/
+	logOutgoing = false;
+	/**
+	* Channel bank change events are received on
+	*/
+	bankChangeChannel = 4;
+	/**
+	* Channel side button press events are received on
+	*/
+	sideButtonChannel = 4;
+	constructor() {
+		super();
+		for (let bank = 1; bank < 5; bank++) for (let encoder = 1; encoder < 17; encoder++) {
+			const enc = new MidiFighterEncoder(this, {
+				bank,
+				encoder
+			});
+			this.encoders.push(enc);
+			enc.addEventListener(`encoder`, (event) => {
+				this.fireEvent(`encoder`, event);
+			});
+			enc.addEventListener(`switch`, (event) => {
+				this.fireEvent(`switch`, event);
+			});
+		}
+	}
+	/**
+	* Our input/output port has changed state
+	* @param event 
+	* @returns 
+	*/
+	#onPortState = (event) => {
+		const port = event.port;
+		if (!port) return;
+		if (port === this.#outputPort && (port.state === `disconnected` || port.connection === `closed`)) this.#outputPortUnbind();
+		if (port === this.#inputPort && (port.state === `disconnected` || port.connection === `closed`)) this.#inputPortUnbind();
+		if (this.#outputPort !== void 0 && this.#inputPort !== void 0) this.#setState(`ready`);
+		else this.#setState(`disconnected`);
+	};
+	/**
+	* Unsubscribe from events of current input port, if we have one
+	*/
+	#inputPortUnbind() {
+		const ip = this.#inputPort;
+		if (ip !== void 0) {
+			ip.removeEventListener(`statechange`, this.#onPortState);
+			ip.removeEventListener(`midimessage`, this.#onMessage);
+		}
+		this.#inputPort = void 0;
+	}
+	/**
+	* Unsubcribe from events of current output port, if we have one
+	*/
+	#outputPortUnbind() {
+		const op = this.#outputPort;
+		if (op !== void 0) op.removeEventListener(`statechange`, this.#onPortState);
+		this.#outputPort = void 0;
+	}
+	/**
+	* Sets a port for this instance to use.
+	* This will need to be called separately for the input and output ports
+	* @param port 
+	*/
+	setPort(port) {
+		if (port.name === `Midi Fighter Twister`) {
+			if (port.type === `output`) {
+				this.#outputPortUnbind();
+				this.#outputPort = port;
+				if (this.#outputPort !== void 0) this.#outputPort.addEventListener(`statechange`, this.#onPortState);
+			} else if (port.type === `input`) {
+				this.#inputPortUnbind();
+				this.#inputPort = port;
+				if (port !== void 0) {
+					this.#inputPort.addEventListener(`midimessage`, this.#onMessage);
+					this.#inputPort.addEventListener(`statechange`, this.#onPortState);
+				}
+			}
+		}
+		if (this.#outputPort !== void 0 && this.#inputPort !== void 0) this.#setState(`ready`);
+	}
+	#setState(state) {
+		const previous = this.#state;
+		if (previous === state) return;
+		this.#state = state;
+		this.fireEvent(`state`, {
+			previous,
+			state,
+			mf: this
+		});
+	}
+	#onMessage = (event) => {
+		const data = event.data;
+		if (!data) return;
+		const message = unpack(data);
+		if (message.channel === this.bankChangeChannel) {
+			if (message.command === `cc` && message.note < 4) {
+				this.#onBankChange(message.note + 1, false);
+				return;
+			}
+		}
+		if (message.channel === this.sideButtonChannel && message.command == `cc`) {
+			let buttonBank = -1;
+			let position;
+			let side;
+			if (message.note === 8) {
+				buttonBank = 1;
+				position = `top`;
+				side = `left`;
+			} else if (message.note === 10) {
+				buttonBank = 1;
+				side = `left`;
+				position = `bottom`;
+			} else if (message.note === 11) {
+				buttonBank = 1;
+				side = `right`;
+				position = `top`;
+			} else if (message.note === 13) {
+				buttonBank = 1;
+				side = `right`;
+				position = `bottom`;
+			} else if (message.note === 14) {
+				buttonBank = 2;
+				side = `left`;
+				position = `top`;
+			} else if (message.note === 16) {
+				buttonBank = 2;
+				side = `left`;
+				position = `bottom`;
+			} else if (message.note === 17) {
+				buttonBank = 2;
+				side = `right`;
+				position = `top`;
+			} else if (message.note === 19) {
+				buttonBank = 2;
+				side = `right`;
+				position = `bottom`;
+			} else if (message.note === 20) {
+				buttonBank = 3;
+				position = `top`;
+				side = `left`;
+			} else if (message.note === 22) {
+				buttonBank = 3;
+				position = `bottom`;
+				side = `left`;
+			} else if (message.note === 23) {
+				buttonBank = 3;
+				position = `top`;
+				side = `right`;
+			} else if (message.note == 25) {
+				buttonBank = 3;
+				position = `bottom`;
+				side = `right`;
+			} else if (message.note == 26) {
+				buttonBank = 4;
+				position = `top`;
+				side = `left`;
+			} else if (message.note == 28) {
+				buttonBank = 4;
+				position = `bottom`;
+				side = `left`;
+			} else if (message.note == 29) {
+				buttonBank = 4;
+				position = `top`;
+				side = `right`;
+			} else if (message.note == 31) {
+				buttonBank = 4;
+				position = `bottom`;
+				side = `right`;
+			}
+			if (position !== void 0 && side !== void 0) {
+				if (buttonBank !== this.#currentBank) this.#onBankChange(buttonBank, true);
+				this.fireEvent(`sideButton`, {
+					bank: buttonBank,
+					position,
+					side,
+					mf: this
+				});
+				return;
+			}
+		}
+		for (const enc of this.encoders) {
+			if (enc.inputEncoderChannel === message.channel && enc.inputEncoderNoteOrCc === message.note) {
+				enc.onValueSet(message.velocity);
+				return;
+			}
+			if (enc.inputSwitchChannel === message.channel && enc.inputSwitchNoteOrCc === message.note) {
+				enc.onSwitchSet(message.velocity);
+				return;
+			}
+		}
+	};
+	/**
+	* When bank has changed
+	* @param bank 
+	* @param implicit 
+	*/
+	#onBankChange(bank, implicit) {
+		const previousBank = this.#currentBank;
+		this.#currentBank = bank;
+		if (previousBank !== bank) this.fireEvent(`bankChange`, {
+			prev: previousBank,
+			current: this.#currentBank,
+			mf: this,
+			implicit
+		});
+	}
+	/**
+	* Sets the current bank (1..4)
+	* 
+	* Triggers `bankChange` event.
+	*/
+	set bank(bank) {
+		if (bank < 1 || bank > 4) throw new Error(`Bank must be 1-4`);
+		if (!this.#outputPort) return;
+		sendNote(this.#outputPort, this.bankChangeChannel, bank - 1, 127, 100);
+		this.#onBankChange(bank, false);
+	}
+	/**
+	* Gets the current bank number (1-4)
+	*/
+	get bank() {
+		return this.#currentBank;
+	}
+	/**
+	* Yields all encooders within the specified bank number.
+	* If no bank number is given, current bank is used
+	* @param bank 
+	*/
+	*getBank(bank) {
+		if (typeof bank === `undefined`) bank = this.#currentBank;
+		if (bank < 1 || bank > 4) throw new Error(`Bank out of range, expected 1-4`);
+		for (const enc of this.encoders) if (enc.bank === bank) yield enc;
+	}
+	/**
+	* Gets an encoder by its index and bank. If no bank is specified,
+	* the current is used.
+	* 
+	* ```js
+	* mf.getEncoder(4);    // Get encoder #4 on current bank
+	* mf.getEncoder(4, 2); // Get encoder #4 from bank #2
+	* ```
+	* @param encoder Encoder number (1..16)
+	* @param bank Bank number (1..4)
+	* @returns Encoder
+	*/
+	getEncoder(encoder, bank) {
+		if (typeof bank === `undefined`) bank = this.#currentBank;
+		if (bank < 1 || bank > 4) throw new Error(`Bank out of range, expected 1-4. Got: ${bank}`);
+		if (encoder < 1 || encoder > 16) throw new Error(`Encoder out of range, expected 1-16`);
+		return this.encoders.find((enc) => enc.bank === bank && enc.encoder === encoder);
+	}
+	/**
+	* Sends a message to the output port associated with this instance.
+	* If there's no output port, message is dropped and _false_ returned.
+	* @param message 
+	*/
+	send(message) {
+		if (this.#outputPort) {
+			if (this.logOutgoing) console.log(`MF send: ${JSON.stringify(message)}`);
+			this.#outputPort.send(pack(message));
+			return true;
+		}
+		return false;
+	}
+	/**
+	* Gets the current output port
+	*/
+	get outputPort() {
+		return this.#outputPort;
+	}
+	/**
+	* Gets the current input port
+	*/
+	get inputPort() {
+		return this.#inputPort;
+	}
+	/**
+	* Returns the current state
+	*/
+	get state() {
+		return this.#state;
+	}
+};
+/**
+* Represents a single encoder.
+*/
+var MidiFighterEncoder = class extends SimpleEventEmitter {
+	/**
+	* Bank (1..4) of encoder
+	*/
+	bank;
+	/**
+	* Encoder index (1..16)
+	*/
+	encoder;
+	/**
+	* Note/CC for received encoder values
+	*/
+	inputEncoderNoteOrCc;
+	/**
+	* Midi channel for received encoder values
+	*/
+	inputEncoderChannel;
+	/**
+	* Midi channel for received switch values
+	*/
+	inputSwitchChannel;
+	/**
+	* Note/CC for received switch values
+	*/
+	inputSwitchNoteOrCc;
+	/**
+	* Channel to change LED effect (eg strobe)
+	*/
+	ledEffectChannel = 3;
+	/**
+	* Channel to change LED colour
+	*/
+	ledColourChannel = 2;
+	/**
+	* Channel to change LED ring value
+	*/
+	ledRingChannel = 1;
+	/**
+	* Note for this encoder.
+	*/
+	encoderStaticNote = 0;
+	/**
+	* The last encoder value received
+	*/
+	lastEncoderValue = -1;
+	/**
+	* The last switch value received
+	*/
+	lastSwitchValue = -1;
+	/**
+	* Do not create yourself. Access via a {@link MidiFighter} instance.
+	* @private
+	* @param mf 
+	* @param options 
+	*/
+	constructor(mf, options) {
+		super();
+		this.mf = mf;
+		const bank = options.bank;
+		const encoder = options.encoder;
+		if (bank < 0 || bank > 4) throw new Error(`Expected bank value 1-4. Got: ${bank}`);
+		if (encoder < 0 || encoder > 16) throw new Error(`Expected encoder number 1-16. Got: ${encoder}`);
+		const bankOffset = (bank - 1) * 16;
+		this.encoderStaticNote = encoder - 1 + bankOffset;
+		this.inputEncoderChannel = 1;
+		this.inputEncoderNoteOrCc = this.encoderStaticNote;
+		this.inputSwitchChannel = 2;
+		this.inputSwitchNoteOrCc = this.encoderStaticNote;
+		this.bank = bank;
+		this.encoder = encoder;
+	}
+	/**
+	* Called by a {@link MidiFighter} instance when a value is received associated with this encoder.
+	* Do not call directly
+	* @private
+	* @param value 
+	*/
+	onValueSet(value) {
+		const lastValue = this.lastEncoderValue;
+		this.lastEncoderValue = value;
+		this.fireEvent(`encoder`, {
+			previous: lastValue,
+			value,
+			encoder: this
+		});
+	}
+	/**
+	* Called by a {@link MidiFighter} instance when the switch value for this encoder changes
+	* @private
+	* @param value 
+	*/
+	onSwitchSet(value) {
+		const lastValue = this.lastSwitchValue;
+		this.lastSwitchValue = value;
+		this.fireEvent(`switch`, {
+			previous: lastValue,
+			value,
+			encoder: this
+		});
+	}
+	/**
+	* Set a scalar LED ring value (0..1).
+	* 
+	* ```js
+	* encoder.setLedRing(0.5); // Set to 50%
+	* ```
+	* Use {@link setLedRingRaw} to set 0..127 integer value
+	* @param v Scalar (0..1)
+	*/
+	setLedRing(v) {
+		this.setLedRingRaw(clamp(Math.floor(v * 127)));
+	}
+	/**
+	* Sets the raw (0..127) value for the LED ring feedback. Use {@link setLedRing} for scalar values (0..1)
+	* 
+	* ```js
+	* encoder.setLedRingRaw(50);
+	* ```
+	* 
+	* @param v Raw value (0..127)
+	*/
+	setLedRingRaw(v) {
+		if (v < 0 || v > 127) throw new Error(`Param 'v' should be between 0-127`);
+		const message = {
+			channel: this.ledRingChannel,
+			command: `cc`,
+			note: this.encoderStaticNote,
+			velocity: v
+		};
+		this.mf.send(message);
+	}
+	/**
+	* Sets the switch colour based on a 0..1 standard hue degree
+	* ```js
+	* const hsl = Colour.HslSpace.fromCss(`orange`);
+	* encoder.setSwitchColourHue(hsl.hue);
+	* ```
+	* @param v Hue degree (0..1) range
+	*/
+	setSwitchColourHue(v) {
+		if (v < 0 || v > 1) throw new Error(`Param 'v' should be in 0-1 range`);
+		let vv = 1 - v + .7;
+		if (vv > 1) vv = vv - 1;
+		const velo = Math.floor(vv * 127);
+		this.setSwitchColourRaw(velo);
+	}
+	/**
+	* Set the switch colour based on 0..127 Midi Fighter range (start/end in blue).
+	* Use {@link setSwitchColourHue} to set colour based on hue angle instead
+	* 
+	* See page 4 of the MF manual.
+	* @param v 
+	* @returns 
+	*/
+	setSwitchColourRaw(v) {
+		if (v < 0 || v > 127) throw new Error(`Param 'v' should be between 0-127`);
+		const message = {
+			channel: this.ledColourChannel,
+			command: `cc`,
+			note: this.encoderStaticNote,
+			velocity: v
+		};
+		this.mf.send(message);
+	}
+	/**
+	* Set the effect of the colour pip
+	* ```js
+	* encoder.setSwitchEffect(`strobe`, 3);
+	* ```
+	* @param kind 
+	* @param value 
+	*/
+	setSwitchEffect(kind, value = 1) {
+		let velocity = 0;
+		if (kind === `rainbow`) velocity = 127;
+		else if (kind === `pulse`) {
+			if (value < 1 || value > 7) throw new Error(`Pulse effect expects a value 1-7`);
+			velocity = 9 + value;
+		} else if (kind === `strobe`) {
+			if (value < 1 || value > 8) throw new Error(`Strobe effect expects a value 1-8`);
+			velocity = value;
+		} else if (kind === `none`) velocity = 0;
+		else throw new Error(`Unknown kind: '${kind}'`);
+		const message = {
+			channel: this.ledEffectChannel,
+			command: `cc`,
+			note: this.encoderStaticNote,
+			velocity
+		};
+		this.mf.send(message);
+	}
+};
+
+//#endregion
+//#region ../io/src/midi/index.ts
+var midi_exports = {};
+__export(midi_exports, {
+	Control: () => Control,
+	Feedback: () => Feedback,
+	MidiFighter: () => MidiFighter,
+	MidiFighterEncoder: () => MidiFighterEncoder,
+	MidiManager: () => MidiManager,
+	pack: () => pack,
+	sendNote: () => sendNote,
+	unpack: () => unpack
 });
 
 //#endregion
@@ -2176,5 +3109,5 @@ const reconnectingWebsocket = (url, opts = {}) => {
 };
 
 //#endregion
-export { audio_exports as Audio, nordic_ble_device_exports as Bluetooth, camera_exports as Camera, Codec, espruino_exports as Espruino, FrameProcessor, serial_exports as Serial, StringReceiveBuffer, StringWriteBuffer, video_file_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };
+export { audio_exports as Audio, nordic_ble_device_exports as Bluetooth, camera_exports as Camera, Codec, espruino_exports as Espruino, FrameProcessor, midi_exports as Midi, serial_exports as Serial, StringReceiveBuffer, StringWriteBuffer, video_file_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };
 //# sourceMappingURL=io.js.map
