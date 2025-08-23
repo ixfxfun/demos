@@ -485,8 +485,12 @@ type MidiMessage = {
   note: number;
   velocity: number;
 };
+type NoteMidiMessage = MidiMessage & {
+  command: `noteon` | `noteoff`;
+  noteName: string;
+  frequency: number;
+};
 //# sourceMappingURL=types.d.ts.map
-
 //#endregion
 //#region ../io/src/midi/midi-fns.d.ts
 /**
@@ -553,15 +557,42 @@ type MidiManagerEvents = {
   deviceDisconnected: {
     port: MIDIPort;
   };
-  message: MidiMessage & {
+  message: (MidiMessage | NoteMidiMessage) & {
     port: MIDIInput;
     raw: Uint8Array;
   };
 };
+/**
+ * Midi Manager makes simplifies connecting to ports
+ * and having omni input/output
+ *
+ * ```js
+ * const midi = new MidiManager(); // By default connects to all ins and outs
+ * midi.addEventListener(`message`, event => {
+ *  // Do something with received MIDI data from any input
+ * })
+ *
+ * midi.scan();
+ * midi.send({ command: `cc`, note: 10, channel: 1, velocity: 20 });
+ *
+ * // Sends note '10' on channel 1, velocity 100, duration 200ms
+ * midi.sendNote(1, 10, 100, 200);
+ * ```
+ * Events:
+ * * open/close: Connected port is open/closed
+ * * deviceConnected/deviceDisconnected: A port is newly available or unavailable
+ * * message: MIDI event received
+ */
 declare class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
   #private;
   verbose: boolean;
   constructor();
+  getInUse(): Generator<MIDIPort, void, unknown>;
+  getInUseInput(): Generator<MIDIInput, void, unknown>;
+  getInUseOutput(): Generator<MIDIOutput, void, unknown>;
+  known(): Generator<MIDIPort, void, unknown>;
+  knownInput(): Generator<MIDIInput, void, unknown>;
+  knownOutput(): Generator<MIDIOutput, void, unknown>;
   scan(): Promise<void>;
   /**
    * Sends a message to a port.
@@ -572,7 +603,28 @@ declare class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
    * @param timestamp
    */
   send(message: MidiMessage, port?: MIDIOutput, timestamp?: DOMHighResTimeStamp): void;
+  sendNote(channel: number, note: number, velocity: number, duration: number, delay?: DOMHighResTimeStamp, port?: MIDIOutput): void;
+  closeAll(what?: `input` | `output` | `both`): Promise<void>;
+  setOmniInput(value: boolean): Promise<void>;
+  get omniInput(): boolean;
+  setOmniOutput(value: boolean): Promise<void>;
+  get omniOutput(): boolean;
   dumpToStringLines(): string[];
+  /**
+   * Opens `port`.
+   *
+   * If `exclusive` is _true_, all other ports of that type
+   * (ie. input or output) are closed before the port is opened.
+   *
+   * If `exclusive` is _false_ (default), already open ports are left open.
+   * @param port
+   * @param exclusive
+   */
+  open(port: MIDIPort, exclusive?: boolean): Promise<void>;
+  findKnownPort(fn: (p: MIDIPort) => boolean): MIDIPort | undefined;
+  filterKnownPort(fn: (p: MIDIPort) => boolean): Generator<MIDIPort, void, unknown>;
+  findInUsePort(fn: (p: MIDIPort) => boolean): MIDIPort | undefined;
+  filterInUsePort(fn: (p: MIDIPort) => boolean): Generator<MIDIPort, void, unknown>;
 }
 //# sourceMappingURL=manager.d.ts.map
 //#endregion
@@ -914,8 +966,16 @@ declare class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEv
   setSwitchEffect(kind: `none` | `strobe` | `pulse` | `rainbow`, value?: number): void;
 }
 //# sourceMappingURL=midi-fighter.d.ts.map
+//#endregion
+//#region ../io/src/midi/notes.d.ts
+type ParsedNote = [noteNumber: number, name: string, frequency: number];
+declare const getParsedNotes: () => ParsedNote[];
+declare const noteNameToNumber: (name: string) => number;
+declare const noteNameToFrequency: (name: string) => number;
+declare const noteNumberToName: (number: number) => string;
+declare const noteNumberToFrequency: (number: number) => number;
 declare namespace index_d_exports$1 {
-  export { Control, ControlEvents, Feedback, MidiCommands, MidiFighter, MidiFighterEncoder, MidiFighterEncoderEvents, MidiFighterEvents, MidiFighterState, MidiManager, MidiManagerEvents, MidiManagerState, MidiMessage, pack, sendNote, unpack };
+  export { Control, ControlEvents, Feedback, MidiCommands, MidiFighter, MidiFighterEncoder, MidiFighterEncoderEvents, MidiFighterEvents, MidiFighterState, MidiManager, MidiManagerEvents, MidiManagerState, MidiMessage, NoteMidiMessage, getParsedNotes, noteNameToFrequency, noteNameToNumber, noteNumberToFrequency, noteNumberToName, pack, sendNote, unpack };
 }
 //#endregion
 //#region ../io/src/espruino-ble-device.d.ts

@@ -319,7 +319,7 @@ declare function saw(timerOrFreq: Timer | number): Generator<number, void, unkno
  * osc.next().value;
  * ```
  */
-declare function square(timerOrFreq: Timer | number): Generator<0 | 1, void, unknown>;
+declare function square(timerOrFreq: Timer | number): Generator<1 | 0, void, unknown>;
 //# sourceMappingURL=oscillator.d.ts.map
 declare namespace easings_named_d_exports {
   export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };
