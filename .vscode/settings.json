@@ -109,5 +109,6 @@
   "editor.insertSpaces": true,
   "editor.tabSize": 2,
     "workbench.editor.limit.enabled":true,
-  "workbench.editor.limit.value":5
+  "workbench.editor.limit.value": 5,
+  "chat.mcp.access": "none"
 }
