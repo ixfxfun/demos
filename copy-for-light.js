@@ -15,11 +15,11 @@ deleteSync(deletePatterns, { force: true });
 
 // Copy files
 for (const c of categories) {
-  await cpy([`${c}/**/*`], `${destination}/${c}`);
+  await cpy([ `${c}/**/*` ], `${destination}/${c}`);
 }
 
 // Copy loose files
-await cpy([`index.html`, `favicon.ico`, `demos.css`, `.eslintrc.json`], `${destination}/`);
+await cpy([ `index.html`, `favicon.ico`, `demos.css`, `eslint.config.mjs` ], `${destination}/`);
 
 // Re-write import map
 const replaceOptions = {
@@ -31,7 +31,6 @@ const replaceOptions = {
 try {
   replaceInFileSync(replaceOptions);
   console.log(`copy-for-light done`);
-}
-catch (error) {
+} catch (error) {
   console.error(`copy-for-light error occurred:`, error);
 }

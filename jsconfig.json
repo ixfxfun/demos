@@ -17,6 +17,13 @@
       ],
       "@ixfx/*": [
         "./ixfx/*"
+      ],
+      "https://unpkg.com/meyda@5.6.3/dist/web/meyda.min.js": [
+        "./audio/features/lib/meyda.d.ts"
+      ],
+      "https://unpkg.com/meyda@6.0.0-beta.2/dist/web/meyda.min.js": [
+        "./audio/features/lib/meyda.d.ts"
+      
       ]
     },
     "lib": [
