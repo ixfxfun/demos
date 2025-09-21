@@ -96,11 +96,7 @@
     "ixfx",
     "WLED"
   ],
-  "chat.agent.enabled": false,
-  "chat.commandCenter.enabled": false,
-  "chat.mcp.enabled": false,
-  "chat.extensionTools.enabled": false,
-  "chat.sendElementsToChat.enabled": false,
+
   "livePreview.showServerStatusNotifications": false,
   "workbench.activityBar.location": "top",
   "workbench.sideBar.location": "right",
@@ -110,5 +106,19 @@
   "editor.tabSize": 2,
     "workbench.editor.limit.enabled":true,
   "workbench.editor.limit.value": 5,
-  "chat.mcp.access": "none"
+  "chat.mcp.access": "none",
+  "chat.mcp.autostart": "never",
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": false,
+    "windsurf": false,
+    "cursor-global": false,
+    "cursor-workspace": false
+  },
+  "inlineChat.enableV2": false,
+  "chat.disableAIFeatures": true,
+  "chat.agent.enabled": false,
+  "chat.commandCenter.enabled": false,
+  "chat.extensionTools.enabled": false,
+  "chat.sendElementsToChat.enabled": false,
+
 }
