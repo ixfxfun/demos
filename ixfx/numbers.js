@@ -1,6 +1,6 @@
 import { __export } from "./chunk-51aI8Tpl.js";
 import { integerTest, numberTest, resultThrow } from "./src-BBD50Kth.js";
-import { interpolate, scale, scaler, zip } from "./src-BeVDUOoq.js";
+import { interpolate, scale, scaler, zip } from "./src-2eX6lIN8.js";
 
 //#region ../numbers/src/apply-to-values.ts
 /**
@@ -1669,10 +1669,12 @@ const numberArrayCompute = (data, opts = {}) => {
 			if (nonNumbers === `nan`) value = NaN;
 		}
 		if (Number.isNaN(value)) continue;
-		min$1 = Math.min(min$1, value);
-		max$1 = Math.max(max$1, value);
-		total$1 += value;
-		count$1++;
+		if (value !== void 0) {
+			min$1 = Math.min(min$1, value);
+			max$1 = Math.max(max$1, value);
+			total$1 += value;
+			count$1++;
+		}
 	}
 	return {
 		total: total$1,
@@ -1832,6 +1834,141 @@ const quantiseEvery = (v, every, middleRoundsUp = true) => {
 };
 
 //#endregion
+//#region ../numbers/src/range.ts
+/**
+* Computes min/max based on a new value and previous range.
+* Returns existing object reference if value is within existing range.
+* 
+* If `value` is not a number, by default it will be ignored. Use the 'nonNumberHandling' param to set it
+* to throw an error instead if you want to catch that
+* @param value Value to compare against range
+* @param previous Previous range
+* @param nonNumberHandling 'skip' (default), non numbers are ignored; 'error' an error is thrown
+* @returns 
+*/
+function rangeMergeValue(value, previous, nonNumberHandling = `skip`) {
+	if (typeof value === `number`) {
+		if (Number.isNaN(value) || !Number.isFinite(value)) {
+			if (nonNumberHandling === `error`) throw new TypeError(`Param 'value' is NaN or infinite, and nonNumberHandling is set to 'error'`);
+			return previous;
+		}
+		if (value >= previous.min && value <= previous.max) return previous;
+		return {
+			min: Math.min(value, previous.min),
+			max: Math.max(value, previous.max)
+		};
+	} else if (nonNumberHandling === `error`) throw new TypeError(`Param 'value' is not a number (type: '${typeof value}') and nonNumberHandling is set to 'error'`);
+	return previous;
+}
+/**
+* Returns a function that scales values in a range, by default on 0..1 scale.
+* ```js
+* const range = { min: 10, max: 20 }
+* const s = rangeScaler(range);
+* s(15); // 0.5
+* ```
+* @param range Range to scale on
+* @param outMax Output range max. Default: 1
+* @param outMin Output range min. Default: 0
+* @param easing Easing function: Default: none
+* @param clamped Whether input values should be clamped if they exceed range. Default: true
+* @returns 
+*/
+function rangeScaler(range, outMax = 1, outMin = 0, easing, clamped = true) {
+	return scaler$1(range.min, range.max, outMin, outMax, easing, clamped);
+}
+/**
+* Expands a range to encompass a new range.
+* Returns `existingRange` if `newRange` is within it.
+* @param newRange 
+* @param existingRange 
+* @returns 
+*/
+function rangeMergeRange(newRange, existingRange) {
+	if (newRange.max <= existingRange.max && newRange.min >= existingRange.min) return existingRange;
+	return {
+		min: Math.min(newRange.min, existingRange.min),
+		max: Math.max(newRange.max, existingRange.max)
+	};
+}
+/**
+* Returns an empty range:
+* ```js
+* { 
+*  min: Number.MAX_SAFE_INTEGER, 
+*  max: Number.MIN_SAFE_INTEGER 
+* }
+* ```
+* @returns 
+*/
+const rangeInit = () => ({
+	min: Number.MAX_SAFE_INTEGER,
+	max: Number.MIN_SAFE_INTEGER
+});
+const rangeIsEqual = (a, b) => a.max === b.max && a.min === b.min;
+const rangeStream = (initWith = rangeInit()) => {
+	let { min: min$1, max: max$1 } = initWith;
+	const seen = (v) => {
+		if (typeof v === `number`) {
+			if (!Number.isNaN(v) && Number.isFinite(v)) {
+				min$1 = Math.min(min$1, v);
+				max$1 = Math.max(max$1, v);
+			}
+		}
+	};
+	const reset = () => {
+		min$1 = Number.MAX_SAFE_INTEGER;
+		max$1 = Number.MIN_SAFE_INTEGER;
+	};
+	return {
+		seen,
+		reset,
+		get range() {
+			return {
+				min: min$1,
+				max: max$1
+			};
+		},
+		get min() {
+			return min$1;
+		},
+		get max() {
+			return max$1;
+		}
+	};
+};
+/**
+* Iterates over `values` finding the min/max.
+* By default non-numbers, as well as NaN and infinite values are skipped.
+* @param values 
+* @param nonNumberHandling 
+* @returns 
+*/
+function rangeCompute(values, nonNumberHandling = `skip`) {
+	let min$1 = Number.MAX_SAFE_INTEGER;
+	let max$1 = Number.MIN_SAFE_INTEGER;
+	let position = 0;
+	for (const v of values) {
+		if (typeof v === `number`) {
+			if (Number.isNaN(v) || !Number.isFinite(v)) {
+				if (nonNumberHandling === `error`) throw new Error(`Value NaN or infinite at position: ${position}`);
+				continue;
+			}
+		} else {
+			if (nonNumberHandling === `error`) throw new Error(`Contains non number value. Type: '${typeof v}' Position: ${position}`);
+			continue;
+		}
+		if (v < min$1) min$1 = v;
+		if (v > max$1) max$1 = v;
+		position++;
+	}
+	return {
+		min: min$1,
+		max: max$1
+	};
+}
+
+//#endregion
 //#region ../numbers/src/softmax.ts
 /**
 * Via: https://gist.github.com/cyphunk/6c255fa05dd30e69f438a930faeb53fe
@@ -1846,5 +1983,5 @@ const softmax = (logits) => {
 };
 
 //#endregion
-export { bipolar_exports as Bipolar, normalise_exports as Normalise, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeInclusive, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
+export { bipolar_exports as Bipolar, normalise_exports as Normalise, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
 //# sourceMappingURL=numbers.js.map

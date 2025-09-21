@@ -5,13 +5,13 @@ import "./index-DTe1EM0y.js";
 import "./comparers-C6kfLE-t.js";
 import { HasCompletion } from "./index-Bne6KcmH.js";
 import "./key-value-ww1DZidG.js";
-import "./resolve-core-Cji7XRWY.js";
+import "./resolve-core-CYBLBOMw.js";
 import "./sleep-DiuAJS4P.js";
-import { RandomSource } from "./index-BD4Xy9K5.js";
+import { RandomSource } from "./index-Dg6fxrlu.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Path, Point, Rect } from "./index-D8PtH9JS.js";
-import { BasicInterpolateOptions, interpolate } from "./index-pdF5CCTk.js";
-import { Timer } from "./index-CrDQWgWl.js";
+import { Path, Point, Rect } from "./index-DSWMSAve.js";
+import { BasicInterpolateOptions, interpolate } from "./index-iwzx6A0f.js";
+import { Timer } from "./index-DSIfkq7l.js";
 import "./index-1oZyS9hM.js";
 
 //#region ../modulation/src/types.d.ts
@@ -683,7 +683,7 @@ declare class AdsrIterator implements Iterator<number> {
   private adsr;
   constructor(adsr: Adsr);
   next(...args: [] | [undefined]): IteratorResult<number>;
-  get [Symbol.toStringTag](): string;
+  readonly [Symbol.toStringTag] = "Generator";
 }
 /**
  * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
@@ -775,13 +775,13 @@ declare class Adsr extends AdsrBase implements Iterable<number> {
   readonly attackPath: Path;
   readonly decayPath: Path;
   readonly releasePath: Path;
-  readonly initialLevel: any;
-  readonly peakLevel: any;
-  readonly releaseLevel: any;
-  readonly sustainLevel: any;
-  readonly attackBend: any;
-  readonly decayBend: any;
-  readonly releaseBend: any;
+  readonly initialLevel: number;
+  readonly peakLevel: number;
+  readonly releaseLevel: number;
+  readonly sustainLevel: number;
+  readonly attackBend: number;
+  readonly decayBend: number;
+  readonly releaseBend: number;
   protected initialLevelOverride: number | undefined;
   readonly retrigger: boolean;
   private releasedAt;
@@ -826,7 +826,7 @@ declare namespace index_d_exports$1 {
  * @param opts
  * @returns
  */
-declare const adsr: (opts?: EnvelopeOpts) => () => any;
+declare const adsr: (opts?: EnvelopeOpts) => () => number;
 /**
  * Creates and runs an envelope, sampling its values at `sampleRateMs`.
  * Note that if the envelope loops, iterator never returns.

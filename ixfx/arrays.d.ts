@@ -131,8 +131,8 @@ declare const containsDuplicateInstances: <V>(array: V[] | readonly V[]) => bool
 //# sourceMappingURL=contains.d.ts.map
 //#endregion
 //#region ../arrays/src/ensure-length.d.ts
-declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand: `repeat` | `first` | `last`): (V)[];
-declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand?: `undefined`): (V | undefined)[];
+declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand: `repeat` | `first` | `last`, truncate?: `from-end` | `from-start`): (V)[];
+declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand?: `undefined`, truncate?: `from-end` | `from-start`): (V | undefined)[];
 //# sourceMappingURL=ensure-length.d.ts.map
 //#endregion
 //#region ../arrays/src/util/is-equal.d.ts

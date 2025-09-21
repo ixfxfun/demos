@@ -256,17 +256,19 @@ const containsDuplicateInstances = (array) => {
 * ```
 * @param data Input array to expand
 * @param length Desired length
-* @param expand Expand strategy
+* @param expandStrategy Expand strategy
+* @param truncateStrategy Truncation strategy. By default removes from end ('from-end')
 * @typeParam V Type of array
 */
-function ensureLength(data, length, expand = `undefined`) {
+function ensureLength(data, length, expandStrategy = `undefined`, truncateStrategy = `from-end`) {
 	if (data === void 0) throw new Error(`Data undefined`);
 	if (!Array.isArray(data)) throw new Error(`data is not an array`);
 	if (data.length === length) return [...data];
-	if (data.length > length) return data.slice(0, length);
+	if (data.length > length) if (truncateStrategy === `from-end`) return data.slice(0, length);
+	else return data.slice(data.length - length);
 	const d = [...data];
 	const add = length - d.length;
-	for (let index = 0; index < add; index++) switch (expand) {
+	for (let index = 0; index < add; index++) switch (expandStrategy) {
 		case `undefined`: {
 			d.push(void 0);
 			break;

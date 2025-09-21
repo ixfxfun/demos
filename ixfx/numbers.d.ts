@@ -939,7 +939,7 @@ declare const array: (values: readonly number[], minForced?: number, maxForced?:
  * @param opts
  * @returns
  */
-declare const numberArrayCompute: (data: number[] | readonly number[], opts?: NumbersComputeOptions) => NumbersComputeResult;
+declare const numberArrayCompute: (data: (number | undefined)[] | readonly (number | undefined)[], opts?: NumbersComputeOptions) => NumbersComputeResult;
 //# sourceMappingURL=number-array-compute.d.ts.map
 
 //#endregion
@@ -1141,6 +1141,78 @@ declare const proportion: (v: number | (() => number), t: number | (() => number
  */
 declare const quantiseEvery: (v: number, every: number, middleRoundsUp?: boolean) => number;
 //# sourceMappingURL=quantise.d.ts.map
+//#endregion
+//#region ../numbers/src/range.d.ts
+type NumericRange = Readonly<{
+  min: number;
+  max: number;
+}>;
+/**
+ * Computes min/max based on a new value and previous range.
+ * Returns existing object reference if value is within existing range.
+ *
+ * If `value` is not a number, by default it will be ignored. Use the 'nonNumberHandling' param to set it
+ * to throw an error instead if you want to catch that
+ * @param value Value to compare against range
+ * @param previous Previous range
+ * @param nonNumberHandling 'skip' (default), non numbers are ignored; 'error' an error is thrown
+ * @returns
+ */
+declare function rangeMergeValue(value: number | undefined, previous: NumericRange, nonNumberHandling?: `skip` | `error`): NumericRange;
+/**
+ * Returns a function that scales values in a range, by default on 0..1 scale.
+ * ```js
+ * const range = { min: 10, max: 20 }
+ * const s = rangeScaler(range);
+ * s(15); // 0.5
+ * ```
+ * @param range Range to scale on
+ * @param outMax Output range max. Default: 1
+ * @param outMin Output range min. Default: 0
+ * @param easing Easing function: Default: none
+ * @param clamped Whether input values should be clamped if they exceed range. Default: true
+ * @returns
+ */
+declare function rangeScaler(range: NumericRange, outMax?: number, outMin?: number, easing?: (v: number) => number, clamped?: boolean): NumberScaler;
+/**
+ * Expands a range to encompass a new range.
+ * Returns `existingRange` if `newRange` is within it.
+ * @param newRange
+ * @param existingRange
+ * @returns
+ */
+declare function rangeMergeRange(newRange: NumericRange, existingRange: NumericRange): NumericRange;
+/**
+ * Returns an empty range:
+ * ```js
+ * {
+ *  min: Number.MAX_SAFE_INTEGER,
+ *  max: Number.MIN_SAFE_INTEGER
+ * }
+ * ```
+ * @returns
+ */
+declare const rangeInit: () => NumericRange;
+declare const rangeIsEqual: (a: NumericRange, b: NumericRange) => boolean;
+declare const rangeStream: (initWith?: NumericRange) => {
+  seen: (v: any) => void;
+  reset: () => void;
+  readonly range: {
+    min: number;
+    max: number;
+  };
+  readonly min: number;
+  readonly max: number;
+};
+/**
+ * Iterates over `values` finding the min/max.
+ * By default non-numbers, as well as NaN and infinite values are skipped.
+ * @param values
+ * @param nonNumberHandling
+ * @returns
+ */
+declare function rangeCompute(values: Iterable<any>, nonNumberHandling?: `skip` | `error`): NumericRange;
+//# sourceMappingURL=range.d.ts.map
 //#endregion
 //#region ../numbers/src/round.d.ts
 declare function round(decimalPlaces: number, v: number, roundUp?: boolean): number;
@@ -1391,5 +1463,5 @@ declare const wrapRange: (min: number, max: number, fn: (distance: number) => nu
 //# sourceMappingURL=wrap.d.ts.map
 
 //#endregion
-export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeInclusive, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
+export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
 //# sourceMappingURL=numbers.d.ts.map

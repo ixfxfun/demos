@@ -2,12 +2,137 @@ import "./src-BBD50Kth.js";
 import "./is-primitive-eBwrK4Yg.js";
 import "./interval-type-DajslxUJ.js";
 import { getOrGenerate } from "./basic-D0XoOdBJ.js";
-import { SimpleEventEmitter } from "./src-TlKlGoex.js";
+import { SimpleEventEmitter } from "./src-CkygQtXo.js";
 import { keyValueSorter } from "./key-value-JSby0EXT.js";
-import "./resolve-core-BwRmfzav.js";
-import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-BeVDUOoq.js";
-import { timeout } from "./src-BIfshA2g.js";
+import "./resolve-core-CZPH91No.js";
+import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-2eX6lIN8.js";
+import { timeout } from "./src-BnNr7xTX.js";
 
+//#region ../trackers/src/changes.ts
+/**
+* Run a function if a value changes
+* ```js
+* const r = handleChangeResult(trackNumberChange, (value) => {
+*  // Called when value changes
+* });
+* r(10);
+* ```
+* @param monitor 
+* @param onChanged 
+* @param onNotChanged 
+* @returns 
+*/
+function handleChangeResult(monitor, onChanged, onNotChanged) {
+	return (v) => {
+		const r = monitor(v);
+		if (r.changed) onChanged(v, r.changes, r.total);
+		else if (typeof onNotChanged !== `undefined`) onNotChanged(v, r.identicalRun, r.total);
+	};
+}
+/**
+* Returns a function to monitor value changes.
+* ```js
+* const f = trackNumberChange(true);
+* f(10); // { changed: true, changesCount: 1 }
+* f(10); // { changed: false, changesCount: 1 }
+* ```
+* 
+* Default options:
+* * nanHandling: error
+* * includeFirstValueInCount: false
+* 
+* NaN handling:
+* * allow: use NaN value as a legal value and report a change
+* * skip: ignore NaN values, reporting back no change and use the same changes count
+* * error: throw an error if a NaN value is received
+* 
+* 
+* @returns 
+*/
+function trackNumberChange(options = {}) {
+	const nanHandling = options.nanHandling ?? `error`;
+	const includeFirstValueInCount = options.includeFirstValueInCount ?? false;
+	let lastValue = options.initial;
+	let changes = 0;
+	let total = 0;
+	let identicalRun = 0;
+	return (v) => {
+		if (typeof v !== `number`) throw new TypeError(`Parameter should be number. Got type: ${typeof v}`);
+		if (Number.isNaN(v)) switch (nanHandling) {
+			case `error`: throw new Error(`Parameter is NaN`);
+			case `skip`: return {
+				changed: false,
+				changes,
+				total,
+				identicalRun
+			};
+		}
+		total++;
+		let eq = lastValue === v;
+		if (Number.isNaN(lastValue) && Number.isNaN(v)) eq = true;
+		if (!eq) {
+			identicalRun = 0;
+			if (lastValue !== void 0 || includeFirstValueInCount) changes++;
+			lastValue = v;
+			return {
+				changed: true,
+				changes,
+				total,
+				identicalRun
+			};
+		} else identicalRun++;
+		return {
+			changed: false,
+			changes,
+			total,
+			identicalRun
+		};
+	};
+}
+/**
+* Returns a function to track changes in a boolean value
+* ```js
+* const t = trackBooleanChange();
+* t(true); // { changed:false }
+* t(true); // { changed:false }
+* t(false); // { changed: true }
+* ```
+* 
+* Default options:
+* * includeFirstValueInCount: false
+* @param options 
+* @returns 
+*/
+function trackBooleanChange(options = {}) {
+	const includeFirstValueInCount = options.includeFirstValueInCount ?? false;
+	let lastValue = options.initial;
+	let changes = 0;
+	let total = 0;
+	let identicalRun = 0;
+	return (v) => {
+		if (typeof v !== `boolean`) throw new TypeError(`Parameter should be boolean. Got type: ${typeof v}`);
+		total++;
+		if (lastValue !== v) {
+			identicalRun = 0;
+			if (lastValue !== void 0 || includeFirstValueInCount) changes++;
+			lastValue = v;
+			return {
+				changed: true,
+				changes,
+				total,
+				identicalRun
+			};
+		} else identicalRun++;
+		return {
+			changed: false,
+			changes,
+			total,
+			identicalRun
+		};
+	};
+}
+
+//#endregion
 //#region ../trackers/src/frequency-mutable.ts
 /**
 * Frequency keeps track of how many times a particular value is seen, but
@@ -821,5 +946,5 @@ var TrackedValueMap = class {
 };
 
 //#endregion
-export { FrequencyTracker, IntervalTracker, NumberTracker, ObjectTracker, PrimitiveTracker, RateTracker, TrackedValueMap, TrackerBase, frequency, interval, number, rate };
+export { FrequencyTracker, IntervalTracker, NumberTracker, ObjectTracker, PrimitiveTracker, RateTracker, TrackedValueMap, TrackerBase, frequency, handleChangeResult, interval, number, rate, trackBooleanChange, trackNumberChange };
 //# sourceMappingURL=trackers.js.map

@@ -1,7 +1,7 @@
 import { IsEqual, IsEqualContext } from "./is-equal-BzhoT7pd.js";
 import { BasicType, Interval, ToString } from "./types-CcY4GIC4.js";
 import { Result } from "./index-DTe1EM0y.js";
-import { ReactiveNonInitial, ResolveToValue } from "./resolve-core-Cji7XRWY.js";
+import { ReactiveNonInitial, ResolveToValue } from "./resolve-core-CYBLBOMw.js";
 
 //#region ../core/src/types-compare.d.ts
 /**
@@ -2152,15 +2152,19 @@ declare const hasLast: <V>(rx: object) => rx is ReactiveInitial<V>;
 /**
  * Something that can resolve to a value
  */
-type ResolveToValueSync<V> = BasicType | ReactiveNonInitial$1<V> | Generator<V> | IterableIterator<V> | ((args: any) => V);
-type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V> | ((args: any) => Promise<V>);
+type ResolveToValueSync<V> = BasicType | ReactiveNonInitial$1<V> | Generator<V> | IterableIterator<V> | ((...args: unknown[]) => V);
+type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V> | ((...args: unknown[]) => Promise<V>);
 type ResolveToValue$1<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
 /**
- * Resolves `r` to a value, where `r` is:
- * * primitive value
+ * Resolves the input to a concrete value.
+ *
+ * The input can be:
+ * * primitive value (string, boolean, number, object)
  * * a/sync function
  * * a/sync generator/iterator
  * * ReactiveNonInitial
+ *
+ * Examples:
  * ```js
  * await resolve(10);       // 10
  * await resolve(() => 10); // 10
@@ -2170,26 +2174,26 @@ type ResolveToValue$1<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
  * });                // 10
  * ```
  *
- * To resolve an object's properties, use {@link resolveFields}.
+ * If the input is a function, any arguments given to `resolve` are passed to it as a spread.
  *
- * Resolve is not recursive. So if `r` is an object, it will be returned, even
- * though its properties may be resolvable.
- * @param r
+ * Resolve is not recursive. If the input is an object, it will be returned, even
+ * though its properties may be resolvable. Use {@link resolveFields} if you want to handle this case.
+ * @param resolvable Input to resolve
+ * @param args Additional arguments to pass to function-resolvables.
+ * @returns
+ */
+declare function resolve<V extends BasicType>(resolvable: ResolveToValue$1<V>, ...args: unknown[]): Promise<V>;
+/**
+ * For the given input, attempts to 'resolve' it. See {@link resolve} for details and asynchronous version.
+ * @param resolvable
  * @param args
  * @returns
  */
-declare function resolve<V extends BasicType>(r: ResolveToValue$1<V>, ...args: any): Promise<V>;
+declare function resolveSync<V extends BasicType>(resolvable: ResolveToValueSync<V>, ...args: unknown[]): V;
 /**
- * For a given input `r`, attempts to 'resolve' it. See {@link resolve} for details.
- * @param r
- * @param args
- * @returns
- */
-declare function resolveSync<V extends BasicType>(r: ResolveToValueSync<V>, ...args: any): V;
-/**
- * Resolves a value as per {@link resolve}, however
- * If an error is thrown or the resolution results in _undefined_
- * or NaN, `fallbackValue` is returned instead.
+ * Resolves a value as per {@link resolve}, however f an error is thrown
+ * or the resolution results in _undefined_
+ * or NaN, the fallback value is returned instead.
  *
  * `null` is an allowed return value.
  *
@@ -2202,15 +2206,40 @@ declare function resolveSync<V extends BasicType>(r: ResolveToValueSync<V>, ...a
  * const r = resolveWithFallback(fn, 1);
  * const value = r(); // Always 0 or 1
  * ```
+ *
+ * See also {@link resolveWithFallbackSync}
  * @param p Thing to resolve
- * @param fallback Fallback value if an error happens, undefined or NaN
+ * @param options Fallback value if an error happens, undefined or NaN
  * @param args
  * @returns
  */
-declare function resolveWithFallback<T extends BasicType>(p: ResolveToValue$1<T>, fallback: ResolveFallbackOpts<T>, ...args: any): Promise<T>;
-declare function resolveWithFallbackSync<T extends BasicType>(p: ResolveToValueSync<T>, fallback: ResolveFallbackOpts<T>, ...args: any): T;
-type ResolveFallbackOpts<T> = {
+declare function resolveWithFallback<T extends BasicType>(p: ResolveToValue$1<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]): Promise<T>;
+/**
+ * Resolves a 'resolvable', using a fallback value if it results to _undefined_ or _NaN_. _null_ is allowed.
+ *
+ * See also {@link resolveWithFallback} for the asynchronous version.
+ *
+ * Options:
+ * * value: Fallback value
+ * * overrideWithLast: If true, uses the previously-valid value as the replacement fallback (default: false)
+ * @param p
+ * @param options
+ * @param args
+ * @returns
+ */
+declare function resolveWithFallbackSync<T extends BasicType>(p: ResolveToValueSync<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]): T;
+/**
+ * Options for {@link resolveWithFallbackSync}
+ */
+type ResolveFallbackOptions<T> = {
+  /**
+   * Fallback value
+   */
   value: T;
+  /**
+   * If _true_, will use the last valid value as a replacement fallback
+   * Default: false
+   */
   overrideWithLast?: boolean;
 };
 //# sourceMappingURL=resolve-core.d.ts.map
@@ -2353,5 +2382,5 @@ type FixedLengthArray<T extends any[]> = Pick<T, Exclude<keyof T, ArrayLengthMut
 //# sourceMappingURL=types-array.d.ts.map
 
 //#endregion
-export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, BasicType$1 as BasicType, ChangeKind, ChangeRecord, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, FixedLengthArray, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval$1 as Interval, IsEqual$1 as IsEqual, IsEqualContext$1 as IsEqualContext, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial$1 as ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOpts, ResolveToValue$1 as ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString$1 as ToString, TrackUnique, index_d_exports$1 as Trackers, Unsubscriber, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
+export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, BasicType$1 as BasicType, ChangeKind, ChangeRecord, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, FixedLengthArray, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval$1 as Interval, IsEqual$1 as IsEqual, IsEqualContext$1 as IsEqualContext, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial$1 as ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOptions, ResolveToValue$1 as ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString$1 as ToString, TrackUnique, index_d_exports$1 as Trackers, Unsubscriber, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=core.d.ts.map

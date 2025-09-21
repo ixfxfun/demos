@@ -3,8 +3,87 @@ import { Interval, KeyValue, ToString } from "./types-CcY4GIC4.js";
 import { GetOrGenerate } from "./maps-Di0k-jsW.js";
 import { KeyValueSortSyles } from "./key-value-ww1DZidG.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { NumbersComputeResult } from "./index-pdF5CCTk.js";
+import { NumbersComputeResult } from "./index-iwzx6A0f.js";
 
+//#region ../trackers/src/changes.d.ts
+type TrackChangeResult = {
+  /**
+   * If value has changed
+   */
+  changed: boolean;
+  /**
+   * Number of times value has changed for duration of monitor
+   */
+  changes: number;
+  /**
+   * Number of times the same value has come
+   * up in a row
+   */
+  identicalRun: number;
+  /**
+   * Number of values total
+   */
+  total: number;
+};
+type TrackChangeOptions<T> = {
+  includeFirstValueInCount: boolean;
+  initial: T;
+};
+type TrackNumberChangeOptions = TrackChangeOptions<number> & {
+  nanHandling: `allow` | `skip` | `error`;
+};
+/**
+ * Run a function if a value changes
+ * ```js
+ * const r = handleChangeResult(trackNumberChange, (value) => {
+ *  // Called when value changes
+ * });
+ * r(10);
+ * ```
+ * @param monitor
+ * @param onChanged
+ * @param onNotChanged
+ * @returns
+ */
+declare function handleChangeResult<T>(monitor: (v: T) => TrackChangeResult, onChanged: (v: T, countChanges: number, countTotal: number) => void, onNotChanged?: (v: T, countIdentical: number, countTotal: number) => void): (v: T) => void;
+/**
+ * Returns a function to monitor value changes.
+ * ```js
+ * const f = trackNumberChange(true);
+ * f(10); // { changed: true, changesCount: 1 }
+ * f(10); // { changed: false, changesCount: 1 }
+ * ```
+ *
+ * Default options:
+ * * nanHandling: error
+ * * includeFirstValueInCount: false
+ *
+ * NaN handling:
+ * * allow: use NaN value as a legal value and report a change
+ * * skip: ignore NaN values, reporting back no change and use the same changes count
+ * * error: throw an error if a NaN value is received
+ *
+ *
+ * @returns
+ */
+declare function trackNumberChange(options?: Partial<TrackNumberChangeOptions>): (v: number) => TrackChangeResult;
+/**
+ * Returns a function to track changes in a boolean value
+ * ```js
+ * const t = trackBooleanChange();
+ * t(true); // { changed:false }
+ * t(true); // { changed:false }
+ * t(false); // { changed: true }
+ * ```
+ *
+ * Default options:
+ * * includeFirstValueInCount: false
+ * @param options
+ * @returns
+ */
+declare function trackBooleanChange(options?: Partial<TrackChangeOptions<boolean>>): (v: boolean) => TrackChangeResult;
+//# sourceMappingURL=changes.d.ts.map
+//#endregion
 //#region ../trackers/src/frequency-mutable.d.ts
 type FrequencyEventMap = {
   readonly change: {
@@ -626,5 +705,5 @@ declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
 //# sourceMappingURL=tracked-value.d.ts.map
 
 //#endregion
-export { FrequencyEventMap, FrequencyTracker, IntervalTracker, NumberTracker, NumberTrackerResults, ObjectTracker, PrimitiveTracker, RateTracker, RateTrackerOpts, Timestamped, TimestampedObject, TimestampedPrimitive, TrackedValueMap, TrackedValueOpts, TrackerBase, TrimReason, frequency, interval, number, rate };
+export { FrequencyEventMap, FrequencyTracker, IntervalTracker, NumberTracker, NumberTrackerResults, ObjectTracker, PrimitiveTracker, RateTracker, RateTrackerOpts, Timestamped, TimestampedObject, TimestampedPrimitive, TrackChangeOptions, TrackChangeResult, TrackNumberChangeOptions, TrackedValueMap, TrackedValueOpts, TrackerBase, TrimReason, frequency, handleChangeResult, interval, number, rate, trackBooleanChange, trackNumberChange };
 //# sourceMappingURL=trackers.d.ts.map

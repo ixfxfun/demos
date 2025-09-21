@@ -2,7 +2,7 @@ import { BasicType, Interval } from "./types-CcY4GIC4.js";
 import { Result } from "./index-DTe1EM0y.js";
 import { Comparer } from "./comparers-C6kfLE-t.js";
 import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, LogOption, LogSet, OnStartCalled, continuously } from "./index-Bne6KcmH.js";
-import { ResolveToValue, ResolveToValueSync } from "./resolve-core-Cji7XRWY.js";
+import { ResolveToValue, ResolveToValueSync } from "./resolve-core-CYBLBOMw.js";
 import { sleep } from "./sleep-DiuAJS4P.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
 

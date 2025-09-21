@@ -3,13 +3,13 @@ import { functionTest, integerTest, numberTest, resultThrow, stringTest } from "
 import "./is-primitive-eBwrK4Yg.js";
 import { intervalToMs } from "./interval-type-DajslxUJ.js";
 import "./basic-D0XoOdBJ.js";
-import { SimpleEventEmitter } from "./src-TlKlGoex.js";
+import { SimpleEventEmitter } from "./src-CkygQtXo.js";
 import "./key-value-JSby0EXT.js";
-import { resolveWithFallbackSync } from "./resolve-core-BwRmfzav.js";
-import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-BeVDUOoq.js";
-import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-BIfshA2g.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-C7XtfIer.js";
-import { float, floatSource } from "./bezier-CITq2XUb.js";
+import { resolveWithFallbackSync } from "./resolve-core-CZPH91No.js";
+import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-2eX6lIN8.js";
+import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-BnNr7xTX.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-CURfSkGx.js";
+import { float, floatSource } from "./bezier-5SBfGcNj.js";
 
 //#region ../modulation/src/source/ticks.ts
 /**
@@ -1032,9 +1032,7 @@ var AdsrIterator = class {
 			done: c[0] === `complete`
 		};
 	}
-	get [Symbol.toStringTag]() {
-		return `Generator`;
-	}
+	[Symbol.toStringTag] = `Generator`;
 };
 /**
 * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,

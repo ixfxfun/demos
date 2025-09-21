@@ -4,7 +4,7 @@ import { recordEntriesDepthFirst } from "./records-Cei7yF1D.js";
 import { isPrimitive } from "./is-primitive-eBwrK4Yg.js";
 import { compareIterableValuesShallow, intervalToMs, isEqualContextString, isEqualDefault, toStringDefault } from "./interval-type-DajslxUJ.js";
 import { isInteger } from "./is-integer-BmMnD0ra.js";
-import { getErrorMessage, resolve, resolveSync } from "./resolve-core-BwRmfzav.js";
+import { getErrorMessage, resolve, resolveSync } from "./resolve-core-CZPH91No.js";
 
 //#region ../core/src/records/map-object-keys.ts
 /**
@@ -2852,11 +2852,15 @@ const hasLast = (rx) => {
 //#endregion
 //#region ../core/src/resolve-core.ts
 /**
-* Resolves `r` to a value, where `r` is:
-* * primitive value
+* Resolves the input to a concrete value. 
+* 
+* The input can be:
+* * primitive value (string, boolean, number, object)
 * * a/sync function
 * * a/sync generator/iterator
 * * ReactiveNonInitial
+* 
+* Examples:
 * ```js
 * await resolve(10);       // 10
 * await resolve(() => 10); // 10
@@ -2866,61 +2870,61 @@ const hasLast = (rx) => {
 * });                // 10
 * ```
 * 
-* To resolve an object's properties, use {@link resolveFields}.
+* If the input is a function, any arguments given to `resolve` are passed to it as a spread.
 * 
-* Resolve is not recursive. So if `r` is an object, it will be returned, even
-* though its properties may be resolvable.
-* @param r 
-* @param args 
+* Resolve is not recursive. If the input is an object, it will be returned, even
+* though its properties may be resolvable. Use {@link resolveFields} if you want to handle this case.
+* @param resolvable Input to resolve
+* @param args Additional arguments to pass to function-resolvables.
 * @returns 
 */
-async function resolve$1(r, ...args) {
-	if (typeof r === `object`) if (`next` in r) {
-		const tag = r[Symbol.toStringTag];
+async function resolve$1(resolvable, ...args) {
+	if (typeof resolvable === `object`) if (`next` in resolvable) {
+		const tag = resolvable[Symbol.toStringTag];
 		if (tag === `Generator` || tag == `Array Iterator`) {
-			const v = r.next();
+			const v = resolvable.next();
 			if (`done` in v && `value` in v) return v.value;
 			return v;
 		} else if (tag === `AsyncGenerator`) {
-			const v = await r.next();
+			const v = await resolvable.next();
 			if (`done` in v && `value` in v) return v.value;
 			return v;
 		} else throw new Error(`Object has 'next' prop, but does not have 'AsyncGenerator', 'Generator' or 'Array Iterator' string tag symbol. Got: '${tag}'`);
-	} else if (isReactive(r)) {
-		if (hasLast(r)) return r.last();
+	} else if (isReactive(resolvable)) {
+		if (hasLast(resolvable)) return resolvable.last();
 		throw new Error(`Reactive does not have last value`);
-	} else return r;
-	else if (typeof r === `function`) {
-		const v = await r(args);
+	} else return resolvable;
+	else if (typeof resolvable === `function`) {
+		const v = await resolvable(...args);
 		return v;
-	} else return r;
+	} else return resolvable;
 }
 /**
-* For a given input `r`, attempts to 'resolve' it. See {@link resolve} for details.
-* @param r 
+* For the given input, attempts to 'resolve' it. See {@link resolve} for details and asynchronous version.
+* @param resolvable 
 * @param args 
 * @returns 
 */
-function resolveSync$1(r, ...args) {
-	if (typeof r === `object`) if (`next` in r) {
-		const tag = r[Symbol.toStringTag];
+function resolveSync$1(resolvable, ...args) {
+	if (typeof resolvable === `object`) if (`next` in resolvable) {
+		const tag = resolvable[Symbol.toStringTag];
 		if (tag === `Generator` || tag == `Array Iterator`) {
-			const v = r.next();
+			const v = resolvable.next();
 			if (`done` in v && `value` in v) return v.value;
 			return v;
 		} else if (tag === `AsyncGenerator`) throw new Error(`resolveSync cannot work with an async generator`);
 		else throw new Error(`Object has 'next' prop, but does not have 'Generator' or 'Array Iterator' string tag symbol. Got: '${tag}'`);
-	} else if (isReactive(r)) {
-		if (hasLast(r)) return r.last();
+	} else if (isReactive(resolvable)) {
+		if (hasLast(resolvable)) return resolvable.last();
 		throw new Error(`Reactive does not have last value`);
-	} else return r;
-	else if (typeof r === `function`) return r(args);
-	else return r;
+	} else return resolvable;
+	else if (typeof resolvable === `function`) return resolvable(...args);
+	else return resolvable;
 }
 /**
-* Resolves a value as per {@link resolve}, however
-* If an error is thrown or the resolution results in _undefined_ 
-* or NaN, `fallbackValue` is returned instead.
+* Resolves a value as per {@link resolve}, however f an error is thrown 
+* or the resolution results in _undefined_ 
+* or NaN, the fallback value is returned instead.
 * 
 * `null` is an allowed return value.
 * 
@@ -2933,16 +2937,18 @@ function resolveSync$1(r, ...args) {
 * const r = resolveWithFallback(fn, 1);
 * const value = r(); // Always 0 or 1
 * ```
+* 
+* See also {@link resolveWithFallbackSync}
 * @param p Thing to resolve
-* @param fallback Fallback value if an error happens, undefined or NaN
+* @param options Fallback value if an error happens, undefined or NaN
 * @param args 
 * @returns 
 */
-async function resolveWithFallback(p, fallback, ...args) {
+async function resolveWithFallback(p, options, ...args) {
 	let errored = false;
-	let fallbackValue = fallback.value;
-	const overrideWithLast = fallback.overrideWithLast ?? false;
-	if (fallbackValue === void 0) throw new Error(`Needs a fallback value`);
+	let fallbackValue = options.value;
+	const overrideWithLast = options.overrideWithLast ?? false;
+	if (fallbackValue === void 0) throw new Error(`Param 'options.value' is undefined`);
 	try {
 		const r = await resolve$1(p, ...args);
 		if (typeof r === `undefined`) return fallbackValue;
@@ -2957,11 +2963,24 @@ async function resolveWithFallback(p, fallback, ...args) {
 		return fallbackValue;
 	}
 }
-function resolveWithFallbackSync(p, fallback, ...args) {
+/**
+* Resolves a 'resolvable', using a fallback value if it results to _undefined_ or _NaN_. _null_ is allowed.
+* 
+* See also {@link resolveWithFallback} for the asynchronous version.
+* 
+* Options:
+* * value: Fallback value
+* * overrideWithLast: If true, uses the previously-valid value as the replacement fallback (default: false)
+* @param p 
+* @param options 
+* @param args 
+* @returns 
+*/
+function resolveWithFallbackSync(p, options, ...args) {
 	let errored = false;
-	let fallbackValue = fallback.value;
-	const overrideWithLast = fallback.overrideWithLast ?? false;
-	if (fallbackValue === void 0) throw new Error(`Needs a fallback value`);
+	let fallbackValue = options.value;
+	const overrideWithLast = options.overrideWithLast ?? false;
+	if (fallbackValue === void 0) throw new Error(`Param 'options.value' is undefined`);
 	try {
 		const r = resolveSync$1(p, ...args);
 		if (typeof r === `undefined`) return fallbackValue;
