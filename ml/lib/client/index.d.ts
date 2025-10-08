@@ -187,6 +187,8 @@ type HandLandmarkerResult = {
  * This is useful for tracking the movement of a pose or its landmarks over time.
  * It does this by making a PointTracker for each keypoint of a pose.
  *
+ * Note: You probably don't want to create this yourself! Rather, use a {@link PosesTracker} to access.
+ *
  * @example
  * ```js
  * // Create a tracker (fromId is the id of sender, poseId is the id of the pose)
@@ -203,15 +205,15 @@ type HandLandmarkerResult = {
  *  You can get the raw keypoint data from the pose
  * ```js
  * // Get a single point
- * const nosePoint = pose.keypointValue(`nose`); // { x, y, score, name }
+ * const nosePoint = pose.landmarkValue(`nose`); // { x, y, score, name }
  * // Get all points
- * for (const kp of poses.getRawValues()) {
+ * for (const kp of poses.landmarkValues()) {
  * // { x, y, score, name }
  * }
  * ```
  * But the real power comes from getting the [PointTracker](https://api.ixfx.fun/_ixfx/geometry/PointTracker/) for a keypoint, since it keeps track of not just the last data, but a whole trail of historical data for a given keypoint.
  * ```js
- * const noseTracker = pose.keypoint(`nose`); // PointTracker
+ * const noseTracker = pose.landmark(`nose`); // PointTracker
  * ```
  * Once we have the PointTracker, there are a _lot_ of things to access:
  *
