@@ -3,12 +3,12 @@ import { errorResult, integerTest, numberTest, percentTest, resultThrow } from "
 import "./is-primitive-eBwrK4Yg.js";
 import "./interval-type-DajslxUJ.js";
 import { zipKeyValue } from "./basic-D0XoOdBJ.js";
-import "./src-CkygQtXo.js";
+import "./src-BC3BytBO.js";
 import "./key-value-JSby0EXT.js";
 import "./resolve-core-CZPH91No.js";
-import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-2eX6lIN8.js";
-import { mutable } from "./src-BnNr7xTX.js";
-import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-5SBfGcNj.js";
+import { clamp$1 as clamp, clampIndex, dotProduct, linearSpace, minFast, minIndex, movingAverageLight, quantiseEvery, round, scale, sortByNumericProperty, wrap } from "./src-CSkWIttj.js";
+import { mutable } from "./src-BP8ZzJBi.js";
+import { Bezier, ObjectTracker, TrackedValueMap, randomElement } from "./bezier-DxzJ_wRN.js";
 
 //#region ../geometry/src/pi.ts
 const piPi = Math.PI * 2;
@@ -6007,25 +6007,6 @@ var PointTracker = class extends ObjectTracker {
 		this.markRelation = void 0;
 	}
 	/**
-	* Adds a PointerEvent along with its
-	* coalesced events, if available.
-	* @param p 
-	* @returns 
-	*/
-	seenEvent(p) {
-		if (`getCoalescedEvents` in p) {
-			const events = p.getCoalescedEvents();
-			const asPoints$1 = events.map((event) => ({
-				x: event.clientX,
-				y: event.clientY
-			}));
-			return this.seen(...asPoints$1);
-		} else return this.seen({
-			x: p.clientX,
-			y: p.clientY
-		});
-	}
-	/**
 	* Makes a 'mark' in the tracker, allowing you to compare values
 	* to this point.
 	*/
@@ -6102,12 +6083,25 @@ var PointTracker = class extends ObjectTracker {
 	* If there are less than two points, zero is returned.
 	*
 	* This is the direct distance from initial to last,
-	* not the accumulated length.
+	* not the accumulated length. Use {@link length} for that.
 	* @returns Distance
 	*/
 	distanceFromStart() {
 		const initial = this.initial;
 		return this.values.length >= 2 && initial !== void 0 ? distance(initial, this.last) : 0;
+	}
+	/**
+	* Returns the speed (over milliseconds) based on accumulated travel distance.
+	* 
+	* If there's no initial point, 0 is returned.
+	* @returns 
+	*/
+	speedFromStart() {
+		const d = this.length;
+		const t = this.timespan;
+		if (Number.isNaN(t)) return 0;
+		if (d === 0) return 0;
+		return Math.abs(d) / t;
 	}
 	/**
 	* Difference between last point and the initial point, calculated
@@ -6129,7 +6123,7 @@ var PointTracker = class extends ObjectTracker {
 		if (initial !== void 0 && this.values.length > 2) return angleRadian(initial, this.last);
 	}
 	/**
-	* Returns the total length of accumulated points.
+	* Returns the total distance from accumulated points.
 	* Returns 0 if points were not saved, or there's only one
 	*/
 	get length() {
@@ -6171,6 +6165,48 @@ var PointsTracker = class extends TrackedValueMap {
 			p.seen(start);
 			return p;
 		});
+	}
+	get(id) {
+		const v = super.get(id);
+		return v;
+	}
+};
+var UserPointerTracker = class extends PointTracker {
+	/**
+	* Adds a PointerEvent along with its
+	* coalesced events, if available.
+	* @param p 
+	* @returns 
+	*/
+	seenEvent(p) {
+		if (`getCoalescedEvents` in p) {
+			const events = p.getCoalescedEvents();
+			const asPoints$1 = events.map((event) => ({
+				x: event.clientX,
+				y: event.clientY
+			}));
+			return this.seen(...asPoints$1);
+		} else return this.seen({
+			x: p.clientX,
+			y: p.clientY
+		});
+	}
+};
+var UserPointersTracker = class extends TrackedValueMap {
+	constructor(opts = {}) {
+		super((key, start) => {
+			if (start === void 0) throw new Error(`Requires start point`);
+			const p = new UserPointerTracker({
+				...opts,
+				id: key
+			});
+			p.seen(start);
+			return p;
+		});
+	}
+	get(id) {
+		const v = super.get(id);
+		return v;
 	}
 	/**
 	* Track a PointerEvent
@@ -6470,6 +6506,8 @@ __export(point_exports, {
 	PointsTracker: () => PointsTracker,
 	Unit: () => Unit,
 	Unit3d: () => Unit3d,
+	UserPointerTracker: () => UserPointerTracker,
+	UserPointersTracker: () => UserPointersTracker,
 	abs: () => abs,
 	angleRadian: () => angleRadian,
 	angleRadianCircle: () => angleRadianCircle,
@@ -10411,5 +10449,5 @@ __export(triangle_exports, {
 */
 
 //#endregion
-export { arc_exports as Arcs, bezier_exports as Beziers, circle_exports as Circles, compound_path_exports as Compound, curve_simplification_exports as CurveSimplification, ellipse_exports as Ellipses, grid_exports as Grids, layout_exports as Layouts, line_exports as Lines, path_exports as Paths, PointTracker, point_exports as Points, PointsTracker, polar_exports as Polar, quad_tree_exports as QuadTree, rect_exports as Rects, shape_exports as Shapes, surface_points_exports as SurfacePoints, triangle_exports as Triangles, vector_exports as Vectors, waypoint_exports as Waypoints, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
+export { arc_exports as Arcs, bezier_exports as Beziers, circle_exports as Circles, compound_path_exports as Compound, curve_simplification_exports as CurveSimplification, ellipse_exports as Ellipses, grid_exports as Grids, layout_exports as Layouts, line_exports as Lines, path_exports as Paths, PointTracker, point_exports as Points, PointsTracker, polar_exports as Polar, quad_tree_exports as QuadTree, rect_exports as Rects, shape_exports as Shapes, surface_points_exports as SurfacePoints, triangle_exports as Triangles, UserPointerTracker, UserPointersTracker, vector_exports as Vectors, waypoint_exports as Waypoints, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
 //# sourceMappingURL=geometry.js.map

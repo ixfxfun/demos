@@ -1,11 +1,11 @@
 import "./is-equal-BzhoT7pd.js";
 import "./types-CcY4GIC4.js";
-import "./maps-Di0k-jsW.js";
+import "./maps-Bm5z7qq5.js";
 import { Result } from "./index-DTe1EM0y.js";
 import "./key-value-ww1DZidG.js";
-import { ISetMutable, ObjectTracker, RandomSource, TimestampedObject, TrackedValueMap, TrackedValueOpts, TraversableTree, TrimReason } from "./index-Dg6fxrlu.js";
+import { ISetMutable, ObjectTracker, RandomSource, TimestampedObject, TrackedValueMap, TrackedValueOpts, TraversableTree, TrimReason } from "./index-BkFpdty_.js";
 import "./index-CZIsUroQ.js";
-import "./index-iwzx6A0f.js";
+import "./index-C8cro9Jz.js";
 
 //#region ../geometry/src/point/point-type.d.ts
 /**
@@ -4239,7 +4239,7 @@ type PointTrackerResults = Readonly<{
  * When using a buffer limited by `sampleLimit`, the 'initial' point will be the oldest in the
  * buffer, not actually the very first point seen.
  */
-declare class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
+declare class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TPoint, PointTrackerResults> {
   initialRelation: PointRelation | undefined;
   markRelation: PointRelation | undefined;
   lastResult: PointTrackerResults | undefined;
@@ -4254,13 +4254,6 @@ declare class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * @ignore
    */
   onReset(): void;
-  /**
-   * Adds a PointerEvent along with its
-   * coalesced events, if available.
-   * @param p
-   * @returns
-   */
-  seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults;
   /**
    * Makes a 'mark' in the tracker, allowing you to compare values
    * to this point.
@@ -4301,10 +4294,17 @@ declare class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * If there are less than two points, zero is returned.
    *
    * This is the direct distance from initial to last,
-   * not the accumulated length.
+   * not the accumulated length. Use {@link length} for that.
    * @returns Distance
    */
   distanceFromStart(): number;
+  /**
+   * Returns the speed (over milliseconds) based on accumulated travel distance.
+   *
+   * If there's no initial point, 0 is returned.
+   * @returns
+   */
+  speedFromStart(): number;
   /**
    * Difference between last point and the initial point, calculated
    * as a simple subtraction of x,y & z.
@@ -4319,7 +4319,7 @@ declare class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    */
   angleFromStart(): number | undefined;
   /**
-   * Returns the total length of accumulated points.
+   * Returns the total distance from accumulated points.
    * Returns 0 if points were not saved, or there's only one
    */
   get length(): number;
@@ -4340,12 +4340,26 @@ declare class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
  * A {@link TrackedValueMap} for points. Uses {@link PointTracker} to
  * track added values.
  */
-declare class PointsTracker extends TrackedValueMap<Point, PointTracker, PointTrackerResults> {
+declare class PointsTracker<TPoint extends Point = Point> extends TrackedValueMap<TPoint, PointTracker<TPoint>, PointTrackerResults> {
   constructor(opts?: TrackedValueOpts);
+  get(id: string): PointTracker<TPoint> | undefined;
+}
+declare class UserPointerTracker extends PointTracker {
   /**
-   * Track a PointerEvent
-   * @param event
+   * Adds a PointerEvent along with its
+   * coalesced events, if available.
+   * @param p
+   * @returns
    */
+  seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults;
+}
+declare class UserPointersTracker extends TrackedValueMap<Point, PointTracker, PointTrackerResults> {
+  constructor(opts?: TrackedValueOpts);
+  get(id: string): UserPointerTracker | undefined;
+  /**
+  * Track a PointerEvent
+  * @param event
+  */
   seenEvent(event: PointerEvent): Promise<PointTrackerResults[]>;
 }
 //# sourceMappingURL=point-tracker.d.ts.map
@@ -4646,7 +4660,7 @@ declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => b
 declare const wrap: (pt: Point, ptMax?: Point, ptMin?: Point) => Point;
 //# sourceMappingURL=wrap.d.ts.map
 declare namespace index_d_exports$6 {
-  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, test, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
+  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, UserPointerTracker, UserPointersTracker, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, test, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
 }
 //#endregion
 //#region ../geometry/src/line/multiply.d.ts
@@ -6476,5 +6490,5 @@ declare namespace index_d_exports$10 {
   export { BarycentricCoord, Empty, equilateral_d_exports as Equilateral, isosceles_d_exports as Isosceles, Placeholder$1 as Placeholder, right_d_exports as Right, Triangle, angles, anglesDegrees, apply, area$3 as area, barycentricCoord, barycentricToCartestian, bbox, centroid, corners, edges, equilateralFromVertex, fromFlatArray, fromPoints, fromRadius, guard, innerCircle, intersectsPoint, isAcute, isEmpty, isEqual, isEquilateral, isIsosceles, isOblique, isObtuse, isPlaceholder, isRightAngle, isTriangle, lengths, outerCircle, perimeter$3 as perimeter, rotate, rotateByVertex, toFlatArray };
 }
 //#endregion
-export { Angle, Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, index_d_exports as Arcs, BarycentricCoord, index_d_exports$1 as Beziers, Circle, CirclePositioned, CircleRandomPointOpts, CircleToSvg, index_d_exports$2 as Circles, compound_path_d_exports as Compound, CompoundPath, ContainsResult, Coord, CubicBezier, CubicBezierPath, curve_simplification_d_exports as CurveSimplification, Dimensions, ellipse_d_exports as Ellipses, Grid, GridArray1d, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridCreateVisitor, GridIdentifyNeighbours, GridNeighbour, GridNeighbourMaybe, GridNeighbourSelectionLogic, GridNeighbourSelector, GridNeighbours, GridReadable, GridVisitorOpts, GridVisual, GridWritable, index_d_exports$3 as Grids, layout_d_exports as Layouts, Line, LinePath, index_d_exports$4 as Lines, Path, index_d_exports$5 as Paths, Placeholder, Placeholder3d, type Point, type Point3d, PointCalculableShape, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, index_d_exports$6 as Points, PointsTracker, index_d_exports$7 as Polar, PolarRay, PolarRayWithOrigin, PolarToCartesian, PolyLine, quad_tree_d_exports as QuadTree, QuadraticBezier, QuadraticBezierPath, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, index_d_exports$8 as Rects, ScaleBy, Scaler, ScalerCombined, ShapePositioned, index_d_exports$9 as Shapes, Sphere, surface_points_d_exports as SurfacePoints, Triangle, index_d_exports$10 as Triangles, vector_d_exports as Vectors, waypoint_d_exports as Waypoints, WithBeziers, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
+export { Angle, Arc, ArcInterpolate, ArcPositioned, ArcSvgOpts, ArcToSvg, index_d_exports as Arcs, BarycentricCoord, index_d_exports$1 as Beziers, Circle, CirclePositioned, CircleRandomPointOpts, CircleToSvg, index_d_exports$2 as Circles, compound_path_d_exports as Compound, CompoundPath, ContainsResult, Coord, CubicBezier, CubicBezierPath, curve_simplification_d_exports as CurveSimplification, Dimensions, ellipse_d_exports as Ellipses, Grid, GridArray1d, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridCreateVisitor, GridIdentifyNeighbours, GridNeighbour, GridNeighbourMaybe, GridNeighbourSelectionLogic, GridNeighbourSelector, GridNeighbours, GridReadable, GridVisitorOpts, GridVisual, GridWritable, index_d_exports$3 as Grids, layout_d_exports as Layouts, Line, LinePath, index_d_exports$4 as Lines, Path, index_d_exports$5 as Paths, Placeholder, Placeholder3d, type Point, type Point3d, PointCalculableShape, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, index_d_exports$6 as Points, PointsTracker, index_d_exports$7 as Polar, PolarRay, PolarRayWithOrigin, PolarToCartesian, PolyLine, quad_tree_d_exports as QuadTree, QuadraticBezier, QuadraticBezierPath, Rect, Rect3d, Rect3dPositioned, RectArray, RectPositioned, RectPositionedArray, index_d_exports$8 as Rects, ScaleBy, Scaler, ScalerCombined, ShapePositioned, index_d_exports$9 as Shapes, Sphere, surface_points_d_exports as SurfacePoints, Triangle, index_d_exports$10 as Triangles, UserPointerTracker, UserPointersTracker, vector_d_exports as Vectors, waypoint_d_exports as Waypoints, WithBeziers, angleConvert, angleParse, degreeArc, degreeToGradian, degreeToRadian, degreeToTurn, degreesSum, gradianToDegree, gradianToRadian, radianArc, radianInvert, radianToDegree, radianToGradian, radianToTurn, radiansFromAxisX, radiansSum, scaler, turnToDegree, turnToRadian };
 //# sourceMappingURL=geometry.d.ts.map

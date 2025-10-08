@@ -1,7 +1,7 @@
 import { IsEqual } from "./is-equal-BzhoT7pd.js";
 import { Interval, RankArrayOptions, RankFunction, RankOptions, ToString } from "./types-CcY4GIC4.js";
 import { SleepOpts } from "./sleep-DiuAJS4P.js";
-import { NumbersComputeOptions, NumbersComputeResult } from "./index-iwzx6A0f.js";
+import { NumbersComputeOptions, NumbersComputeResult } from "./index-C8cro9Jz.js";
 
 //#region ../iterables/src/types.d.ts
 type WithEvents = {

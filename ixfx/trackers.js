@@ -1,12 +1,12 @@
 import "./src-BBD50Kth.js";
 import "./is-primitive-eBwrK4Yg.js";
 import "./interval-type-DajslxUJ.js";
-import { getOrGenerate } from "./basic-D0XoOdBJ.js";
-import { SimpleEventEmitter } from "./src-CkygQtXo.js";
+import { getOrGenerateSync } from "./basic-D0XoOdBJ.js";
+import { SimpleEventEmitter } from "./src-BC3BytBO.js";
 import { keyValueSorter } from "./key-value-JSby0EXT.js";
 import "./resolve-core-CZPH91No.js";
-import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-2eX6lIN8.js";
-import { timeout } from "./src-BnNr7xTX.js";
+import { maxFast, minFast, numberArrayCompute, totalFast } from "./src-CSkWIttj.js";
+import { timeout } from "./src-BP8ZzJBi.js";
 
 //#region ../trackers/src/changes.ts
 /**
@@ -391,6 +391,17 @@ var PrimitiveTracker = class extends TrackerBase {
 		if (this.values.length < 0) throw new Error(`No values seen yet`);
 		return Date.now() - this.timestamps[0];
 	}
+	/**
+	* Returns the time, in milliseconds, covering the initial and last values.
+	* Returns NaN if either of these is missing.
+	*/
+	get timespan() {
+		const oldest = this.timestamps.at(0);
+		const newest = this.timestamps.at(-1);
+		if (oldest === void 0) return NaN;
+		if (newest === void 0) return NaN;
+		return newest - oldest;
+	}
 	onReset() {
 		this.values = [];
 		this.timestamps = [];
@@ -435,12 +446,9 @@ var PrimitiveTracker = class extends TrackerBase {
 //#endregion
 //#region ../trackers/src/number-tracker.ts
 var NumberTracker = class extends PrimitiveTracker {
-	total = 0;
-	min = Number.MAX_SAFE_INTEGER;
-	max = Number.MIN_SAFE_INTEGER;
-	get avg() {
-		return this.total / this.seenCount;
-	}
+	#total = 0;
+	#min = Number.MAX_SAFE_INTEGER;
+	#max = Number.MIN_SAFE_INTEGER;
 	/**
 	* Difference between last value and initial.
 	* Eg. if last value was 10 and initial value was 5, 5 is returned (10 - 5)
@@ -461,9 +469,9 @@ var NumberTracker = class extends PrimitiveTracker {
 		return this.last / this.initial;
 	}
 	onReset() {
-		this.min = Number.MAX_SAFE_INTEGER;
-		this.max = Number.MIN_SAFE_INTEGER;
-		this.total = 0;
+		this.#min = Number.MAX_SAFE_INTEGER;
+		this.#max = Number.MIN_SAFE_INTEGER;
+		this.#total = 0;
 		super.onReset();
 	}
 	/**
@@ -472,30 +480,41 @@ var NumberTracker = class extends PrimitiveTracker {
 	* @param reason 
 	*/
 	onTrimmed(reason) {
-		this.min = minFast(this.values);
-		this.max = maxFast(this.values);
-		this.total = totalFast(this.values);
+		this.#min = minFast(this.values);
+		this.#max = maxFast(this.values);
+		this.#total = totalFast(this.values);
 	}
 	computeResults(values) {
 		if (values.some((v) => Number.isNaN(v))) throw new Error(`Cannot add NaN`);
 		const numbers = values.map((value) => value.value);
-		this.total = numbers.reduce((accumulator, v) => accumulator + v, this.total);
-		this.min = Math.min(...numbers, this.min);
-		this.max = Math.max(...numbers, this.max);
-		const r = {
-			max: this.max,
-			min: this.min,
-			total: this.total,
+		this.#total = numbers.reduce((accumulator, v) => accumulator + v, this.#total);
+		this.#min = Math.min(...numbers, this.#min);
+		this.#max = Math.max(...numbers, this.#max);
+		return {
+			max: this.#max,
+			min: this.#min,
+			total: this.#total,
 			avg: this.avg
 		};
-		return r;
 	}
 	getMinMaxAvg() {
 		return {
-			min: this.min,
-			max: this.max,
+			min: this.#min,
+			max: this.#max,
 			avg: this.avg
 		};
+	}
+	get max() {
+		return this.#max;
+	}
+	get total() {
+		return this.#total;
+	}
+	get min() {
+		return this.#min;
+	}
+	get avg() {
+		return this.#total / this.seenCount;
 	}
 };
 /**
@@ -797,6 +816,17 @@ var ObjectTracker = class extends TrackerBase {
 	get elapsed() {
 		return Date.now() - this.values[0].at;
 	}
+	/**
+	* Returns the time, in milliseconds, covering the initial and last values.
+	* Returns NaN if either of these is missing.
+	*/
+	get timespan() {
+		const oldest = this.initial;
+		const newest = this.last;
+		if (!oldest) return NaN;
+		if (!newest) return NaN;
+		return newest.at - oldest.at;
+	}
 };
 
 //#endregion
@@ -828,7 +858,7 @@ var TrackedValueMap = class {
 	gog;
 	constructor(creator) {
 		this.store = /* @__PURE__ */ new Map();
-		this.gog = getOrGenerate(this.store, creator);
+		this.gog = getOrGenerateSync(this.store, creator);
 	}
 	/**
 	* Number of named values being tracked
@@ -850,8 +880,8 @@ var TrackedValueMap = class {
 	* @param values Values(s)
 	* @returns Information about start to last value
 	*/
-	async seen(id, ...values) {
-		const trackedValue = await this.getTrackedValue(id, ...values);
+	seen(id, ...values) {
+		const trackedValue = this.getTrackedValue(id, ...values);
 		const result = trackedValue.seen(...values);
 		return result;
 	}
@@ -861,10 +891,10 @@ var TrackedValueMap = class {
 	* @param values
 	* @returns
 	*/
-	async getTrackedValue(id, ...values) {
+	getTrackedValue(id, ...values) {
 		if (id === null) throw new Error(`id parameter cannot be null`);
 		if (id === void 0) throw new Error(`id parameter cannot be undefined`);
-		const trackedValue = await this.gog(id, values[0]);
+		const trackedValue = this.gog(id, values[0]);
 		return trackedValue;
 	}
 	/**

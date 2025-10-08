@@ -1,16 +1,16 @@
 import "./is-equal-BzhoT7pd.js";
 import { Interval } from "./types-CcY4GIC4.js";
-import "./maps-Di0k-jsW.js";
+import "./maps-Bm5z7qq5.js";
 import "./index-DTe1EM0y.js";
 import "./comparers-C6kfLE-t.js";
 import { HasCompletion } from "./index-Bne6KcmH.js";
 import "./key-value-ww1DZidG.js";
 import "./resolve-core-CYBLBOMw.js";
 import "./sleep-DiuAJS4P.js";
-import { RandomSource } from "./index-Dg6fxrlu.js";
+import { RandomSource } from "./index-BkFpdty_.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Path, Point, Rect } from "./index-DSWMSAve.js";
-import { BasicInterpolateOptions, interpolate } from "./index-iwzx6A0f.js";
+import { Path, Point, Rect } from "./index-CoKcnnlv.js";
+import { BasicInterpolateOptions, interpolate } from "./index-C8cro9Jz.js";
 import { Timer } from "./index-DSIfkq7l.js";
 import "./index-1oZyS9hM.js";
 
@@ -319,7 +319,7 @@ declare function saw(timerOrFreq: Timer | number): Generator<number, void, unkno
  * osc.next().value;
  * ```
  */
-declare function square(timerOrFreq: Timer | number): Generator<1 | 0, void, unknown>;
+declare function square(timerOrFreq: Timer | number): Generator<0 | 1, void, unknown>;
 //# sourceMappingURL=oscillator.d.ts.map
 declare namespace easings_named_d_exports {
   export { arch, backIn, backInOut, backOut, bell, bounceIn, bounceInOut, bounceOut, circIn, circInOut, circOut, cubicIn, cubicOut, elasticIn, elasticInOut, elasticOut, expoIn, expoInOut, expoOut, quadIn, quadInOut, quadOut, quartIn, quartOut, quintIn, quintInOut, quintOut, sineIn, sineInOut, sineOut, smootherstep, smoothstep };

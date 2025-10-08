@@ -507,6 +507,48 @@ type BipolarWrapper = {
   interpolate: (amt: number, b: number) => BipolarWrapper;
   [Symbol.toPrimitive]: (hint: string) => number | string | boolean;
 };
+type NumericRange = Readonly<{
+  min: number;
+  max: number;
+}>;
+type NormaliseStreamContext = NumericRange & {
+  /**
+   * Passes a value to the normaliser, getting
+   * back the normalised result
+   * @param v Value to add
+   * @returns Normalised result
+   */
+  seen: (v: number) => number;
+  /**
+   * Reset the normaliser, by default to
+   * extreme ranges so it will calibrate after the
+   * next value.
+   * @param minDefault Start min value (default: Number.MAX_SAFE_INTEGER)
+   * @param maxDefault Start max value (default: Number.MIN_SAFE_INTERGER)
+   * @returns
+   */
+  reset: (minDefault?: number, maxDefault?: number) => void;
+  /**
+   * Get the current min value of range.
+   *
+   * If no values have been passed through the stream it will be
+   * the initial minDefault or Number.MAX_SAFE_INTEGER
+   */
+  get min(): number;
+  /**
+   * Get the current max value of range.
+   *
+   * If no values have been passed through the stream it will be
+   * the initial maxDefault or Number.MIN_SAFE_INTEGER
+   */
+  get max(): number;
+  /**
+   * Gets the absolute range (ie. max-min) of the normaliser.
+   *
+   * If normaliser hasn't received any values it will use its default min/max.
+   */
+  get range(): number;
+};
 //# sourceMappingURL=types.d.ts.map
 declare namespace bipolar_d_exports {
   export { clamp$1 as clamp, fromScalar, immutable, scale$1 as scale, scaleUnclamped, toScalar, towardZero };
@@ -865,13 +907,36 @@ declare const movingAverage: (samples?: number, weighter?: (v: number) => number
 declare const noiseFilter: (cutoffMin?: number, speedCoefficient?: number, cutoffDefault?: number) => (value: number, timestamp?: number) => number;
 //# sourceMappingURL=moving-average.d.ts.map
 declare namespace normalise_d_exports {
-  export { array, stream };
+  export { array, arrayWithContext, stream, streamWithContext };
 }
 /**
- * Normalises numbers, adjusting min/max as new values are processed.
- * Normalised return values will be in the range of 0-1 (inclusive).
+ * A more advanced form of {@link stream}.
+ *
+ * With this version
+ * @example
+ * ```js
+ * const s = Normalise.streamWithContext();
+ * s.seen(2);    // 1 (because 2 is highest seen)
+ * s.seen(1);    // 0 (because 1 is the lowest so far)
+ * s.seen(1.5);  // 0.5 (50% of range 1-2)
+ * s.seen(0.5);  // 0 (because it's the new lowest)
+ * ```
+ *
+ * And the more advanced features
+ * ```js
+ * s.min / s.max / s.range
+ * s.reset();
+ * s.reset(10, 100);
+ * ```
+ * @returns
+ */
+declare const streamWithContext: (minDefault?: number, maxDefault?: number) => NormaliseStreamContext;
+/**
+ * Normalises numbers, adjusting min/max as new values are processed. Return values will be in the range of 0-1 (inclusive).
  *
  * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ *
+ * Use {@link streamWithContext} if you want to be able to check the min/max or reset the normaliser.
  *
  * @example
  * ```js
@@ -902,10 +967,36 @@ declare namespace normalise_d_exports {
  * normalise NaN.
  * @returns
  */
-declare const stream: (minDefault?: number, maxDefault?: number) => (v: number) => number;
+declare const stream: (minDefault?: number, maxDefault?: number) => (value: number) => number;
+/**
+ * Normalises an array.
+ *
+ * This version returns additional context of the normalisation, alternatively use {@link array}
+ *
+ * ```js
+ * const c = arrayWithContext(someValues);
+ * c.values;    // Array of normalised values
+ * c.original;  // Original input array
+ * c.min / c.max / c.range
+ * ```
+ * @param values Values
+ * @param minForced If provided, this will be min value used
+ * @param maxForced If provided, this will be the max value used
+ */
+declare const arrayWithContext: (values: readonly number[], minForced?: number, maxForced?: number) => {
+  values: number[];
+  original: any[];
+  min: number;
+  max: number;
+  range: number;
+};
 /**
  * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range. [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ * as the normalisation range.
+ *
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ *
+ * Use {@link arrayWithContext} to get back the min/max/range and original values
  *
  * ```js
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
@@ -1143,10 +1234,6 @@ declare const quantiseEvery: (v: number, every: number, middleRoundsUp?: boolean
 //# sourceMappingURL=quantise.d.ts.map
 //#endregion
 //#region ../numbers/src/range.d.ts
-type NumericRange = Readonly<{
-  min: number;
-  max: number;
-}>;
 /**
  * Computes min/max based on a new value and previous range.
  * Returns existing object reference if value is within existing range.
@@ -1193,9 +1280,46 @@ declare function rangeMergeRange(newRange: NumericRange, existingRange: NumericR
  * @returns
  */
 declare const rangeInit: () => NumericRange;
-declare const rangeIsEqual: (a: NumericRange, b: NumericRange) => boolean;
+/**
+ * Returns _true_ if ranges `a` and `b` have identical min/max values.
+ * Returns _false_ if not, or if either/both values are _undefined_
+ * @param a
+ * @param b
+ * @returns
+ */
+declare const rangeIsEqual: (a: NumericRange | undefined, b: NumericRange | undefined) => boolean;
+/**
+ * Returns _true_ if range 'a' is within or same as range 'b'.
+ * Returns _false_ if not or if either/both ranges are _undefined_
+ * @param a
+ * @param b
+ * @returns
+ */
+declare const rangeIsWithin: (a: NumericRange | undefined, b: NumericRange | undefined) => boolean;
+/**
+ * Keeps track of min/max values.
+ *
+ * ```js
+ * const s = rangeStream();
+ * s.seen(10);  // { min: 10, max: 10}
+ * s.seen(5);   // { min:5, max: 10}
+ * ```
+ *
+ * When calling `seen`, non-numbers, or non-finite numbers are silently ignored.
+ *
+ * ```js
+ * s.reset();   // Reset
+ * s.min/s.max; // Current min/max
+ * s.range;     // Current { min, max }
+ * ```
+ * @param initWith
+ * @returns
+ */
 declare const rangeStream: (initWith?: NumericRange) => {
-  seen: (v: any) => void;
+  seen: (v: any) => {
+    min: number;
+    max: number;
+  };
   reset: () => void;
   readonly range: {
     min: number;
@@ -1363,6 +1487,19 @@ declare const scalerTwoWay: (inMin: number, inMax: number, outMin?: number, outM
  */
 declare const softmax: (logits: number[]) => number[];
 //# sourceMappingURL=softmax.d.ts.map
+//#endregion
+//#region ../numbers/src/track-simple.d.ts
+declare const trackSimple: () => {
+  seen: (v: number) => void;
+  reset: () => void;
+  rangeToString: (digits?: number) => string;
+  readonly avg: number;
+  readonly min: number;
+  readonly max: number;
+  readonly total: number;
+  readonly count: number;
+};
+//# sourceMappingURL=track-simple.d.ts.map
 
 //#endregion
 //#region ../numbers/src/wrap.d.ts
@@ -1463,5 +1600,5 @@ declare const wrapRange: (min: number, max: number, fn: (distance: number) => nu
 //# sourceMappingURL=wrap.d.ts.map
 
 //#endregion
-export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
+export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, normalise_d_exports as Normalise, NormaliseStreamContext, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };
 //# sourceMappingURL=numbers.d.ts.map

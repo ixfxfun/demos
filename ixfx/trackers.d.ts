@@ -1,9 +1,9 @@
 import "./is-equal-BzhoT7pd.js";
 import { Interval, KeyValue, ToString } from "./types-CcY4GIC4.js";
-import { GetOrGenerate } from "./maps-Di0k-jsW.js";
+import { GetOrGenerateSync } from "./maps-Bm5z7qq5.js";
 import { KeyValueSortSyles } from "./key-value-ww1DZidG.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { NumbersComputeResult } from "./index-iwzx6A0f.js";
+import { NumbersComputeResult } from "./index-C8cro9Jz.js";
 
 //#region ../trackers/src/changes.d.ts
 type TrackChangeResult = {
@@ -195,6 +195,9 @@ declare const frequency: <V>(keyString?: ToString<V>) => FrequencyTracker<V>;
 //#endregion
 //#region ../trackers/src/types.d.ts
 type Timestamped = {
+  /**
+   * Timestamp (Date.now)
+   */
   readonly at: number;
 };
 type TimestampedObject<V> = V & Timestamped;
@@ -286,6 +289,11 @@ declare abstract class TrackerBase<V, SeenResultType> {
    */
   abstract get elapsed(): number;
   /**
+   * Returns the millisecond period from the oldest and newest value.
+   * Returns NaN if there's no initial/last values
+   */
+  abstract get timespan(): number;
+  /**
    * @ignore
    */
   abstract computeResults(_p: Timestamped[]): SeenResultType;
@@ -323,6 +331,11 @@ declare abstract class PrimitiveTracker<V extends number | string, TResult> exte
    * Returns the elapsed time, in milliseconds since the instance was created
    */
   get elapsed(): number;
+  /**
+   * Returns the time, in milliseconds, covering the initial and last values.
+   * Returns NaN if either of these is missing.
+   */
+  get timespan(): number;
   onReset(): void;
   /**
    * Tracks a value
@@ -339,10 +352,7 @@ type NumberTrackerResults = {
   readonly avg: number;
 };
 declare class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults> {
-  total: number;
-  min: number;
-  max: number;
-  get avg(): number;
+  #private;
   /**
    * Difference between last value and initial.
    * Eg. if last value was 10 and initial value was 5, 5 is returned (10 - 5)
@@ -367,6 +377,10 @@ declare class NumberTracker extends PrimitiveTracker<number, NumberTrackerResult
     max: number;
     avg: number;
   };
+  get max(): number;
+  get total(): number;
+  get min(): number;
+  get avg(): number;
 }
 /**
  * Keeps track of the total, min, max and avg in a stream of values. By default values
@@ -597,6 +611,11 @@ declare abstract class ObjectTracker<V extends object, SeenResultType> extends T
    * Returns the elapsed time, in milliseconds since the initial value
    */
   get elapsed(): number;
+  /**
+   * Returns the time, in milliseconds, covering the initial and last values.
+   * Returns NaN if either of these is missing.
+   */
+  get timespan(): number;
 }
 //# sourceMappingURL=object-tracker.d.ts.map
 //#endregion
@@ -625,7 +644,7 @@ declare abstract class ObjectTracker<V extends object, SeenResultType> extends T
  */
 declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
   store: Map<string, T>;
-  gog: GetOrGenerate<string, T, V>;
+  gog: GetOrGenerateSync<string, T, V>;
   constructor(creator: (key: string, start: V | undefined) => T);
   /**
    * Number of named values being tracked
@@ -643,14 +662,14 @@ declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @param values Values(s)
    * @returns Information about start to last value
    */
-  seen(id: string, ...values: V[]): Promise<TResult>;
+  seen(id: string, ...values: V[]): TResult;
   /**
    * Creates or returns a TrackedValue instance for `id`.
    * @param id
    * @param values
    * @returns
    */
-  protected getTrackedValue(id: string, ...values: V[]): Promise<T>;
+  protected getTrackedValue(id: string, ...values: V[]): T;
   /**
    * Remove a tracked value by id.
    * Use {@link reset} to clear them all.

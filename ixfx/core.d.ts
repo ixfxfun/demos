@@ -625,7 +625,7 @@ type RankOptions = {
 };
 //# sourceMappingURL=types.d.ts.map
 declare namespace maps_d_exports {
-  export { GetOrGenerate, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue };
+  export { GetOrGenerate, GetOrGenerateSync, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue };
 }
 /**
  * Gets the closest integer key to `target` in `data`.
@@ -1133,6 +1133,7 @@ type MergeReconcile<V> = (a: V, b: V) => V;
  */
 declare const mergeByKey: <K, V>(reconcile: MergeReconcile<V>, ...maps: readonly ReadonlyMap<K, V>[]) => ReadonlyMap<K, V>;
 type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
+type GetOrGenerateSync<K, V, Z> = (key: K, args?: Z) => V;
 /**
  * @inheritDoc getOrGenerate
  * @param map

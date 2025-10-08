@@ -1,23 +1,23 @@
-import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-DKoSQp7B.js";
+import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-CwT9JCsR.js";
 import { ReadonlyRemapObjectPropertyType, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, Rest, Writeable } from "./ts-utility-DZKsU5oa.js";
 import { IsEqual, IsEqualContext, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, toStringOrdered } from "./is-equal-BzhoT7pd.js";
 import { BasicType, IDictionary, IWithEntries, Interval, KeyValue, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, StringOrNumber, ToString } from "./types-CcY4GIC4.js";
-import { maps_d_exports } from "./maps-Di0k-jsW.js";
+import { maps_d_exports } from "./maps-Bm5z7qq5.js";
 import { index_d_exports as index_d_exports$3 } from "./index-DTe1EM0y.js";
 import { CompareResult, Comparer, comparerInverse, defaultComparer, jsComparer, numericComparer } from "./comparers-C6kfLE-t.js";
 import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, OnStartCalled, continuously, index_d_exports as index_d_exports$4 } from "./index-Bne6KcmH.js";
 import { KeyValueSortSyles, KeyValueSorter, keyValueSorter } from "./key-value-ww1DZidG.js";
 import { Passed, Reactive, ReactiveInitial, ReactiveNonInitial, ResolveFallbackOptions, ResolveToValue, ResolveToValueAsync, ResolveToValueSync, SignalKinds, Unsubscriber, resolve, resolveSync, resolveWithFallback, resolveWithFallbackSync } from "./resolve-core-CYBLBOMw.js";
 import { SleepOpts, sleep, sleepWhile } from "./sleep-DiuAJS4P.js";
-import { QueueMutable, index_d_exports as index_d_exports$6, index_d_exports$1 as index_d_exports$5, index_d_exports$2 as index_d_exports$7 } from "./index-Dg6fxrlu.js";
+import { QueueMutable, index_d_exports as index_d_exports$6, index_d_exports$1 as index_d_exports$5, index_d_exports$2 as index_d_exports$7 } from "./index-BkFpdty_.js";
 import { ISimpleEventEmitter, SimpleEventEmitter, index_d_exports as index_d_exports$8 } from "./index-CZIsUroQ.js";
-import { index_d_exports as index_d_exports$9 } from "./index-CAqlgugJ.js";
-import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-DSWMSAve.js";
-import { NumbersComputeOptions, NumbersComputeResult, index_d_exports as index_d_exports$11 } from "./index-iwzx6A0f.js";
+import { index_d_exports as index_d_exports$9 } from "./index-B__6muSD.js";
+import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-CoKcnnlv.js";
+import { NumbersComputeOptions, NumbersComputeResult, index_d_exports as index_d_exports$11 } from "./index-C8cro9Jz.js";
 import { index_d_exports as index_d_exports$12 } from "./index-DSIfkq7l.js";
 import { StateChangeEvent, StateMachineWithEvents, Transitions } from "./index-1oZyS9hM.js";
-import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-BuVUgJn-.js";
-import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-CY3dEsvu.js";
+import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-BclWPRAk.js";
+import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-CmZaRs0o.js";
 
 //#region ../core/dist/src/correlate.d.ts
 /**

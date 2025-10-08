@@ -2,7 +2,7 @@ import { __export } from "./chunk-51aI8Tpl.js";
 import { integerTest, resultThrow } from "./src-BBD50Kth.js";
 import { compareIterableValuesShallow, intervalToMs, isEqualValueIgnoreOrder, toStringDefault } from "./interval-type-DajslxUJ.js";
 import { average, continuously, elapsedSince, max, min, promiseFromEvent, rank, sleep, some, sum, tally } from "./basic-D0XoOdBJ.js";
-import { isEqual, numberArrayCompute } from "./src-2eX6lIN8.js";
+import { isEqual, numberArrayCompute } from "./src-CSkWIttj.js";
 
 //#region ../iterables/src/guard.ts
 const isAsyncIterable = (v) => {

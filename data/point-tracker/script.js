@@ -1,10 +1,10 @@
 import * as Numbers from '@ixfx/numbers.js';
-import { PointTracker } from '@ixfx/geometry.js';
+import { UserPointerTracker } from '@ixfx/geometry.js';
 import * as Util from "./util.js";
 
 const settings = Object.freeze({
   // Tracker for point. Reset when there is a pointerdown
-  tracker: new PointTracker({
+  tracker: new UserPointerTracker({
     sampleLimit: 5
   }),
   // How much to decay values by each loop

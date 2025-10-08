@@ -4,16 +4,16 @@ import { cloneFromFields } from "./records-Cei7yF1D.js";
 import "./is-primitive-eBwrK4Yg.js";
 import "./interval-type-DajslxUJ.js";
 import { continuously } from "./basic-D0XoOdBJ.js";
-import { SimpleEventEmitter } from "./src-CkygQtXo.js";
+import { SimpleEventEmitter } from "./src-BC3BytBO.js";
 import "./key-value-JSby0EXT.js";
 import "./dist-DE4H3J9W.js";
 import "./resolve-core-CZPH91No.js";
-import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-2eX6lIN8.js";
-import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-BnNr7xTX.js";
-import { ElementSizer, resolveEl, resolveElementTry } from "./src-CtUbQWIP.js";
-import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-CURfSkGx.js";
-import "./bezier-5SBfGcNj.js";
-import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, oklch2rgb, rgb2hsl, rgb2oklch } from "./src-3nHXiifJ.js";
+import { clamp as clamp$1, clamp$1 as clamp, interpolate, pairwise, quantiseEvery, round, scaler, scalerTwoWay } from "./src-CSkWIttj.js";
+import { MapOfSimpleMutable, QueueImmutable, StackImmutable, delayLoop } from "./src-BP8ZzJBi.js";
+import { ElementSizer, resolveEl, resolveElementTry } from "./src-BnEw_MoE.js";
+import { Empty$1 as Empty, EmptyPositioned, PlaceholderPositioned, PointsTracker, angleConvert, angleParse, applyFields, cells, center, corners, corners$1, fromLine, fromNumbers, guard as guard$1, guard$1 as guard, indexFromCell, isCubicBezier, isEqual, isLine, isQuadraticBezier, isRectPositioned, multiplyScalar$1 as multiplyScalar, offset, rows, scaler as scaler$1, subtract, subtractSize, toCartesian } from "./src-DQ65dkP-.js";
+import "./bezier-DxzJ_wRN.js";
+import { convert, hex2hsl, hex2oklch, hex2rgb, hsl2rgb, index_default, multiplyOpacity, oklab2rgb, oklch2rgb, rgb2hsl, rgb2oklch } from "./src-DM61xwXd.js";
 
 //#region ../visual/src/drawing.ts
 var drawing_exports = {};

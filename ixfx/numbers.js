@@ -1,6 +1,6 @@
 import { __export } from "./chunk-51aI8Tpl.js";
 import { integerTest, numberTest, resultThrow } from "./src-BBD50Kth.js";
-import { interpolate, scale, scaler, zip } from "./src-2eX6lIN8.js";
+import { interpolate, scale, scaler, zip } from "./src-CSkWIttj.js";
 
 //#region ../numbers/src/apply-to-values.ts
 /**
@@ -1690,14 +1690,64 @@ const numberArrayCompute = (data, opts = {}) => {
 var normalise_exports = {};
 __export(normalise_exports, {
 	array: () => array,
-	stream: () => stream
+	arrayWithContext: () => arrayWithContext,
+	stream: () => stream,
+	streamWithContext: () => streamWithContext
 });
 /**
-* Normalises numbers, adjusting min/max as new values are processed.
-* Normalised return values will be in the range of 0-1 (inclusive).
+* A more advanced form of {@link stream}.
+* 
+* With this version
+* @example
+* ```js
+* const s = Normalise.streamWithContext();
+* s.seen(2);    // 1 (because 2 is highest seen)
+* s.seen(1);    // 0 (because 1 is the lowest so far)
+* s.seen(1.5);  // 0.5 (50% of range 1-2)
+* s.seen(0.5);  // 0 (because it's the new lowest)
+* ```
+* 
+* And the more advanced features
+* ```js
+* s.min / s.max / s.range
+* s.reset();
+* s.reset(10, 100);
+* ```
+* @returns
+*/
+const streamWithContext = (minDefault, maxDefault) => {
+	let min$1 = minDefault ?? Number.MAX_SAFE_INTEGER;
+	let max$1 = maxDefault ?? Number.MIN_SAFE_INTEGER;
+	resultThrow(numberTest(min$1), numberTest(max$1));
+	return {
+		seen: (v) => {
+			resultThrow(numberTest(v));
+			min$1 = Math.min(min$1, v);
+			max$1 = Math.max(max$1, v);
+			return scale$1(v, min$1, max$1);
+		},
+		reset: (minDefault$1, maxDefault$1) => {
+			min$1 = minDefault$1 ?? Number.MAX_SAFE_INTEGER;
+			max$1 = maxDefault$1 ?? Number.MIN_SAFE_INTEGER;
+		},
+		get min() {
+			return min$1;
+		},
+		get max() {
+			return max$1;
+		},
+		get range() {
+			return Math.abs(max$1 - min$1);
+		}
+	};
+};
+/**
+* Normalises numbers, adjusting min/max as new values are processed. Return values will be in the range of 0-1 (inclusive).
 *
 * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
 *
+* Use {@link streamWithContext} if you want to be able to check the min/max or reset the normaliser.
+* 
 * @example
 * ```js
 * const s = Normalise.stream();
@@ -1728,20 +1778,45 @@ __export(normalise_exports, {
 * @returns
 */
 const stream = (minDefault, maxDefault) => {
-	let min$1 = minDefault ?? Number.MAX_SAFE_INTEGER;
-	let max$1 = maxDefault ?? Number.MIN_SAFE_INTEGER;
-	resultThrow(numberTest(min$1), numberTest(max$1));
-	return (v) => {
-		resultThrow(numberTest(v));
-		min$1 = Math.min(min$1, v);
-		max$1 = Math.max(max$1, v);
-		return scale$1(v, min$1, max$1);
+	const c = streamWithContext(minDefault, maxDefault);
+	return c.seen;
+};
+/**
+* Normalises an array.
+* 
+* This version returns additional context of the normalisation, alternatively use {@link array}
+*
+* ```js
+* const c = arrayWithContext(someValues);
+* c.values;    // Array of normalised values
+* c.original;  // Original input array
+* c.min / c.max / c.range
+* ```
+* @param values Values
+* @param minForced If provided, this will be min value used
+* @param maxForced If provided, this will be the max value used
+*/
+const arrayWithContext = (values, minForced, maxForced) => {
+	if (!Array.isArray(values)) throw new TypeError(`Param 'values' should be an array. Got: ${typeof values}`);
+	const mma = numberArrayCompute(values);
+	const min$1 = minForced ?? mma.min;
+	const max$1 = maxForced ?? mma.max;
+	return {
+		values: values.map((v) => clamp(scale$1(v, min$1, max$1))),
+		original: values,
+		min: min$1,
+		max: max$1,
+		range: Math.abs(max$1 - min$1)
 	};
 };
 /**
 * Normalises an array. By default uses the actual min/max of the array
-* as the normalisation range. [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+* as the normalisation range. 
+* 
+* [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
 *
+* Use {@link arrayWithContext} to get back the min/max/range and original values
+* 
 * ```js
 * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
 * Normalise.array([5,1,0,9,10]);
@@ -1762,11 +1837,8 @@ const stream = (minDefault, maxDefault) => {
 * @param maxForced If provided, this will be the max value used
 */
 const array = (values, minForced, maxForced) => {
-	if (!Array.isArray(values)) throw new TypeError(`Param 'values' should be an array. Got: ${typeof values}`);
-	const mma = numberArrayCompute(values);
-	const min$1 = minForced ?? mma.min;
-	const max$1 = maxForced ?? mma.max;
-	return values.map((v) => clamp(scale$1(v, min$1, max$1)));
+	const c = arrayWithContext(values, minForced, maxForced);
+	return c.values;
 };
 
 //#endregion
@@ -1905,7 +1977,50 @@ const rangeInit = () => ({
 	min: Number.MAX_SAFE_INTEGER,
 	max: Number.MIN_SAFE_INTEGER
 });
-const rangeIsEqual = (a, b) => a.max === b.max && a.min === b.min;
+/**
+* Returns _true_ if ranges `a` and `b` have identical min/max values.
+* Returns _false_ if not, or if either/both values are _undefined_
+* @param a 
+* @param b 
+* @returns 
+*/
+const rangeIsEqual = (a, b) => {
+	if (typeof a === `undefined`) return false;
+	if (typeof b === `undefined`) return false;
+	return a.max === b.max && a.min === b.min;
+};
+/**
+* Returns _true_ if range 'a' is within or same as range 'b'.
+* Returns _false_ if not or if either/both ranges are _undefined_
+* @param a 
+* @param b 
+* @returns 
+*/
+const rangeIsWithin = (a, b) => {
+	if (typeof a === `undefined`) return false;
+	if (typeof b === `undefined`) return false;
+	if (a.min >= b.min && a.max <= b.max) return true;
+	return false;
+};
+/**
+* Keeps track of min/max values.
+* 
+* ```js
+* const s = rangeStream();
+* s.seen(10);  // { min: 10, max: 10}
+* s.seen(5);   // { min:5, max: 10}
+* ```
+* 
+* When calling `seen`, non-numbers, or non-finite numbers are silently ignored.
+* 
+* ```js
+* s.reset();   // Reset
+* s.min/s.max; // Current min/max
+* s.range;     // Current { min, max }
+* ```
+* @param initWith 
+* @returns 
+*/
 const rangeStream = (initWith = rangeInit()) => {
 	let { min: min$1, max: max$1 } = initWith;
 	const seen = (v) => {
@@ -1915,6 +2030,10 @@ const rangeStream = (initWith = rangeInit()) => {
 				max$1 = Math.max(max$1, v);
 			}
 		}
+		return {
+			min: min$1,
+			max: max$1
+		};
 	};
 	const reset = () => {
 		min$1 = Number.MAX_SAFE_INTEGER;
@@ -1983,5 +2102,49 @@ const softmax = (logits) => {
 };
 
 //#endregion
-export { bipolar_exports as Bipolar, normalise_exports as Normalise, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, validNumbers, weight, wrap, wrapInteger, wrapRange };
+//#region ../numbers/src/track-simple.ts
+const trackSimple = () => {
+	let count$1 = 0;
+	let min$1 = Number.MAX_SAFE_INTEGER;
+	let max$1 = Number.MIN_SAFE_INTEGER;
+	let total$1 = 0;
+	const seen = (v) => {
+		min$1 = Math.min(v, min$1);
+		max$1 = Math.max(v, max$1);
+		total$1 += v;
+		count$1++;
+	};
+	const reset = () => {
+		count$1 = 0;
+		min$1 = Number.MAX_SAFE_INTEGER;
+		max$1 = Number.MIN_SAFE_INTEGER;
+		total$1 = 0;
+	};
+	const rangeToString = (digits = 2) => {
+		return `${min$1.toFixed(2)} - ${max$1.toFixed(2)}`;
+	};
+	return {
+		seen,
+		reset,
+		rangeToString,
+		get avg() {
+			return total$1 / count$1;
+		},
+		get min() {
+			return min$1;
+		},
+		get max() {
+			return max$1;
+		},
+		get total() {
+			return total$1;
+		},
+		get count() {
+			return count$1;
+		}
+	};
+};
+
+//#endregion
+export { bipolar_exports as Bipolar, normalise_exports as Normalise, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate$1 as interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale$1 as scale, scaleClamped, scalePercent, scalePercentages, scaler$1 as scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };
 //# sourceMappingURL=numbers.js.map
