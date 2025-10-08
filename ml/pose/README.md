@@ -4,7 +4,7 @@ We use MediaPipe (MP) for this module.
 * [MediaPipe overview](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
 * [BlazePose model card](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf)
 * ixfx PointTracker [Guide](https://ixfx.fun/geometry/points/tracking/#pointtracker) or [API](https://api.ixfx.fun/_ixfx/geometry/PointTracker/)
-* [Helper API docs](../lib/client/docs/index.html)
+* [Helper API docs](https://demos.ixfx.fun/ml/lib/client/docs/modules/Poses)
 
 # Introdution
 
@@ -68,9 +68,9 @@ In terms of objects that you'll encounter, from top-level to low-level, we have:
 * PosesConsumer -> PosesTracker -> PoseTracker -> PointTracker
 
 * PosesConsumer: listens for pose data and updates PosesTracker
-* PosesTracker: maintain a set of poses currently observed by MediaPipe
-* PoseTracker: tracks the 'landmarks' of single pose (ie. a single human body)
-* PointTracker: tracks the history of a single 'landmark', eg the nose, on a single body
+* [PosesTracker](https://demos.ixfx.fun/ml/lib/client/docs/classes/Poses.PosesTracker): maintain a set of poses currently observed by MediaPipe
+* [PoseTracker](https://demos.ixfx.fun/ml/lib/client/docs/classes/Poses.PoseTracker): tracks the 'landmarks' of single pose (ie. a single human body)
+* [PointTracker](https://api.ixfx.fun/_ixfx/geometry/PointTracker/): tracks the history of a single 'landmark', eg the nose, on a single body
 
 Thus, if you want to do something with different poses, you probably want to start with the `PosesTracker`, use it to find the pose you're interested in and from there dig deeper.
 
@@ -119,7 +119,7 @@ of automatically updating the tracker when new pose data is received.
 
 # PosesTracker
 
-`PosesTracker` keeps track of all current poses (ie. multiple bodies). If you're using the `PosesConsumer` as described above, you can get the `PosesTracker` this way:
+[`PosesTracker`](https://demos.ixfx.fun/ml/lib/client/docs/classes/Poses.PosesTracker) keeps track of all current poses (ie. multiple bodies). If you're using the `PosesConsumer` as described above, you can get the `PosesTracker` this way:
 
 ```js
 // Get the PosesTracker instance buried in the PoseConsumer
@@ -204,7 +204,7 @@ const poseData = poses.getRawPoseByPoseId(`10`);
 
 # PoseTracker
 
-The `PoseTracker` instance maintains data for a single body. A body is itself made up several 'landmarks', known points of the body with associated coordinates. The `PoseTracker` does the work of tracking the movement of each landmark over time using a `PointTracker` ([Guide](https://ixfx.fun/geometry/points/tracking/#pointtracker), [API](https://api.ixfx.fun/_ixfx/geometry/PointTracker/))
+The [`PoseTracker`](https://demos.ixfx.fun/ml/lib/client/docs/classes/Poses.PoseTracker) instance maintains data for a single body. A body is itself made up several 'landmarks', known points of the body with associated coordinates. The `PoseTracker` does the work of tracking the movement of each landmark over time using a `PointTracker` ([Guide](https://ixfx.fun/geometry/points/tracking/#pointtracker), [API](https://api.ixfx.fun/_ixfx/geometry/PointTracker/))
 
 There's documentation provided by VS Code when working with the tracker. But here's an overview:
 
