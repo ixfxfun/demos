@@ -272,40 +272,9 @@ To access the last raw `PoseData` from MediaPipe:
 poseTracker.last; // PoseData
 ```
 
-
 # Recording
 
 Point data is recorded to the browser's local storage. Image data is are not stored.
-
-# Utility
-
-A few utility functions are available when importing:
-```js
-import * as MoveNet from "../Poses.js";
-```
-
-
-Sort array of poses horizontally:
-```js
-const sorted = MoveNet.horizontalSort(poses);
-```
-
-Get centroid of pose (including all landmarks):
-```js
-const centroid = MoveNet.centroid(pose); // {x,y}
-```
-
-Return a line between two named points. If either of the points is not found, _undefined_ is returned. This is useful for using with ixfx's Line module.
-```js
-const line = MoveNet.lineBetween(pose, `left_shoulder`, `right_shoulder`);
-// { a: { x, y }, b: { x, y } }
-```
-
-Gets the center based on the torso (between shoulders and hips). If
-any of the needed points is not found, _undefined_ is returned.
-```js
-const c = MoveNet.roughCenter(pose); // { x, y }
-```
 
 # Troubleshooting
 
