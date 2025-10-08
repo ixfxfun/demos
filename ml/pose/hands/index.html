@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no">
-  <title>starter</title>
+  <title>hands</title>
   <script type="importmap">{ "imports": { "@ixfx/": "/ixfx/" } }</script>
 
 </head>
@@ -30,7 +30,6 @@
       color: var(--fg);
       font-family: var(--font);
       user-select: none;
-      -webkit-user-select: none;
       overscroll-behavior: none;
       touch-action: none;
     }
@@ -42,7 +41,6 @@
       left: 0 !important;
     }
 
-    canvas,
     section {
       position: absolute;
       top: 0;
@@ -52,11 +50,38 @@
     section {
       padding: 1rem;
     }
+
+    .thing {
+      border: 1px solid silver;
+      padding: 1em;
+      margin: 1em;
+      width: 13em;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;  
+    }
+
+    .thing>div {
+      font-family: monospace;
+    }
+
+    .thing h1 {
+      font-size: 1em;
+    }
+    .thing h2 {
+      font-size: 0.8em;
+      text-transform: uppercase;
+      font-weight: normal;
+      margin:0;
+      margin-top: 0.4em;
+      color: gray;
+    }
+
   </style>
   <section>
-    <canvas id="canvas"></canvas>
-    <h1>starter</h1>
-    Open the <a href="../sender/index.html" target="_blank">Remote</a> in a new window and see the console for data.
+    <h1>hands</h1>
+    <a href="../sender/index.html" target="_blank">Sender</a>
+    <div id="things"></div>
     <script type="module" src="script.js"></script>
   </section>
 </body>

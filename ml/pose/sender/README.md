@@ -1,6 +1,28 @@
-# pose-sender
+# pose/sender
 
 See `script.js` for parameters to tune the pose detection.
+
+You might want to copy this folder when making tweaks, so differently-tuned versions are available. Make sure you update the HTML in your sketch to point to the right sender.
+
+## Changing models
+
+For example, to use the 'heavy' model instead of the default 'lite', there are two places that need updating.
+
+```js
+{
+ ...
+ pose: {
+  ...
+  modelPath: `pose_landmarker_heavy.task`,
+  ...
+ }
+ ... 
+ modelsBase: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/`
+
+}
+```
+
+The name of the model and path is based on the [MediaPipe docs](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models)
 
 ## Local models
 
@@ -24,8 +46,8 @@ Instead of:
 }
 ```
 
-
 ## Sending
+
 Transmits pose data via Remote.
 
 To specify an id of the peer, use the `peerId` URL parameter. That is, we access the sketch via:
