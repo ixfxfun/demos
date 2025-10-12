@@ -5,7 +5,7 @@ import { Result } from "./index-DTe1EM0y.js";
 import "./key-value-ww1DZidG.js";
 import "./index-BkFpdty_.js";
 import "./index-CZIsUroQ.js";
-import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-CoKcnnlv.js";
+import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-CSCfZ46V.js";
 import "./index-C8cro9Jz.js";
 
 //#region ../dom/src/data-table.d.ts

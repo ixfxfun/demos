@@ -9,7 +9,7 @@ import { require_dist, uniqueInstances } from "./dist-DE4H3J9W.js";
 import { getErrorMessage } from "./resolve-core-CZPH91No.js";
 import { clamp$1 as clamp, round } from "./src-CSkWIttj.js";
 import "./src-BP8ZzJBi.js";
-import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-DQ65dkP-.js";
+import { Empty, Empty$1, EmptyPositioned, Placeholder, PlaceholderPositioned, cardinal, getPointParameter, guard, isPlaceholder, isPlaceholder$1, multiply, subtract } from "./src-DyNQdaQ7.js";
 import { shortGuid } from "./bezier-DxzJ_wRN.js";
 
 //#region ../dom/src/resolve-el.ts

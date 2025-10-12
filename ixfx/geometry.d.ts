@@ -3125,6 +3125,16 @@ declare const angleRadian$1: (a: Point, b?: Point, c?: Point) => number;
  * @returns
  */
 declare const angleRadianCircle: (a: Point, b?: Point, c?: Point) => number;
+/**
+ * Return the angle of a wedge, defined by a, b and C points, where 'b'
+ * could be thought of as the origin or pivot.
+ *
+ * @param a
+ * @param b
+ * @param c
+ * @returns
+ */
+declare const angleRadianThreePoint: (a: Point, b: Point, c: Point) => number;
 //# sourceMappingURL=angle.d.ts.map
 //#endregion
 //#region ../geometry/src/point/apply.d.ts
@@ -3176,7 +3186,7 @@ declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
 //#region ../geometry/src/point/centroid.d.ts
 /**
  * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
- * Undefined values are skipped over.
+ * Undefined values are skipped over. Calculation and return value is 2D.
  *
  * ```js
  * // Find centroid of a list of points
@@ -3188,7 +3198,7 @@ declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
  * @param points
  * @returns A single point
  */
-declare const centroid$1: (...points: ReadonlyArray<Point | undefined>) => Point;
+declare const centroid$1: (...points: readonly (Point | undefined)[]) => Point;
 //# sourceMappingURL=centroid.d.ts.map
 //#endregion
 //#region ../geometry/src/point/clamp.d.ts
@@ -3280,6 +3290,15 @@ declare const convexHull: (...pts: ReadonlyArray<Point>) => ReadonlyArray<Point>
 //#region ../geometry/src/point/distance.d.ts
 declare function distance$1(a: Point, b?: Point): number;
 declare function distance$1(a: Point, x: number, y: number): number;
+/**
+ * As {@distance} but always compares by x,y only.
+ * @param a
+ * @param xOrB
+ * @param y
+ * @param z
+ * @returns
+ */
+declare function distance2d(a: Point, xOrB?: Point | number, y?: number): number;
 //# sourceMappingURL=distance.d.ts.map
 //#endregion
 //#region ../geometry/src/shape/shape-type.d.ts
@@ -4660,7 +4679,7 @@ declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => b
 declare const wrap: (pt: Point, ptMax?: Point, ptMin?: Point) => Point;
 //# sourceMappingURL=wrap.d.ts.map
 declare namespace index_d_exports$6 {
-  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, UserPointerTracker, UserPointersTracker, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, test, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
+  export { Empty$2 as Empty, Empty3d, Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, UserPointerTracker, UserPointersTracker, abs, angleRadian$1 as angleRadian, angleRadianCircle, angleRadianThreePoint, apply$2 as apply, averager, bbox$1 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distance2d, distanceToCenter, distanceToExterior, divide$2 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers, fromString, getPointParameter, getTwoPointParameters, guard$2 as guard, guardNonZeroPoint, interpolate, invert$1 as invert, isEmpty$2 as isEmpty, isEqual$1 as isEqual, isNaN, isNull, isPlaceholder$2 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$3 as multiply, multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$1 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$2 as subtract, sum$2 as sum, test, to2d, to3d, toArray, toIntegerValues, toString$2 as toString, withinRange$1 as withinRange, wrap };
 }
 //#endregion
 //#region ../geometry/src/line/multiply.d.ts

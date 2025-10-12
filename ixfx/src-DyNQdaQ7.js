@@ -893,7 +893,7 @@ const isIntersecting$1 = (a, b) => {
 /**
 * Calculate distance between two points.
 * If both points have a `z` property, the distance is 3D distance is calculated.
-* If only one point has a `z`, it is ignored.
+* If only one point has a `z`, it is ignored. To force 2D distance, use {@link distance2d}
 *
 * ```js
 * // Distance between two points
@@ -919,6 +919,20 @@ function distance(a, xOrB, y, z) {
 	guard$1(pt, `b`);
 	guard$1(a, `a`);
 	return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
+}
+/**
+* As {@distance} but always compares by x,y only.
+* @param a
+* @param xOrB
+* @param y
+* @param z
+* @returns
+*/
+function distance2d(a, xOrB, y) {
+	const pt = getPointParameter(xOrB, y);
+	guard$1(pt, `b`);
+	guard$1(a, `a`);
+	return Math.hypot(pt.x - a.x, pt.y - a.y);
 }
 
 //#endregion
@@ -2012,6 +2026,21 @@ const angleRadianCircle = (a, b, c) => {
 	const angle = angleRadian(a, b, c);
 	if (angle < 0) return angle + piPi;
 	return angle;
+};
+/**
+* Return the angle of a wedge, defined by a, b and C points, where 'b'
+* could be thought of as the origin or pivot.
+*
+* @param a
+* @param b
+* @param c
+* @returns
+*/
+const angleRadianThreePoint = (a, b, c) => {
+	const ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+	const bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
+	const ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
+	return Math.acos((bc * bc + ab * ab - ac * ac) / (2 * bc * ab));
 };
 
 //#endregion
@@ -5576,6 +5605,7 @@ __export(point_exports, {
 	abs: () => abs,
 	angleRadian: () => angleRadian,
 	angleRadianCircle: () => angleRadianCircle,
+	angleRadianThreePoint: () => angleRadianThreePoint,
 	apply: () => apply$2,
 	averager: () => averager,
 	bbox: () => bbox$1,
@@ -5589,6 +5619,7 @@ __export(point_exports, {
 	compareByZ: () => compareByZ,
 	convexHull: () => convexHull,
 	distance: () => distance,
+	distance2d: () => distance2d,
 	distanceToCenter: () => distanceToCenter,
 	distanceToExterior: () => distanceToExterior,
 	divide: () => divide$1,
@@ -10528,4 +10559,4 @@ __export(src_exports, {
 
 //#endregion
 export { Empty, Empty$3 as Empty$1, EmptyPositioned, Placeholder$2 as Placeholder, PlaceholderPositioned, PointsTracker, Unit, abs, angleConvert, angleParse, angleRadian, applyFields, cardinal, cells, center$1 as center, clampMagnitude, compare, corners, corners$1, cubic, distance, divide$1 as divide, fromLine, fromNumbers$1 as fromNumbers, getEdgeX, getEdgeY, getPointParameter, guard$6 as guard, guard$1, indexFromCell, interpolate$4 as interpolate, interpolator, invert$1 as invert, isCubicBezier, isEqual$5 as isEqual, isLine, isPlaceholder$3 as isPlaceholder, isPlaceholder as isPlaceholder$1, isQuadraticBezier, isRectPositioned, multiply$1 as multiply, multiplyScalar, multiplyScalar$2 as multiplyScalar$1, normalise, offset, pipeline, pipelineApply, quadraticSimple, rows, scaler, src_exports, subtract, subtractSize, sum, toCartesian$2 as toCartesian, toCartesian as toCartesian$1, toPath$2 as toPath };
-//# sourceMappingURL=src-DQ65dkP-.js.map
+//# sourceMappingURL=src-DyNQdaQ7.js.map

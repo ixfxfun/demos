@@ -76,6 +76,16 @@ declare const angleRadian$1: (a: Point, b?: Point, c?: Point) => number;
  * @returns
  */
 declare const angleRadianCircle: (a: Point, b?: Point, c?: Point) => number;
+/**
+ * Return the angle of a wedge, defined by a, b and C points, where 'b'
+ * could be thought of as the origin or pivot.
+ *
+ * @param a
+ * @param b
+ * @param c
+ * @returns
+ */
+declare const angleRadianThreePoint: (a: Point, b: Point, c: Point) => number;
 //# sourceMappingURL=angle.d.ts.map
 //#endregion
 //#region ../geometry/dist/src/point/apply.d.ts
@@ -251,6 +261,15 @@ declare const convexHull: (...pts: ReadonlyArray<Point>) => ReadonlyArray<Point>
 //#region ../geometry/dist/src/point/distance.d.ts
 declare function distance$1(a: Point, b?: Point): number;
 declare function distance$1(a: Point, x: number, y: number): number;
+/**
+ * As {@distance} but always compares by x,y only.
+ * @param a
+ * @param xOrB
+ * @param y
+ * @param z
+ * @returns
+ */
+declare function distance2d(a: Point, xOrB?: Point | number, y?: number): number;
 //# sourceMappingURL=distance.d.ts.map
 //#endregion
 //#region ../geometry/dist/src/circle/circle-type.d.ts
@@ -1679,7 +1698,7 @@ declare const withinRange$1: (a: Point, b: Point, maxRange: Point | number) => b
 declare const wrap$2: (pt: Point, ptMax?: Point, ptMin?: Point) => Point;
 //# sourceMappingURL=wrap.d.ts.map
 declare namespace index_d_exports$7 {
-  export { Empty$3 as Empty, Empty3d, Placeholder$3 as Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, UserPointerTracker, UserPointersTracker, abs, angleRadian$1 as angleRadian, angleRadianCircle, apply$2 as apply, averager, bbox$5 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distanceToCenter, distanceToExterior, divide$4 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers$2 as fromNumbers, fromString, getPointParameter$1 as getPointParameter, getTwoPointParameters, guard$6 as guard, guardNonZeroPoint, interpolate$4 as interpolate, invert$1 as invert, isEmpty$3 as isEmpty, isEqual$6 as isEqual, isNaN$1 as isNaN, isNull, isPlaceholder$3 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$4 as multiply, multiplyScalar$2 as multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$2 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$3 as subtract, sum$3 as sum, test, to2d, to3d, toArray$1 as toArray, toIntegerValues, toString$3 as toString, withinRange$1 as withinRange, wrap$2 as wrap };
+  export { Empty$3 as Empty, Empty3d, Placeholder$3 as Placeholder, Placeholder3d, Point, Point3d, Point3dApplyFn, PointApplyFn, PointAverageKinds, PointAverager, PointRelation, PointRelationResult, PointTrack, PointTracker, PointTrackerResults, PointsTracker, Unit, Unit3d, UserPointerTracker, UserPointersTracker, abs, angleRadian$1 as angleRadian, angleRadianCircle, angleRadianThreePoint, apply$2 as apply, averager, bbox$5 as bbox, bbox3d, centroid$1 as centroid, clamp, clampMagnitude$2 as clampMagnitude, compare, compareByX, compareByY, compareByZ, convexHull, distance$1 as distance, distance2d, distanceToCenter, distanceToExterior, divide$4 as divide, divider, dotProduct$2 as dotProduct, findMinimum, from, fromNumbers$2 as fromNumbers, fromString, getPointParameter$1 as getPointParameter, getTwoPointParameters, guard$6 as guard, guardNonZeroPoint, interpolate$4 as interpolate, invert$1 as invert, isEmpty$3 as isEmpty, isEqual$6 as isEqual, isNaN$1 as isNaN, isNull, isPlaceholder$3 as isPlaceholder, isPoint, isPoint3d, leftmost, multiply$4 as multiply, multiplyScalar$2 as multiplyScalar, normalise$2 as normalise, normaliseByRect$1 as normaliseByRect, pipeline, pipelineApply, progressBetween, project, quantiseEvery, random$2 as random, random3d, reduce, relation, rightmost, rotate$2 as rotate, rotatePointArray, round, subtract$3 as subtract, sum$3 as sum, test, to2d, to3d, toArray$1 as toArray, toIntegerValues, toString$3 as toString, withinRange$1 as withinRange, wrap$2 as wrap };
 }
 //#endregion
 //#region ../geometry/dist/src/rect/area.d.ts
@@ -6489,4 +6508,4 @@ declare namespace index_d_exports {
 }
 //#endregion
 export { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCardinalDirection, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, type Point, type Point3d, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle, index_d_exports };
-//# sourceMappingURL=index-CoKcnnlv.d.ts.map
+//# sourceMappingURL=index-CSCfZ46V.d.ts.map
