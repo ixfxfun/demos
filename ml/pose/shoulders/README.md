@@ -17,4 +17,4 @@ Read more:
 
 ## Things to try
 
-* Tweak the physics parameters in `thing.js`. For example: the friction amount (default: 0.0015)
+* Tweak the physics parameters in `thing.js`. For example: the friction amount, the mass of the thing, how tilt is applied to acceleration etc.
