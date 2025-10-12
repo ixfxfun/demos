@@ -66,7 +66,7 @@ const computeHead = (pose) => {
   const leftEar = pose.landmarkValue(`left_ear`);
   const rightEar = pose.landmarkValue(`right_ear`);
   if (!leftEar || !rightEar || !nose) return; // No ears or nose :/
-  const earDistance = Points.distance(leftEar, rightEar);
+  const earDistance = Points.distance2d(leftEar, rightEar);
   const radius = earDistance / 2;
 
   return {
