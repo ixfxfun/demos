@@ -22351,7 +22351,7 @@ var Bezier = class Bezier2 {
   }
 };
 
-// node_modules/ixfx/bundle/src-DQ65dkP-.js
+// node_modules/ixfx/bundle/src-DyNQdaQ7.js
 var isNull = (p3) => {
   if (isPoint3d(p3)) {
     if (p3.z !== null) return false;
@@ -22874,6 +22874,12 @@ function distance3(a3, xOrB, y3, z3) {
   guard$1(a3, `a`);
   return isPoint3d(pt2) && isPoint3d(a3) ? Math.hypot(pt2.x - a3.x, pt2.y - a3.y, pt2.z - a3.z) : Math.hypot(pt2.x - a3.x, pt2.y - a3.y);
 }
+function distance2d(a3, xOrB, y3) {
+  const pt2 = getPointParameter(xOrB, y3);
+  guard$1(pt2, `b`);
+  guard$1(a3, `a`);
+  return Math.hypot(pt2.x - a3.x, pt2.y - a3.y);
+}
 var distanceFromExterior = (rect3, pt2) => {
   guardPositioned$1(rect3, `rect`);
   guard$1(pt2, `pt`);
@@ -23379,6 +23385,12 @@ var angleRadianCircle = (a3, b3, c5) => {
   const angle = angleRadian(a3, b3, c5);
   if (angle < 0) return angle + piPi2;
   return angle;
+};
+var angleRadianThreePoint = (a3, b3, c5) => {
+  const ab = Math.sqrt(Math.pow(b3.x - a3.x, 2) + Math.pow(b3.y - a3.y, 2));
+  const bc = Math.sqrt(Math.pow(b3.x - c5.x, 2) + Math.pow(b3.y - c5.y, 2));
+  const ac2 = Math.sqrt(Math.pow(c5.x - a3.x, 2) + Math.pow(c5.y - a3.y, 2));
+  return Math.acos((bc * bc + ab * ab - ac2 * ac2) / (2 * bc * ab));
 };
 function apply$2(pt2, fn2) {
   guard$1(pt2, `pt`);
@@ -25153,6 +25165,7 @@ __export(point_exports, {
   abs: () => abs2,
   angleRadian: () => angleRadian,
   angleRadianCircle: () => angleRadianCircle,
+  angleRadianThreePoint: () => angleRadianThreePoint,
   apply: () => apply$2,
   averager: () => averager,
   bbox: () => bbox$1,
@@ -25166,6 +25179,7 @@ __export(point_exports, {
   compareByZ: () => compareByZ,
   convexHull: () => convexHull,
   distance: () => distance3,
+  distance2d: () => distance2d,
   distanceToCenter: () => distanceToCenter,
   distanceToExterior: () => distanceToExterior,
   divide: () => divide$1,
@@ -28073,7 +28087,7 @@ __export(src_exports7, {
   turnToRadian: () => turnToRadian
 });
 
-// node_modules/ixfx/bundle/src-BnEw_MoE.js
+// node_modules/ixfx/bundle/src-Cf3m_lM9.js
 var resolveEl2 = (domQueryOrEl) => {
   const r5 = resolveElementTry(domQueryOrEl);
   if (r5.success) return r5.value;
@@ -29586,7 +29600,7 @@ __export(src_exports8, {
   viewportToSpace: () => viewportToSpace
 });
 
-// node_modules/ixfx/bundle/src-DM61xwXd.js
+// node_modules/ixfx/bundle/src-DY17tx6P.js
 var drawing_exports = {};
 __export(drawing_exports, {
   arc: () => arc,
@@ -40098,6 +40112,12 @@ function distance4(a3, xOrB, y3, z3) {
   guard$12(a3, `a`);
   return isPoint3d2(pt2) && isPoint3d2(a3) ? Math.hypot(pt2.x - a3.x, pt2.y - a3.y, pt2.z - a3.z) : Math.hypot(pt2.x - a3.x, pt2.y - a3.y);
 }
+function distance2d2(a3, xOrB, y3) {
+  const pt2 = getPointParameter2(xOrB, y3);
+  guard$12(pt2, `b`);
+  guard$12(a3, `a`);
+  return Math.hypot(pt2.x - a3.x, pt2.y - a3.y);
+}
 function findMinimum2(comparer, ...points) {
   if (points.length === 0) throw new Error(`No points provided`);
   let min4 = points[0];
@@ -40355,6 +40375,12 @@ var angleRadianCircle2 = (a3, b3, c5) => {
   const angle = angleRadian2(a3, b3, c5);
   if (angle < 0) return angle + piPi5;
   return angle;
+};
+var angleRadianThreePoint2 = (a3, b3, c5) => {
+  const ab = Math.sqrt(Math.pow(b3.x - a3.x, 2) + Math.pow(b3.y - a3.y, 2));
+  const bc = Math.sqrt(Math.pow(b3.x - c5.x, 2) + Math.pow(b3.y - c5.y, 2));
+  const ac2 = Math.sqrt(Math.pow(c5.x - a3.x, 2) + Math.pow(c5.y - a3.y, 2));
+  return Math.acos((bc * bc + ab * ab - ac2 * ac2) / (2 * bc * ab));
 };
 var toIntegerValues2 = (pt2, rounder = Math.round) => {
   guard$12(pt2, `pt`);
@@ -43193,6 +43219,7 @@ __export(point_exports2, {
   abs: () => abs4,
   angleRadian: () => angleRadian2,
   angleRadianCircle: () => angleRadianCircle2,
+  angleRadianThreePoint: () => angleRadianThreePoint2,
   apply: () => apply$22,
   averager: () => averager2,
   bbox: () => bbox$12,
@@ -43206,6 +43233,7 @@ __export(point_exports2, {
   compareByZ: () => compareByZ2,
   convexHull: () => convexHull2,
   distance: () => distance4,
+  distance2d: () => distance2d2,
   distanceToCenter: () => distanceToCenter2,
   distanceToExterior: () => distanceToExterior2,
   divide: () => divide$22,
@@ -45415,7 +45443,12 @@ var PoseMatcher = class {
 };
 
 // src/mediapipe/makeModelPath.ts
-var makeModelPath = (basePath, provided) => {
+var makeModelPath = (basePath, provided, presets) => {
+  if (provided in presets) {
+    const url = presets[provided];
+    console.log(`Using model preset '${provided}' Url: ${url}`);
+    return url;
+  }
   if (provided.startsWith(`http`)) return provided;
   return basePath + provided;
 };
@@ -45444,6 +45477,11 @@ var PoseDetector = class _PoseDetector {
         distanceThreshold: 0.1,
         maxAgeMs: 2e3,
         verbosity: `errors`
+      },
+      presetModelPaths: {
+        lite: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task",
+        full: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task",
+        heavy: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task"
       }
     };
   }
@@ -45457,9 +45495,10 @@ var PoseDetector = class _PoseDetector {
     const p3 = this.p;
     const v3 = await Xo.forVisionTasks(p3.wasmBase);
     const opts = this.opts;
+    const presets = this.opts.presetModelPaths ?? _PoseDetector.defaults().presetModelPaths;
     const mpOpts = {
       baseOptions: {
-        modelAssetPath: makeModelPath(p3.modelsBase, opts.modelPath),
+        modelAssetPath: makeModelPath(p3.modelsBase, opts.modelPath, presets),
         delegate: `GPU`
       },
       runningMode: `VIDEO`,
@@ -45533,7 +45572,17 @@ var ObjectDetector = class _ObjectDetector {
     return {
       verbosity: `errors`,
       modelPath: "efficientdet_lite0.tflite",
-      scoreThreshold: 0.5
+      scoreThreshold: 0.5,
+      presetModelPaths: {
+        "lite0-8": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite`,
+        "lite0-16": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/latest/efficientdet_lite0.tflite`,
+        "lite0-32": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/latest/efficientdet_lite0.tflite`,
+        "lite2-8": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite2/int8/latest/efficientdet_lite2.tflite`,
+        "lite2-16": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite2/float16/latest/efficientdet_lite2.tflite`,
+        "lite2-32": `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite2/float32/latest/efficientdet_lite2.tflite`,
+        "mobilenet2-8": `https://storage.googleapis.com/mediapipe-models/object_detector/ssd_mobilenet_v2/float16/latest/ssd_mobilenet_v2.tflite`,
+        "mobilenet2-32": `https://storage.googleapis.com/mediapipe-models/object_detector/ssd_mobilenet_v2/float32/latest/ssd_mobilenet_v2.tflite`
+      }
     };
   }
   compute(v3, callback, timestamp2) {
@@ -45546,10 +45595,12 @@ var ObjectDetector = class _ObjectDetector {
   }
   async init() {
     const p3 = this.p;
+    const opts = this.opts;
+    const presets = this.opts.presetModelPaths ?? _ObjectDetector.defaults().presetModelPaths;
     const vision = await Xo.forVisionTasks(p3.wasmBase);
     const mpOpts = {
       baseOptions: {
-        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath)
+        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath, presets)
       },
       scoreThreshold: 0.5,
       runningMode: `VIDEO`
@@ -45575,7 +45626,10 @@ var FaceDetector = class _FaceDetector {
       verbosity: `errors`,
       modelPath: "blaze_face_short_range.tflite",
       minDetectionConfidence: 0.5,
-      minSupressionThreshold: 0.3
+      minSupressionThreshold: 0.3,
+      presetModelPaths: {
+        shortRange: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite`
+      }
     };
   }
   compute(v3, callback, timestamp2) {
@@ -45588,11 +45642,12 @@ var FaceDetector = class _FaceDetector {
   }
   async init() {
     const opts = this.opts;
+    const presets = this.opts.presetModelPaths ?? _FaceDetector.defaults().presetModelPaths;
     const p3 = this.p;
     const vision = await Xo.forVisionTasks(p3.wasmBase);
     const mpOpts = {
       baseOptions: {
-        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath)
+        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath, presets)
       },
       minDetectionConfidence: opts.minDetectionConfidence,
       minSuppressionThreshold: opts.minSupressionThreshold,
@@ -45621,7 +45676,10 @@ var HandDetector = class _HandDetector {
       modelPath: "hand_landmarker.task",
       minHandDetectionConfidence: 0.5,
       minHandPresenceConfidence: 0.5,
-      minTrackingConfidence: 0.5
+      minTrackingConfidence: 0.5,
+      presetModelPaths: {
+        full: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task`
+      }
     };
   }
   compute(v3, callback, timestamp2) {
@@ -45634,11 +45692,12 @@ var HandDetector = class _HandDetector {
   }
   async init() {
     const opts = this.opts;
+    const presets = this.opts.presetModelPaths ?? _HandDetector.defaults().presetModelPaths;
     const p3 = this.p;
     const vision = await Xo.forVisionTasks(p3.wasmBase);
     const mpOpts = {
       baseOptions: {
-        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath)
+        modelAssetPath: makeModelPath(p3.modelsBase, this.opts.modelPath, presets)
       },
       minHandDetectionConfidence: opts.minHandDetectionConfidence,
       minHandPresenceConfidence: opts.minHandPresenceConfidence,
@@ -47819,6 +47878,47 @@ var Client = class extends EventTarget {
     };
   }
 };
+
+// src/util/search-params.ts
+var parseUrlParams = (url) => {
+  const params = new URL(url ?? document.location.toString()).searchParams;
+  return {
+    params,
+    int: (name, defaultValue = Number.NaN) => intParamOrDefault(params, name, defaultValue),
+    float: (name, defaultValue = Number.NaN) => floatParamOrDefault(params, name, defaultValue),
+    string: (name, defaultValue = ``) => stringParamOrDefault(params, name, defaultValue),
+    bool: (name) => boolParamOrDefault(params, name)
+  };
+};
+function boolParamOrDefault(params, name) {
+  const p3 = params.get(name);
+  if (p3 === null) return false;
+  if (p3 === `true`) return true;
+  return false;
+}
+function intParamOrDefault(params, name, defaultValue) {
+  const p3 = params.get(name);
+  if (p3 !== null) {
+    const v3 = Number.parseInt(p3);
+    return v3;
+  }
+  return defaultValue;
+}
+function floatParamOrDefault(params, name, defaultValue) {
+  const p3 = params.get(name);
+  if (p3 !== null) {
+    const v3 = Number.parseFloat(p3);
+    return v3;
+  }
+  return defaultValue;
+}
+function stringParamOrDefault(params, name, defaultValue) {
+  const p3 = params.get(name);
+  if (p3 !== null) {
+    return p3;
+  }
+  return defaultValue;
+}
 export {
   Client,
   MlVision2 as MlVision,
@@ -47833,6 +47933,7 @@ export {
   defaults,
   getLowest,
   getProcessorModes,
+  parseUrlParams,
   validateProcessorMode
 };
 /*! Bundled license information:

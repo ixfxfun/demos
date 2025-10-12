@@ -12402,6 +12402,12 @@ function distance2(a, xOrB, y, z) {
   guard$1(a, `a`);
   return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
 }
+function distance2d(a, xOrB, y) {
+  const pt = getPointParameter(xOrB, y);
+  guard$1(pt, `b`);
+  guard$1(a, `a`);
+  return Math.hypot(pt.x - a.x, pt.y - a.y);
+}
 function findMinimum(comparer, ...points) {
   if (points.length === 0) throw new Error(`No points provided`);
   let min4 = points[0];
@@ -12659,6 +12665,12 @@ var angleRadianCircle = (a, b, c) => {
   const angle = angleRadian(a, b, c);
   if (angle < 0) return angle + piPi2;
   return angle;
+};
+var angleRadianThreePoint = (a, b, c) => {
+  const ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+  const bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
+  const ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
+  return Math.acos((bc * bc + ab * ab - ac * ac) / (2 * bc * ab));
 };
 var toIntegerValues = (pt, rounder = Math.round) => {
   guard$1(pt, `pt`);
@@ -15497,6 +15509,7 @@ __export2(point_exports, {
   abs: () => abs2,
   angleRadian: () => angleRadian,
   angleRadianCircle: () => angleRadianCircle,
+  angleRadianThreePoint: () => angleRadianThreePoint,
   apply: () => apply$2,
   averager: () => averager,
   bbox: () => bbox$1,
@@ -15510,6 +15523,7 @@ __export2(point_exports, {
   compareByZ: () => compareByZ,
   convexHull: () => convexHull,
   distance: () => distance2,
+  distance2d: () => distance2d,
   distanceToCenter: () => distanceToCenter,
   distanceToExterior: () => distanceToExterior,
   divide: () => divide$2,
@@ -18155,7 +18169,7 @@ var PoseTracker = class {
     }
   }
   /**
-   * Returns the centroid of all the pose points (uses normalised landmarks)
+   * Returns the 2D centroid of all the pose points (uses normalised landmarks)
    * ```js
    * pose.centroid(); // { x, y }
    * ```
@@ -18235,12 +18249,13 @@ var PoseTracker = class {
    * Returns landmarks in order of distance from the given point.
    * 
    * The point should be the same coordinates as poses.
-   * @param guid 
+   * @param point Point to compare to
+   * @param use2d If _true_, Z coordinate is ignored.
    */
-  getByDistanceFromPoint(point2) {
+  getByDistanceFromPoint(point2, use2d = true) {
     const withDistance = [...this.landmarks()].map((lm) => {
       return {
-        distance: point_exports.distance(lm.last, point2),
+        distance: use2d ? point_exports.distance2d(lm.last, point2) : point_exports.distance(lm.last, point2),
         landmark: lm,
         raw: lm.last
       };
@@ -18253,10 +18268,11 @@ var PoseTracker = class {
   /**
    * Returns the closest landmark to `point`
    * @param point 
+   * @param use2d If _true_ only x,y coordinates are used for distance calculation
    * @returns 
    */
-  getClosestLandmarkToPoint(point2) {
-    const sorted = this.getByDistanceFromPoint(point2);
+  getClosestLandmarkToPoint(point2, use2d) {
+    const sorted = this.getByDistanceFromPoint(point2, use2d);
     if (sorted.length === 0) return;
     return sorted[0].landmark;
   }
@@ -18512,15 +18528,15 @@ var PosesTracker = class extends EventTarget {
   }
   /**
    * Returns poses in order of distance (as judged by their centroid property)
-   * from the given point.
+   * from the given point. Since centroid is 2D, distance is also calculated using x,y only.
    * 
    * The point should be the same coordinates as poses.
-   * @param guid 
+   * @param point Point to compare to 
    */
   getByDistanceFromPoint(point2) {
     const withDistance = [...this.#data.values()].map((pt) => {
       return {
-        distance: point_exports.distance(pt.centroid(), point2),
+        distance: point_exports.distance2d(pt.centroid(), point2),
         tracker: pt
       };
     });

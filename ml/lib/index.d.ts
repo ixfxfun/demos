@@ -117,10 +117,19 @@ type CameraOptions = {
     height?: number;
     facingMode?: `user` | `environment`;
 };
+/**
+ * Object detector options.
+ *
+ * Preset model names:
+ * * EfficientDet-Lite0: lite0-8, lite0-16, lite0-32
+ * * EfficientDet-Lite2: lite2-8, lite2-16, lite2-32
+ * * SSDMObileNet-V2: mobilenet2-8, mobilenet2-32
+ */
 type ObjectDetectorOptions = {
     verbosity: Verbosity;
     scoreThreshold: number;
     modelPath: string;
+    presetModelPaths?: Record<string, string>;
 };
 type CommonModelOptions = {
     wasmBase: string;
@@ -150,6 +159,7 @@ type HandDetectorOptions = {
     minHandPresenceConfidence: number;
     minTrackingConfidence: number;
     modelPath: string;
+    presetModelPaths?: Record<string, string>;
 };
 type FaceDetectorOptions = {
     verbosity: Verbosity;
@@ -162,7 +172,11 @@ type FaceDetectorOptions = {
      * Default: 0.3
      */
     minSupressionThreshold: number;
+    presetModelPaths?: Record<string, string>;
 };
+/**
+ * Preset model names: lite, full, heavy.
+ */
 type PoseDetectorOptions = {
     numPoses: number;
     minPoseDetectionConfidence: number;
@@ -172,6 +186,7 @@ type PoseDetectorOptions = {
     modelPath: string;
     matcher: PoseMatcherOptions;
     verbosity: Verbosity;
+    presetModelPaths?: Record<string, string>;
 };
 type OverlayOptions = {
     show: boolean;
@@ -582,4 +597,12 @@ declare class Client extends EventTarget {
     constructor(options?: Options$1);
 }
 
-export { type BoundingBox, type CameraOptions, type Category, Client, type CommonModelOptions, type ComputeCallback, type Detection, type FaceDetectorOptions, type HandDetectorOptions, type HandLandmarkerResult, type IModel, type ISource, type Landmark, MlVision, ModelElement, type NormalizedKeypoint, type NormalizedLandmark, type ObjectDetectorOptions, type OnDispatcherData, type OnReceivedData, type Options, OverlayElement, type OverlayOptions, type PoseData, PoseDetector, type PoseDetectorOptions, PoseMatcher, type PoseMatcherOptions, Processing, type ProcessingStates, type ProcessorModes, RecPanel, type RecordingData, type SourceData, type SourceKinds, type Verbosity, VideoSourceElement, type VideoSourceStates, VisionElement, defaults, getLowest, getProcessorModes, validateProcessorMode };
+declare const parseUrlParams: (url?: string) => {
+    params: URLSearchParams;
+    int: (name: string, defaultValue?: number) => number;
+    float: (name: string, defaultValue?: number) => number;
+    string: (name: string, defaultValue?: string) => string;
+    bool: (name: string) => boolean;
+};
+
+export { type BoundingBox, type CameraOptions, type Category, Client, type CommonModelOptions, type ComputeCallback, type Detection, type FaceDetectorOptions, type HandDetectorOptions, type HandLandmarkerResult, type IModel, type ISource, type Landmark, MlVision, ModelElement, type NormalizedKeypoint, type NormalizedLandmark, type ObjectDetectorOptions, type OnDispatcherData, type OnReceivedData, type Options, OverlayElement, type OverlayOptions, type PoseData, PoseDetector, type PoseDetectorOptions, PoseMatcher, type PoseMatcherOptions, Processing, type ProcessingStates, type ProcessorModes, RecPanel, type RecordingData, type SourceData, type SourceKinds, type Verbosity, VideoSourceElement, type VideoSourceStates, VisionElement, defaults, getLowest, getProcessorModes, parseUrlParams, validateProcessorMode };

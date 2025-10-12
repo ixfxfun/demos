@@ -328,7 +328,7 @@ declare class PoseTracker {
     landmarkValues(...namesOrIds: (PoseLandmarks | number)[]): Generator<ixfx_index_BkFpdty__js.TimestampedObject<NormalizedLandmark>, void, unknown>;
     worldLandmarkValues(...namesOrIds: (PoseLandmarks | number)[]): Generator<ixfx_index_BkFpdty__js.TimestampedObject<NormalizedLandmark>, void, unknown>;
     /**
-     * Returns the centroid of all the pose points (uses normalised landmarks)
+     * Returns the 2D centroid of all the pose points (uses normalised landmarks)
      * ```js
      * pose.centroid(); // { x, y }
      * ```
@@ -384,9 +384,10 @@ declare class PoseTracker {
      * Returns landmarks in order of distance from the given point.
      *
      * The point should be the same coordinates as poses.
-     * @param guid
+     * @param point Point to compare to
+     * @param use2d If _true_, Z coordinate is ignored.
      */
-    getByDistanceFromPoint(point: Points.Point): {
+    getByDistanceFromPoint(point: Points.Point, use2d?: boolean): {
         distance: number;
         landmark: Points.PointTracker<NormalizedLandmark>;
         raw: NormalizedLandmark;
@@ -394,9 +395,10 @@ declare class PoseTracker {
     /**
      * Returns the closest landmark to `point`
      * @param point
+     * @param use2d If _true_ only x,y coordinates are used for distance calculation
      * @returns
      */
-    getClosestLandmarkToPoint(point: Points.Point): Points.PointTracker<NormalizedLandmark> | undefined;
+    getClosestLandmarkToPoint(point: Points.Point, use2d: boolean): Points.PointTracker<NormalizedLandmark> | undefined;
     /**
      * Gets the lowest (by camera frame coords) of any of the listed landmarks
      *
@@ -573,10 +575,10 @@ declare class PosesTracker extends EventTarget {
     getByHorizontal(): Generator<PoseTracker, void, undefined>;
     /**
      * Returns poses in order of distance (as judged by their centroid property)
-     * from the given point.
+     * from the given point. Since centroid is 2D, distance is also calculated using x,y only.
      *
      * The point should be the same coordinates as poses.
-     * @param guid
+     * @param point Point to compare to
      */
     getByDistanceFromPoint(point: Points.Point): {
         distance: number;
@@ -763,10 +765,19 @@ type CameraOptions = {
     height?: number;
     facingMode?: `user` | `environment`;
 };
+/**
+ * Object detector options.
+ *
+ * Preset model names:
+ * * EfficientDet-Lite0: lite0-8, lite0-16, lite0-32
+ * * EfficientDet-Lite2: lite2-8, lite2-16, lite2-32
+ * * SSDMObileNet-V2: mobilenet2-8, mobilenet2-32
+ */
 type ObjectDetectorOptions = {
     verbosity: Verbosity;
     scoreThreshold: number;
     modelPath: string;
+    presetModelPaths?: Record<string, string>;
 };
 type CommonModelOptions = {
     wasmBase: string;
@@ -796,6 +807,7 @@ type HandDetectorOptions = {
     minHandPresenceConfidence: number;
     minTrackingConfidence: number;
     modelPath: string;
+    presetModelPaths?: Record<string, string>;
 };
 type FaceDetectorOptions = {
     verbosity: Verbosity;
@@ -808,7 +820,11 @@ type FaceDetectorOptions = {
      * Default: 0.3
      */
     minSupressionThreshold: number;
+    presetModelPaths?: Record<string, string>;
 };
+/**
+ * Preset model names: lite, full, heavy.
+ */
 type PoseDetectorOptions = {
     numPoses: number;
     minPoseDetectionConfidence: number;
@@ -818,6 +834,7 @@ type PoseDetectorOptions = {
     modelPath: string;
     matcher: PoseMatcherOptions;
     verbosity: Verbosity;
+    presetModelPaths?: Record<string, string>;
 };
 type OverlayOptions = {
     show: boolean;
