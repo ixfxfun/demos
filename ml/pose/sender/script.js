@@ -1,13 +1,13 @@
 // @ts-ignore
 import { LitElement } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
-import { MlVision } from "../../lib/index.js";
+import { MlVision, parseUrlParams } from "../../lib/index.js";
 import { shortGuid } from '@ixfx/random.js';
 
 // Parse query params
-const params = (new URL(document.location.toString())).searchParams;
+const params = parseUrlParams();
 
 // Use 'peerId' specified as URL parameter or a random one
-const peerId = params.get(`peerId`) ?? shortGuid();
+const peerId = params.string(`peerId`, shortGuid());
 
 // Setup
 const ds = new MlVision(`#is`, {
@@ -15,7 +15,7 @@ const ds = new MlVision(`#is`, {
   mode: `pose`,
   // How often to run computation on image
   // Increase number to reduce CPU load, but add latency
-  computeFreqMs: intParamOrDefault(`freq`, 100),
+  computeFreqMs: params.int(`computeFreqMs`, 50),
   // Remote id
   remote: {
     peerId
@@ -28,13 +28,13 @@ const ds = new MlVision(`#is`, {
   pose: {
     // See: https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#configurations_options
     outputSegmentationMasks: false,
-    minPoseDetectionConfidence: floatParamOrDefault(`minPoseDetectionConfidence`, 0.5),
-    minPosePresenceConfidence: floatParamOrDefault(`minPosePresenceConfidence`, 0.5),
-    minTrackingConfidence: floatParamOrDefault(`minTrackingConfidence`, 0.5),
-    numPoses: intParamOrDefault(`numPoses`, 5),
-    // For more on models:
-    // https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models
-    modelPath: `pose_landmarker_lite.task`,
+    minPoseDetectionConfidence: params.float(`minPoseDetectionConfidence`, 0.5),
+    minPosePresenceConfidence: params.float(`minPosePresenceConfidence`, 0.5),
+    minTrackingConfidence: params.float(`minTrackingConfidence`, 0.5),
+    numPoses: params.int(`numPoses`, 5),
+    // Use three presets 'lite', 'full' and 'heavy' 
+    //    For more info on the differences: https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models
+    modelPath: params.string(`model`, `lite`),
     verbosity: `errors`,
     matcher: {
       distanceThreshold: 0.1,
@@ -90,32 +90,3 @@ function updateParams() {
 //   console.log(detail);
 // })
 
-/**
- * Return an integer value from URL parameter or use a default value
- * @param {string} name 
- * @param {number} defaultValue 
- * @returns 
- */
-function intParamOrDefault(name, defaultValue) {
-  const p = params.get(name);
-  if (p !== null) {
-    const v = Number.parseInt(p);
-    return v;
-  }
-  return defaultValue;
-}
-
-/**
- * Return an integer value from URL parameter or use a default value
- * @param {string} name 
- * @param {number} defaultValue 
- * @returns 
- */
-function floatParamOrDefault(name, defaultValue) {
-  const p = params.get(name);
-  if (p !== null) {
-    const v = Number.parseFloat(p);
-    return v;
-  }
-  return defaultValue;
-}
