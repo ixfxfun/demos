@@ -4,10 +4,10 @@ import { Poses, PosesConsumer } from "../util/Poses.js";
 
 const settings = Object.freeze({
   updateRateMs: 100,
-  posesConsumer: new PosesConsumer({
+  poses: new PosesConsumer({
     // Old poses are ignored after this length of time
     maxAgeMs: 1000
-  }),
+  }).poses,
   dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } }),
 });
 
@@ -26,8 +26,7 @@ let state = Object.freeze({
 
 
 const update = () => {
-  const { posesConsumer } = settings;
-  const { poses } = posesConsumer;
+  const { poses } = settings;
 
   // Eg. Use raw data
   // for (const rawData of poses.getRawPosesByAge()) {
@@ -39,7 +38,7 @@ const update = () => {
     // eg. Get center point of a body
     const centroid = pose.centroid();
 
-    console.log(`Pose: ${pose.guid} ${centroid.x.toFixed((2))}, ${centroid.y.toFixed((2))}`);
+    console.log(`Pose: ${pose.guid} Centroid: ${centroid.x.toFixed((2))}, ${centroid.y.toFixed((2))}`);
   }
 
   // Save newly computed properties

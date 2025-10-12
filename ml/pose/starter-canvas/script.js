@@ -6,11 +6,11 @@ import * as Util from './util.js';
 
 const settings = Object.freeze({
   updateRateMs: 100,
-  posesConsumer: new PosesConsumer({
+  poses: new PosesConsumer({
     maxAgeMs: 1000,
     sampleLimit: 25,
     storeIntermediate: true
-  }),
+  }).poses,
   // Debug display of data can be handy
   dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } }),
   // Automatically sizes canvas for us
@@ -31,10 +31,7 @@ let state = Object.freeze({
 });
 
 function update() {
-  const { posesConsumer, dataDisplay } = settings;
-
-  // PosesTracker: tracks all poses
-  const poses = posesConsumer.poses;
+  const { poses, dataDisplay } = settings;
 
   // Eg: Work with raw pose data
   // for (const rawData of poses.getRawPosesByAge()) {
@@ -46,7 +43,7 @@ function update() {
     // eg. Get center point of a body
     const centroid = pose.centroid();
 
-    console.log(`Pose: ${pose.guid} ${centroid.x.toFixed((2))}, ${centroid.y.toFixed((2))}`);
+    console.log(`Pose: ${pose.guid} Centroid: ${centroid.x.toFixed((2))}, ${centroid.y.toFixed((2))}`);
   }
 
   // Save state
@@ -58,8 +55,7 @@ function update() {
 }
 
 function use() {
-  const { canvasHelper, posesConsumer } = settings;
-  const poses = posesConsumer.poses;
+  const { canvasHelper, poses } = settings;
   const { yourProp } = state;
   const { ctx } = canvasHelper;
 
