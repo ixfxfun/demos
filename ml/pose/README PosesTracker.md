@@ -1,5 +1,15 @@
 Tip: Most likely you don't want to create a `PosesTracker` yourself. Use `PoseConsumer` instead (see main README)
 
+## Importing
+
+In your own sketch, you can import stuff relating via:
+
+```js
+import { Poses, PosesConsumer } from "../util/Poses.js";
+```
+...assuming your sketch is located at `demos/ml/pose/YOUR-SKETCH` and thus accessible via _http://localhost:3000/ml/pose/YOUR-SKETCH_
+
+
 ## Setup
 
 To create:
