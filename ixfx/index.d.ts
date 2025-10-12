@@ -1,4 +1,4 @@
-import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-DqGVTY7D.js";
+import { ChangeKind, ChangeRecord, CompareChangeSet, PathDataChange, index_d_exports as index_d_exports$2, index_d_exports$1, index_d_exports$2 as index_d_exports, pathed_d_exports } from "./index-yI9sq57Z.js";
 import { ReadonlyRemapObjectPropertyType, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, Rest, Writeable } from "./ts-utility-DZKsU5oa.js";
 import { IsEqual, IsEqualContext, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, toStringOrdered } from "./is-equal-BzhoT7pd.js";
 import { BasicType, IDictionary, IWithEntries, Interval, KeyValue, Primitive, PrimitiveOrObject, RankArrayOptions, RankFunction, RankOptions, StringOrNumber, ToString } from "./types-CcY4GIC4.js";
@@ -11,13 +11,13 @@ import { Passed, Reactive, ReactiveInitial, ReactiveNonInitial, ResolveFallbackO
 import { SleepOpts, sleep, sleepWhile } from "./sleep-DiuAJS4P.js";
 import { QueueMutable, index_d_exports as index_d_exports$6, index_d_exports$1 as index_d_exports$5, index_d_exports$2 as index_d_exports$7 } from "./index-BkFpdty_.js";
 import { ISimpleEventEmitter, SimpleEventEmitter, index_d_exports as index_d_exports$8 } from "./index-CZIsUroQ.js";
-import { index_d_exports as index_d_exports$9 } from "./index-Cl4Q8jtr.js";
-import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-CSCfZ46V.js";
+import { index_d_exports as index_d_exports$9 } from "./index-0CFu-Nj7.js";
+import { Point, Rect, index_d_exports as index_d_exports$10 } from "./index-Bu_Q0Nu0.js";
 import { NumbersComputeOptions, NumbersComputeResult, index_d_exports as index_d_exports$11 } from "./index-C8cro9Jz.js";
 import { index_d_exports as index_d_exports$12 } from "./index-DSIfkq7l.js";
 import { StateChangeEvent, StateMachineWithEvents, Transitions } from "./index-1oZyS9hM.js";
-import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-B3siXtGi.js";
-import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-BtrsNuqG.js";
+import { HslScalar, ManualCapturer, index_d_exports as index_d_exports$13 } from "./index-BFy0kD2P.js";
+import { EventSourceOptions, ObjectFieldHandler, Reactive as Reactive$1, ReactiveDiff, ReactiveInitial as ReactiveInitial$1, ReactiveNonInitial as ReactiveNonInitial$1, ReactiveWritable, index_d_exports as index_d_exports$14 } from "./index-BngJgbks.js";
 
 //#region ../core/dist/src/correlate.d.ts
 /**
@@ -505,6 +505,16 @@ declare function resolveFieldsSync<T extends Record<string, ResolveToValue<any>>
  * @returns
  */
 //# sourceMappingURL=resolve-fields.d.ts.map
+//#endregion
+//#region ../core/dist/src/url-parameters.d.ts
+declare const parseUrlParameters: (url?: string) => {
+  params: URLSearchParams;
+  int: (name: string, defaultValue?: number) => number;
+  float: (name: string, defaultValue?: number) => number;
+  string: (name: string, defaultValue?: string) => string;
+  bool: (name: string) => boolean;
+};
+//# sourceMappingURL=url-parameters.d.ts.map
 //#endregion
 //#region ../core/dist/src/types-array.d.ts
 /**
@@ -5388,5 +5398,5 @@ declare namespace index_d_exports$18 {
   export { index_d_exports$19 as RxUi };
 }
 //#endregion
-export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, index_d_exports$15 as Arrays, BasicType, ChangeKind, ChangeRecord, index_d_exports$7 as Collections, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, index_d_exports$4 as Debug, index_d_exports$9 as Dom, index_d_exports$8 as Events, FixedLengthArray, index_d_exports$12 as Flow, index_d_exports$10 as Geometry, index_d_exports$3 as Guards, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval, index_d_exports$16 as Io, type IsEqual, IsEqualContext, index_d_exports$17 as Iterables, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, index_d_exports$1 as Modulation, index_d_exports$11 as Numbers, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, index_d_exports$2 as Process, index_d_exports$5 as Random, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOptions, ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, index_d_exports$14 as Rx, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString, TrackUnique, index_d_exports$6 as Trackers, index_d_exports$18 as Ui, Unsubscriber, index_d_exports$13 as Visual, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
+export { AlignOpts, ArrayItems, ArrayLengthMutationKeys, index_d_exports$15 as Arrays, BasicType, ChangeKind, ChangeRecord, index_d_exports$7 as Collections, CompareChangeSet, CompareResult, Comparer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DataWithId, index_d_exports$4 as Debug, index_d_exports$9 as Dom, index_d_exports$8 as Events, FixedLengthArray, index_d_exports$12 as Flow, index_d_exports$10 as Geometry, index_d_exports$3 as Guards, HasCompletion, HasCompletionRunStates, IDictionary, IWithEntries, Interval, index_d_exports$16 as Io, type IsEqual, IsEqualContext, index_d_exports$17 as Iterables, KeyValue, KeyValueSortSyles, KeyValueSorter, maps_d_exports as Maps, index_d_exports$1 as Modulation, index_d_exports$11 as Numbers, OnStartCalled, Passed, pathed_d_exports as Pathed, Primitive, PrimitiveOrObject, index_d_exports$2 as Process, index_d_exports$5 as Random, RankArrayOptions, RankFunction, RankOptions, Reactive, ReactiveInitial, ReactiveNonInitial, ReadonlyRemapObjectPropertyType, index_d_exports as Records, RecursivePartial, RecursiveReplace, RecursiveWriteable, RemapObjectPropertyType, RequireOnlyOne, ResolveFallbackOptions, ResolveToValue, ResolveToValueAsync, ResolveToValueSync, ResolvedObject, Rest, index_d_exports$14 as Rx, SignalKinds, Similarity, Since, SleepOpts, StringOrNumber, ToString, TrackUnique, index_d_exports$6 as Trackers, index_d_exports$18 as Ui, Unsubscriber, index_d_exports$13 as Visual, Writeable, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, parseUrlParameters, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=index.d.ts.map

@@ -4,7 +4,7 @@ import { records_exports } from "./records-Cei7yF1D.js";
 import { isPrimitive, isPrimitiveOrObject } from "./is-primitive-eBwrK4Yg.js";
 import { compareIterableValuesShallow, defaultToString, elapsedToHumanString, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInterval, isMap, isSet, toStringDefault, toStringOrdered } from "./interval-type-DajslxUJ.js";
 import { comparerInverse, continuously, defaultComparer, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, findBySomeKey, jsComparer, maps_exports, numericComparer, promiseFromEvent, sleep, sleepWhile } from "./basic-D0XoOdBJ.js";
-import { getPathsAndData, pathed_exports, src_exports as src_exports$1, src_exports$1 as src_exports$2 } from "./src-CUm_o64t.js";
+import { getPathsAndData, pathed_exports, src_exports as src_exports$1, src_exports$1 as src_exports$2 } from "./src-DwfNu1ux.js";
 import { SimpleEventEmitter, afterMatch, beforeMatch, defaultKeyer, indexOfCharCode, omitChars, splitByLength, src_exports as src_exports$3, src_exports$1 as src_exports$4, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst, toStringAbbreviate } from "./src-BC3BytBO.js";
 import { isInteger } from "./is-integer-BmMnD0ra.js";
 import { keyValueSorter } from "./key-value-JSby0EXT.js";
@@ -12,11 +12,11 @@ import { unique, uniqueInstances } from "./dist-DE4H3J9W.js";
 import { getErrorMessage, hasLast, isReactive, resolve, resolveSync, resolveWithFallback, resolveWithFallbackSync, src_exports as src_exports$5 } from "./resolve-core-CZPH91No.js";
 import { clamp$1 as clamp, mapWithEmptyFallback, max, maxFast, numberArrayCompute, scale, src_exports as src_exports$6, src_exports$1 as src_exports$7 } from "./src-CSkWIttj.js";
 import { QueueMutable, StateMachineWithEvents, debounce, eventRace, init, retryFunction, retryTask, src_exports as src_exports$8, src_exports$1 as src_exports$9, to, waitFor } from "./src-BP8ZzJBi.js";
-import { resolveEl, src_exports as src_exports$10 } from "./src-Cf3m_lM9.js";
-import { src_exports as src_exports$11 } from "./src-DyNQdaQ7.js";
+import { resolveEl, src_exports as src_exports$10 } from "./src-CbFSI981.js";
+import { src_exports as src_exports$11 } from "./src-B2XPlXC0.js";
 import { number, shortGuid, src_exports as src_exports$12, src_exports$1 as src_exports$13, string } from "./bezier-DxzJ_wRN.js";
-import { fromCss as fromCss$1, fromCss$1 as fromCss, manualCapture, src_exports as src_exports$14, toColour, toCssColour, toCssString } from "./src-DY17tx6P.js";
-import { debounce as debounce$1, event, eventTrigger, hasLast as hasLast$1, initStream, messageHasValue, messageIsSignal, object, observable, src_exports as src_exports$15, transform } from "./src-BaFnnLaS.js";
+import { fromCss as fromCss$1, fromCss$1 as fromCss, manualCapture, src_exports as src_exports$14, toColour, toCssColour, toCssString } from "./src-D7U7_bQi.js";
+import { debounce as debounce$1, event, eventTrigger, hasLast as hasLast$1, initStream, messageHasValue, messageIsSignal, object, observable, src_exports as src_exports$15, transform } from "./src-CN4FGbep.js";
 
 //#region ../core/dist/src/correlate.js
 const orderScore = (a, b) => {
@@ -271,6 +271,63 @@ function resolveFieldsSync(object$1) {
 * @param object
 * @returns
 */
+
+//#endregion
+//#region ../core/dist/src/url-parameters.js
+const parseUrlParameters = (url) => {
+	const parameters = new URL(url ?? document.location.toString()).searchParams;
+	return {
+		params: parameters,
+		int: (name, defaultValue = NaN) => intParamOrDefault(parameters, name, defaultValue),
+		float: (name, defaultValue = NaN) => floatParamOrDefault(parameters, name, defaultValue),
+		string: (name, defaultValue = ``) => stringParamOrDefault(parameters, name, defaultValue),
+		bool: (name) => boolParamOrDefault(parameters, name)
+	};
+};
+/**
+* Return an integer value from URL parameter or use a default value.
+* Value is considered _false_ if it's not present, or it is explicitly 'false'
+* @returns
+*/
+function boolParamOrDefault(parameters, name) {
+	const p = parameters.get(name);
+	if (p === null) return false;
+	if (p === `true`) return true;
+	return false;
+}
+/**
+* Return an integer value from URL parameter or use a default value
+* @returns
+*/
+function intParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) {
+		const v = Number.parseInt(p);
+		return v;
+	}
+	return defaultValue;
+}
+/**
+* Return a float value from URL parameter or use a default value
+* @returns
+*/
+function floatParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) {
+		const v = Number.parseFloat(p);
+		return v;
+	}
+	return defaultValue;
+}
+/**
+* Return a string value from URL parameter or use a default value
+* @returns
+*/
+function stringParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) return p;
+	return defaultValue;
+}
 
 //#endregion
 //#region ../io/dist/src/codec.js
@@ -4632,5 +4689,5 @@ var src_exports$17 = {};
 __export(src_exports$17, { RxUi: () => rx_exports });
 
 //#endregion
-export { src_exports$7 as Arrays, src_exports$9 as Collections, src_exports$5 as Debug, src_exports$10 as Dom, src_exports$4 as Events, src_exports$8 as Flow, src_exports$11 as Geometry, src_exports as Guards, src_exports$16 as Io, src_exports$3 as Iterables, maps_exports as Maps, src_exports$2 as Modulation, src_exports$6 as Numbers, pathed_exports as Pathed, src_exports$1 as Process, src_exports$13 as Random, records_exports as Records, src_exports$15 as Rx, src_exports$12 as Trackers, src_exports$17 as Ui, src_exports$14 as Visual, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
+export { src_exports$7 as Arrays, src_exports$9 as Collections, src_exports$5 as Debug, src_exports$10 as Dom, src_exports$4 as Events, src_exports$8 as Flow, src_exports$11 as Geometry, src_exports as Guards, src_exports$16 as Io, src_exports$3 as Iterables, maps_exports as Maps, src_exports$2 as Modulation, src_exports$6 as Numbers, pathed_exports as Pathed, src_exports$1 as Process, src_exports$13 as Random, records_exports as Records, src_exports$15 as Rx, src_exports$12 as Trackers, src_exports$17 as Ui, src_exports$14 as Visual, align, alignById, compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs, isEmptyEntries, isEqualContextString, isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger, isInterval, isMap, isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, parseUrlParameters, promiseFromEvent, resolve, resolveFields, resolveFieldsSync, resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=index.js.map

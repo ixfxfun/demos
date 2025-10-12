@@ -157,7 +157,7 @@ declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
 //#region ../geometry/dist/src/point/centroid.d.ts
 /**
  * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
- * Undefined values are skipped over.
+ * Undefined values are skipped over. Calculation and return value is 2D.
  *
  * ```js
  * // Find centroid of a list of points
@@ -169,7 +169,7 @@ declare const bbox3d: (...points: ReadonlyArray<Point3d>) => Rect3dPositioned;
  * @param points
  * @returns A single point
  */
-declare const centroid$1: (...points: ReadonlyArray<Point | undefined>) => Point;
+declare const centroid$1: (...points: readonly (Point | undefined)[]) => Point;
 //# sourceMappingURL=centroid.d.ts.map
 //#endregion
 //#region ../geometry/dist/src/point/clamp.d.ts
@@ -1332,17 +1332,20 @@ declare class PointTracker<TPoint extends Point = Point> extends ObjectTracker<T
    * If there are less than two points, zero is returned.
    *
    * This is the direct distance from initial to last,
-   * not the accumulated length. Use {@link length} for that.
+   * not the accumulated length. Use {@link lengthTotal} for that.
+   * @param force2d If _true_ distance is calculated only in 2d
    * @returns Distance
    */
-  distanceFromStart(): number;
+  distanceFromStart(force2d?: boolean): number;
   /**
    * Returns the speed (over milliseconds) based on accumulated travel distance.
    *
    * If there's no initial point, 0 is returned.
+   * @param force2d If _true_, speed is calculated with x,y only
    * @returns
    */
-  speedFromStart(): number;
+  speedFromStart(force2d?: boolean): number;
+  speedFromLast(force2d?: boolean): number;
   /**
    * Difference between last point and the initial point, calculated
    * as a simple subtraction of x,y & z.
@@ -1358,9 +1361,19 @@ declare class PointTracker<TPoint extends Point = Point> extends ObjectTracker<T
   angleFromStart(): number | undefined;
   /**
    * Returns the total distance from accumulated points.
-   * Returns 0 if points were not saved, or there's only one
+   * Returns 0 if points were not saved, or there's only one.
+   *
+   * Use {@link lengthAverage} to get the average length for all segments
+   * @param force2d If _true_ length is calculated using x&y only
    */
-  get length(): number;
+  lengthTotal(force2d?: boolean): number;
+  /**
+   * Adds up the accumulated length of all points (using {@link lengthTotal})
+   * dividing by the total number of points.
+   * @param force2d
+   * @returns
+   */
+  lengthAverage(force2d?: boolean): number;
   /**
   * Returns the last x coord
   */
@@ -4648,7 +4661,7 @@ declare const joinPointsToLines: (...points: readonly Point[]) => PolyLine;
  * @param b Second point
  * @returns
  */
-declare function length(a: Point, b: Point): number;
+declare function length(a: Point, b: Point, force2d?: boolean): number;
 /**
  * Returns length of line. If a polyline (array of lines) is provided,
  * it is the sum total that is returned.
@@ -4659,7 +4672,7 @@ declare function length(a: Point, b: Point): number;
  * ```
  * @param line Line
  */
-declare function length(line: Line | PolyLine): number;
+declare function length(line: Line | PolyLine, force2d?: boolean): number;
 //# sourceMappingURL=length.d.ts.map
 //#endregion
 //#region ../geometry/dist/src/line/midpoint.d.ts
@@ -6508,4 +6521,4 @@ declare namespace index_d_exports {
 }
 //#endregion
 export { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCardinalDirection, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, type Point, type Point3d, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle, index_d_exports };
-//# sourceMappingURL=index-CSCfZ46V.d.ts.map
+//# sourceMappingURL=index-Bu_Q0Nu0.d.ts.map

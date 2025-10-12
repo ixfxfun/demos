@@ -9,7 +9,7 @@ import "./resolve-core-CYBLBOMw.js";
 import "./sleep-DiuAJS4P.js";
 import { RandomSource } from "./index-BkFpdty_.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Path, Point, Rect } from "./index-CSCfZ46V.js";
+import { Path, Point, Rect } from "./index-Bu_Q0Nu0.js";
 import { BasicInterpolateOptions, interpolate } from "./index-C8cro9Jz.js";
 import { Timer } from "./index-DSIfkq7l.js";
 import "./index-1oZyS9hM.js";

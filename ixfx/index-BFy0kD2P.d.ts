@@ -1,8 +1,8 @@
 import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
 import { IStackImmutable, RandomSource } from "./index-BkFpdty_.js";
 import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-Cl4Q8jtr.js";
-import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-CSCfZ46V.js";
+import { Colorizr, ElementResizeLogic, HSL, LCH, RGB } from "./index-0CFu-Nj7.js";
+import { Angle, ArcPositioned, CirclePositioned, CubicBezier, EllipsePositioned, Grid, GridCell, GridCellAccessor, GridCellAndValue, GridCellSetter, GridReadable, GridWritable, Line, Path, Point, PolarRay, QuadraticBezier, Rect, RectPositioned, ScaleBy, Scaler, Triangle } from "./index-Bu_Q0Nu0.js";
 
 //#region ../visual/dist/src/colour/types.d.ts
 type HslBase = {
@@ -2652,4 +2652,4 @@ declare namespace index_d_exports {
 }
 //#endregion
 export { HslScalar, ManualCapturer, index_d_exports };
-//# sourceMappingURL=index-B3siXtGi.d.ts.map
+//# sourceMappingURL=index-BFy0kD2P.d.ts.map

@@ -3171,5 +3171,62 @@ const sleepWhile = async (predicate, checkInterval = 100) => {
 };
 
 //#endregion
-export { maps_exports as Maps, pathed_exports as Pathed, records_exports as Records, trackers_exports as Trackers, align, alignById, compareIterableValuesShallow$1 as compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs$1 as intervalToMs, isEmptyEntries, isEqualContextString$1 as isEqualContextString, isEqualDefault$1 as isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger$1 as isInteger, isInterval, isMap, isPrimitive$1 as isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, promiseFromEvent, resolve$1 as resolve, resolveFields, resolveFieldsSync, resolveSync$1 as resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault$1 as toStringDefault, toStringOrdered, unique, uniqueInstances };
+//#region ../core/src/url-parameters.ts
+const parseUrlParameters = (url) => {
+	const parameters = new URL(url ?? document.location.toString()).searchParams;
+	return {
+		params: parameters,
+		int: (name, defaultValue = NaN) => intParamOrDefault(parameters, name, defaultValue),
+		float: (name, defaultValue = NaN) => floatParamOrDefault(parameters, name, defaultValue),
+		string: (name, defaultValue = ``) => stringParamOrDefault(parameters, name, defaultValue),
+		bool: (name) => boolParamOrDefault(parameters, name)
+	};
+};
+/**
+* Return an integer value from URL parameter or use a default value.
+* Value is considered _false_ if it's not present, or it is explicitly 'false'
+* @returns 
+*/
+function boolParamOrDefault(parameters, name) {
+	const p = parameters.get(name);
+	if (p === null) return false;
+	if (p === `true`) return true;
+	return false;
+}
+/**
+* Return an integer value from URL parameter or use a default value
+* @returns 
+*/
+function intParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) {
+		const v = Number.parseInt(p);
+		return v;
+	}
+	return defaultValue;
+}
+/**
+* Return a float value from URL parameter or use a default value
+* @returns 
+*/
+function floatParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) {
+		const v = Number.parseFloat(p);
+		return v;
+	}
+	return defaultValue;
+}
+/**
+* Return a string value from URL parameter or use a default value
+* @returns 
+*/
+function stringParamOrDefault(parameters, name, defaultValue) {
+	const p = parameters.get(name);
+	if (p !== null) return p;
+	return defaultValue;
+}
+
+//#endregion
+export { maps_exports as Maps, pathed_exports as Pathed, records_exports as Records, trackers_exports as Trackers, align, alignById, compareIterableValuesShallow$1 as compareIterableValuesShallow, comparerInverse, continuously, defaultComparer, defaultKeyer, defaultToString, elapsedInfinity, elapsedInterval, elapsedOnce, elapsedSince, elapsedToHumanString, filterValue, hasLast, intervalToMs$1 as intervalToMs, isEmptyEntries, isEqualContextString$1 as isEqualContextString, isEqualDefault$1 as isEqualDefault, isEqualTrace, isEqualValueDefault, isEqualValueIgnoreOrder, isEqualValuePartial, isInteger$1 as isInteger, isInterval, isMap, isPrimitive$1 as isPrimitive, isPrimitiveOrObject, isReactive, isSet, jsComparer, keyValueSorter, numericComparer, parseUrlParameters, promiseFromEvent, resolve$1 as resolve, resolveFields, resolveFieldsSync, resolveSync$1 as resolveSync, resolveWithFallback, resolveWithFallbackSync, runningiOS, sleep, sleepWhile, toStringDefault$1 as toStringDefault, toStringOrdered, unique, uniqueInstances };
 //# sourceMappingURL=core.js.map

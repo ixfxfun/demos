@@ -8,7 +8,7 @@ import "./key-value-JSby0EXT.js";
 import { resolveWithFallbackSync } from "./resolve-core-CZPH91No.js";
 import { clamp$1 as clamp, interpolate, interpolateAngle, scale, wrap } from "./src-CSkWIttj.js";
 import { StateMachineWithEvents, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, frequencyTimer, ofTotal, ofTotalTicks, relative, repeat, timerWithFunction } from "./src-BP8ZzJBi.js";
-import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-DyNQdaQ7.js";
+import { Empty, Unit, abs, angleRadian, clampMagnitude, compare, cubic, distance, divide, getEdgeX, getEdgeY, interpolate as interpolate$1, interpolator, invert, multiply, multiplyScalar, normalise, pipeline, pipelineApply, quadraticSimple, subtract, sum, toCartesian$1 as toCartesian, toPath } from "./src-B2XPlXC0.js";
 import { float, floatSource } from "./bezier-DxzJ_wRN.js";
 
 //#region ../modulation/src/source/ticks.ts
