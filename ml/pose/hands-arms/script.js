@@ -1,8 +1,8 @@
 import * as Dom from '@ixfx/dom.js';
 import { continuously } from '@ixfx/flow.js';
+import { Maps } from '@ixfx/collections.js';
 import { Poses, PosesConsumer } from "../util/Poses.js";
 import * as Things from './thing.js';
-import { Maps } from '@ixfx/collections.js';
 
 const settings = Object.freeze({
   updateRateMs: 100,
@@ -32,16 +32,20 @@ const update = () => {
   let { things } = state;
 
   for (const pose of poses.get()) {
+    // Get an existing thing for this particular pose
     let thing = things.get(pose.guid);
+
     if (!thing) {
-      // No thing for pose
+      // No thing for pose, create it!
       thing = Things.create(pose);
     }
 
-    // Update thing
+    // Update thing and update map
     thing = Things.update(thing, state, pose);
     things = things.set(pose.guid, thing);
   }
+
+  // Save map
   saveState({ things });
 };
 
@@ -61,8 +65,9 @@ function onPoseExpired(event) {
 
   // Find thing for this pose
   const t = things.get(poseTracker.guid);
-  if (!t) return; // Not found
+  if (!t) return; // Not found, nothing else to do then
 
+  // Remove the thing from the DOM, the map, and then save the updated map.
   Things.remove(t);
   things = things.delete(poseTracker.guid);
   saveState({ things });
@@ -70,6 +75,8 @@ function onPoseExpired(event) {
 
 function setup() {
   const { poses } = settings;
+
+  // Get notified whenever a pose disappears
   poses.addEventListener(`expired`, onPoseExpired);
 
   continuously(() => {

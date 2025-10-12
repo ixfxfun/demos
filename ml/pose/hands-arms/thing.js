@@ -14,7 +14,7 @@ const settings = Object.freeze({
  *  wristDistance: number
  *  wristZ: number
  *  indexAngleL: number
- *  indexAngleR: number
+ *  armBendL: number
  * }>} Thing
  */
 
@@ -23,14 +23,14 @@ const settings = Object.freeze({
  * @param {Thing} thing 
  */
 export const use = (thing) => {
-  const { pose, element, wristDistance, wristZ, indexAngleL, indexAngleR } = thing;
+  const { pose, element, wristDistance, wristZ, indexAngleL, armBendL } = thing;
   element.innerHTML = `
   <h2>Between hands</h2>
   <div>Distance: ${wristDistance.toFixed(2)}</div>
   <div>Z difference: ${wristZ.toFixed(2)}</div>
-  <h2>Same hand/arm</h2>
-  <div>Angle left: ${indexAngleL.toFixed(2)}</div>
-  <div>Angle right: ${indexAngleR.toFixed(2)}</div>
+  <h2>Left arm</h2>
+  <div>Pointing angle: ${indexAngleL.toFixed(2)}</div>
+  <div>Bend angle: ${armBendL.toFixed(2)}</div>
   `;
 };
 
@@ -43,28 +43,31 @@ export const use = (thing) => {
  * @returns {Thing}
  */
 export const update = (thing, ambientState, pose) => {
+  // Get the wrist landmarks
   const wristL = pose.landmarkValue(`left_wrist`);
   const wristR = pose.landmarkValue(`right_wrist`);
 
+  // Get a few landmarks from the left arm
+  const shoulderL = pose.landmarkValue(`left_shoulder`);
   const elbowL = pose.landmarkValue(`left_elbow`);
-  const elbowR = pose.landmarkValue(`right_elbow`);
-
   const indexL = pose.landmarkValue(`left_index`);
-  const indexR = pose.landmarkValue(`right_index`);
 
-  const wristDistance = Points.distance(wristL, wristR);
+  // Calculate distance between wrists, as well as Z separately
+  const wristDistance = Points.distance2d(wristL, wristR);
   const wristZ = wristL.z - wristR.z;
 
+  // Calculate angle of index finger to elbow, and arm bend
   const indexAngleL = radianToDegree(Points.angleRadian(elbowL, indexL));
-  const indexAngleR = radianToDegree(Points.angleRadian(elbowR, indexR));
+  const armBendL = radianToDegree(Points.angleRadianThreePoint(wristL, elbowL, shoulderL));
 
   return {
     ...thing,
     wristDistance,
     wristZ,
-    indexAngleL, indexAngleR
+    indexAngleL, armBendL
   };
 };
+
 
 /**
  * Removes a thing, deleting its associated DOM element
@@ -90,7 +93,7 @@ export const create = (pose) => {
     element,
     pose: pose,
     indexAngleL: 0,
-    indexAngleR: 0,
+    armBendL: 0,
     wristDistance: 0,
     wristZ: 0
   };
