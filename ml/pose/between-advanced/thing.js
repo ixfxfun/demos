@@ -95,7 +95,7 @@ export const create = (poseA, poseB) => {
   const { containerEl } = settings;
   const element = document.createElement(`div`);
   element.classList.add(`thing`);
-  containerEl.append(element);
+  containerEl.prepend(element);
 
   return {
     id: shortGuid(),

@@ -1,13 +1,14 @@
+import { DataDisplay } from '@ixfx/dom.js';
 import * as Arrays from '@ixfx/arrays.js';
 import { PosesConsumer } from "../util/Poses.js";
 import * as Things from './thing.js';
-import { StackMutable } from '@ixfx/collections.js';
 
 const settings = Object.freeze({
   // How often to re-compute and visually update
   updateSpeedMs: 200,
   // Helps us listen for pose data
-  poses: new PosesConsumer({ maxAgeMs: 1000 }).poses
+  poses: new PosesConsumer({ maxAgeMs: 1000 }).poses,
+  dataDisplay: new DataDisplay({ numbers: { leftPadding: 5, precision: 2 } })
 });
 
 /** 
@@ -37,6 +38,10 @@ function update() {
 
   // Save updated things into state
   saveState({ things });
+
+  // Debug display the 'distance' prop of each thing
+  const debug = things.map(thing => ({ distance: thing.distance }));
+  settings.dataDisplay.update(debug);
 }
 
 
