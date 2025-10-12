@@ -4,25 +4,55 @@ See `script.js` for parameters to tune the pose detection.
 
 You might want to copy this folder when making tweaks, so differently-tuned versions are available. Make sure you update the HTML in your sketch to point to the right sender.
 
-## Changing models
+## URL parameters
 
-For example, to use the 'heavy' model instead of the default 'lite', there are two places that need updating.
+If you want to re-use the same 'sender' sketch in different contexts, it may be preferred to set parameter values dynamically, via the URL.
 
-```js
-{
- ...
- pose: {
-  ...
-  modelPath: `pose_landmarker_heavy.task`,
-  ...
- }
- ... 
- modelsBase: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/`
-
-}
+That is, rather than opening up:
+```
+http://127.0.0.1:3000/ml/pose/sender/index.html
 ```
 
-The name of the model and path is based on the [MediaPipe docs](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models)
+In your browser, you might open something like:
+```
+http://127.0.0.1:3000/ml/pose/sender/index.html?numPoses=2&minPoseDetectionConfidence=0.2&minPosePresenceConfidence=0.9&model=full
+```
+
+URL parameters are basically `name=value`, tacked on to the end of the URL. You can set it manually in the browser address bar, or when you link to the sender in the HTML. You can see the latter in `between-basic/index.html`
+
+To add parameters, the first one must be prefixed with a '?', as in 'numPoses' above. After that, use a '&' between each one you add.
+
+Parameters you can set (see the MediaPipe docs for more info)
+* numPoses (default: 5)
+* minPoseDetectionConfidence (default 0.5)
+* minPosePresenceConfidence (default 0.5)
+* minTrackingConfidence (default 0.5)
+* computeFreqMs: how often to process frames (milliseconds). Lower numbers improve tracking fast moving things, but increase CPU load. (default 50)
+* model: lite, heavy, full (default lite)
+
+Examples: Only track one pose, as fast as we can, using the 'full' model
+```
+index.html?numPoses=1&computeFreqMs=1&model=full
+```
+
+## Changing models
+
+You can change to one of three preset models, 'lite', 'full' and 'heavy'. See the [MediaPipe docs](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models) for more on the differences.
+
+Tip: You can also change models using a URL parameter as described above.
+
+Eg. to use MP's 'Pose landmarker heavy' model, change the 'modelPath' property:
+```js
+{
+  ...
+  pose: {
+    ...
+    modelPath: `heavy`,
+    ...
+  }
+  ...
+}
+```
 
 ## Local models
 
