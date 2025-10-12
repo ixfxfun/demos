@@ -23,7 +23,7 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/_lib": true,
-    "ml/**/*": true,
+    "ml/lib/*": true,
     "**/*.code-search": true
   },
   "files.eol": "\n",
