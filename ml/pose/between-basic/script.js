@@ -53,7 +53,7 @@ function update() {
     // Get whichever hand is closest to the other for each body
     const poseAHand = poseA.getRightmost(`left_wrist`, `right_wrist`);
     const poseBHand = poseB.getLeftmost(`left_wrist`, `right_wrist`);
-    distance = Points.distance(poseAHand, poseBHand);
+    distance = Points.distance2d(poseAHand, poseBHand);
 
     // Normalise on 0..1 scale
     distance = distanceNormalise(distance);

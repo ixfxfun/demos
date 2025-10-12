@@ -20,7 +20,7 @@ const poseBHand = poseB.getLeftmost(`left_wrist`, `right_wrist`);
 
 Once we have that, we can compute the distance between the hands:
 ```js
-distance = Points.distance(poseAHand, poseBHand);
+distance = Points.distance2d(poseAHand, poseBHand);
 ```
 
 ...and a `Normalise.stream` function is used to establish a 0..1 scale
