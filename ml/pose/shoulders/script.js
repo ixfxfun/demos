@@ -16,9 +16,9 @@ const settings = Object.freeze({
   // How much of computed angle to fold in
   angleAmount: 0.03,
   // Empirically-discovered min Y distance
-  tiltMin: -0.25,
+  tiltMin: 0.25,
   // Empirically-discovered max Y distance
-  tiltMax: 0.25,
+  tiltMax: -0.25,
   dataDisplay: new Dom.DataDisplay({ numbers: { leftPadding: 5, precision: 2 } }),
   // Automatically sizes canvas for us
   canvasHelper: new CanvasHelper(`canvas`, { resizeLogic: `both` })

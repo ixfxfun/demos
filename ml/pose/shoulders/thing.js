@@ -7,7 +7,7 @@ const settings = Object.freeze({
   // Bounce off sides, losing some velocity
   constrainForce: Forces.constrainBounce({ width: 0.9, height: 0.9 }, 0.5),
   // Slow down velocity
-  frictionForce: Forces.velocityForce(0.015, `multiply`)
+  frictionForce: Forces.velocityForce(0.015, `dampen`)
 });
 
 /**
