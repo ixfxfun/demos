@@ -1,5 +1,6 @@
 import { Points, radianToDegree } from '@ixfx/geometry.js';
-import { Dom, Numbers } from '@ixfx';
+import * as Dom from '@ixfx/dom.js';
+import * as Numbers from '@ixfx/numbers.js';
 import * as Util from './util.js';
 import * as EspruinoSnippets from './espruino.js';
 

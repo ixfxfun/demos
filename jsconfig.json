@@ -13,7 +13,7 @@
     "baseUrl": "./",
     "paths": {
       "@ixfx": [
-        "./ixfx/index.js"
+        "./ixfx/core.js"
       ],
       "@ixfx/*": [
         "./ixfx/*"

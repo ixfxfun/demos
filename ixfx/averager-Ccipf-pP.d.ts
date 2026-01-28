@@ -1,4 +1,4 @@
-import { r as Point } from "./point-type-CAmjZfny.js";
+import { r as Point } from "./point-type-DLbh1Hzz.js";
 
 //#region ../packages/geometry/src/point/averager.d.ts
 type PointAverager = (point: Point) => Point;

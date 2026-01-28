@@ -1,6 +1,6 @@
 import { HslOff, Wled } from "../wled.js";
 import { clamp } from '@ixfx/numbers.js';
-import { continuously } from '@ixfx/index.js';
+import { continuously } from '@ixfx/core.js';
 import { frequencyTimer } from '@ixfx/flow.js';
 import { Oscillators } from '@ixfx/modulation.js';
 
@@ -19,7 +19,7 @@ const settings = Object.freeze({
  * connected: boolean
  * reset: boolean
  * index: number
- * test4Loop: undefined|import('@ixfx/index.js').Continuously
+ * test4Loop: undefined|import('@ixfx/core.js').Continuously
  * }} State
  */
 

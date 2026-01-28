@@ -1,6 +1,6 @@
 // @ts-ignore
 import { LitElement } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
-import { parseUrlParameters } from "@ixfx/index.js";
+import { parseUrlParameters } from "@ixfx/core.js";
 import { shortGuid } from '@ixfx/random.js';
 import { MlVision } from "../../lib/index.js";
 

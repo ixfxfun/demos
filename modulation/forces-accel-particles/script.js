@@ -4,7 +4,7 @@
  */
 import { Points, Rects } from '@ixfx/geometry.js';
 import { Forces } from '@ixfx/modulation.js';
-import { continuously } from '@ixfx/index.js';
+import { continuously } from '@ixfx/core.js';
 import { PointTracker } from '@ixfx/geometry.js';
 import * as Util from './util.js';
 import * as Thing from './thing.js';

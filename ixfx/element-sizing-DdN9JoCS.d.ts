@@ -1,5 +1,5 @@
 import { i as Interval } from "./types-DhLXV-YQ.js";
-import { a as RectPositioned, t as Rect } from "./rect-types-S6H0PcF2.js";
+import { a as RectPositioned, t as Rect } from "./rect-types-C3cN9Uxl.js";
 
 //#region ../packages/dom/src/element-sizing.d.ts
 /**

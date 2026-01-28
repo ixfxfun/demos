@@ -1,5 +1,5 @@
-import { r as Point } from "./point-type-CAmjZfny.js";
-import { a as RectPositioned } from "./rect-types-S6H0PcF2.js";
+import { r as Point } from "./point-type-DLbh1Hzz.js";
+import { a as RectPositioned } from "./rect-types-C3cN9Uxl.js";
 
 //#region ../packages/geometry/src/path/path-type.d.ts
 type Path = {

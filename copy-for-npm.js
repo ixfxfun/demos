@@ -34,7 +34,7 @@ replaceInFileSync({
   files: `${destination}/**/*.js`,
   // from: /^import.*['"]@ixfx['"]/,
   from: /from\s+['"]@ixfx['"]/g,
-  to: `from 'ixfx'`,
+  to: `from '@ixfx/core'`,
 });
 
 // Copy loose files

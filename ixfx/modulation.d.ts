@@ -1,12 +1,12 @@
 import { i as Interval } from "./types-DhLXV-YQ.js";
-import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
-import { r as Point } from "./point-type-CAmjZfny.js";
-import { t as Rect } from "./rect-types-S6H0PcF2.js";
-import { a as RandomSource } from "./types-CnWQrQZd.js";
-import { n as interpolate } from "./interpolate-CyUFbngy.js";
-import { r as Path } from "./path-type-D-LhwMLl.js";
-import { i as Timer } from "./timer-7CRCFgKn.js";
-import { a as easing_d_exports, c as EasingTickOptions, d as ModSettable, f as ModSettableFeedback, g as SpringOptions, h as ModulatorTimed, i as interpolatorStepped, l as EasingTimeOptions, m as ModSource, n as interpolateAngle, o as EasingName, p as ModSettableOptions, r as interpolatorInterval, s as EasingOptions, t as InterpolateOptions, u as ModFunction } from "./interpolate-DyToz7jX.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
+import { r as Point } from "./point-type-DLbh1Hzz.js";
+import { t as Rect } from "./rect-types-C3cN9Uxl.js";
+import { a as RandomSource } from "./types-B4a9qJv9.js";
+import { n as interpolate } from "./interpolate-CCr7T6z3.js";
+import { r as Path } from "./path-type-CgxfTQlW.js";
+import { i as Timer } from "./timer-9dNlwelV.js";
+import { a as easing_d_exports, c as EasingTickOptions, d as ModSettable, f as ModSettableFeedback, g as SpringOptions, h as ModulatorTimed, i as interpolatorStepped, l as EasingTimeOptions, m as ModSource, n as interpolateAngle, o as EasingName, p as ModSettableOptions, r as interpolatorInterval, s as EasingOptions, t as InterpolateOptions, u as ModFunction } from "./interpolate-B5VRMXei.js";
 
 //#region ../packages/modulation/src/source/ticks.d.ts
 type TicksModSettableOptions = ModSettableOptions & {

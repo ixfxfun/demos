@@ -1,4 +1,4 @@
-import { a as Processors2, c as Processors5, i as Processors1, l as RankFunction, n as ProcessFactory, o as Processors3, r as Processors, s as Processors4, t as Process, u as RankOptions } from "./types-BNRWOieO.js";
+import { a as Processors2, c as Processors5, i as Processors1, l as RankFunction, n as ProcessFactory, o as Processors3, r as Processors, s as Processors4, t as Process, u as RankOptions } from "./types-lFRpBv6A.js";
 
 //#region ../packages/process/src/basic.d.ts
 /**

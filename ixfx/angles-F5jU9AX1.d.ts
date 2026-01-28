@@ -1,5 +1,5 @@
-import { r as Point } from "./point-type-CAmjZfny.js";
-import { t as PointAverageKinds } from "./averager-BlnrtLRJ.js";
+import { r as Point } from "./point-type-DLbh1Hzz.js";
+import { t as PointAverageKinds } from "./averager-Ccipf-pP.js";
 
 //#region ../packages/geometry/src/angles.d.ts
 /**

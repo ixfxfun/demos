@@ -1,5 +1,5 @@
 import { t as IsEqual } from "./is-equal--ZpQv_rE.js";
-import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
 
 //#region ../packages/collections/src/queue/iqueue-mutable.d.ts
 type QueueMutableEvents<V> = {

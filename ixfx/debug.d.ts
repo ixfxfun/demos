@@ -1,4 +1,4 @@
-import { a as resolveLogOption, c as LogSet, i as logger, l as MessageLogger, n as logColours, o as LogKind, r as logSet, s as LogMessage, t as LogOption } from "./logger-BKAIJOvg.js";
+import { a as resolveLogOption, c as LogSet, i as logger, l as MessageLogger, n as logColours, o as LogKind, r as logSet, s as LogMessage, t as LogOption } from "./logger-C2iNOtSg.js";
 
 //#region ../packages/debug/src/fps-counter.d.ts
 /**

@@ -1,4 +1,4 @@
-import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
 
 //#region ../packages/collections/src/set/types.d.ts
 type ValueSetEventMap<V> = {

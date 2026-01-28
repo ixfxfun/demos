@@ -1,4 +1,4 @@
-import { continuously } from '@ixfx/index.js';
+import { continuously } from '@ixfx/core.js';
 import { Espruino } from '@ixfx/io.js';
 import { setCssDisplay } from './util.js';
 

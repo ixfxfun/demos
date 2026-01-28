@@ -1,6 +1,6 @@
 import { n as MovingWindowOptions } from "./types-j4lP7di-.js";
-import { a as NumbersComputeResult, i as NumbersComputeOptions, n as NumberScaler, o as NumericRange, r as NumberScalerTwoWay, t as BipolarWrapper } from "./types-B4eDHvnI.js";
-import { i as interpolatorStepped, n as interpolate, r as interpolateAngle, t as BasicInterpolateOptions } from "./interpolate-CyUFbngy.js";
+import { a as NumbersComputeResult, i as NumbersComputeOptions, n as NumberScaler, o as NumericRange, r as NumberScalerTwoWay, t as BipolarWrapper } from "./types-DtDff87L.js";
+import { i as interpolatorStepped, n as interpolate, r as interpolateAngle, t as BasicInterpolateOptions } from "./interpolate-CCr7T6z3.js";
 
 //#region ../packages/numbers/src/apply-to-values.d.ts
 /**

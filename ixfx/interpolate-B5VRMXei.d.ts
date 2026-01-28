@@ -1,7 +1,7 @@
 import { i as Interval } from "./types-DhLXV-YQ.js";
-import { a as HasCompletion } from "./continuously-BuE6tYiM.js";
-import { r as Point } from "./point-type-CAmjZfny.js";
-import { t as BasicInterpolateOptions } from "./interpolate-CyUFbngy.js";
+import { a as HasCompletion } from "./continuously-BdZhuIkm.js";
+import { r as Point } from "./point-type-DLbh1Hzz.js";
+import { t as BasicInterpolateOptions } from "./interpolate-CCr7T6z3.js";
 
 //#region ../packages/modulation/src/types.d.ts
 type ModSettableOptions = {
