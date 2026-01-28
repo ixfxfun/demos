@@ -21,16 +21,14 @@ for (const c of categories) {
 // Copy loose files
 await cpy([ `index.html`, `favicon.ico`, `demos.css`, `eslint.config.mjs` ], `${destination}/`);
 
-// Re-write import map
-const replaceOptions = {
-  files: `${destination}/**/*.html`,
-  from: /{ "ixfx\/": "\/ixfx\/" }/g,
-  to: `{ "ixfx/": "https://unpkg.com/ixfx/dist/" }`
-};
-
 try {
-  replaceInFileSync(replaceOptions);
-  console.log(`copy-for-light done`);
+  // Re-write import map
+  replaceInFileSync({
+    files: `${destination}/**/*.html`,
+    processor: (input) => input.replace(/<script type="importmap">[\s\S]*?<\/script>/, `<script type="importmap">{ "imports": { "@ixfx":"https://unpkg.com/ixfx/dist/min/core.js", "@ixfx/": "https://unpkg.com/ixfx/dist/min/" } }</script>`)
+
+  });
+  console.log(`copy-for-light done. Destination: ${destination}`);
 } catch (error) {
   console.error(`copy-for-light error occurred:`, error);
 }
