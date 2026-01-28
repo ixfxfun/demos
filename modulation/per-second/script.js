@@ -1,5 +1,5 @@
 import { Sources } from '@ixfx/modulation.js';
-import { resolveFields } from '@ixfx/core.js';
+import { resolveFields } from '@ixfx/index.js';
 import { clamp, scalePercent } from '@ixfx/numbers.js';
 
 const settings = {

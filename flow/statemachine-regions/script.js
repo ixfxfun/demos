@@ -3,7 +3,7 @@ import { getCssVariable } from '@ixfx/dom.js';
 import { CanvasHelper } from '@ixfx/visual.js';
 import { StateMachine } from '@ixfx/flow.js';
 import { Circles } from '@ixfx/geometry.js';
-import { elapsedInfinity, elapsedSince } from '@ixfx/core.js';
+import { elapsedInfinity, elapsedSince } from '@ixfx/index.js';
 
 const settings = Object.freeze({
   canvas: new CanvasHelper(`#canvas`, { resizeLogic: `both` }),

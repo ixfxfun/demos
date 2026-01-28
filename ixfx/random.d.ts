@@ -1,45 +1,6 @@
-//#region ../random/src/types.d.ts
-/**
- * A random source.
- *
- * Predefined sources: Math.random, {@link gaussianSource}, {@link weightedSource}
- */
-type RandomSource = () => number;
-type WeightedOptions = RandomNumberOptions & Readonly<{
-  easingFunction: (v: number) => number;
-  easing?: string;
-}>;
-type StringOptions = Readonly<{
-  length: number;
-  source?: RandomSource;
-}>;
-type RandomOptions = Readonly<{
-  source?: RandomSource;
-}>;
-type RandomNumberOptions = RandomOptions & Readonly<{
-  max?: number;
-  min?: number;
-}>;
-/**
- * Options for generating a random boolean
- */
-type RandomBooleanOptions = RandomOptions & Readonly<{
-  /**
-   * If a random value is above threshold, _true_ is returned,
-   * otherwise _false_.
-   * Defaults to 0.5
-   */
-  threshold?: number;
-}>;
-type GenerateRandomOptions = RandomNumberOptions & Readonly<{
-  /**
-   * If true, number range is looped
-   */
-  loop?: boolean;
-}>;
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../random/src/arrays.d.ts
+import { a as RandomSource, i as RandomOptions, n as RandomBooleanOptions, o as StringOptions, r as RandomNumberOptions, s as WeightedOptions, t as GenerateRandomOptions } from "./types-CnWQrQZd.js";
+
+//#region ../packages/random/src/arrays.d.ts
 /**
  * Returns a random array index.
  *
@@ -132,9 +93,8 @@ declare const randomElementWeightedSource: <V>(array: ArrayLike<V>, weightings: 
  * @typeParam V - Type of array items
  */
 declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: RandomSource) => V[];
-//# sourceMappingURL=arrays.d.ts.map
 //#endregion
-//#region ../random/src/chance.d.ts
+//#region ../packages/random/src/chance.d.ts
 /**
  * Chance of returning `a` or `b`, based on threshold `p`.
  *
@@ -155,9 +115,8 @@ declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: RandomSource) => 
  * @returns
  */
 declare const chance: <T>(p: number | (() => number), a: T | (() => T), b: T | (() => T), randomSource?: RandomSource) => T;
-//# sourceMappingURL=chance.d.ts.map
 //#endregion
-//#region ../random/src/float-source.d.ts
+//#region ../packages/random/src/float-source.d.ts
 /**
  * Source for random bipolar values
  * ```js
@@ -242,9 +201,82 @@ declare const floatSource: (maxOrOptions?: (number | RandomNumberOptions)) => Ra
  * @returns Random number
  */
 declare const float: (maxOrOptions?: (number | RandomNumberOptions)) => number;
-//# sourceMappingURL=float-source.d.ts.map
 //#endregion
-//#region ../random/src/gaussian.d.ts
+//#region ../packages/random/src/lfsr.d.ts
+type LfsrResult = {
+  stringValue: string;
+  value: number;
+};
+type LfsrOptions = {
+  taps: number[];
+  /**
+   * Width: 8 or 16.
+   */
+  width: number;
+  seed: number;
+  output: `integer` | `float`;
+};
+/**
+ * Creates a linear feedback shift register (LFSR). Useful for creating deterministic,
+ * pseudo-random numbers.
+ *
+ * Uses 0 (inclusive)...1 (exclusive) scale like Math.random();
+ *
+ * ```js
+ * // Get a function to produce sclar (0..1) values:
+ * const l = lfsrSource();
+ *
+ * // Produce a value
+ * l(); // 0..1 value
+ * ```
+ *
+ * By default, `lfsrSource` uses a fixed seed, so each time it creates the same
+ * series of random numbers.
+ *
+ * Custom seed
+ * ```js
+ * const l = lfsrSource({ seed: 0b10111101 });
+ * ```
+ *
+ * The algorithm natively produces integer values which are scaled to 0..1 range.
+ * If you want integer results:
+ *
+ * ```js
+ * const l = lfsrSource({ output: `integer` });
+ * ```
+ *
+ * Note: not very high-resolution.
+ * @param options
+ * @returns
+ */
+declare function lfsrSource(options?: Partial<LfsrOptions>): RandomSource;
+declare function lfsrCompute(options?: Partial<LfsrOptions>): () => LfsrResult;
+//#endregion
+//#region ../packages/random/src/mulberry.d.ts
+/**
+ * Generates deterministic pseudo-random numbers using the mulberry32 technique.
+ * Uses 0 (inclusive)...1 (exclusive) scale like ``ath.random()`.
+ *
+ * By default it uses a fixed seed, so each time it's used it always produces
+ * the same sequence of random values.
+ * ```js
+ * // Get the function
+ * const r = mulberrySource();
+ *
+ * // Generate a number
+ * r(); // 0..1
+ * ```
+ *
+ * To create a more properly random source, use the time as the seed:
+ * ```js
+ * const r = mulberrySource(Date.now());
+ * ```
+ * @param seed
+ * @returns
+ */
+declare function mulberrySource(seed?: number): () => number;
+//#endregion
+//#region ../packages/random/src/gaussian.d.ts
 /**
  * Returns a random number with gaussian (ie. bell-curved) distribution
  *
@@ -289,9 +321,8 @@ declare const gaussian: (skew?: number) => number;
  * @returns
  */
 declare const gaussianSource: (skew?: number) => RandomSource;
-//# sourceMappingURL=gaussian.d.ts.map
 //#endregion
-//#region ../random/src/guid.d.ts
+//#region ../packages/random/src/guid.d.ts
 /**
  * Generates a six-digit roughly unique id
  * ```js
@@ -303,10 +334,8 @@ declare const gaussianSource: (skew?: number) => RandomSource;
 declare const shortGuid: (options?: Readonly<{
   source?: RandomSource;
 }>) => string;
-//# sourceMappingURL=guid.d.ts.map
-
 //#endregion
-//#region ../random/src/integer.d.ts
+//#region ../packages/random/src/integer.d.ts
 /**
  * Returns a function that produces a random integer between `max` (exclusive) and 0 (inclusive)
  * Use {@link integer} if you want a random number directly.
@@ -399,9 +428,8 @@ declare const integer: (maxOrOptions: number | RandomNumberOptions) => number;
  * @returns
  */
 declare function integerUniqueGen(maxOrOptions: number | GenerateRandomOptions): IterableIterator<number>;
-//# sourceMappingURL=integer.d.ts.map
 //#endregion
-//#region ../random/src/non-zero.d.ts
+//#region ../packages/random/src/non-zero.d.ts
 /**
  * Keeps generating a random number until
  * it's not 0
@@ -409,10 +437,8 @@ declare function integerUniqueGen(maxOrOptions: number | GenerateRandomOptions):
  * @returns Non-zero number
  */
 declare const calculateNonZero: (source?: RandomSource) => number;
-//# sourceMappingURL=non-zero.d.ts.map
-
 //#endregion
-//#region ../random/src/seeded.d.ts
+//#region ../packages/random/src/seeded.d.ts
 /**
  * Reproducible random values using the Merseene Twister algorithm.
  * With the same seed value, it produces the same series of random values.
@@ -438,13 +464,12 @@ declare const calculateNonZero: (source?: RandomSource) => number;
  * https://github.com/jawj/mtwist/
  * @param seed Seed value 0..4294967295. Default: random seed.
  */
-declare function mersenneTwister(seed?: number | undefined): {
-  integer: (maxExclusive: number, minInclusive?: number) => number;
+declare function mersenneTwister(seed?: number): {
+  integer: (maxInclusive: number, minInclusive?: number) => number;
   float: () => number;
 };
-//# sourceMappingURL=seeded.d.ts.map
 //#endregion
-//#region ../random/src/string.d.ts
+//#region ../packages/random/src/string.d.ts
 /**
  * Returns a string of random letters and numbers of a given `length`.
  *
@@ -456,10 +481,8 @@ declare function mersenneTwister(seed?: number | undefined): {
  * @returns Random string
  */
 declare const string: (lengthOrOptions?: number | StringOptions) => string;
-//# sourceMappingURL=string.d.ts.map
-
 //#endregion
-//#region ../random/src/time.d.ts
+//#region ../packages/random/src/time.d.ts
 /**
  * Returns a random number of minutes, with a unit of milliseconds.
  *
@@ -562,9 +585,8 @@ declare const secondsMsSource: (maxSecondsOrOptions: number | RandomNumberOption
  * @returns
  */
 declare const secondsMs: (maxSecondsOrOptions: number | RandomNumberOptions) => number;
-//# sourceMappingURL=time.d.ts.map
 //#endregion
-//#region ../random/src/weighted-index.d.ts
+//#region ../packages/random/src/weighted-index.d.ts
 /**
 * Returns a random number from 0..weightings.length, distributed by the weighting values.
 *
@@ -576,11 +598,9 @@ declare const secondsMs: (maxSecondsOrOptions: number | RandomNumberOptions) => 
 * @param rand
 * @returns
 */
-declare const weightedIndex: (weightings: Array<number>, rand?: RandomSource) => () => number;
-//# sourceMappingURL=weighted-index.d.ts.map
-
+declare const weightedIndex: (weightings: number[], rand?: RandomSource) => () => number;
 //#endregion
-//#region ../random/src/weighted-integer.d.ts
+//#region ../packages/random/src/weighted-integer.d.ts
 /**
  * Random integer, weighted according to an easing function.
  * Number will be inclusive of `min` and below `max`.
@@ -630,9 +650,8 @@ declare const weightedIntegerSource: (options: WeightedOptions) => RandomSource;
  * @returns Random weighted integer
  */
 declare const weightedInteger: (options: WeightedOptions) => number;
-//# sourceMappingURL=weighted-integer.d.ts.map
 //#endregion
-//#region ../random/src/weighted.d.ts
+//#region ../packages/random/src/weighted.d.ts
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
  * See @ixfx/modulation.weighted to use a named easing function.
@@ -651,8 +670,5 @@ declare const weighted: (options: WeightedOptions) => number;
  * @returns Function which returns a weighted random value
  */
 declare const weightedSource: (options: WeightedOptions) => RandomSource;
-//# sourceMappingURL=weighted.d.ts.map
-
 //#endregion
-export { GenerateRandomOptions, RandomBooleanOptions, RandomNumberOptions, RandomOptions, RandomSource, StringOptions, WeightedOptions, bipolar, bipolarSource, calculateNonZero, chance, float, floatSource, gaussian, gaussianSource, integer, integerSource, integerUniqueGen, mersenneTwister, minutesMs, minutesMsSource, randomElement, randomElementWeightedSource, randomIndex, randomPluck, secondsMs, secondsMsSource, shortGuid, shuffle, string, weighted, weightedIndex, weightedInteger, weightedIntegerSource, weightedSource };
-//# sourceMappingURL=random.d.ts.map
+export { GenerateRandomOptions, LfsrOptions, LfsrResult, RandomBooleanOptions, RandomNumberOptions, RandomOptions, RandomSource, StringOptions, WeightedOptions, bipolar, bipolarSource, calculateNonZero, chance, float, floatSource, gaussian, gaussianSource, integer, integerSource, integerUniqueGen, lfsrCompute, lfsrSource, mersenneTwister, minutesMs, minutesMsSource, mulberrySource, randomElement, randomElementWeightedSource, randomIndex, randomPluck, secondsMs, secondsMsSource, shortGuid, shuffle, string, weighted, weightedIndex, weightedInteger, weightedIntegerSource, weightedSource };

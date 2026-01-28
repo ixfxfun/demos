@@ -4,7 +4,7 @@
  */
 import { movingAverage } from '@ixfx/numbers.js';
 import { Points } from '@ixfx/geometry.js';
-import { Records } from '@ixfx/core.js';
+import { Records } from '@ixfx/index.js';
 
 const settings = Object.freeze({
   // Create an averager for x and y

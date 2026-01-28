@@ -19,7 +19,8 @@
     "serve:express": "node express-ws-server.js",
     "serve": "concurrently npm:serve:*",
     "ngrok": "ngrok start --all --config ./ngrok.yml",
-    "start": "npm run serve:express"
+    "start": "npm run serve:express",
+    "typecheck": "tsc -p jsconfig.json --noEmit"
   },
   "repository": {
     "type": "git",
@@ -33,22 +34,23 @@
   },
   "homepage": "https://github.com/ixfxfun/demos#readme",
   "dependencies": {
-    "@stylistic/eslint-plugin": "5.2.2",
-    "@html-eslint/eslint-plugin": "0.44.0",
-    "@html-eslint/parser": "0.44.0",
-    "eslint": "9.32.0"
+    "@html-eslint/eslint-plugin": "0.54.0",
+    "@html-eslint/parser": "0.54.0",
+    "@stylistic/eslint-plugin": "5.7.1",
+    "eslint": "9.39.2",
+    "typescript": "5.9.3"
   },
   "devDependencies": {
-    "body-parser": "^2.2.0",
-    "concurrently": "^9.1.2",
+    "body-parser": "^2.2.2",
+    "concurrently": "^9.2.1",
     "copyfiles": "^2.4.1",
-    "cpy": "^11.1.0",
-    "del": "^8.0.0",
-    "express": "^5.1.0",
+    "cpy": "^12.1.0",
+    "del": "^8.0.1",
+    "express": "^5.2.0",
     "express-ws": "^5.0.2",
-    "replace-in-file": "8.3.0",
-    "rimraf": "^6.0.1",
-    "ws": "^8.18.1"
+    "replace-in-file": "8.4.0",
+    "rimraf": "^6.1.2",
+    "ws": "^8.19.0"
   },
   "stackblitz": {
     "startCommand": "concurrently 'npm:serve:*'"

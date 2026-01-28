@@ -1,11 +1,11 @@
-import "./is-equal-BzhoT7pd.js";
-import { Interval, KeyValue, ToString } from "./types-CcY4GIC4.js";
-import { GetOrGenerateSync } from "./maps-Bm5z7qq5.js";
-import { KeyValueSortSyles } from "./key-value-ww1DZidG.js";
-import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import { NumbersComputeResult } from "./index-C8cro9Jz.js";
+import { a as KeyValue, f as ToString, i as Interval } from "./types-DhLXV-YQ.js";
+import { t as KeyValueSortSyles } from "./key-value-171G2bA4.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { a as NumbersComputeResult } from "./types-B4eDHvnI.js";
+import { a as TimestampedObject, c as TrimReason, i as Timestamped, n as ObjectTracker, o as TimestampedPrimitive, r as TrackerBase, s as TrackedValueOpts, t as TrackedValueMap } from "./tracked-value-BzRrNjSU.js";
+import { i as PrimitiveTracker, n as NumberTrackerResults, r as number, t as NumberTracker } from "./number-tracker-ClwOej43.js";
 
-//#region ../trackers/src/changes.d.ts
+//#region ../packages/trackers/src/changes.d.ts
 type TrackChangeResult = {
   /**
    * If value has changed
@@ -82,14 +82,23 @@ declare function trackNumberChange(options?: Partial<TrackNumberChangeOptions>):
  * @returns
  */
 declare function trackBooleanChange(options?: Partial<TrackChangeOptions<boolean>>): (v: boolean) => TrackChangeResult;
-//# sourceMappingURL=changes.d.ts.map
 //#endregion
-//#region ../trackers/src/frequency-mutable.d.ts
+//#region ../packages/trackers/src/frequency-mutable.d.ts
 type FrequencyEventMap = {
   readonly change: {
     context: unknown;
   };
 };
+/**
+ * Wraps a {@link FrequencyTracker}, but ignores values that come from the same source.
+ */
+declare class GatedFrequencyTracker<T> {
+  readonly ft: FrequencyTracker<T>;
+  readonly sources: Set<string>;
+  constructor(keyString?: ToString<T>);
+  add(value: T, source: string): void;
+  clear(): void;
+}
 /**
  * Frequency keeps track of how many times a particular value is seen, but
  * unlike a Map it does not store the data. By default compares
@@ -163,7 +172,7 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
    */
   frequencyOf(value: V | string): number | undefined;
   /**
-   *
+   * Gets the relative frequency of `value`.
    * @param value Value to count
    * @returns Relative frequency of `value`, or _undefined_ if it does not exist
    */
@@ -172,7 +181,24 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
    * Returns copy of entries as an array
    * @returns Copy of entries as an array
    */
-  entries(): KeyValue[];
+  entries(): Generator<[string, number], void, unknown>;
+  /**
+   * Yields key-value pairs, passing through the filter predicate
+   * @param predicate
+   */
+  filterByTally(predicate: (tally: number) => boolean): Generator<[string, number], void, unknown>;
+  /**
+  * Yields key-value pairs, passing through the filter predicate.
+  *
+  * Passes a relative tally amount
+  * ```js
+  * // Get all key-value pairs where tally is 10% of total
+  * for (const kv of fm.filterByRelativeTally(t=>t>0.1)) {
+  * }
+  * ```
+  * @param predicate
+  */
+  filterByRelativeTally(predicate: (tally: number) => boolean): Generator<[string, number], void, unknown>;
   /**
    * Calculate min,max,avg,total & count from values
    * @returns Returns `{min,max,avg,total}`
@@ -183,7 +209,7 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
    * @param sortStyle Sorting style (default: _value_, ie. count)
    * @returns Sorted array of [key,frequency]
    */
-  entriesSorted(sortStyle?: KeyValueSortSyles): readonly KeyValue[];
+  entriesSorted(sortStyle?: KeyValueSortSyles): KeyValue[];
   /**
    * Add one or more values, firing _change_ event.
    * @param values Values to add. Fires _change_ event after adding item(s)
@@ -191,250 +217,8 @@ declare class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> 
   add(...values: V[]): void;
 }
 declare const frequency: <V>(keyString?: ToString<V>) => FrequencyTracker<V>;
-//# sourceMappingURL=frequency-mutable.d.ts.map
 //#endregion
-//#region ../trackers/src/types.d.ts
-type Timestamped = {
-  /**
-   * Timestamp (Date.now)
-   */
-  readonly at: number;
-};
-type TimestampedObject<V> = V & Timestamped;
-/**
- * Options
- */
-type TrackedValueOpts = {
-  readonly id?: string;
-  /**
-   * If true, intermediate points are stored. False by default
-   */
-  readonly storeIntermediate?: boolean;
-  /**
-   * If above zero, tracker will reset after this many samples
-   */
-  readonly resetAfterSamples?: number;
-  /**
-   * If above zero, there will be a limit to intermediate values kept.
-   *
-   * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
-   * to `sampleLimit`. We only do this when the values are double the size so that
-   * the collections do not need to be trimmed repeatedly whilst we are at the limit.
-   *
-   * Automatically implies storeIntermediate
-   */
-  readonly sampleLimit?: number;
-  /**
-   * If _true_, prints debug info
-   */
-  readonly debug?: boolean;
-};
-type TrimReason = `reset` | `resize`;
-type TimestampedPrimitive<V extends number | string> = {
-  at: number;
-  value: V;
-};
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../trackers/src/tracker-base.d.ts
-/**
- * Base tracker class
- */
-declare abstract class TrackerBase<V, SeenResultType> {
-  /**
-   * @ignore
-   */
-  seenCount: number;
-  /**
-   * @ignore
-   */
-  protected storeIntermediate: boolean;
-  /**
-   * @ignore
-   */
-  protected resetAfterSamples: number;
-  /**
-   * @ignore
-   */
-  protected sampleLimit: number;
-  readonly id: string;
-  protected debug: boolean;
-  constructor(opts?: TrackedValueOpts);
-  /**
-   * Reset tracker
-   */
-  reset(): void;
-  /**
-   * Adds a value, returning computed result.
-   *
-   * At this point, we check if the buffer is larger than `resetAfterSamples`. If so, `reset()` is called.
-   * If not, we check `sampleLimit`. If the buffer is twice as large as sample limit, `trimStore()` is
-   * called to take it down to sample limit, and `onTrimmed()` is called.
-   * @param p
-   * @returns
-   */
-  seen(...p: V[]): SeenResultType;
-  /**
-   * @ignore
-   * @param p
-   */
-  abstract filterData(p: V[]): Timestamped[];
-  abstract get last(): V | undefined;
-  /**
-   * Returns the initial value, or undefined
-   */
-  abstract get initial(): V | undefined;
-  /**
-   * Returns the elapsed milliseconds since the initial value
-   */
-  abstract get elapsed(): number;
-  /**
-   * Returns the millisecond period from the oldest and newest value.
-   * Returns NaN if there's no initial/last values
-   */
-  abstract get timespan(): number;
-  /**
-   * @ignore
-   */
-  abstract computeResults(_p: Timestamped[]): SeenResultType;
-  /**
-   * @ignore
-   */
-  abstract onReset(): void;
-  /**
-   * Notification that buffer has been trimmed
-   */
-  abstract onTrimmed(reason: TrimReason): void;
-  abstract trimStore(limit: number): number;
-}
-//# sourceMappingURL=tracker-base.d.ts.map
-//#endregion
-//#region ../trackers/src/primitive-tracker.d.ts
-declare abstract class PrimitiveTracker<V extends number | string, TResult> extends TrackerBase<V, TResult> {
-  values: V[];
-  timestamps: number[];
-  constructor(opts?: TrackedValueOpts);
-  /**
-   * Reduces size of value store to `limit`. Returns
-   * number of remaining items
-   * @param limit
-   */
-  trimStore(limit: number): number;
-  onTrimmed(reason: TrimReason): void;
-  get last(): V | undefined;
-  get initial(): V | undefined;
-  /**
-   * Returns number of recorded values (this can include the initial value)
-   */
-  get size(): number;
-  /**
-   * Returns the elapsed time, in milliseconds since the instance was created
-   */
-  get elapsed(): number;
-  /**
-   * Returns the time, in milliseconds, covering the initial and last values.
-   * Returns NaN if either of these is missing.
-   */
-  get timespan(): number;
-  onReset(): void;
-  /**
-   * Tracks a value
-   */
-  filterData(rawValues: V[]): TimestampedPrimitive<V>[];
-}
-//# sourceMappingURL=primitive-tracker.d.ts.map
-//#endregion
-//#region ../trackers/src/number-tracker.d.ts
-type NumberTrackerResults = {
-  readonly total: number;
-  readonly min: number;
-  readonly max: number;
-  readonly avg: number;
-};
-declare class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults> {
-  #private;
-  /**
-   * Difference between last value and initial.
-   * Eg. if last value was 10 and initial value was 5, 5 is returned (10 - 5)
-   * If either of those is missing, undefined is returned
-   */
-  difference(): number | undefined;
-  /**
-   * Relative difference between last value and initial.
-   * Eg if last value was 10 and initial value was 5, 2 is returned (200%)
-   */
-  relativeDifference(): number | undefined;
-  onReset(): void;
-  /**
-   * When trimmed, recomputes to set total/min/max to be based on
-   * current values.
-   * @param reason
-   */
-  onTrimmed(reason: TrimReason): void;
-  computeResults(values: TimestampedPrimitive<number>[]): NumberTrackerResults;
-  getMinMaxAvg(): {
-    min: number;
-    max: number;
-    avg: number;
-  };
-  get max(): number;
-  get total(): number;
-  get min(): number;
-  get avg(): number;
-}
-/**
- * Keeps track of the total, min, max and avg in a stream of values. By default values
- * are not stored.
- *
- * Usage:
- *
- * ```js
- * import { number } from '@ixfx/trackers.js';
- *
- * const t = number();
- * t.seen(10);
- *
- * t.avg / t.min/ t.max
- * t.initial; // initial value
- * t.size;    // number of seen values
- * t.elapsed; // milliseconds since intialisation
- * t.last;    // last value
- * ```
- *
- * To get `{ avg, min, max, total }`
- * ```
- * t.getMinMax()
- * ```
- *
- * Use `t.reset()` to clear everything.
- *
- * Trackers can automatically reset after a given number of samples
- * ```
- * // reset after 100 samples
- * const t = number({ resetAfterSamples: 100 });
- * ```
- *
- * To store values, use the `storeIntermediate` option:
- *
- * ```js
- * const t = number({ storeIntermediate: true });
- * ```
- *
- * Difference between last value and initial value:
- * ```js
- * t.relativeDifference();
- * ```
- *
- * Get raw data (if it is being stored):
- * ```js
- * t.values; // array of numbers
- * t.timestampes; // array of millisecond times, indexes correspond to t.values
- * ```
- */
-declare const number: (opts?: TrackedValueOpts) => NumberTracker;
-//# sourceMappingURL=number-tracker.d.ts.map
-//#endregion
-//#region ../trackers/src/interval-tracker.d.ts
+//#region ../packages/trackers/src/interval-tracker.d.ts
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
  */
@@ -473,9 +257,8 @@ declare class IntervalTracker extends NumberTracker {
  * @returns New interval tracker
  */
 declare const interval: (options?: TrackedValueOpts) => IntervalTracker;
-//# sourceMappingURL=interval-tracker.d.ts.map
 //#endregion
-//#region ../trackers/src/rate-tracker.d.ts
+//#region ../packages/trackers/src/rate-tracker.d.ts
 type RateTrackerOpts = Readonly<{
   /**
   * If above zero, tracker will reset after this many samples
@@ -569,160 +352,5 @@ declare class RateTracker {
  * @returns
  */
 declare const rate: (opts?: Partial<RateTrackerOpts>) => RateTracker;
-//# sourceMappingURL=rate-tracker.d.ts.map
 //#endregion
-//#region ../trackers/src/object-tracker.d.ts
-/**
- * A tracked value of type `V`.
- */
-declare abstract class ObjectTracker<V extends object, SeenResultType> extends TrackerBase<V, SeenResultType> {
-  values: TimestampedObject<V>[];
-  constructor(opts?: TrackedValueOpts);
-  onTrimmed(reason: TrimReason): void;
-  /**
-   * Reduces size of value store to `limit`.
-   * Returns number of remaining items
-   * @param limit
-   */
-  trimStore(limit: number): number;
-  /**
-   * Allows sub-classes to be notified when a reset happens
-   * @ignore
-   */
-  onReset(): void;
-  /**
-   * Tracks a value
-   * @ignore
-   */
-  filterData(p: V[] | TimestampedObject<V>[]): TimestampedObject<V>[];
-  /**
-   * Last seen value. If no values have been added, it will return the initial value
-   */
-  get last(): TimestampedObject<V>;
-  /**
-   * Returns the oldest value in the buffer
-   */
-  get initial(): TimestampedObject<V> | undefined;
-  /**
-   * Returns number of recorded values (includes the initial value in the count)
-   */
-  get size(): number;
-  /**
-   * Returns the elapsed time, in milliseconds since the initial value
-   */
-  get elapsed(): number;
-  /**
-   * Returns the time, in milliseconds, covering the initial and last values.
-   * Returns NaN if either of these is missing.
-   */
-  get timespan(): number;
-}
-//# sourceMappingURL=object-tracker.d.ts.map
-//#endregion
-//#region ../trackers/src/tracked-value.d.ts
-/**
- * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
- * must extend from `TrackerBase<V>`, eg `PointTracker`.
- *
- * The `creator` function passed in to the constructor is responsible for instantiating
- * the appropriate `TrackerBase` sub-class.
- *
- * @example Sub-class
- * ```js
- * export class PointsTracker extends TrackedValueMap<Points.Point> {
- *  constructor(opts:TrackOpts = {}) {
- *   super((key, start) => {
- *    if (start === undefined) throw new Error(`Requires start point`);
- *    const p = new PointTracker(key, opts);
- *    p.seen(start);
- *    return p;
- *   });
- *  }
- * }
- * ```
- *
- */
-declare class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
-  store: Map<string, T>;
-  gog: GetOrGenerateSync<string, T, V>;
-  constructor(creator: (key: string, start: V | undefined) => T);
-  /**
-   * Number of named values being tracked
-   */
-  get size(): number;
-  /**
-   * Returns _true_ if `id` is stored
-   * @param id
-   * @returns
-   */
-  has(id: string): boolean;
-  /**
-   * For a given id, note that we have seen one or more values.
-   * @param id Id
-   * @param values Values(s)
-   * @returns Information about start to last value
-   */
-  seen(id: string, ...values: V[]): TResult;
-  /**
-   * Creates or returns a TrackedValue instance for `id`.
-   * @param id
-   * @param values
-   * @returns
-   */
-  protected getTrackedValue(id: string, ...values: V[]): T;
-  /**
-   * Remove a tracked value by id.
-   * Use {@link reset} to clear them all.
-   * @param id
-   */
-  delete(id: string): void;
-  /**
-   * Remove all tracked values.
-   * Use {@link delete} to remove a single value by id.
-   */
-  reset(): void;
-  /**
-   * Enumerate ids
-   */
-  ids(): Generator<string, void, unknown>;
-  /**
-   * Enumerate tracked values
-   */
-  tracked(): Generator<T, void, unknown>;
-  /**
-   * Iterates TrackedValues ordered with oldest first
-   * @returns
-   */
-  trackedByAge(): Generator<T, void, unknown>;
-  /**
-   * Iterates underlying values, ordered by age (oldest first)
-   * First the named values are sorted by their `elapsed` value, and then
-   * we return the last value for that group.
-   */
-  valuesByAge(): Generator<V | undefined, void, unknown>;
-  /**
-   * Enumerate last received values
-   *
-   * @example Calculate centroid of latest-received values
-   * ```js
-   * const pointers = pointTracker();
-   * const c = Points.centroid(...Array.from(pointers.lastPoints()));
-   * ```
-   */
-  last(): Generator<V | undefined, void, unknown>;
-  /**
-   * Enumerate starting values
-   */
-  initialValues(): Generator<V | undefined, void, unknown>;
-  /**
-   * Returns a tracked value by id, or undefined if not found
-   * @param id
-   * @returns
-   */
-  get(id: string): TrackerBase<V, TResult> | undefined;
-}
-//# sourceMappingURL=tracked-value.d.ts.map
-
-//#endregion
-export { FrequencyEventMap, FrequencyTracker, IntervalTracker, NumberTracker, NumberTrackerResults, ObjectTracker, PrimitiveTracker, RateTracker, RateTrackerOpts, Timestamped, TimestampedObject, TimestampedPrimitive, TrackChangeOptions, TrackChangeResult, TrackNumberChangeOptions, TrackedValueMap, TrackedValueOpts, TrackerBase, TrimReason, frequency, handleChangeResult, interval, number, rate, trackBooleanChange, trackNumberChange };
-//# sourceMappingURL=trackers.d.ts.map
+export { FrequencyEventMap, FrequencyTracker, GatedFrequencyTracker, IntervalTracker, NumberTracker, NumberTrackerResults, ObjectTracker, PrimitiveTracker, RateTracker, RateTrackerOpts, Timestamped, TimestampedObject, TimestampedPrimitive, TrackChangeOptions, TrackChangeResult, TrackNumberChangeOptions, TrackedValueMap, TrackedValueOpts, TrackerBase, TrimReason, frequency, handleChangeResult, interval, number, rate, trackBooleanChange, trackNumberChange };

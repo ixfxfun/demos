@@ -1,37 +1,6 @@
-//#region ../process/src/types.d.ts
-type Process<TIn, TOut> = (value: TIn) => TOut;
-type ProcessFactory<TIn, TOut> = () => Process<TIn, TOut>;
-type Processors1<T1, T2> = [Process<T1, T2>];
-type Processors2<T1, T2, T3> = [Process<T1, T2>, Process<T2, T3>];
-type Processors3<T1, T2, T3, T4> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>];
-type Processors4<T1, T2, T3, T4, T5> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>];
-type Processors5<T1, T2, T3, T4, T5, T6> = [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6>];
-type Processors<T1, T2, T3, T4, T5, T6> = Processors1<T1, T2> | Processors2<T1, T2, T3> | Processors3<T1, T2, T3, T4> | Processors4<T1, T2, T3, T4, T5> | Processors5<T1, T2, T3, T4, T5, T6>;
-/**
- * A rank function that compares A and B.
- * Returns the highest value, 'a' or 'b'.
- * Returns 'eq' if values are equal
- */
-type RankFunction<T> = (a: T, b: T) => `a` | `b` | `eq`;
-type RankOptions = {
-  /**
-   * If set, only values with this JS type are included
-   */
-  includeType?: `string` | `number` | `object` | `boolean`;
-  /**
-   * If _true_, also emits values when they rank equal with current highest.
-   * _false_ by default
-   */
-  emitEqualRanked?: boolean;
-  /**
-   * If _true_, emits the current highest value even if it hasn't changed.
-   * This means it will match the tempo of the incoming stream.
-   */
-  emitRepeatHighest?: boolean;
-};
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../process/src/basic.d.ts
+import { a as Processors2, c as Processors5, i as Processors1, l as RankFunction, n as ProcessFactory, o as Processors3, r as Processors, s as Processors4, t as Process, u as RankOptions } from "./types-BNRWOieO.js";
+
+//#region ../packages/process/src/basic.d.ts
 /**
  * Outputs the current largest-seen value
  * @returns
@@ -66,24 +35,20 @@ declare const tally: (countArrayItems: boolean) => Process<any, number>;
  * @returns
  */
 declare function rank<In>(r: RankFunction<In>, options?: Partial<RankOptions>): (value: In) => In | undefined;
-//# sourceMappingURL=basic.d.ts.map
 //#endregion
-//#region ../process/src/cancel-error.d.ts
+//#region ../packages/process/src/cancel-error.d.ts
 declare class CancelError extends Error {
   constructor(message: any);
 }
-//# sourceMappingURL=cancel-error.d.ts.map
 //#endregion
-//#region ../process/src/flow.d.ts
+//#region ../packages/process/src/flow.d.ts
 declare function flow<T1, T2>(...processors: [Process<T1, T2>]): (value: T1) => T2;
 declare function flow<T1, T2, T3>(...processors: [Process<T1, T2>, Process<T2, T3>]): (value: T1) => T3;
 declare function flow<T1, T2, T3, T4>(...processors: [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>]): (value: T1) => T4;
 declare function flow<T1, T2, T3, T4, T5>(...processors: [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>]): (value: T1) => T5;
 declare function flow<T1, T2, T3, T4, T5, T6>(...processors: [Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6>]): (value: T1) => T6;
-//# sourceMappingURL=flow.d.ts.map
-
 //#endregion
-//#region ../process/src/if-undefined.d.ts
+//#region ../packages/process/src/if-undefined.d.ts
 /**
  * Calls a function if the input value is not undefined.
  * Return value from function is passed to next function in flow.
@@ -131,9 +96,8 @@ declare function cancelIfUndefined<TIn>(): (value: TIn | undefined) => TIn;
  * @returns
  */
 declare function ifUndefined<TIn, TOut>(fn: () => TOut): (value: TIn) => TOut | (TIn & ({} | null));
-//# sourceMappingURL=if-undefined.d.ts.map
 //#endregion
-//#region ../process/src/seen.d.ts
+//#region ../packages/process/src/seen.d.ts
 /**
  * If a value is same as the previous value, _undefined_ is emitted instead.
  *
@@ -165,8 +129,5 @@ declare function seenToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Process
  * @returns
  */
 declare function seenToUndefinedByKey<TIn>(toString?: (value: TIn) => string): Process<TIn, TIn | undefined>;
-//# sourceMappingURL=seen.d.ts.map
-
 //#endregion
 export { CancelError, type Process, ProcessFactory, Processors, Processors1, Processors2, Processors3, Processors4, Processors5, RankFunction, RankOptions, average, cancelIfUndefined, flow, ifNotUndefined, ifUndefined, max, min, rank, seenLastToUndefined, seenToUndefined, seenToUndefinedByKey, sum, tally };
-//# sourceMappingURL=process.d.ts.map

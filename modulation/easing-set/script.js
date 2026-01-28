@@ -1,4 +1,4 @@
-import * as Core from '@ixfx/core.js';
+import * as Core from '@ixfx/index.js';
 import * as Mod from '@ixfx/modulation.js';
 import * as Util from './util.js';
 

@@ -1,4 +1,8 @@
-//#region ../numbers/src/apply-to-values.d.ts
+import { n as MovingWindowOptions } from "./types-j4lP7di-.js";
+import { a as NumbersComputeResult, i as NumbersComputeOptions, n as NumberScaler, o as NumericRange, r as NumberScalerTwoWay, t as BipolarWrapper } from "./types-B4eDHvnI.js";
+import { i as interpolatorStepped, n as interpolate, r as interpolateAngle, t as BasicInterpolateOptions } from "./interpolate-CyUFbngy.js";
+
+//#region ../packages/numbers/src/apply-to-values.d.ts
 /**
  * Apples `fn` to every key of `obj` which is numeric.
  * ```js
@@ -16,10 +20,20 @@
  * @returns
  */
 declare const applyToValues: <T extends Record<string, any>>(object: T, apply: (v: number) => number) => T;
-//# sourceMappingURL=apply-to-values.d.ts.map
-
 //#endregion
-//#region ../numbers/src/average-weighted.d.ts
+//#region ../packages/numbers/src/average.d.ts
+/**
+ * Calculate median value of an array of numbers
+ * @param data
+ * @returns
+ */
+declare const median: (data: number[] | readonly number[]) => number;
+/**
+ * Calculate the mean of `array`.
+ * @param array
+ * @returns
+ */
+declare const mean: (array: number[] | readonly number[]) => number;
 /**
  * Computes an average of an array with a set of weights applied.
  *
@@ -45,7 +59,7 @@ declare const applyToValues: <T extends Record<string, any>>(object: T, apply: (
  * This is the same as:
  *
  * ```js
- * const data = [1,2,3];
+ * const data = [ 1, 2, 3 ];
  * const w = weight(data, Random.gaussian());
  * const avg = averageWeighted(data, w); // 2.0
  * ```
@@ -53,10 +67,22 @@ declare const applyToValues: <T extends Record<string, any>>(object: T, apply: (
  * @param weightings Array of weightings that match up to data array, or an easing function
  * @see {@link average} Compute averages without weighting.
  */
-declare const averageWeighted: (data: number[] | readonly number[], weightings: number[] | readonly number[] | ((value: number) => number)) => number;
-//# sourceMappingURL=average-weighted.d.ts.map
+declare const averageWeighted: (data: number[] | readonly number[], weightings: number[] | readonly number[] | ((arrayIndex: number) => number)) => number;
+/**
+ * Returns a function that computes a weighted average of an array
+ *
+ * ```js
+ * const w = averageWeigher(v => Math.random() * v);
+ *
+ * // Give each array index a random
+ * w([1,2,3,4]);
+ * ```
+ * @param weigher
+ * @returns
+ */
+declare const averageWeigher: (weigher: (arrayIndex: number) => number) => (data: number[]) => number;
 //#endregion
-//#region ../numbers/src/clamp.d.ts
+//#region ../packages/numbers/src/clamp.d.ts
 /**
  * Clamps a value between min and max (both inclusive)
  * Defaults to a 0-1 range, useful for percentages.
@@ -117,20 +143,10 @@ declare const clamper: (min?: number, max?: number) => (v: number) => number;
  * @returns Clamped value, minimum will be 0, maximum will be one less than `length`.
  */
 declare const clampIndex: (v: number, arrayOrLength: number | readonly any[]) => number;
-/**
- * Returns the largest value, ignoring the sign of numbers
- *
- * ```js
- * maxAbs(1, 5);    // 5
- * maxAbs(-10, 5);  // -10 (since sign is ignored)
- * ```
- * @param values
- * @returns
- */
-declare const maxAbs: (...values: number[]) => number;
-//# sourceMappingURL=clamp.d.ts.map
+declare function maxAbs(values: Iterable<number>): number;
+declare function maxAbs(...values: number[]): number;
 //#endregion
-//#region ../numbers/src/count.d.ts
+//#region ../packages/numbers/src/count.d.ts
 /**
  * Yields `amount` integers, counting by one from zero. If a negative amount is used,
  * count decreases. If `offset` is provided, this is added to the return result.
@@ -165,9 +181,8 @@ declare const maxAbs: (...values: number[]) => number;
  * @param offset Added to result
  */
 declare function count(amount: number, offset?: number): Generator<number, void, void>;
-//# sourceMappingURL=count.d.ts.map
 //#endregion
-//#region ../numbers/src/difference.d.ts
+//#region ../packages/numbers/src/difference.d.ts
 type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `absolute`;
 /**
  * Returns the difference from the `initial` value. Defaults to absolute difference.
@@ -253,9 +268,8 @@ declare const differenceFromFixed: (initial: number, kind?: DifferenceKind) => (
  * @returns
  */
 declare const differenceFromLast: (kind?: DifferenceKind, initialValue?: number) => (v: number) => number;
-//# sourceMappingURL=difference.d.ts.map
 //#endregion
-//#region ../numbers/src/filter.d.ts
+//#region ../packages/numbers/src/filter.d.ts
 /**
  * Filters an iterator of values, only yielding
  * those that are valid numbers
@@ -299,9 +313,8 @@ declare const thresholdAtLeast: (threshold: number) => (v: number) => boolean;
  * @returns
  */
 declare const rangeInclusive: (min: number, max: number) => (v: number) => boolean;
-//# sourceMappingURL=filter.d.ts.map
 //#endregion
-//#region ../numbers/src/flip.d.ts
+//#region ../packages/numbers/src/flip.d.ts
 /**
  * Flips a percentage-scale number: `1 - v`.
  *
@@ -317,12 +330,11 @@ declare const rangeInclusive: (min: number, max: number) => (v: number) => boole
  * @returns
  */
 declare const flip: (v: number | (() => number)) => number;
-//# sourceMappingURL=flip.d.ts.map
 //#endregion
-//#region ../numbers/src/generate.d.ts
+//#region ../packages/numbers/src/generate.d.ts
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
- * If `end` is provided, generator stops when reached.
+ * If `end` is provided, generator stops when reached
  *
  * Unlike {@link numericRange}, numbers might contain rounding errors
  *
@@ -331,9 +343,14 @@ declare const flip: (v: number | (() => number)) => number;
  *  // 100, 110, 120 ...
  * }
  * ```
+ *
+ * Get results as an array
+ * ```js
+ * const c = [...numericRangeRaw(1,0,5)]; // [0,1,2,3,4]
+ * ```
  * @param interval Interval between numbers
  * @param start Start
- * @param end End (if undefined, range never ends)
+ * @param end End (if undefined, range never ends). Inclusive.
  */
 declare const numericRangeRaw: (interval: number, start?: number, end?: number, repeating?: boolean) => Generator<number, void, unknown>;
 /**
@@ -359,7 +376,7 @@ declare const numericRangeRaw: (interval: number, start?: number, end?: number, 
  *
  * @param interval Interval between numbers
  * @param start Start. Defaults to 0
- * @param end End (if undefined, range never ends)
+ * @param end End (if undefined, range never ends). Inclusive.
  * @param repeating Range loops from start indefinately. Default _false_
  * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
@@ -385,19 +402,16 @@ declare const numericRange: (interval: number, start?: number, end?: number, rep
  * @returns
  */
 declare const numericPercent: (interval?: number, repeating?: boolean, start?: number, end?: number) => Generator<number, void, unknown>;
-//# sourceMappingURL=generate.d.ts.map
 //#endregion
-//#region ../numbers/src/guard.d.ts
+//#region ../packages/numbers/src/guard.d.ts
 /**
  * Returns true if `possibleNumber` is a number and not NaN
  * @param possibleNumber
  * @returns
  */
 declare const isValid: (possibleNumber: unknown) => boolean;
-//# sourceMappingURL=guard.d.ts.map
-
 //#endregion
-//#region ../numbers/src/is-approx.d.ts
+//#region ../packages/numbers/src/is-approx.d.ts
 /**
  * Returns a function that checks if a value is within range of a base value
  * ```js
@@ -423,7 +437,14 @@ declare function isApprox(rangePercent: number, baseValue: number): (value: numb
  * Returns _true/false_ if `value` is within `rangePercent` of `baseValue`.
  *
  * ```js
+ * // True
  * isApprox(0.1, 100, 101);
+ * isApprox(0.1, 100, 99);
+ * isApprox(0.1, 100, 100);
+ *
+ * // False
+ * isApprox(0.1, 100, 98);
+ * isApprox(0.1, 100, 102);
  * ```
  * @param rangePercent
  * @param baseValue
@@ -449,107 +470,103 @@ declare function isApprox(rangePercent: number, baseValue: number, value: number
  * @returns
  */
 declare const isCloseToAny: (allowedRangeAbsolute: number, ...targets: number[]) => (...values: number[]) => boolean;
-//# sourceMappingURL=is-approx.d.ts.map
 //#endregion
-//#region ../numbers/src/types.d.ts
-type NumbersComputeResult = {
+//#region ../packages/numbers/src/kalman.d.ts
+type Kalman1dFilterOptions = {
   /**
-   * Tally of number of items
+   * Process noise
+   * @default 1
    */
-  readonly count: number;
+  r: number;
   /**
-   * Smallest value in array
+   * Measurement noise
+   * @default 1
    */
-  readonly min: number;
+  q: number;
   /**
-   * Total of all items
+   * State vector
+   * @default 1
    */
-  readonly total: number;
+  a: number;
   /**
-   * Largest value in array
+   * Control vector
+   * @default 0
    */
-  readonly max: number;
+  b: number;
   /**
-   * Average value in array
+   * Measurement vector
+   * @default 1
    */
-  readonly avg: number;
-};
-type NumbersComputeOptions = Readonly<{
-  /**
-   * Start index, inclusive
-   */
-  /**
-   * End index, exclusive
-   */
-  nonNumbers?: `throw` | `ignore` | `nan`;
-}>;
-type NumberScaler = (v: number) => number;
-type NumberScalerTwoWay = {
-  out: NumberScaler;
-  in: NumberScaler;
+  c: number;
 };
 /**
- * Wrapper around a bipolar value. Immutable.
+* KalmanFilter
+*
+* author: Wouter Bulten
+* see {@link http://github.com/wouterbulten/kalmanjs}
+* version Version: 1.0.0-beta
+* copyright Copyright 2015-2018 Wouter Bulten
+* license MIT License
+*/
+declare class Kalman1dFilter {
+  R: number;
+  Q: number;
+  A: number;
+  C: number;
+  B: number;
+  cov: number;
+  x: number;
+  /**
+  * Create 1-dimensional kalman filter
+  */
+  constructor(options?: Partial<Kalman1dFilterOptions>);
+  /**
+  * Filter a new value
+  * @param  {Number} z Measurement
+  * @param  {Number} u Control
+  * @return {Number}
+  */
+  filter(z: number, u?: number): number;
+  /**
+  * Predict next value
+  * @param  {Number} [u] Control
+  * @return {Number}
+  */
+  predict(u?: number): number;
+  /**
+  * Return uncertainty of filter
+  * @return {Number}
+  */
+  uncertainty(): number;
+  /**
+  * Return the last filtered measurement
+  * @return {Number}
+  */
+  lastMeasurement(): number;
+  /**
+  * Set measurement noise Q
+  * @param {Number} noise
+  */
+  setMeasurementNoise(noise: number): void;
+  /**
+  * Set the process noise R
+  * @param {Number} noise
+  */
+  setProcessNoise(noise: number): void;
+}
+/**
+ * Returns a function that performs 1D Kalman filtering.
  *
  * ```js
- * let b = Bipolar.immutable();
- * let b = Bipolar.immutable(0.5);
- * b = b.add(0.1);
+ * const f = kalman1dFilter();
+ * f(10); // 10
  * ```
+ *
+ * Under the hood creates a {@link Kalman1dFilter} instance and returns its `filter` method.
+ * @param options
+ * @returns
  */
-type BipolarWrapper = {
-  value: number;
-  towardZero: (amt: number) => BipolarWrapper;
-  add: (amt: number) => BipolarWrapper;
-  multiply: (amt: number) => BipolarWrapper;
-  inverse: () => BipolarWrapper;
-  asScalar: () => number;
-  interpolate: (amt: number, b: number) => BipolarWrapper;
-  [Symbol.toPrimitive]: (hint: string) => number | string | boolean;
-};
-type NumericRange = Readonly<{
-  min: number;
-  max: number;
-}>;
-type NormaliseStreamContext = NumericRange & {
-  /**
-   * Passes a value to the normaliser, getting
-   * back the normalised result
-   * @param v Value to add
-   * @returns Normalised result
-   */
-  seen: (v: number) => number;
-  /**
-   * Reset the normaliser, by default to
-   * extreme ranges so it will calibrate after the
-   * next value.
-   * @param minDefault Start min value (default: Number.MAX_SAFE_INTEGER)
-   * @param maxDefault Start max value (default: Number.MIN_SAFE_INTERGER)
-   * @returns
-   */
-  reset: (minDefault?: number, maxDefault?: number) => void;
-  /**
-   * Get the current min value of range.
-   *
-   * If no values have been passed through the stream it will be
-   * the initial minDefault or Number.MAX_SAFE_INTEGER
-   */
-  get min(): number;
-  /**
-   * Get the current max value of range.
-   *
-   * If no values have been passed through the stream it will be
-   * the initial maxDefault or Number.MIN_SAFE_INTEGER
-   */
-  get max(): number;
-  /**
-   * Gets the absolute range (ie. max-min) of the normaliser.
-   *
-   * If normaliser hasn't received any values it will use its default min/max.
-   */
-  get range(): number;
-};
-//# sourceMappingURL=types.d.ts.map
+declare const kalman1dFilter: (options?: Partial<Kalman1dFilterOptions>) => (z: number, u?: number) => number;
 declare namespace bipolar_d_exports {
   export { clamp$1 as clamp, fromScalar, immutable, scale$1 as scale, scaleUnclamped, toScalar, towardZero };
 }
@@ -575,6 +592,7 @@ declare namespace bipolar_d_exports {
  * // x = 11
  * ```
  * @param startingValueOrBipolar Initial numeric value or BipolarWrapper instance
+ * @throws {TypeError} If start value is out of bipolar range or invalid
  * @returns
  */
 declare const immutable: (startingValueOrBipolar?: number | BipolarWrapper) => BipolarWrapper;
@@ -678,138 +696,48 @@ declare const clamp$1: (bipolarValue: number) => number;
  * @returns Bipolar value -1...1
  */
 declare const towardZero: (bipolarValue: number, amount: number) => number;
-//# sourceMappingURL=bipolar.d.ts.map
 //#endregion
-//#region ../numbers/src/interpolate.d.ts
+//#region ../packages/numbers/src/iqr.d.ts
 /**
- * Interpolation options.
+ * Calculate interquartile range.
  *
- * Limit: What to do if interpolation amount exceeds 0..1 range
- * * clamp: lock to A & B (inclusive) Default.
- * * wrap: wrap from end to start again
- * * ignore: allow return values outside of A..B range
- *
- * Transform: name of function to transform `amount` prior to interpolate. This is useful for creating non-linear interpolation results.
- *
- * For example:
- * ```js
- * // Divide interpolation amount in half
- * const interpolatorInterval({ mins: 1 }, 10, 100, {
- *  transform: (amount) => amount * Math.random()
- * });
- * ```
- * In the above example, the results would get more random over time.
- * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result.
- *
- */
-type BasicInterpolateOptions = {
-  limits: `clamp` | `wrap` | `ignore`;
-  transform: (v: number) => number;
-};
-/**
- * Returns an interpolation function with a fixed interpolation amount. This
- * function will need the A and B values to interpolate between (ie start and end)
- *
- * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * // Create function
- * const fn = interpolate(0.1);
- *
- * // Later, use to interpolate between a and b
- * fn(50, 100); // 10% of 50..100 range
- * ```
- *
- * This is useful if you have a fixed interpolation amount, but varying A and B values.
- * @param amount Interpolation value (0..1 usually)
- * @param options Options
- */
-declare function interpolate(amount: number, options?: Partial<BasicInterpolateOptions>): (a: number, b: number) => number;
-/**
- * Interpolates between `a` and `b` by `amount`.
- *
- * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * // Get the value at 10% of range between 50-100
- * const fn = interpolate(0.1, 50, 100);
- * ```
- *
- * This is useful if you have dynamic interpolation amount as well as A & B values.
- * Consider using `interpolate(amount)` if you have a fixed interpolation amount.
- * @param amount Interpolation value (0..1 usually)
- * @param a Starting value (corresponding to an interpolation of 0)
- * @param b End value (corresponding to an interpolation value of 1)
- * @param options Options
- */
-declare function interpolate(amount: number, a: number, b: number, options?: Partial<BasicInterpolateOptions>): number;
-/**
- * Returns an interpolation function with a fixed A and B values.
- * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
- *
- * ```js
- * // Create function to interpolate between 50..100
- * const fn = interpolate(50, 100);
- *
- * // Later, use to interpolate
- * fn(0.1); // 10% of 50..100 range
- * ```
- * @param a Starting value (corresponding to an interpolation of 0)
- * @param b End value (corresponding to an interpolation value of 1)
- * @param options Options
- */
-declare function interpolate(a: number, b: number, options?: Partial<BasicInterpolateOptions>): (amount: number) => number;
-/**
- * Returns a function that interpolates from A to B.
- * It steps through the interpolation with each call to the returned function.
- * This means that the `incrementAmount` will hinge on the rate
- * at which the function is called. Alternatively, consider {@link https://api.ixfx.fun/_ixfx/modulation/interpolatorInterval/}
- * which steps on the basis of clock time.
- *
- * ```js
- * // Interpolate from 0..1 by 0.01
- * const v = interpolatorStepped(0.01, 100, 200);
- * v(); // Each call returns a value closer to target
- * // Eg: 100, 110, 120, 130 ...
- * ```
- *
- * Under the hood, it calls `interpolate` with an amount that
- * increases by `incrementAmount` each time.
- *
- * When calling `v()` to step the interpolator, you can also pass
- * in new B and A values. Note that the order is swapped: the B (target) is provided first, and
- * then optionally A.
- *
- * ```js
- * const v = interpolatorStepped(0.1, 100, 200); // Interpolate 100->200
- * v(300, 200); // Retarget to 200->300 and return result
- * v(150); // Retarget 200->150 and return result
- * ```
- *
- * This allows you to maintain the current interpolation progress.
- * @param incrementAmount Amount to increment by
- * @param a Start value. Default: 0
- * @param b End value. Default: 1
- * @param startInterpolationAt Starting interpolation amount. Default: 0
- * @param options Options for interpolation
+ * If `n` is unspecified, `data.length` is used.
+ * @param data
+ * @param n
  * @returns
  */
-declare const interpolatorStepped: (incrementAmount: number, a?: number, b?: number, startInterpolationAt?: number, options?: Partial<BasicInterpolateOptions>) => (retargetB?: number, retargetA?: number) => number;
+declare const interquartileRange: (data: number[], n?: number) => number;
 /**
- * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
+ * Returns a function which itself returns _true_ if a value is an outlier.
  *
+ * This can be used for example to get a copy of an array without outliers:
  * ```js
- * interpolateAngle(0.5, Math.PI, Math.PI/2);
+ * const p = computeIsOutlier(someData);
+ * const someDataWithoutOutliers = someData.filter(value => !p(value));
  * ```
- * @param amount
- * @param aRadians Start angle (radian)
- * @param bRadians End angle (radian)
+ *
+ * Outliers are defined as: "a point which falls more than 1.5 times the interquartile range above the third quartile or below the first quartile." [Wolfram](https://mathworld.wolfram.com/Outlier.html)
+ *
+ * If array length is less than 4, no value will be considered an outlier.
+ * @param data Data to filter
+ * @param multiplier Multiplier of Q3 Q1. Default: 1.5
  * @returns
  */
-declare const interpolateAngle: (amount: number, aRadians: number, bRadians: number, options?: Partial<BasicInterpolateOptions>) => number;
-//# sourceMappingURL=interpolate.d.ts.map
+declare const computeIsOutlier: (data: number[], multiplier?: number) => (value: number) => boolean;
+/**
+ * Gets the value at a specific quantile
+ * ```js
+ * getQuantile(data, 25); // 1st quartile
+ * getQuantile(data, 75); // 3rd quartile
+ * ```
+ * @param data
+ * @param quantile
+ * @param presorted Pass _true_ if `data` is already sorted
+ * @returns
+ */
+declare const getQuantile: (data: number[], quantile: number, presorted?: boolean) => number;
 //#endregion
-//#region ../numbers/src/linear-space.d.ts
+//#region ../packages/numbers/src/linear-space.d.ts
 /**
  * Generates a `step`-length series of values between `start` and `end` (inclusive).
  * Each value will be equally spaced.
@@ -831,9 +759,8 @@ declare const interpolateAngle: (amount: number, aRadians: number, bRadians: num
  * @param precision Number of decimal points to round to
  */
 declare function linearSpace(start: number, end: number, steps: number, precision?: number): IterableIterator<number>;
-//# sourceMappingURL=linear-space.d.ts.map
 //#endregion
-//#region ../numbers/src/moving-average.d.ts
+//#region ../packages/numbers/src/moving-average.d.ts
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
  * previous samples. Less accurate, but uses less system resources.
@@ -889,11 +816,26 @@ declare const movingAverageLight: (scaling?: number) => (value?: number) => numb
  * ```
  *
  * Because it keeps track of `samples` previous data, there is a memory impact. A lighter version is {@link movingAverageLight} which does not keep a buffer of prior data, but can't be as easily fine-tuned.
- * @param samples Number of samples to compute average from
- * @param weighter Optional weighting function
+ * @param samplesOrOptions Number of samples to compute average from, or object of options
  * @returns
  */
-declare const movingAverage: (samples?: number, weighter?: (v: number) => number) => (value?: number) => number;
+declare const movingAverage: (samplesOrOptions: number | MovingAverageOptions) => (value: number) => any;
+declare const movingAverageWithContext: (samplesOrOptions: number | MovingAverageOptions) => {
+  seen: (value: number) => any;
+  readonly data: any[];
+  readonly average: number;
+};
+type MovingAverageNanOptions = `throw` | `ignore`;
+type MovingAverageOptions = MovingWindowOptions<number> & Partial<{
+  /**
+   * If set, a weighted average will be
+   * calculated instead of a plain average.
+   * @param v
+   * @returns
+   */
+  weighter: (v: number) => number;
+  nanPolicy: MovingAverageNanOptions;
+}>;
 /**
  * Noise filtering
  *
@@ -905,17 +847,179 @@ declare const movingAverage: (samples?: number, weighter?: (v: number) => number
  * @param cutoffDefault Default: 1
  */
 declare const noiseFilter: (cutoffMin?: number, speedCoefficient?: number, cutoffDefault?: number) => (value: number, timestamp?: number) => number;
-//# sourceMappingURL=moving-average.d.ts.map
-declare namespace normalise_d_exports {
-  export { array, arrayWithContext, stream, streamWithContext };
+//#endregion
+//#region ../packages/numbers/src/normalise-types.d.ts
+/**
+ * Normalisation strategies
+ *
+ * In brief,
+ * * `minmax`: Produces values on 0..1 scale. Sensitive to outliers.
+ * * ``score`: Mean value will be normalised to 0, those on standard deviation 1. Less sensitive to outliers.
+ * * `robust`: Does the best job if outliers are expected
+ *
+ * Keep in mind you could also remove outliers from the dataset before using a
+ * basic min-max normalisation.
+ *
+ * For more details, see Wikipedia:
+ * * [Min-Max normalisation](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization))
+ * * [Z-score normalisation](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization))
+ * * [Robust scaling]](https://en.wikipedia.org/wiki/Feature_scaling#Robust_Scaling)
+ */
+type NormalisationStrategy = `minmax` | `zscore` | `robust`;
+type NormalisationStreamStrategy = `minmax`;
+type MinMaxStreamOptions = {
+  minDefault: number;
+  maxDefault: number;
+};
+/**
+ * Options for computing min-max normalisation
+ */
+type MinMaxArrayOptions = {
+  /**
+   * Minimum value of range
+   */
+  minForced: number;
+  /**
+   * Maximum value of range
+   */
+  maxForced: number;
+  /**
+   * Clamp input value to min/max
+   */
+  clamp: boolean;
+};
+type ZScoreArrayOptions = {
+  meanForced: number;
+  standardDeviationForced: number;
+};
+type RobustArrayOptions = {
+  medianForced: number;
+  iqrForced: number;
+};
+type NormalisationStreamOptions = MinMaxStreamOptions;
+type NormalisationArrayOptions = MinMaxArrayOptions | ZScoreArrayOptions | RobustArrayOptions;
+/**
+ * Context for stream normalisation
+ */
+type NormaliseStreamContext = NumericRange & {
+  /**
+   * Passes a value to the normaliser, getting
+   * back the normalised result
+   * @param v Value to add
+   * @returns Normalised result
+   */
+  seen: (v: number) => number;
+  /**
+   * Reset the normaliser, by default to
+   * extreme ranges so it will calibrate after the
+   * next value.
+   * @param minDefault Start min value (default: Number.MAX_SAFE_INTEGER)
+   * @param maxDefault Start max value (default: Number.MIN_SAFE_INTERGER)
+   * @returns
+   */
+  reset: (minDefault?: number, maxDefault?: number) => void;
+  /**
+   * Get the current min value of range.
+   *
+   * If no values have been passed through the stream it will be
+   * the initial minDefault or Number.MAX_SAFE_INTEGER
+   */
+  get min(): number;
+  /**
+   * Get the current max value of range.
+   *
+   * If no values have been passed through the stream it will be
+   * the initial maxDefault or Number.MIN_SAFE_INTEGER
+   */
+  get max(): number;
+  /**
+   * Gets the absolute range (ie. max-min) of the normaliser.
+   *
+   * If normaliser hasn't received any values it will use its default min/max.
+   */
+  get range(): number;
+};
+declare namespace normalise_minmax_d_exports {
+  export { array$3 as array, arrayWithContext$3 as arrayWithContext, compute$2 as compute, stream$1 as stream, streamWithContext$1 as streamWithContext };
 }
 /**
- * A more advanced form of {@link stream}.
+ * Returns a function which can do min-max normalisation, baking-in the min and max values.
+ * ```js
+ * // Normalise with min value of 20, max of 100
+ * const fn = compute(20, 100);
+ *
+ * // Use function with input value of 40
+ * fn(40);
+ * ```
+ *
+ * @param min Minimum value of range
+ * @param max Maximum value of range
+ * @param clamp Whether to clamp input value to min/max range. Default: _false_
+ * @returns
+ */
+declare const compute$2: (min: number, max: number, clamp?: boolean) => (value: number) => number;
+/**
+ * Normalises an array using the [min-max](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization)) technique.
+ *
+ * This version returns additional context of the normalisation, alternatively use {@link array}
+ *
+ * ```js
+ * const c = arrayWithContext(someValues);
+ * c.values;    // Array of normalised values
+ * c.original;  // Original input array
+ * c.min / c.max / c.range
+ * ```
+ *
+ * By default, computes min and max values based on contents of `values`. Clamping is not required
+ * for this case, so it's _false_ by default.
+ *
+ * @param values Values
+ * @param options Optionally uses 'minForced' and 'maxForced' properties to scale values instead of actual min/max values of data.
+ */
+declare const arrayWithContext$3: (values: readonly number[], options?: Partial<MinMaxArrayOptions>) => {
+  values: number[];
+  original: any[];
+  min: number;
+  max: number;
+  range: number;
+};
+/**
+ * Normalises an array using the [min-max](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization)) technique.
+ * By default uses the actual min/max of the array as the normalisation range.
+ *
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ *
+ * Use {@link arrayWithContext} to get back the min/max/range and original values
+ *
+ * ```js
+ * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
+ * Normalise.MinMax.array([5,1,0,9,10]);
+ * ```
+ *
+ * `minForced` and/or `maxForced` can
+ * be provided to use an arbitrary range.
+ *
+ * ```js
+ * // Forced range 0-100
+ * // Yields: [0.05, 0.01, 0.0, 0.09, 0.10]
+ * Normalise.MinMax.array([5,1,0,9,10], { minForced: 0, maxForced: 100 });
+ * ```
+ *
+ * Return values are clamped to always be 0-1, inclusive.
+ *
+ * @param values Values
+ * @param options Options to override or min/max values.
+ */
+declare const array$3: (values: readonly number[], options?: Partial<MinMaxArrayOptions>) => number[];
+/**
+ * [Min-max scaling](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization))
+ *
+ * A more advanced form of {@link stream}
  *
  * With this version
  * @example
  * ```js
- * const s = Normalise.streamWithContext();
+ * const s = Normalise.MinMax.streamWithContext();
  * s.seen(2);    // 1 (because 2 is highest seen)
  * s.seen(1);    // 0 (because 1 is the lowest so far)
  * s.seen(1.5);  // 0.5 (50% of range 1-2)
@@ -930,9 +1034,11 @@ declare namespace normalise_d_exports {
  * ```
  * @returns
  */
-declare const streamWithContext: (minDefault?: number, maxDefault?: number) => NormaliseStreamContext;
+declare const streamWithContext$1: (options?: Partial<MinMaxStreamOptions>) => NormaliseStreamContext;
 /**
- * Normalises numbers, adjusting min/max as new values are processed. Return values will be in the range of 0-1 (inclusive).
+ * Normalises numbers using the [min-max](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization)) technique.
+ *
+ * Adjusts min/max as new values are processed. Return values will be in the range of 0-1 (inclusive).
  *
  * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
@@ -940,7 +1046,7 @@ declare const streamWithContext: (minDefault?: number, maxDefault?: number) => N
  *
  * @example
  * ```js
- * const s = Normalise.stream();
+ * const s = Normalise.MinMax.stream();
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
  * s(1.5);  // 0.5 (50% of range 1-2)
@@ -954,45 +1060,199 @@ declare const streamWithContext: (minDefault?: number, maxDefault?: number) => N
  * If you already know what to expect of the number range, passing in `minDefault`
  * and `maxDefault` primes the normalisation.
  * ```js
- * const s = Normalise.stream();
+ * const s = Normalise.MinMax.stream();
  * s(5); // 1, because it's the highest seen
  *
  * // With priming:
- * const s = Normalise.stream(0, 10);
+ * const s = Normalise.MinMax.stream({ minDefault:0, maxDefault:10 });
  * s(5); // 0.5, because we're expecting range 0-10
  * ```
  *
  * If a value exceeds the default range, normalisation adjusts.
  * Errors are thrown if min/max defaults are NaN or if one attempts to
  * normalise NaN.
+ *
  * @returns
  */
-declare const stream: (minDefault?: number, maxDefault?: number) => (value: number) => number;
+declare const stream$1: (options: MinMaxStreamOptions) => (value: number) => number;
+declare namespace normalise_zscore_d_exports {
+  export { array$2 as array, arrayWithContext$2 as arrayWithContext, compute$1 as compute };
+}
 /**
- * Normalises an array.
- *
- * This version returns additional context of the normalisation, alternatively use {@link array}
+ * Returns a function that computes zscore-based normalisation.
  *
  * ```js
- * const c = arrayWithContext(someValues);
- * c.values;    // Array of normalised values
- * c.original;  // Original input array
- * c.min / c.max / c.range
+ * // Calculate necessary components
+ * const m = mean(data);
+ * const s = standardDeviation(data);
+ *
+ * // Get the function
+ * const fn = compute(m, s);
+ *
+ * // Use it
+ * fn(10); // Yields the normalised value
  * ```
- * @param values Values
- * @param minForced If provided, this will be min value used
- * @param maxForced If provided, this will be the max value used
+ *
+ * It can be used to normalise a whole array
+ * ```js
+ * const normalised = someData.map(fn);
+ * ```
+ *
+ * If you want to calculate for a whole array, use {@link array}.
+ * @param mean Mean of data
+ * @param standardDeviation Standard deviation of data
+ * @returns
  */
-declare const arrayWithContext: (values: readonly number[], minForced?: number, maxForced?: number) => {
+declare const compute$1: (mean: number, standardDeviation: number) => (value: number) => number;
+/**
+ * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
+ * If you just want the computed results, use {@link Normalise.ZScore.array}.
+ *
+ * By default it will compute mean and std.dev based on `array`. If you have these already, they
+ * can be passed as options.
+ * @param array
+ * @returns
+ */
+declare const arrayWithContext$2: (array: readonly number[] | number[], options?: Partial<ZScoreArrayOptions>) => {
+  mean: number;
+  standardDeviation: number;
+  values: number[];
+  original: readonly number[] | number[];
+};
+/**
+ * Returns an array of normalised values using the 'z score' algorithm.
+ *
+ * By default it will compute mean and std.dev based on `array`. If you have these already, they
+ * can be passed as options.
+ * @param values
+ * @param options
+ * @returns
+ */
+declare const array$2: (values: readonly number[] | number[], options?: Partial<ZScoreArrayOptions>) => number[];
+declare namespace normalise_robust_d_exports {
+  export { array$1 as array, arrayWithContext$1 as arrayWithContext, compute };
+}
+/**
+ * Calculates 'robust scaling' of a single value, `x`, based on provided mean and standard deviation.
+ *
+ * ```js
+ * const m = median(someData);
+ * const i = interquartileRange(someData);
+ * const fn = compute(m, i);
+ *
+ * // Use normaliser function
+ * fn(10);
+ * ```
+ * If you want to calculate for a whole array, use {@link array}.
+ * @param median Median of data
+ * @param iqr Interquartile range of data
+ * @returns
+ */
+declare const compute: (median: number, iqr: number) => (value: number) => number;
+/**
+ * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
+ * If you just want the computed results, use {@link Normalise.Robust.array}.
+ *
+ * By default it will compute mean and std.dev based on `array`. If you have these already, they
+ * can be passed as options.
+ * @param array
+ * @returns
+ */
+declare const arrayWithContext$1: (array: readonly number[] | number[], options?: Partial<RobustArrayOptions>) => {
+  median: number;
+  iqr: number;
+  values: number[];
+  original: number[];
+};
+/**
+ * Returns an array of normalised values using the 'z score' algorithm.
+ *
+ * By default it will compute mean and std.dev based on `array`. If you have these already, they
+ * can be passed as options.
+ * @param values
+ * @param options
+ * @returns
+ */
+declare const array$1: (values: readonly number[] | number[], options?: Partial<RobustArrayOptions>) => number[];
+declare namespace normalise_d_exports {
+  export { normalise_minmax_d_exports as MinMax, MinMaxArrayOptions, MinMaxStreamOptions, NormalisationArrayOptions, NormalisationStrategy, NormalisationStreamOptions, NormalisationStreamStrategy, NormaliseStreamContext, normalise_robust_d_exports as Robust, RobustArrayOptions, normalise_zscore_d_exports as ZScore, ZScoreArrayOptions, array, arrayWithContext, stream, streamWithContext };
+}
+/**
+ * Normalises numbers with additional context on the range.
+ *
+ * For more details, see:
+ * * {@link MinMax.streamWithContext}
+ *
+ * @param strategy
+ * @param options
+ * @returns
+ */
+declare const streamWithContext: (strategy: NormalisationStreamStrategy, options?: Partial<NormalisationStreamOptions>) => NormaliseStreamContext;
+/**
+ * Normalises numbers. Return values will be in the range of 0-1 (inclusive).
+ *
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ *
+ * Use {@link streamWithContext} if you want to be able to check the min/max or reset the normaliser.
+ *
+ * @example
+ * ```js
+ * const s = Normalise.stream(`minmax`);
+ * s(2);    // 1 (because 2 is highest seen)
+ * s(1);    // 0 (because 1 is the lowest so far)
+ * s(1.5);  // 0.5 (50% of range 1-2)
+ * s(0.5);  // 0 (because it's the new lowest)
+ * ```
+ *
+ * For more details, see:
+ * * {@link MinMax.stream}
+ * @returns
+ */
+declare const stream: (strategy?: NormalisationStreamStrategy, options?: Partial<NormalisationStreamOptions>) => (value: number) => number;
+/**
+ * Normalise an array of values with added context, depending on strategy.
+ *
+ * Strategies are available: minmax, zscore & robust
+ *
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
+ *
+ * Use {@link array} to get back the min/max/range and original values
+ *
+ * ```js
+ * const { values, min, max, range } = Normalise.arrayWithContext(`minmax`, [5,1,0,9,10]);
+ * // values will be normalised output
+ * ```
+ *
+ * For more details, see:
+ * * {@link MinMax.array}
+ * * {@link ZScore.array}
+ * * {@link Robust.array}
+ * @param strategy
+ * @param values
+ * @param options
+ * @returns
+ */
+declare const arrayWithContext: (strategy: NormalisationStrategy, values: readonly number[], options?: Partial<NormalisationArrayOptions>) => {
+  mean: number;
+  standardDeviation: number;
+  values: number[];
+  original: readonly number[] | number[];
+} | {
   values: number[];
   original: any[];
   min: number;
   max: number;
   range: number;
+} | {
+  median: number;
+  iqr: number;
+  values: number[];
+  original: number[];
 };
 /**
- * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range.
+ * Normalise an array of values.
+ *
+ * Strategies are available: minmax, zscore & robust
  *
  * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
@@ -1000,27 +1260,22 @@ declare const arrayWithContext: (values: readonly number[], minForced?: number, 
  *
  * ```js
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
- * Normalise.array([5,1,0,9,10]);
+ * Normalise.array(`minmax`, [5,1,0,9,10]);
  * ```
  *
- * `minForced` and/or `maxForced` can
- * be provided to use an arbitrary range.
- * ```js
- * // Forced range 0-100
- * // Yields: [0.05, 0.01, 0.0, 0.09, 0.10]
- * Normalise.array([5,1,0,9,10], 0, 100);
- * ```
+ * For more details, see:
+ * * {@link MinMax.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization))
+ * * {@link ZScore.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization))
+ * * {@link Robust.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Robust_Scaling)
  *
- * Return values are clamped to always be 0-1, inclusive.
- *
- * @param values Values
- * @param minForced If provided, this will be min value used
- * @param maxForced If provided, this will be the max value used
+ * @param strategy
+ * @param values
+ * @param options
+ * @returns
  */
-declare const array: (values: readonly number[], minForced?: number, maxForced?: number) => number[];
-//# sourceMappingURL=normalise.d.ts.map
+declare const array: (strategy: NormalisationStrategy, values: readonly number[], options?: Partial<NormalisationArrayOptions>) => number[];
 //#endregion
-//#region ../numbers/src/number-array-compute.d.ts
+//#region ../packages/numbers/src/number-array-compute.d.ts
 /**
  * Calculate the min, max, total, average and count of input array `data`.
  * ```js
@@ -1031,10 +1286,8 @@ declare const array: (values: readonly number[], minForced?: number, maxForced?:
  * @returns
  */
 declare const numberArrayCompute: (data: (number | undefined)[] | readonly (number | undefined)[], opts?: NumbersComputeOptions) => NumbersComputeResult;
-//# sourceMappingURL=number-array-compute.d.ts.map
-
 //#endregion
-//#region ../numbers/src/numeric-arrays.d.ts
+//#region ../packages/numbers/src/numeric-arrays.d.ts
 /**
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  *
@@ -1074,9 +1327,10 @@ declare const validNumbers: (data: readonly number[]) => number[];
 /**
  * Returns the dot product of arbitrary-sized arrays. Assumed they are of the same length.
  * @param values
+ * @param nonNumber What to do if array contains an invalid number. Error: throw an exception, 'treat-as-zero' use as 0 instead, 'ignore', let math run with invalid number
  * @returns
  */
-declare const dotProduct: (values: readonly (readonly number[])[]) => number;
+declare const dotProduct: (values: readonly (readonly number[])[], nonNumber?: `error` | `treat-as-zero` | `ignore`) => number;
 /**
  * Calculates the average of all numbers in an array.
  * Array items which aren't a valid number are ignored and do not factor into averaging.
@@ -1129,7 +1383,7 @@ declare const maxIndex: (data: readonly number[]) => number;
  * @param data Array of numbers
  * @returns Index of smallest value
  */
-declare const minIndex: (...data: readonly number[]) => number;
+declare const minIndex: (data: readonly number[]) => number;
 /**
  * Returns the maximum number out of `data`.
  * Undefined and non-numbers are silently ignored.
@@ -1188,9 +1442,8 @@ declare const totalFast: (data: readonly number[] | Float32Array) => number;
  * @returns Maximum
  */
 declare const minFast: (data: readonly number[] | Float32Array) => number;
-//# sourceMappingURL=numeric-arrays.d.ts.map
 //#endregion
-//#region ../numbers/src/proportion.d.ts
+//#region ../packages/numbers/src/proportion.d.ts
 /**
  * Scales a percentage-scale number, ie: `v * t`.
  *
@@ -1204,10 +1457,8 @@ declare const minFast: (data: readonly number[] | Float32Array) => number;
  * @returns Scaled value
  */
 declare const proportion: (v: number | (() => number), t: number | (() => number)) => number;
-//# sourceMappingURL=proportion.d.ts.map
-
 //#endregion
-//#region ../numbers/src/quantise.d.ts
+//#region ../packages/numbers/src/quantise.d.ts
 /**
  * Rounds `v` by `every`. Middle values are rounded up by default.
  *
@@ -1231,9 +1482,8 @@ declare const proportion: (v: number | (() => number), t: number | (() => number
  * @returns
  */
 declare const quantiseEvery: (v: number, every: number, middleRoundsUp?: boolean) => number;
-//# sourceMappingURL=quantise.d.ts.map
 //#endregion
-//#region ../numbers/src/range.d.ts
+//#region ../packages/numbers/src/range.d.ts
 /**
  * Computes min/max based on a new value and previous range.
  * Returns existing object reference if value is within existing range.
@@ -1336,15 +1586,12 @@ declare const rangeStream: (initWith?: NumericRange) => {
  * @returns
  */
 declare function rangeCompute(values: Iterable<any>, nonNumberHandling?: `skip` | `error`): NumericRange;
-//# sourceMappingURL=range.d.ts.map
 //#endregion
-//#region ../numbers/src/round.d.ts
+//#region ../packages/numbers/src/round.d.ts
 declare function round(decimalPlaces: number, v: number, roundUp?: boolean): number;
 declare function round(decimalPlaces: number, roundUp?: boolean): (v: number) => number;
-//# sourceMappingURL=round.d.ts.map
-
 //#endregion
-//#region ../numbers/src/scale.d.ts
+//#region ../packages/numbers/src/scale.d.ts
 /**
  * Scales `v` from an input range to an output range (aka `map`)
  *
@@ -1477,18 +1724,43 @@ declare const scalerPercent: (outMin: number, outMax: number) => (v: number) => 
  * @returns
  */
 declare const scalerTwoWay: (inMin: number, inMax: number, outMin?: number, outMax?: number, clamped?: boolean, easing?: (v: number) => number) => NumberScalerTwoWay;
-//# sourceMappingURL=scale.d.ts.map
 //#endregion
-//#region ../numbers/src/softmax.d.ts
+//#region ../packages/numbers/src/softmax.d.ts
 /**
  * Via: https://gist.github.com/cyphunk/6c255fa05dd30e69f438a930faeb53fe
  * @param logits
  * @returns
  */
 declare const softmax: (logits: number[]) => number[];
-//# sourceMappingURL=softmax.d.ts.map
 //#endregion
-//#region ../numbers/src/track-simple.d.ts
+//#region ../packages/numbers/src/standard-deviation.d.ts
+/**
+ * Calculates the standard deviation of an array of numbers.
+ *
+ * If you already have the mean value of the array, this can be passed in.
+ * Otherwise it will be computed.
+ *
+ * If `usePopulation` is true, `array` is assumed to be the entire population (same as Excel's STDEV.P function)
+ * Otherwise, it's like Excel's STDEV.S function which assumes data represents a sample of entire population.
+ *
+ * @param array Array of values
+ * @param meanValue Mean value if pre-computed, otherwise skip this parameter for it to be computed automatically
+ * @param usePopulation If _true_ result is similar to Excel's STDEV.P. Otherwise like STDEV.S
+ * @returns
+ */
+declare const standardDeviation: (array: number[], usePopulation?: boolean, meanValue?: number) => number;
+//#endregion
+//#region ../packages/numbers/src/track-simple.d.ts
+/**
+ * Track values
+ *
+ * When not yet used:
+ *  total: 0
+ *  count: 0
+ *  min: MAX_SAFE_INTEGER,
+ *  max: MIN_SAFE_INTEGER
+ * @returns
+ */
 declare const trackSimple: () => {
   seen: (v: number) => void;
   reset: () => void;
@@ -1499,10 +1771,8 @@ declare const trackSimple: () => {
   readonly total: number;
   readonly count: number;
 };
-//# sourceMappingURL=track-simple.d.ts.map
-
 //#endregion
-//#region ../numbers/src/wrap.d.ts
+//#region ../packages/numbers/src/wrap.d.ts
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
  *
@@ -1597,8 +1867,5 @@ declare const wrap: (v: number, min?: number, max?: number) => number;
  * @returns
  */
 declare const wrapRange: (min: number, max: number, fn: (distance: number) => number, a: number, b: number) => number;
-//# sourceMappingURL=wrap.d.ts.map
-
 //#endregion
-export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, normalise_d_exports as Normalise, NormaliseStreamContext, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeighted, clamp, clampIndex, clamper, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, interpolate, interpolateAngle, interpolatorStepped, isApprox, isCloseToAny, isValid, linearSpace, max, maxAbs, maxFast, maxIndex, min, minFast, minIndex, movingAverage, movingAverageLight, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };
-//# sourceMappingURL=numbers.d.ts.map
+export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, Kalman1dFilter, Kalman1dFilterOptions, MovingAverageNanOptions, MovingAverageOptions, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeigher, averageWeighted, clamp, clampIndex, clamper, computeIsOutlier, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, getQuantile, interpolate, interpolateAngle, interpolatorStepped, interquartileRange, isApprox, isCloseToAny, isValid, kalman1dFilter, linearSpace, max, maxAbs, maxFast, maxIndex, mean, median, min, minFast, minIndex, movingAverage, movingAverageLight, movingAverageWithContext, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, standardDeviation, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };

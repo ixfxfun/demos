@@ -1,4 +1,6 @@
-//#region ../arrays/src/cycle.d.ts
+import { n as MovingWindowOptions, r as IsEqual, t as MergeReconcile } from "./types-j4lP7di-.js";
+
+//#region ../packages/arrays/src/cycle.d.ts
 /**
  * Returns a function that cycles through the contents of an array. By default starts at index 0.
  *
@@ -36,9 +38,8 @@ declare const cycle: <T>(options: readonly T[] | T[]) => {
   readonly current: T;
   select: (indexOrValue: number | T) => void;
 };
-//# sourceMappingURL=cycle.d.ts.map
 //#endregion
-//#region ../arrays/src/at-wrap.d.ts
+//#region ../packages/arrays/src/at-wrap.d.ts
 /**
  * Similar to Javascript's in-built Array.at function, but allows offsets
  * to wrap.
@@ -62,9 +63,8 @@ declare const cycle: <T>(options: readonly T[] | T[]) => {
  * @returns
  */
 declare const atWrap: <V>(array: V[], index: number) => V;
-//# sourceMappingURL=at-wrap.d.ts.map
 //#endregion
-//#region ../arrays/src/chunks.d.ts
+//#region ../packages/arrays/src/chunks.d.ts
 /**
  * Return `array` broken up into chunks of `size` values
  *
@@ -77,12 +77,11 @@ declare const atWrap: <V>(array: V[], index: number) => V;
  * @returns
  */
 declare function chunks<V>(array: readonly V[], size: number): V[][];
-//# sourceMappingURL=chunks.d.ts.map
-
 //#endregion
-//#region ../arrays/src/contains.d.ts
+//#region ../packages/arrays/src/contains.d.ts
 /**
- * Returns _true_ if all value in `needles` is contained in `haystack`.
+ * Returns _true_ if all value in `needles` is contained in `haystack`,
+ * by default using === semantics.
  *
  * ```js
  * const a = ['apples','oranges','pears','mandarins'];
@@ -94,11 +93,20 @@ declare function chunks<V>(array: readonly V[], size: number): V[][];
  * ```
  *
  * If `needles` is empty, `contains` will return true.
+ *
+ * Compare by value using ixfx's {@link isEqualValueDefault}, or a custom function of your own
+ * ```js
+ * contains(a, b, isEqualValueDefault);
+ * contains(a, b, (valueA, valueV) => {
+ *  return valueA.name === valueB.name
+ * })
+ * ```
+ * @throws {TypeError} If parameters are not valid
  * @param haystack Array to search
  * @param needles Things to look for
- * @param eq
+ * @param eq Optional function to compare equality. By default uses === semantics
  */
-declare const contains: <V>(haystack: ArrayLike<V>, needles: ArrayLike<V>, eq?: (a: V, b: V) => boolean) => boolean;
+declare const contains: <V>(haystack: V[], needles: V[], eq?: (a: V, b: V) => boolean) => boolean;
 /**
  * Returns _true_ if array contains duplicate values.
  *
@@ -122,64 +130,72 @@ declare const contains: <V>(haystack: ArrayLike<V>, needles: ArrayLike<V>, eq?: 
  */
 declare const containsDuplicateValues: <V>(data: Iterable<V>, keyFunction?: (itemToMakeStringFor: V) => string) => boolean;
 /**
- * Returns _true_ if array contains duplicate instances based on `===` equality checking
+ * Returns _true_ if array contains duplicate instances based on `===` equality checking.
+ *
+ * ```js
+ * const o1 = { hello: `there` };
+ * const o2 = { hello: `there` };
+ * containsDuplicateInstances([ o1, o2 ]); // False
+ * containsDuplicateInstances([ o1, o1 ]); // True
+ * ```
+ *
+ * Primitive values are compared by value:
+ * ```js
+ * containsDuplicateInstances([ 1, 2, 1 ]); // True
+ * containsDuplicateInstances([ `a`, `b`, `a` ]); // True
+ * ```
+ *
  * Use {@link containsDuplicateValues} if you'd rather compare by value.
  * @param array
+ * @throws {TypeError} If `array` parameter is not an array
  * @returns
  */
 declare const containsDuplicateInstances: <V>(array: V[] | readonly V[]) => boolean;
-//# sourceMappingURL=contains.d.ts.map
 //#endregion
-//#region ../arrays/src/ensure-length.d.ts
+//#region ../packages/arrays/src/ensure-length.d.ts
 declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand: `repeat` | `first` | `last`, truncate?: `from-end` | `from-start`): (V)[];
 declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand?: `undefined`, truncate?: `from-end` | `from-start`): (V | undefined)[];
-//# sourceMappingURL=ensure-length.d.ts.map
 //#endregion
-//#region ../arrays/src/util/is-equal.d.ts
+//#region ../packages/arrays/src/equality.d.ts
 /**
- * Function that returns true if `a` and `b` are considered equal
- */
-type IsEqual<T> = (a: T, b: T) => boolean;
-/**
- * If input is a string, it is returned.
- * Otherwise, it returns the result of JSON.stringify() with fields ordered.
+ * Returns _true_ if the two arrays have the same length, and have the same items at the same indexes.
  *
- * This allows for more consistent comparisons when object field orders are different but values the same.
- * @param itemToMakeStringFor
- * @returns
- */
-/**
- * Default comparer function is equiv to checking `a === b`.
- * Use {@link isEqualValueDefault} to compare by value, via comparing JSON string representation.
- */
-
-//#endregion
-//#region ../arrays/src/equality.d.ts
-/**
- * Returns _true_ if the two arrays have the same items at same indexes.
- *
- * Returns _false_ if arrays are of different length.
  * By default uses === semantics for equality checking.
+ *
+ * Use {@link isEqualIgnoreOrder} if you don't care whether items are in same order.
  *
  * ```js
  * isEqual([ 1, 2, 3], [ 1, 2, 3 ]); // true
  * isEqual([ 1, 2, 3], [ 3, 2, 1 ]); // false
  * ```
  *
- * Compare by value
+ * Compare by value instead:
  * ```js
- * isEqual(a, b, isEqualValueDefault);
+ * // Eg. compare objects based on their 'name' property
+ * isEqual(a, b, v => v.name);
  * ```
  *
- * Custom compare, eg based on `name` field:
- * ```js
- * isEqual(a, b, (compareA, compareB) => compareA.name === compareB.name);
- * ```
  * @param arrayA
  * @param arrayB
- * @param equality Function to compare values
+ * @param comparerOrKey Function to compare values or produce a string key
+ * @throws {TypeError} If inputs are not arrays
  */
-declare const isEqual: <V>(arrayA: V[], arrayB: V[], equality?: (a: V, b: V) => boolean) => boolean;
+declare function isEqual<T>(arrayA: T[], arrayB: T[], comparerOrKey?: IsEqual<T> | ((value: T) => string)): boolean;
+/**
+ * Returns _true_ if arrays contain same value items, regardless of order. Will return _false_ if
+ * arrays are of different length.
+ *
+ * By default uses === semantics to compare items. Pass in a comparer function or key generating function otherwise:
+ * ```js
+ * isEqualIgnoreOrder(arrayA, arrayB, (v) => v.name);
+ * ```
+ *
+ * @param arrayA Array
+ * @param arrayB Array
+ * @param comparerOrKey Function to compare objects or produce a string representation. Defaults to {@link isEqualDefault}
+ * @throws {TypeError} If input parameters are not correct
+ */
+declare function isEqualIgnoreOrder<T>(arrayA: T[], arrayB: T[], comparerOrKey?: IsEqual<T> | ((value: T) => string)): boolean;
 /**
  * Returns _true_ if all values in the array are the same. Uses value-based equality checking by default.
  *
@@ -204,12 +220,12 @@ declare const isEqual: <V>(arrayA: V[], arrayB: V[], equality?: (a: V, b: V) => 
  * Returns _true_ if `array` is empty.
  * @param array Array
  * @param equality Equality checker. Uses string-conversion checking by default
+ * @throws {TypeError} If input is not an array
  * @returns
  */
 declare const containsIdenticalValues: <V>(array: readonly V[] | V[], equality?: IsEqual<V>) => boolean;
-//# sourceMappingURL=equality.d.ts.map
 //#endregion
-//#region ../arrays/src/filter.d.ts
+//#region ../packages/arrays/src/filter.d.ts
 /**
  * Returns two separate arrays of everything that `filter` returns _true_,
  * and everything it returns _false_ on.
@@ -244,9 +260,8 @@ declare const filterAB: <V>(data: readonly V[], filter: (a: V) => boolean) => [a
  * @param endIndex End index (by default runs until end)
  */
 declare function filterBetween<V>(array: readonly V[] | V[], predicate: (value: V, index: number, array: readonly V[] | V[]) => boolean, startIndex?: number, endIndex?: number): Generator<V>;
-//# sourceMappingURL=filter.d.ts.map
 //#endregion
-//#region ../arrays/src/flatten.d.ts
+//#region ../packages/arrays/src/flatten.d.ts
 /**
  * Returns a 'flattened' copy of array, un-nesting arrays one level
  * ```js
@@ -257,10 +272,8 @@ declare function filterBetween<V>(array: readonly V[] | V[], predicate: (value: 
  * @returns
  */
 declare const flatten: (array: ReadonlyArray<any> | Array<any>) => Array<any>;
-//# sourceMappingURL=flatten.d.ts.map
-
 //#endregion
-//#region ../arrays/src/for-each.d.ts
+//#region ../packages/arrays/src/for-each.d.ts
 /**
  * Returns the array.map() output, or a value if `array`
  * is not an array or empty.
@@ -279,9 +292,8 @@ declare const flatten: (array: ReadonlyArray<any> | Array<any>) => Array<any>;
  * @returns
  */
 declare const mapWithEmptyFallback: <TValue, TReturn>(array: TValue[], fn: (value: TValue) => TReturn, fallback: TReturn | TReturn[]) => TReturn[];
-//# sourceMappingURL=for-each.d.ts.map
 //#endregion
-//#region ../arrays/src/frequency.d.ts
+//#region ../packages/arrays/src/frequency.d.ts
 /**
  * Computes the frequency of values by a grouping function.
  *
@@ -300,10 +312,8 @@ declare const mapWithEmptyFallback: <TValue, TReturn>(array: TValue[], fn: (valu
  * @returns
  */
 declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy: ((value: TValue) => TGroup), data: TValue[]) => Map<TGroup, number>;
-//# sourceMappingURL=frequency.d.ts.map
-
 //#endregion
-//#region ../arrays/src/group-by.d.ts
+//#region ../packages/arrays/src/group-by.d.ts
 /**
  * Groups data by a function `grouper`, returning data as a map with string
  * keys and array values. Multiple values can be assigned to the same group.
@@ -338,47 +348,62 @@ declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy
  * @returns Map
  */
 declare const groupBy: <K, V>(array: Iterable<V>, grouper: (item: V) => K) => Map<K, V[]>;
-//# sourceMappingURL=group-by.d.ts.map
 //#endregion
-//#region ../arrays/src/unique.d.ts
+//#region ../packages/arrays/src/unique.d.ts
 /**
  * Combines the values of one or more arrays, removing duplicates.
+ *
  * ```js
- * const v = Arrays.uniqueDeep([ [1, 2, 3, 4], [ 3, 4, 5, 6] ]);
- * // [ 1, 2, 3, 4, 5, 6]
+ * const eq = (a, b) => {
+ *  return a.name === b.name
+ * }
+ * const v = Arrays.unique([
+ *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
+ *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
  * ```
  *
  * A single array can be provided as well:
+ *
  * ```js
- * const v = Arrays.uniqueDeep([ 1, 2, 3, 1, 2, 3 ]);
- * // [ 1, 2, 3 ]
+ * const v = Arrays.unique([
+ *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
  * ```
  *
- * By default uses Javascript's default equality checking
- *
  * See also:
- * * {@link intersection}: Overlap between two arrays
+ * * {@link intersection}: Get overlap between two arrays
  * * Iterables.additionalValues: Yield values from an iterable not present in the other
  * * {@link containsDuplicateValues}: Returns true if array contains duplicates
  * @param arrays
  * @param comparer
  * @returns
  */
-declare const uniqueDeep: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], comparer?: (a: V, b: V) => boolean) => V[];
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], comparer: IsEqual<V>): V[];
 /**
  * Combines the values of one or more arrays, removing duplicates.
+ *
  * Compares based on a string representation of object. Uses a Set
- * to avoid unnecessary comparisons, perhaps faster than `uniqueDeep`.
+ * to avoid unnecessary comparisons, perhaps faster than using a comparer function.
  *
  * ```js
- * const v = Arrays.unique([ [1, 2, 3, 4], [ 3, 4, 5, 6] ]);
- * // [ 1, 2, 3, 4, 5, 6]
+ * const str = (v) => JSON.stringify(v);
+ * const v = Arrays.unique([
+ *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
+ *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
+ * ], str);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
  * ```
  *
  * A single array can be provided as well:
+ *
  * ```js
- * const v = Arrays.unique([ 1, 2, 3, 1, 2, 3 ]);
- * // [ 1, 2, 3 ]
+ * const v = Arrays.unique([
+ *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
  * ```
  *
  * By default uses JSON.toString() to compare values.
@@ -391,10 +416,19 @@ declare const uniqueDeep: <V>(arrays: V[][] | V[] | readonly V[] | readonly (rea
  * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
  * @returns
  */
-declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], toString?: <V_1>(itemToMakeStringFor: V_1) => string) => V[];
-//# sourceMappingURL=unique.d.ts.map
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], toString: (item: V) => string): V[];
+/**
+ * Combines the values of one or more arrays, removing duplicates.
+ *
+ * By default compares values based on a JSON string representation.
+ *
+ * @param arrays Array (or array of arrays) to examine
+ * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
+ * @returns
+ */
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[]): V[];
 //#endregion
-//#region ../arrays/src/insert-at.d.ts
+//#region ../packages/arrays/src/insert-at.d.ts
 /**
  * Inserts `values` at position `index`, shuffling remaining
  * items further down and returning changed result.
@@ -415,9 +449,8 @@ declare const unique: <V>(arrays: V[][] | V[] | readonly V[] | readonly (readonl
  * @returns
  */
 declare const insertAt: <V>(data: readonly V[] | V[], index: number, ...values: V[]) => V[];
-//# sourceMappingURL=insert-at.d.ts.map
 //#endregion
-//#region ../arrays/src/interleave.d.ts
+//#region ../packages/arrays/src/interleave.d.ts
 /**
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  *
@@ -432,35 +465,38 @@ declare const insertAt: <V>(data: readonly V[] | V[], index: number, ...values: 
  * @returns
  */
 declare const interleave: <V>(...arrays: readonly (readonly V[])[] | V[][]) => V[];
-//# sourceMappingURL=interleave.d.ts.map
 //#endregion
-//#region ../arrays/src/intersection.d.ts
+//#region ../packages/arrays/src/intersection.d.ts
 /**
- * Returns the _intersection_ of two arrays: the elements that are in common.
+ * Returns the _intersection_ of two arrays: the elements that are in common. Duplicates are removed in the process.
  *
+ * Custom function checks equality of objects:
  * ```js
- * intersection([1, 2, 3], [2, 4, 6]);
-// returns [2]
+ * // Compare based on 'name' property
+ * intersection(arrayA, arrayB, (a,b) => {
+ *  return a.name === b.name
+ * })
  * ```
- * See also:
- * * {@link unique}: Unique set of items amongst one or more arrays
  * @param arrayA
  * @param arrayB
- * @param equality
- * @returns
+ * @param comparer
  */
-declare const intersection: <V>(arrayA: readonly V[] | V[], arrayB: readonly V[] | V[], equality?: IsEqual<V>) => V[];
-//# sourceMappingURL=intersection.d.ts.map
-//#endregion
-//#region ../arrays/src/types.d.ts
+declare function intersection<V>(arrayA: V[], arrayB: V[], comparer: IsEqual<V>): V[];
 /**
- * Returns a result of a merged into b.
- * B is always the 'newer' data that takes
- * precedence.
+ * Returns the _intersection_ of two arrays: the elements that are in common. Duplicates are removed in the process.
+ *
+ * Custom function makes a string representation of objects to use as the basis for comparison
+ * ```js
+ * intersection(arrayA, arrayB, (v) => v.name)
+ * ```
+ * @param arrayA
+ * @param arrayB
+ * @param toString
  */
-type MergeReconcile<V> = (a: V, b: V) => V;
+declare function intersection<V>(arrayA: V[], arrayB: V[], toString: (value: V) => string): V[];
+declare function intersection<V>(arrayA: V[], arrayB: V[], comparerOrKey?: IsEqual<V> | ((value: V) => string)): V[];
 //#endregion
-//#region ../arrays/src/merge-by-key.d.ts
+//#region ../packages/arrays/src/merge-by-key.d.ts
 /**
  * Merges arrays left to right, using the provided
  * `reconcile` function to choose a winner when keys overlap.
@@ -503,9 +539,54 @@ type MergeReconcile<V> = (a: V, b: V) => V;
  * @param arrays Arrays of data to merge
  */
 declare const mergeByKey: <V>(keyFunction: (value: V) => string, reconcile: MergeReconcile<V>, ...arrays: readonly (readonly V[])[]) => V[];
-//# sourceMappingURL=merge-by-key.d.ts.map
 //#endregion
-//#region ../arrays/src/pairwise.d.ts
+//#region ../packages/arrays/src/moving-window.d.ts
+/**
+ * Creates a moving window
+ *
+ * ```js
+ * // Create a moving window of 3 samples
+ * const window = movingWindow(3);
+ *
+ * window(1); // [ 1 ]
+ * window(2); // [ 1, 2 ]
+ * window(3); // [ 1, 2, 3 ]
+ * window(4); // [ 2, 3, 4 ]
+ * ```
+ *
+ * 'reject' option allows values to be discarded:
+ * ```js
+ * // Reject all NaN values
+ * const window = movingWindow({ samples: 3, reject: (v) => Number.isNaN(v) });
+ * ```
+ *
+ * 'allow' is similar, but is applied after 'reject' (if provided). Instead, values
+ * must pass _true_
+ *
+ * If a reject/disallow is triggered, the current state of the queue is returned.
+ *
+ * @param samplesOrOptions
+ * @returns
+ */
+declare const movingWindow: <T>(samplesOrOptions: number | MovingWindowOptions<T>) => (value: T) => T[];
+/**
+ * As {@link movingWindow} but also allows access to context, namely you
+ * can access the window at any time without adding to it.
+ *
+ * ```js
+ * const window = movingWindowWithContext(3);
+ * window.seen(1); // [ 1 ]
+ * window.data;    // [ 1 ]
+ * ```
+ * @param samplesOrOptions
+ * @returns
+ */
+declare const movingWindowWithContext: <T>(samplesOrOptions: number | MovingWindowOptions<T>) => {
+  seen: (value: T) => T[];
+  readonly data: T[];
+};
+//#endregion
+//#region ../packages/arrays/src/pairwise.d.ts
 /**
  * Yields pairs made up of overlapping items from the input array.
  *
@@ -544,9 +625,8 @@ declare function pairwise<T>(values: T[]): Generator<T[], void, unknown>;
  * @returns
  */
 declare const pairwiseReduce: <V, X>(array: readonly V[], reducer: (accumulator: X, a: V, b: V) => X, initial: X) => X;
-//# sourceMappingURL=pairwise.d.ts.map
 //#endregion
-//#region ../arrays/src/random.d.ts
+//#region ../packages/arrays/src/random.d.ts
 /**
  * Returns a shuffled copy of the input array.
  * @example
@@ -562,6 +642,8 @@ declare const pairwiseReduce: <V, X>(array: readonly V[], reducer: (accumulator:
  *  // Do something with the value...
  * }
  * ```
+ *
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param dataToShuffle Input array
  * @param rand Random generator. `Math.random` by default.
  * @returns Copy with items moved around randomly
@@ -582,6 +664,7 @@ declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: () => number) => 
  * See also:
  * * {@link randomIndex} if you want a random index rather than value.
  *
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param array
  * @param rand Random generator. `Math.random` by default.
  * @returns
@@ -597,14 +680,14 @@ declare const randomElement: <V>(array: ArrayLike<V>, rand?: () => number) => V;
  *
  * Use {@link randomElement} if you want a value from `array`, not index.
  *
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param array Array
  * @param rand Random generator. `Math.random` by default.
  * @returns
  */
 declare const randomIndex: <V>(array: ArrayLike<V>, rand?: () => number) => number;
-//# sourceMappingURL=random.d.ts.map
 //#endregion
-//#region ../arrays/src/remove.d.ts
+//#region ../packages/arrays/src/remove.d.ts
 /**
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  *
@@ -626,10 +709,19 @@ declare const randomIndex: <V>(array: ArrayLike<V>, rand?: () => number) => numb
  * @returns
  */
 declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
-//# sourceMappingURL=remove.d.ts.map
-
+/**
+ * Removes items from `input` array that match `predicate`.
+ * A modified array is returned along with the number of items removed.
+ *
+ * If `predicate` matches no items, a new array will still be returned, and the removed count will be 0.
+ *
+ * @param input
+ * @param predicate
+ * @returns
+ */
+declare const removeByFilter: <T>(input: T[], predicate: (value: T) => boolean) => [changed: T[], removed: number];
 //#endregion
-//#region ../arrays/src/sample.d.ts
+//#region ../packages/arrays/src/sample.d.ts
 /**
  * Samples values from an array.
  *
@@ -657,9 +749,8 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
  * @returns
  */
 declare const sample: <V>(array: ArrayLike<V>, amount: number) => V[];
-//# sourceMappingURL=sample.d.ts.map
 //#endregion
-//#region ../arrays/src/sort.d.ts
+//#region ../packages/arrays/src/sort.d.ts
 /**
  * Sorts an array of objects in ascending order
  * by the given property name, assuming it is a number.
@@ -677,6 +768,7 @@ declare const sample: <V>(array: ArrayLike<V>, amount: number) => V[];
  * ```
  * @param data
  * @param propertyName
+ * @throws {TypeError} If data is not an array
  */
 declare const sortByNumericProperty: <V, K extends keyof V>(data: readonly V[] | V[], propertyName: K) => V[];
 /**
@@ -701,12 +793,12 @@ declare const sortByNumericProperty: <V, K extends keyof V>(data: readonly V[] |
  * This function should return 0 if values are equal, 1 if `a > b` and -1 if `a < b`.
  * @param data
  * @param propertyName
+ * @throws {TypeError} If data is not an array
  * @returns
  */
 declare const sortByProperty: <V, K extends keyof V>(data: readonly V[] | V[], propertyName: K, comparer?: (a: any, b: any) => number) => V[];
-//# sourceMappingURL=sort.d.ts.map
 //#endregion
-//#region ../arrays/src/until.d.ts
+//#region ../packages/arrays/src/until.d.ts
 /**
  * Yields all items in the input array, stopping when `predicate` returns _true_.
  *
@@ -730,9 +822,8 @@ declare function until<V>(data: readonly V[] | V[], predicate: (v: V) => boolean
  * ```
  */
 declare function until<V, A>(data: readonly V[] | V[], predicate: (v: V, accumulator: A) => readonly [stop: boolean, acc: A], initial: A): Generator<V>;
-//# sourceMappingURL=until.d.ts.map
 //#endregion
-//#region ../arrays/src/without.d.ts
+//#region ../packages/arrays/src/without.d.ts
 /**
  * Returns a copy of an input array with _undefined_ values removed.
  * @param data
@@ -778,12 +869,12 @@ declare const withoutUndefined: <V>(data: readonly V[] | V[]) => V[];
  * @param sourceArray Source array
  * @param toRemove Value(s) to remove
  * @param comparer Comparison function. If not provided `isEqualDefault` is used, which compares using `===`
+ * @throws {TypeError} If `sourceArray` is not an array, or compare function is not a function
  * @return Copy of array without value.
  */
 declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], comparer?: IsEqual<V>) => V[];
-//# sourceMappingURL=without.d.ts.map
 //#endregion
-//#region ../arrays/src/zip.d.ts
+//#region ../packages/arrays/src/zip.d.ts
 /**
  * Zip combines the elements of two or more arrays based on their index.
  *
@@ -807,8 +898,5 @@ declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], c
  * @returns Zipped together array
  */
 declare const zip: (...arrays: any[][] | readonly any[][] | readonly (readonly any[])[]) => any[];
-//# sourceMappingURL=zip.d.ts.map
-
 //#endregion
-export { type IsEqual, MergeReconcile, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, mapWithEmptyFallback, mergeByKey, pairwise, pairwiseReduce, randomElement, randomIndex, remove, sample, shuffle, sortByNumericProperty, sortByProperty, unique, uniqueDeep, until, without, withoutUndefined, zip };
-//# sourceMappingURL=arrays.d.ts.map
+export { IsEqual, MergeReconcile, MovingWindowOptions, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, unique, until, without, withoutUndefined, zip };

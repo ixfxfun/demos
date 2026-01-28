@@ -1,9 +1,13 @@
-import { IsEqual } from "./is-equal-BzhoT7pd.js";
-import { IWithEntries, Interval, ToString } from "./types-CcY4GIC4.js";
-import { GetOrGenerate, GetOrGenerateSync, MergeReconcile, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, mapToArray, mapToObjectTransform, mergeByKey, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue } from "./maps-Bm5z7qq5.js";
-import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
+import { t as IsEqual } from "./is-equal--ZpQv_rE.js";
+import { f as ToString, i as Interval, r as IWithEntries } from "./types-DhLXV-YQ.js";
+import { A as transformMap, D as sortByValueProperty, E as sortByValue, O as toArray, S as mapToObjectTransform, T as some, _ as getOrGenerate, a as addValue$1, b as hasKeyValue, c as deleteByValueCompareMutate, d as findEntryByPredicate, f as findEntryByValue, g as getClosestIntegerKey, h as fromObject, i as addObjectEntriesMutate, j as zipKeyValue, k as toObject, l as filterValues, m as fromIterable, n as GetOrGenerateSync, o as addValueMutate, p as findValue, r as MergeReconcile, s as addValueMutator, t as GetOrGenerate, u as findBySomeKey, v as getOrGenerateSync, w as mergeByKey, x as mapToArray, y as hasAnyValue } from "./maps-HjV-V9da.js";
+import { a as SimplifiedNode, c as TraverseObjectEntryStatic, d as TreeNode, f as WrappedNode, i as LabelledValues, l as TraverseObjectEntryWithAncestors, n as LabelledSingleValue, o as TraversableTree, r as LabelledValue, s as TraverseObjectEntry, t as LabelledNode, u as TraverseObjectPathOpts } from "./types-DF915pea.js";
+import { i as IStackImmutable, n as StackMutable, r as StackImmutable, t as index_d_exports$4 } from "./index-9f1-Tisg.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { n as ValueSetEventMap, t as ISetMutable } from "./ISetMutable-pVvBV8vP.js";
+import { a as QueueOpts, i as QueueDiscardPolicy, n as QueueImmutable, r as QueueMutable, t as index_d_exports$2 } from "./index-Cmij82id.js";
 
-//#region ../collections/src/circular-array.d.ts
+//#region ../packages/collections/src/circular-array.d.ts
 interface ICircularArray<V> extends Array<V> {
   /**
    * Returns true if the array has filled to capacity and is now
@@ -61,196 +65,8 @@ declare class CircularArray<V> extends Array {
   get pointer(): number;
   get isFull(): boolean;
 }
-//# sourceMappingURL=circular-array.d.ts.map
 //#endregion
-//#region ../collections/src/tree/types.d.ts
-/**
- * A labelled single value or array of values
- */
-type LabelledValue<TValue> = LabelledSingleValue<TValue> | LabelledValues<TValue>;
-/**
- * A value that is labelled
- * @see {@link LabelledValues}
- */
-type LabelledSingleValue<TValue> = {
-  label: string;
-  value: TValue | undefined;
-};
-/**
- * A label for any number of values
- * @see {@link LabelledValues}
- */
-type LabelledValues<TValue> = {
-  label: string;
-  values: TValue[];
-};
-/**
- * Array-backed tree node.
- *
- * Create using {@link Trees.Mutable.root}
- */
-type TreeNode<TValue> = {
-  /**
-   * Parent node, or _undefined_ if a root
-   */
-  parent: TreeNode<TValue> | undefined;
-  /**
-   * Associated value
-   */
-  value: TValue | undefined;
-  /**
-   * Children of this node
-   */
-  childrenStore: readonly TreeNode<TValue>[];
-};
-type SimplifiedNode<TValue> = {
-  /**
-   * Value of node, or _undefined_ if it has no value
-   */
-  value: TValue | undefined;
-  /**
-   * Children nodes of this one
-   */
-  childrenStore: readonly SimplifiedNode<TValue>[];
-};
-/**
- * A node with an accompanying label
- */
-type LabelledNode<TValue> = TreeNode<LabelledValue<TValue>>;
-/**
- * Traversable Tree
- */
-type TraversableTree<TValue> = {
-  /**
-   * Direct children of node
-   */
-  children(): IterableIterator<TraversableTree<TValue>>;
-  /**
-   * Direct parent of node
-   */
-  getParent(): TraversableTree<TValue> | undefined;
-  /**
-   * Value of node
-   */
-  getValue(): TValue;
-  /**
-   * Object reference that acts as the identity of the node
-   */
-  getIdentity(): any;
-};
-type TraverseObjectEntry = Readonly<{
-  name: string;
-  sourceValue: any;
-  leafValue: any;
-  _kind: `entry`;
-}>;
-type TraverseObjectEntryWithAncestors = Readonly<{
-  name: string;
-  sourceValue: any;
-  leafValue: any;
-  ancestors: string[];
-  _kind: `entry-ancestors`;
-}>;
-type TraverseObjectEntryStatic = Readonly<{
-  name: string;
-  sourceValue: any;
-  ancestors: string[];
-  _kind: `entry-static`;
-}>;
-/**
- * Options for parsing a path
- */
-type TraverseObjectPathOpts = {
-  /**
-   * Separator for path, eg '.'
-   */
-  readonly separator?: string;
-};
-/**
- * Wraps a {@link TreeNode} for a more object-oriented means of access.
- */
-type WrappedNode<T> = TraversableTree<T> & {
-  /**
-   * Underlying Node
-   */
-  wraps: TreeNode<T>;
-  /**
-   * Gets value of node, if defined
-   * @returns Value of Node
-   */
-  getValue: () => T | undefined;
-  /**
-   * Remove node and its children from tree
-   * @returns
-   */
-  remove: () => void;
-  /**
-   * Adds a child node
-   * @param child
-   * @returns
-   */
-  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>;
-  /**
-   * Adds a new child node, with `value` as its value
-   * @param value
-   * @returns
-   */
-  addValue: (value: T) => WrappedNode<T>;
-  /**
-   * Returns _true_ if `child` is an immediate child of this node
-   * @param child
-   * @returns
-   */
-  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
-  queryValue: (value: T) => IterableIterator<WrappedNode<T>>;
-  /**
-  * Yields all parents of `child` that have a given value.
-  * Use 'findParentsValue' to find the first match only.
-  * @param child
-  * @param value
-  * @param eq
-  * @returns
-  */
-  queryParentsValue<T>(child: TreeNode<T>, value: T, eq?: IsEqual<T>): IterableIterator<WrappedNode<T>>;
-  /**
-  * Returns the first parent that has a given value.
-  * @param child
-  * @param value
-  * @param eq
-  * @returns
-  */
-  findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>): WrappedNode<T> | undefined;
-  /**
-   * Yields the node value of each parent of `child`.
-   * _undefined_ values are not returned.
-   *
-   * Use 'queryParentsValue' to search for a particular value
-   * @param child
-   * @returns
-   */
-  parentsValues<T>(child: TreeNode<T>): IterableIterator<T>;
-  /**
-   * Returns _true_ if `child` is contained any any descendant
-   * @param child
-   * @returns
-   */
-  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean;
-  /**
-   * Returns _true_ if `parent` is the immediate parent for this node
-   * @param parent
-   * @returns
-   */
-  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
-  /**
-   * Returns _true_ if `parent` is the immediate or ancestor parent for this node
-   * @param parent
-   * @returns
-   */
-  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean;
-};
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../collections/src/tree/compare.d.ts
+//#region ../packages/collections/src/tree/compare.d.ts
 type DiffAnnotation<T> = {
   /**
    * In the case of changes, this is old value
@@ -281,9 +97,8 @@ type DiffNode<T> = TreeNode<DiffAnnotation<T>> & {
   toString: () => string;
 };
 declare const compare$1: <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq?: IsEqual<T>, parent?: DiffNode<T>) => DiffNode<T>;
-//# sourceMappingURL=compare.d.ts.map
 declare namespace tree_mutable_d_exports {
-  export { add, addValue$1 as addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, childrenValues, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, findParentsValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, parentsValues, queryByValue, queryParentsValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
+  export { add, addValue, asDynamicTraversable$1 as asDynamicTraversable, breadthFirst$1 as breadthFirst, children$1 as children, childrenLength$1 as childrenLength, childrenValues, compare, computeMaxDepth, createNode, depthFirst$2 as depthFirst, findAnyChildByValue$1 as findAnyChildByValue, findChildByValue$1 as findChildByValue, findParentsValue, followValue$1 as followValue, fromPlainObject, getRoot, hasAnyChild$1 as hasAnyChild, hasAnyParent$1 as hasAnyParent, hasChild$1 as hasChild, hasParent$1 as hasParent, nodeDepth, parents$1 as parents, parentsValues, queryByValue, queryParentsValue, remove, root, rootWrapped, setChildren, stripParentage, throwTreeTest, toStringDeep$2 as toStringDeep, treeTest, value, wrap };
 }
 /**
  * Compares two nodes.
@@ -460,7 +275,7 @@ declare const hasParent$1: <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T
  */
 declare const computeMaxDepth: <T>(node: TreeNode<T>) => number;
 declare const add: <T>(child: TreeNode<T>, parent: TreeNode<T>) => void;
-declare const addValue$1: <T>(value: T | undefined, parent: TreeNode<T>) => TreeNode<T>;
+declare const addValue: <T>(value: T | undefined, parent: TreeNode<T>) => TreeNode<T>;
 /**
  * Creates the root for a tree, with an optional `value`.
  * Use {@link rootWrapped} if you want a more object-oriented mode of access.
@@ -497,7 +312,6 @@ declare const asDynamicTraversable$1: <T>(node: TreeNode<T>) => TraversableTree<
 declare const setChildren: <T>(parent: TreeNode<T>, children: TreeNode<T>[]) => void;
 declare const toStringDeep$2: <T>(node: TreeNode<T>, indent?: number) => string;
 declare function followValue$1<T>(root: TreeNode<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth?: number): IterableIterator<T | undefined>;
-//# sourceMappingURL=tree-mutable.d.ts.map
 declare namespace pathed_d_exports {
   export { PathOpts, addValueByPath, childrenLengthByPath, clearValuesByPath, create$2 as create, removeByPath, valueByPath, valuesByPath };
 }
@@ -587,7 +401,6 @@ declare const clearValuesByPath: <T>(path: string, root: LabelledNode<T>, pathOp
 declare const childrenLengthByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => number;
 declare const valueByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => T | undefined;
 declare const valuesByPath: <T>(path: string, node: LabelledNode<T>, pathOpts?: Partial<PathOpts>) => T[];
-//# sourceMappingURL=pathed.d.ts.map
 declare namespace traverse_object_d_exports {
   export { ChildrenOptions, CreateOptions, asDynamicTraversable, children, create$1 as create, createSimplified, createWrapped, depthFirst$1 as depthFirst, getByPath, prettyPrint, prettyPrintEntries, toStringDeep$1 as toStringDeep, traceByPath };
 }
@@ -857,7 +670,6 @@ declare const create$1: (node: object, options?: Partial<CreateOptions>) => Tree
  * @returns
  */
 declare const createSimplified: (node: object, options?: Partial<CreateOptions>) => SimplifiedNode<TraverseObjectEntryStatic>;
-//# sourceMappingURL=traverse-object.d.ts.map
 declare namespace traversable_tree_d_exports {
   export { breadthFirst, childrenLength, couldAddChild, depthFirst, find, findAnyChildByValue, findAnyParentByValue, findByValue, findChildByValue, findParentByValue, followValue, hasAnyChild, hasAnyChildValue, hasAnyParent, hasAnyParentValue, hasChild, hasChildValue, hasParent, hasParentValue, parents, siblings, toString, toStringDeep };
 }
@@ -1081,7 +893,6 @@ declare function findByValue<T>(root: TraversableTree<T>, predicate: (nodeValue:
 declare function followValue<T>(root: TraversableTree<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth?: number): IterableIterator<T>;
 declare function toStringDeep<T>(node: TraversableTree<T>, depth?: number): string;
 declare function toString(...nodes: TraversableTree<any>[]): string;
-//# sourceMappingURL=traversable-tree.d.ts.map
 declare namespace index_d_exports$5 {
   export { DiffAnnotation, DiffNode, traverse_object_d_exports as FromObject, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, tree_mutable_d_exports as Mutable, pathed_d_exports as Pathed, SimplifiedNode, TraversableTree, traversable_tree_d_exports as Traverse, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts, TreeNode, WrappedNode, compare$1 as compare, isTraversable, isTreeNode, toTraversable };
 }
@@ -1108,9 +919,8 @@ declare const isTreeNode: (node: any) => node is TreeNode<any>;
  * @returns
  */
 declare const isTraversable: (node: any) => node is TraversableTree<any>;
-//# sourceMappingURL=index.d.ts.map
 //#endregion
-//#region ../collections/src/types.d.ts
+//#region ../packages/collections/src/types.d.ts
 /**
  * Key-value pairs in an array
  * @see {@link ObjectKeys}
@@ -1124,6 +934,7 @@ type ObjectKeys<K, V> = readonly {
   readonly key: K;
   readonly value: V;
 }[];
+declare function isObjectKeys<K, V>(kvs: EitherKey<K, V>): kvs is ObjectKeys<K, V>;
 /**
  * Type that represents key-values in object or array form
  */
@@ -1136,372 +947,14 @@ type TableValue<V> = V | undefined;
  * A row of table values
  */
 type TableRow<V> = TableValue<V>[];
-//# sourceMappingURL=types.d.ts.map
-
 //#endregion
-//#region ../collections/src/stack/IStack.d.ts
-/**
- * Stack (immutable)
- *
- * @example Overview
- * ```js
- * stack.push(item); // Return a new stack with item(s) added
- * stack.pop();      // Return a new stack with top-most item removed (ie. newest)
- * stack.peek;       // Return what is at the top of the stack or undefined if empty
- * stack.isEmpty;
- * stack.isFull;
- * stack.length;     // How many items in stack
- * stack.data;       // Get the underlying array
- * ```
- *
- * @example
- * ```js
- * let sanga = new Stack();
- * sanga = sanga.push(`bread`, `tomato`, `cheese`);
- * sanga.peek;  // `cheese`
- * sanga = sanga.pop(); // removes `cheese`
- * sanga.peek;  // `tomato`
- * const sangaAlt = sanga.push(`lettuce`, `cheese`); // sanga stays [`bread`, `tomato`], while sangaAlt is [`bread`, `tomato`, `lettuce`, `cheese`]
- * ```
- *
- * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @class Stack
- * @typeParam V - Type of stored items
- */
-interface IStack<V> {
-  /**
-   * Enumerates stack from bottom-to-top
-   *
-   */
-  forEach(fn: (v: V) => void): void;
-  /**
-   * Enumerates stack from top-to-bottom
-   * @param fn
-   */
-  forEachFromTop(fn: (v: V) => void): void;
-  get data(): readonly V[];
-  /**
-   * _True_ if stack is empty
-   */
-  get isEmpty(): boolean;
-  /**
-   * _True_ if stack is at its capacity. _False_ if not, or if there is no capacity.
-   */
-  get isFull(): boolean;
-  /**
-   * Get the item at the top of the stack without removing it (like `pop` would do)
-   * @returns Item at the top of the stack, or _undefined_ if empty.
-   */
-  get peek(): V | undefined;
-  /**
-   * Number of items in stack
-   */
-  get length(): number;
-}
-//# sourceMappingURL=IStack.d.ts.map
-//#endregion
-//#region ../collections/src/stack/IStackMutable.d.ts
-/**
- * Stack (mutable)
- *
- * @example Overview
- * ```
- * stack.push(item); // Add one or more items to the top of the stack
- * stack.pop(); // Removes and retiurns the item at the top of the stack (ie the newest thing)
- * stack.peek; // Return what is at the top of the stack or undefined if empty
- * stack.isEmpty/.isFull;
- * stack.length; // How many items in stack
- * stack.data; // Get the underlying array
- * ```
- *
- * @example
- * ```
- * const sanga = new MutableStack();
- * sanga.push(`bread`, `tomato`, `cheese`);
- * sanga.peek;  // `cheese`
- * sanga.pop(); // removes `cheese`
- * sanga.peek;  // `tomato`
- * sanga.push(`lettuce`, `cheese`); // Stack is now [`bread`, `tomato`, `lettuce`, `cheese`]
- * ```
- *
- * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @typeParam V - Type of stored items
- */
-interface IStackMutable<V> extends IStack<V> {
-  /**
-   * Add items to the 'top' of the stack.
-   *
-   * @param toAdd Items to add.
-   * @returns How many items were added
-   */
-  push(...toAdd: readonly V[]): number;
-  /**
-   * Remove and return item from the top of the stack, or _undefined_ if empty.
-   * If you just want to find out what's at the top, use {@link peek}.
-   */
-  pop(): V | undefined;
-}
-//# sourceMappingURL=IStackMutable.d.ts.map
-//#endregion
-//#region ../collections/src/stack/IStackImmutable.d.ts
-interface IStackImmutable<V> extends IStack<V> {
-  push(...toAdd: readonly V[]): IStackImmutable<V>;
-  pop(): IStackImmutable<V>;
-}
-//# sourceMappingURL=IStackImmutable.d.ts.map
-//#endregion
-//#region ../collections/src/stack/Types.d.ts
-type StackDiscardPolicy = `older` | `newer` | `additions`;
-type StackOpts = {
-  readonly debug?: boolean;
-  readonly capacity?: number;
-  readonly discardPolicy?: StackDiscardPolicy;
-};
-//# sourceMappingURL=Types.d.ts.map
-//#endregion
-//#region ../collections/src/stack/StackImmutable.d.ts
-declare class StackImmutable<V> implements IStackImmutable<V> {
-  private readonly opts;
-  readonly data: ReadonlyArray<V>;
-  constructor(opts?: StackOpts, data?: ReadonlyArray<V>);
-  push(...toAdd: ReadonlyArray<V>): StackImmutable<V>;
-  pop(): IStackImmutable<V>;
-  forEach(fn: (v: V) => void): void;
-  forEachFromTop(fn: (v: V) => void): void;
-  get isEmpty(): boolean;
-  get isFull(): boolean;
-  get peek(): V | undefined;
-  get length(): number;
-}
-/**
- * Returns a stack. Immutable. Use {@link Stacks.mutable} for a mutable alternative.
- *
- * The basic usage is `push`/`pop` to add/remove, returning the modified stack. Use the
- * property `peek` to see what's on top.
- *
- * @example Basic usage
- * ```js
- * // Create
- * let s = stack();
- * // Add one or more items
- * s = s.push(1, 2, 3, 4);
- * // See what's at the top of the stack
- * s.peek;      // 4
- *
- * // Remove from the top of the stack, returning
- * // a new stack without item
- * s = s.pop();
- * s.peek;        // 3
- * ```
- * @param options Options
- * @param startingItems List of items to add to stack. Items will be pushed 'left to right', ie array index 0 will be bottom of the stack.
- */
-declare const immutable$3: <V>(options?: StackOpts, ...startingItems: ReadonlyArray<V>) => IStackImmutable<V>;
-//# sourceMappingURL=StackImmutable.d.ts.map
-//#endregion
-//#region ../collections/src/stack/StackMutable.d.ts
-/**
- * Creates a stack. Mutable. Use {@link StackImmutable} for an immutable alternative.
- *
- * @example Basic usage
- * ```js
- * // Create
- * const s = new StackMutable();
- * // Add one or more items
- * s.push(1, 2, 3, 4);
- *
- * // See what's on top
- * s.peek;  // 4
- *
- * // Remove the top-most, and return it
- * s.pop();   // 4
- *
- * // Now there's a new top-most element
- * s.peek;  // 3
- * ```
- */
-declare class StackMutable<V> implements IStackMutable<V> {
-  readonly opts: StackOpts;
-  data: readonly V[];
-  constructor(opts?: StackOpts, data?: readonly V[]);
-  /**
-   * Push data onto the stack.
-   * If `toAdd` is empty, nothing happens
-   * @param toAdd Data to add
-   * @returns Length of stack
-   */
-  push(...toAdd: readonly V[]): number;
-  forEach(fn: (v: V) => void): void;
-  forEachFromTop(fn: (v: V) => void): void;
-  pop(): V | undefined;
-  get isEmpty(): boolean;
-  get isFull(): boolean;
-  get peek(): V | undefined;
-  get length(): number;
-}
-/**
- * Creates a stack. Mutable. Use {@link Stacks.immutable} for an immutable alternative.
- *
- * @example Basic usage
- * ```js
- * // Create
- * const s = Stacks.mutable();
- * // Add one or more items
- * s.push(1, 2, 3, 4);
- *
- * // See what's on top
- * s.peek;  // 4
- *
- * // Remove the top-most, and return it
- * s.pop();   // 4
- *
- * // Now there's a new top-most element
- * s.peek;  // 3
- * ```
- */
-declare const mutable$3: <V>(opts?: StackOpts, ...startingItems: readonly V[]) => IStackMutable<V>;
-//# sourceMappingURL=StackMutable.d.ts.map
-//#endregion
-//#region ../collections/src/stack/StackFns.d.ts
-declare const trimStack: <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
-declare const push: <V>(opts: StackOpts, stack: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
-declare const pop: <V>(opts: StackOpts, stack: ReadonlyArray<V>) => ReadonlyArray<V>;
-/**
- * Peek at the top of the stack (end of array)
- *
- * @typeParam V - Type of stored items
- * @param {StackOpts} opts
- * @param {V[]} stack
- * @returns {(V | undefined)}
- */
-declare const peek$1: <V>(opts: StackOpts, stack: ReadonlyArray<V>) => V | undefined;
-declare const isEmpty$1: <V>(opts: StackOpts, stack: ReadonlyArray<V>) => boolean;
-declare const isFull$1: <V>(opts: StackOpts, stack: ReadonlyArray<V>) => boolean;
-//# sourceMappingURL=StackFns.d.ts.map
-declare namespace index_d_exports$4 {
-  export { IStack, IStackImmutable, IStackMutable, StackDiscardPolicy, StackImmutable, StackMutable, StackOpts, immutable$3 as immutable, isEmpty$1 as isEmpty, isFull$1 as isFull, mutable$3 as mutable, peek$1 as peek, pop, push, trimStack };
-}
-//#endregion
-//#region ../collections/src/set/Types.d.ts
-type ValueSetEventMap<V> = {
-  readonly add: {
-    readonly value: V;
-    readonly updated: boolean;
-  };
-  readonly clear: boolean;
-  readonly delete: V;
-};
-//# sourceMappingURL=Types.d.ts.map
-
-//#endregion
-//#region ../collections/src/set/ISetMutable.d.ts
-/**
- * A Set which stores unique items determined by their value, rather
- * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Mutable.
- *
- * By default the `JSON.stringify()` representation is considered the 'key' for an object.
- * Pass in a function to `Sets.mutable` to define your own way of creating keys for values. The principle should
- * be that objects that you consider identical should have the same string key value.
- *
- * ISetMutable fires `add`, `clear` and `delete` events.
- *
- * @example Overview of functions
- * ```js
- * const s = Sets.mutable();
- * s.add(item);    // Add one or more items. Items with same key are overriden.
- * s.has(item);    // Returns true if item value is present
- * s.clear();      // Remove everything
- * s.delete(item); // Delete item by value
- * s.toArray();    // Returns values as an array
- * s.values();     // Returns an iterator over values
- * s.size;         // Number of items stored in set
- * ```
- *
- * @example Example usage
- * ```js
- * // Data to add
- * const people = [
- *  {name: `Barry`, city: `London`}
- *  {name: `Sally`, city: `Bristol`}
- * ];
- *
- * // Create a set, defining how keys will be generated
- * const set = Sets.mutable(person => {
- *    // Key person objects by name and city.
- *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
- *    return `${person.name}-${person.city}`
- * });
- *
- * // Add list
- * set.add(...people);
- *
- * // Demo:
- * set.has({name:`Barry`, city:`Manchester`})); // False, key is different (Barry-Manchester)
- * set.has({name:`Barry`, city:`London`}));     // True, we have Barry-London as a key
- * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
- * ```
- *
- * @example
- * Events
- * ```js
- * set.addEventListener(`add`, ev => {
- *  console.log(`New item added: ${ev.value}`);
- * });
- * ```
- *
- * @typeParam V - Type of data stored
- */
-interface ISetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
-  /**
-   * Add `values` to set.
-   * Corresponding keys will be generated according to the
-   * function provided to `setMutable`, or `JSON.stringify` by default.
-   * @param values Value(s) to add
-   * @returns _true_ if something new was added
-   */
-  add(...values: readonly V[]): boolean;
-  /**
-   * Iterate over values
-   * ```js
-   * for (let value of set.values()) {
-   *    // use value...
-   * }
-   * ```
-   */
-  values(): IterableIterator<V>;
-  /**
-   * Clears set
-   */
-  clear(): void;
-  /**
-   * Deletes specified value, if present.
-   * @param value
-   * @returns True if value was found
-   */
-  delete(value: V): boolean;
-  /**
-   * Returns _true_ if _value_ is contained in Set
-   * @param value
-   */
-  has(value: V): boolean;
-  /**
-   * Returns an array of values
-   */
-  toArray(): readonly V[];
-  /**
-   * Returns the number of items stored in the set
-   */
-  get size(): number;
-}
-//# sourceMappingURL=ISetMutable.d.ts.map
-//#endregion
-//#region ../collections/src/set/set-mutable.d.ts
+//#region ../packages/collections/src/set/set-mutable.d.ts
 /**
  * Creates a {@link ISetMutable}.
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
  * @returns
  */
-declare const mutable$2: <V>(keyString?: ToString<V>) => ISetMutable<V>;
+declare const mutable$1: <V>(keyString?: ToString<V>) => ISetMutable<V>;
 /**
  * Mutable string set
  */
@@ -1549,9 +1002,8 @@ declare class SetStringMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>
    */
   toArray(): V[];
 }
-//# sourceMappingURL=set-mutable.d.ts.map
 //#endregion
-//#region ../collections/src/set/ISet.d.ts
+//#region ../packages/collections/src/set/ISet.d.ts
 interface ISet<V> {
   has(v: V): boolean;
   get size(): number;
@@ -1561,10 +1013,8 @@ interface ISet<V> {
    */
   toArray(): readonly V[];
 }
-//# sourceMappingURL=ISet.d.ts.map
-
 //#endregion
-//#region ../collections/src/set/ISetImmutable.d.ts
+//#region ../packages/collections/src/set/ISetImmutable.d.ts
 /**
  * A Set which stores unique items determined by their value, rather
  * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Immutable.
@@ -1620,9 +1070,8 @@ interface ISetImmutable<V> extends ISet<V> {
   add(...values: readonly V[]): ISetImmutable<V>;
   delete(v: V): ISetImmutable<V>;
 }
-//# sourceMappingURL=ISetImmutable.d.ts.map
 //#endregion
-//#region ../collections/src/set/SetImmutable.d.ts
+//#region ../packages/collections/src/set/SetImmutable.d.ts
 declare class SetStringImmutable<V> implements ISetImmutable<V> {
   private store;
   private keyString;
@@ -1640,11 +1089,9 @@ declare class SetStringImmutable<V> implements ISetImmutable<V> {
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`.
  * @returns
  */
-declare const immutable$2: <V>(keyString?: ToString<V>) => ISetImmutable<V>;
-//# sourceMappingURL=SetImmutable.d.ts.map
-
+declare const immutable$1: <V>(keyString?: ToString<V>) => ISetImmutable<V>;
 //#endregion
-//#region ../collections/src/set/massive-set.d.ts
+//#region ../packages/collections/src/set/massive-set.d.ts
 /**
  * MassiveSet supports semantics similar to Set, but without the
  * limitation on how much data is stored.
@@ -1699,454 +1146,11 @@ declare class MassiveSet {
   hasLocal(value: string): boolean;
   has(value: string): boolean;
 }
-//# sourceMappingURL=massive-set.d.ts.map
 declare namespace index_d_exports$3 {
-  export { ISetImmutable, ISetMutable, MassiveSet, SetStringImmutable, SetStringMutable, ValueSetEventMap, immutable$2 as immutable, mutable$2 as mutable };
+  export { ISetImmutable, ISetMutable, MassiveSet, SetStringImmutable, SetStringMutable, ValueSetEventMap, immutable$1 as immutable, mutable$1 as mutable };
 }
 //#endregion
-//#region ../collections/src/queue/iqueue-mutable.d.ts
-type QueueMutableEvents<V> = {
-  /**
-   * Data has been added
-   * * added: data attempted to be added. Note: not all of it may have been accepted into queue
-   * * finalData: actual state of queue
-   */
-  enqueue: {
-    added: readonly V[];
-    finalData: readonly V[];
-  };
-  /**
-   * Single item dequeued.
-   * When dequeing the 'removed' event also fires
-   */
-  dequeue: {
-    removed: V;
-    finalData: readonly V[];
-  };
-  /**
-   * One or more items removed due to dequeuing, clearing or removeWhere called
-   */
-  removed: {
-    removed: readonly V[];
-    finalData: readonly V[];
-  };
-};
-interface IQueueMutableWithEvents<V> extends IQueueMutable<V>, SimpleEventEmitter<QueueMutableEvents<V>> {}
-/**
- * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
- *
- * Queues are useful if you want to treat 'older' or 'newer'
- * items differently. _Enqueing_ adds items at the back of the queue, while
- * _dequeing_ removes items from the front (ie. the oldest).
- *
- * ```js
- * const q = queue();       // Create
- * q.enqueue(`a`, `b`);     // Add two strings
- * const front = q.dequeue();  // `a` is at the front of queue (oldest)
- * ```
- *
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
- * ```
- *
- */
-interface IQueueMutable<V> {
-  /**
-   * Dequeues (removes oldest item / item at front of queue)
-   *
-   * Use {@link peek} to look at the item at front of queue without removing it.
-   * @returns Item, or undefined if queue is empty
-   */
-  readonly dequeue: () => V | undefined;
-  /**
-   * Enqueues (adds items to back of queue).
-   * If a capacity is set, not all items might be added.
-   * @returns How many items were added
-   */
-  readonly enqueue: (...toAdd: readonly V[]) => number;
-  /**
-  * Returns a copy of data in queue as an array
-  */
-  toArray(): readonly V[];
-  /**
-   * Returns front of queue (oldest item), or _undefined_ if queue is empty
-   */
-  get peek(): V | undefined;
-  /**
-   * Number of items in queue
-   */
-  get length(): number;
-  /**
-   * Is queue full? Returns _false_ if no capacity has been set
-   */
-  get isFull(): boolean;
-  /**
-  * Returns true if queue is empty
-  */
-  get isEmpty(): boolean;
-  /**
-   * Removes values that match `predicate`.
-   *
-   * ```js
-   * // Eg queue of strings, compare by value
-   * queue.removeWhere(v => v === `someValue`);
-   *
-   * // Eg queue of objects, compare by reference
-   * queue.removeWhere(v => v === someTarget);
-   *
-   * // Eg use ixfx function to compare value of objects, regardless of key ordering
-   * queue.removeWhere(v => isEqualValueIgnoreOrder(v, someTarget));
-   * ```
-   * @param predicate
-   * @returns Returns number of items removed.
-   */
-  removeWhere(predicate: (item: V) => boolean): number;
-  /**
-   * Returns the item at given rank (0 being front of queue)
-   * @param index
-   */
-  at(index: number): V;
-  /**
-   * Clears the queue
-   */
-  clear(): void;
-}
-//# sourceMappingURL=iqueue-mutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/ipriority-queue-mutable.d.ts
-/**
- * A prioritised item in queue
- */
-type PriorityItem<V> = Readonly<{
-  /**
-   * Item
-   */
-  item: V;
-  /**
-   * Priority
-   */
-  priority: number;
-}>;
-interface IPriorityQueueMutable<V> extends IQueueMutable<PriorityItem<V>> {
-  /**
-   * Dequeues the item with highest priority.
-   */
-  dequeueMax(): V | undefined;
-  /**
-   * Dequeues the item with the lowest priority.
-   */
-  dequeueMin(): V | undefined;
-  /**
-   * Peeks at the item with highest priority without removing it.
-   * _undefined_ if queue is empty.
-   */
-  peekMax(): V | undefined;
-  /**
-   * Peeks at the item with the lowest priority without removing it.
-   * _undefined_ if queue is empty.
-   */
-  peekMin(): V | undefined;
-}
-//# sourceMappingURL=ipriority-queue-mutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/iqueue-immutable.d.ts
-/**
- * Queue (immutable). See also {@link QueueMutable}.
- *
- * Queues are useful if you want to treat 'older' or 'newer'
- * items differently. _Enqueing_ adds items at the back of the queue, while
- * _dequeing_ removes items from the front (ie. the oldest).
- *
- * ```js
- * let q = queue();           // Create
- * q = q.enqueue(`a`, `b`);   // Add two strings
- * const front = q.peek;      // `a` is at the front of queue (oldest)
- * q = q.dequeue();           // q now just consists of `b`
- * ```
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
- * ```
- *
- */
-interface IQueueImmutable<V> {
-  /**
-   * Enumerates queue from back-to-front
-   *
-   */
-  forEach(fn: (v: V) => void): void;
-  /**
-   * Enumerates queue from front-to-back
-   * @param fn
-   */
-  forEachFromFront(fn: (v: V) => void): void;
-  /**
-   * Returns a new queue with item(s) added
-   * @param toAdd Items to add
-   */
-  enqueue(...toAdd: ReadonlyArray<V>): IQueueImmutable<V>;
-  /**
-   * Dequeues (removes oldest item / item at front of queue).
-   * Use {@link peek} to get item that will be removed.
-   *
-   * @returns Queue with item removed
-   */
-  dequeue(): IQueueImmutable<V>;
-  /**
-   * Returns true if queue is empty
-   */
-  get isEmpty(): boolean;
-  /**
-   * Is queue full? Returns _false_ if no capacity has been set
-   */
-  get isFull(): boolean;
-  /**
-   * Number of items in queue
-   */
-  get length(): number;
-  /**
-   * Returns front of queue (oldest item), or _undefined_ if queue is empty
-   */
-  get peek(): V | undefined;
-  /**
-   * Returns a copy of data in queue as an array
-   */
-  toArray(): Array<V>;
-}
-//# sourceMappingURL=iqueue-immutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/queue-types.d.ts
-type QueueDiscardPolicy = `older` | `newer` | `additions`;
-/**
- * Queue options.
- *
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
- * ```
- */
-type QueueOpts<V> = {
-  readonly eq?: IsEqual<V>;
-  /**
-   * @private
-   */
-  readonly debug?: boolean;
-  /**
-   * Capcity limit
-   */
-  readonly capacity?: number;
-  /**
-   * Default is `additions`, meaning new items are discarded.
-   *
-   * `older`: Removes items front of the queue (ie older items are discarded)
-   *
-   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded)
-   *
-   * `additions`: Only adds new items that there are room for (ie. brand new items are discarded)
-   *
-   */
-  readonly discardPolicy?: QueueDiscardPolicy;
-};
-//# sourceMappingURL=queue-types.d.ts.map
-
-//#endregion
-//#region ../collections/src/queue/queue-mutable.d.ts
-/**
- * Mutable queue that fires events when manipulated.
- *
- * Queues are useful if you want to treat 'older' or 'newer'
- * items differently. _Enqueing_ adds items at the back of the queue, while
- * _dequeing_ removes items from the front (ie. the oldest).
- *
- * ```js
- * const q = Queues.mutable();       // Create
- * q.enqueue(`a`, `b`);     // Add two strings
- * const front = q.dequeue();  // `a` is at the front of queue (oldest)
- * ```
- *
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
- * ```
- *
- * Events can be used to monitor data flows.
- * * 'enqueue': fires when item(s) are added
- * * 'dequeue': fires when an item is dequeued from front
- * * 'removed': fires when an item is dequeued, queue is cleared or .removeWhere is used to trim queue
- *
- * Each of the event handlers return the state of the queue as the 'finalData'
- * field.
- *
- * ```js
- * q.addEventListener(`enqueue`, e => {
- *  // e.added, e.finalData
- * });
- * q.addEventListener(`removed`, e => {
- *  // e.removed, e.finalData
- * });
- * q.addEventListener(`dequeue`, e=> {
- *  // e.removed, e.finalData
- * })
- * ```
- * @typeParam V - Data type of items
- */
-declare class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
-  readonly options: QueueOpts<V>;
-  data: readonly V[];
-  eq: IsEqual<V>;
-  constructor(opts?: QueueOpts<V>, data?: readonly V[]);
-  clear(): void;
-  /**
-   * Called when all data is cleared
-   */
-  protected onClear(): void;
-  at(index: number): V;
-  enqueue(...toAdd: readonly V[]): number;
-  protected onEnqueue(result: readonly V[], attemptedToAdd: readonly V[]): void;
-  dequeue(): V | undefined;
-  protected onRemoved(removed: readonly V[], finalData: readonly V[]): void;
-  /**
-   * Removes values that match `predicate`.
-   * @param predicate
-   * @returns Returns number of items removed.
-   */
-  removeWhere(predicate: (item: V) => boolean): number;
-  /**
-  * Return a copy of the array
-  * @returns
-  */
-  toArray(): V[];
-  get isEmpty(): boolean;
-  get isFull(): boolean;
-  get length(): number;
-  get peek(): V | undefined;
-}
-/**
- * Creates a new QueueMutable
- * @param options
- * @param startingItems
- * @returns
- */
-declare function mutable$1<V>(options?: QueueOpts<V>, ...startingItems: readonly V[]): IQueueMutableWithEvents<V>;
-//# sourceMappingURL=queue-mutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/priority-mutable.d.ts
-/**
- * Simple priority queue implementation.
- * Higher numbers mean higher priority.
- *
- * ```js
- * const pm = new PriorityMutable();
- *
- * // Add items with a priority (higher numeric value = higher value)
- * pm.enqueueWithPriority(`hello`, 4);
- * pm.enqueueWithPriotity(`there`, 1);
- *
- * ```
- */
-declare class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements IPriorityQueueMutable<V> {
-  constructor(opts?: QueueOpts<PriorityItem<V>>);
-  /**
-   * Adds an item with a given priority
-   * @param item Item
-   * @param priority Priority (higher numeric value means higher priority)
-   */
-  enqueueWithPriority(item: V, priority: number): void;
-  changePriority(item: V, priority: number, addIfMissing?: boolean, eq?: IsEqual<V>): void;
-  dequeueMax(): V | undefined;
-  dequeueMin(): V | undefined;
-  peekMax(): V | undefined;
-  peekMin(): V | undefined;
-}
-/**
- * Creates a {@link PriorityMutable} queue.
- *
- * Options:
- * * eq: Equality function
- * * capacity: limit on number of items
- * * discardPolicy: what to do if capacity is reached
- * @param opts
- * @returns
- */
-declare function priority<V>(opts?: QueueOpts<PriorityItem<V>>): IPriorityQueueMutable<V>;
-//# sourceMappingURL=priority-mutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/queue-immutable.d.ts
-declare class QueueImmutable<V> implements IQueueImmutable<V> {
-  #private;
-  readonly opts: QueueOpts<V>;
-  /**
-   * Creates an instance of Queue.
-   * @param {QueueOpts} opts Options foor queue
-   * @param {V[]} data Initial data. Index 0 is front of queue
-   */
-  constructor(opts?: QueueOpts<V>, data?: readonly V[]);
-  forEach(fn: (v: V) => void): void;
-  forEachFromFront(fn: (v: V) => void): void;
-  enqueue(...toAdd: readonly V[] | V[]): QueueImmutable<V>;
-  dequeue(): QueueImmutable<V>;
-  get isEmpty(): boolean;
-  get isFull(): boolean;
-  get length(): number;
-  get peek(): V | undefined;
-  toArray(): V[];
-}
-/**
- * Returns an immutable queue. Queues are useful if you want to treat 'older' or 'newer'
- * items differently. _Enqueing_ adds items at the back of the queue, while
- * _dequeing_ removes items from the front (ie. the oldest).
- *
- * ```js
- * let q = Queues.immutable();           // Create
- * q = q.enqueue(`a`, `b`);   // Add two strings
- * const front = q.peek();    // `a` is at the front of queue (oldest)
- * q = q.dequeue();           // q now just consists of `b`
- * ```
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = Queues.immutable({capacity: 5, discardPolicy: `newer`});
- * ```
- *
- * @typeParam V - Type of values stored
- * @param options
- * @param startingItems Index 0 is the front of the queue
- * @returns A new queue
- */
-declare const immutable$1: <V>(options?: QueueOpts<V>, ...startingItems: readonly V[]) => IQueueImmutable<V>;
-//# sourceMappingURL=queue-immutable.d.ts.map
-//#endregion
-//#region ../collections/src/queue/queue-fns.d.ts
-declare const debug: (opts: QueueOpts<any>, message: string) => void;
-declare const trimQueue: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>, toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
-/**
- * Adds to the back of the queue (last array index)
- * Last item of `toAdd` will potentially be the new end of the queue (depending on capacity limit and overflow policy)
- * @typeParam V - Type of values
- * @param {QueueOpts} opts
- * @param {V[]} queue
- * @param {...V[]} toAdd
- * @returns {V[]}
- */
-declare const enqueue: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>) => ReadonlyArray<V>;
-declare const dequeue: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>) => ReadonlyArray<V>;
-/**
- * Returns front of queue (oldest item), or undefined if queue is empty
- *
- * @typeParam V - Type of values stored
- * @param {QueueOpts} opts
- * @param {V[]} queue
- * @returns {(V | undefined)}
- */
-declare const peek: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>) => V | undefined;
-declare const isEmpty: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>) => boolean;
-declare const isFull: <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>) => boolean;
-//# sourceMappingURL=queue-fns.d.ts.map
-declare namespace index_d_exports$2 {
-  export { IPriorityQueueMutable, IQueueImmutable, IQueueMutable, IQueueMutableWithEvents, PriorityItem, PriorityMutable, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueMutableEvents, QueueOpts, debug, dequeue, enqueue, immutable$1 as immutable, isEmpty, isFull, mutable$1 as mutable, peek, priority, trimQueue };
-}
-//#endregion
-//#region ../collections/src/map/expiring-map.d.ts
+//#region ../packages/collections/src/map/expiring-map.d.ts
 /**
  * Expiring map options
  */
@@ -2231,7 +1235,7 @@ declare const create: <K, V>(options?: Opts) => ExpiringMap<K, V>;
  *
  * Events:
  * * 'expired': when an item is automatically removed.
- * * 'removed': when an item is manually or automatically removed.
+ * * 'removed': when an item is manually or automatically removed due to expiry. Note: does not fire when .clear() is called
  * * 'newKey': when a new key is added
  *
  * ```js
@@ -2320,9 +1324,9 @@ declare class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, 
   clear(): void;
   /**
    * Updates the lastSet/lastGet time for a value
-   * under `k`.
+   * under `key`. If key was not found, nothing happens.
    *
-   * Returns false if key was not found
+   * Returns _false_ if key was not found
    * @param key
    * @returns
    */
@@ -2356,9 +1360,8 @@ declare class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, 
    */
   set(key: K, value: V): void;
 }
-//# sourceMappingURL=expiring-map.d.ts.map
 //#endregion
-//#region ../collections/src/map/imap-of.d.ts
+//#region ../packages/collections/src/map/imap-of.d.ts
 interface IMapOf<V> {
   /**
    * Iterates over all keys
@@ -2368,7 +1371,11 @@ interface IMapOf<V> {
    * Iterates over all values stored under `key`
    * @param key
    */
-  get(key: string): IterableIterator<V>;
+  valuesFor(key: string): IterableIterator<V>;
+  /**
+   * Returns a copy of all values under key as an arry
+   * @param key
+   */
   /**
    * Iterates over all values, regardless of key.
    * Same value may re-appear if it's stored under different keys.
@@ -2413,12 +1420,14 @@ interface IMapOf<V> {
    */
   firstKeyByValue(value: V, eq?: IsEqual<V>): string | undefined;
 }
-//# sourceMappingURL=imap-of.d.ts.map
 //#endregion
-//#region ../collections/src/map/imap-of-mutable.d.ts
+//#region ../packages/collections/src/map/imap-of-mutable.d.ts
 interface IMapOfMutable<V> extends IMapOf<V> {
   /**
    * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
+   * ```js
+   * addKeyedValues('colours', 'red', 'green', 'blue')
+   * ```
    * @param key
    * @param values
    */
@@ -2456,19 +1465,22 @@ interface IMapOfMutable<V> extends IMapOf<V> {
    */
   delete(key: string): boolean;
 }
-//# sourceMappingURL=imap-of-mutable.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-simple-base.d.ts
+//#region ../packages/collections/src/map/map-of-simple-base.d.ts
 declare class MapOfSimpleBase<V> {
   protected map: Map<string, readonly V[]>;
-  protected readonly groupBy: any;
-  protected valueEq: any;
+  protected readonly groupBy: (value: V) => string;
+  protected valueEq: IsEqual<V>;
   /**
    * Constructor
    * @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
    * @param valueEq Compare values. By default uses JS logic for equality
    */
-  constructor(groupBy?: (value: V) => string, valueEq?: IsEqual<V>, initial?: [string, readonly V[]][]);
+  constructor(groupBy?: (value: V) => string, valueEq?: IsEqual<V>, initial?: Map<string, readonly V[]> | [string, readonly V[]][]);
+  /**
+   * Returns the underlying map storage. Do not manipulate.
+   */
+  get getRawMapUnsafe(): Map<string, readonly V[]>;
   /**
    * Returns _true_ if `key` exists
    * @param key
@@ -2514,7 +1526,7 @@ declare class MapOfSimpleBase<V> {
    * @param key
    * @returns
    */
-  get(key: string): IterableIterator<V>;
+  valuesFor(key: string): IterableIterator<V>;
   /**
    * Iterate over all keys
    */
@@ -2524,6 +1536,24 @@ declare class MapOfSimpleBase<V> {
    * Use {@link values} to iterate over a set of values per key
    */
   valuesFlat(): IterableIterator<V>;
+  /**
+   * Returns all values under 'key', or
+   * an empty array if key is not found.
+   *
+   * Array is a copy of stored array.
+   * @param key
+   * @returns
+   */
+  /**
+   * Returns the underlying array that stores values for `key`.
+   *
+   * Returns _undefined_ if key does not exist.
+   *
+   * Be careful about modifying array.
+   * @param key
+   * @returns
+   */
+  getRawArray(key: string): readonly V[] | undefined;
   /**
    * Yields the values for each key in sequence, returning an array.
    * Use {@link valuesFlat} to iterate over all keys regardless of key.
@@ -2542,9 +1572,8 @@ declare class MapOfSimpleBase<V> {
   */
   get isEmpty(): boolean;
 }
-//# sourceMappingURL=map-of-simple-base.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-simple-mutable.d.ts
+//#region ../packages/collections/src/map/map-of-simple-mutable.d.ts
 /**
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
@@ -2627,9 +1656,8 @@ declare class MapOfSimpleMutable<V> extends MapOfSimpleBase<V> implements IMapOf
  * @returns New instance
  */
 declare const ofSimpleMutable: <V>(groupBy?: (value: V) => string, valueEq?: IsEqual<V>) => IMapOfMutable<V>;
-//# sourceMappingURL=map-of-simple-mutable.d.ts.map
 //#endregion
-//#region ../collections/src/map/imap-base.d.ts
+//#region ../packages/collections/src/map/imap-base.d.ts
 interface IMapBase<K, V> {
   /**
    * Gets an item by key
@@ -2665,9 +1693,8 @@ interface IMapBase<K, V> {
   entries(): IterableIterator<readonly [K, V]>;
   values(): IterableIterator<V>;
 }
-//# sourceMappingURL=imap-base.d.ts.map
 //#endregion
-//#region ../collections/src/map/map.d.ts
+//#region ../packages/collections/src/map/map.d.ts
 /**
  * An immutable map. Rather than changing the map, functions like `add` and `delete`
  * return a new map reference which must be captured.
@@ -2759,9 +1786,8 @@ interface IMapImmutable<K, V> extends IMapBase<K, V> {
  * @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
 declare const immutable: <K, V>(dataOrMap?: ReadonlyMap<K, V> | EitherKey<K, V>) => IMapImmutable<K, V>;
-//# sourceMappingURL=map.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-mutable.d.ts
+//#region ../packages/collections/src/map/map-mutable.d.ts
 /**
  * A mutable map.
  *
@@ -2821,9 +1847,8 @@ interface IMapMutable<K, V> extends IMapBase<K, V> {
  * @param data Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
 declare const mutable: <K, V>(...data: EitherKey<K, V>) => IMapMutable<K, V>;
-//# sourceMappingURL=map-mutable.d.ts.map
 //#endregion
-//#region ../collections/src/map/imap-of-mutable-extended.d.ts
+//#region ../packages/collections/src/map/imap-of-mutable-extended.d.ts
 /**
  * Events from mapArray
  */
@@ -2919,9 +1944,8 @@ interface IMapOfMutableExtended<V, M> extends SimpleEventEmitter<MapArrayEvents<
    */
   debugString(): string;
 }
-//# sourceMappingURL=imap-of-mutable-extended.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-array-mutable.d.ts
+//#region ../packages/collections/src/map/map-of-array-mutable.d.ts
 /**
  * Map of array options
  */
@@ -2963,10 +1987,8 @@ type MapArrayOpts<V> = MapMultiOpts<V> & {
  * @returns {@link IMapOfMutableExtended}
  */
 declare const ofArrayMutable: <V>(options?: MapArrayOpts<V>) => IMapOfMutableExtended<V, readonly V[]>;
-//# sourceMappingURL=map-of-array-mutable.d.ts.map
-
 //#endregion
-//#region ../collections/src/map/imap-of-immutable.d.ts
+//#region ../packages/collections/src/map/imap-of-immutable.d.ts
 /**
  * Like a `Map` but multiple values can be stored for each key. Immutable.
  * Duplicate values can be added to the same or even a several keys.
@@ -3049,20 +2071,19 @@ interface IMapOfImmutable<V> extends IMapOf<V> {
    */
   delete(key: string): IMapOfImmutable<V>;
 }
-//# sourceMappingURL=imap-of-immutable.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-simple.d.ts
+//#region ../packages/collections/src/map/map-of-simple.d.ts
 /**
  * Simple immutable MapOf
  */
 declare class MapOfSimple<V> extends MapOfSimpleBase<V> implements IMapOf<V>, IMapOfImmutable<V> {
-  addKeyedValues(key: string, ...values: readonly V[]): IMapOfImmutable<V>;
-  addValue(...values: readonly V[]): IMapOfImmutable<V>;
-  addBatch(entries: [key: string, value: readonly V[]][]): IMapOfImmutable<V>;
-  clear(): IMapOfImmutable<V>;
-  deleteKeyValue(_key: string, _value: V): IMapOfImmutable<V>;
-  deleteByValue(value: V, eq?: IsEqual<V>): IMapOfImmutable<V>;
-  delete(key: string): IMapOfImmutable<V>;
+  addKeyedValues(key: string, ...values: V[]): MapOfSimple<V>;
+  addValue(...values: readonly V[]): MapOfSimple<V>;
+  addBatch(batch: [key: string, value: V[]][]): MapOfSimple<V>;
+  clear(): MapOfSimple<V>;
+  deleteKeyValue(_key: string, _value: V, eq?: IsEqual<V>): MapOfSimple<V>;
+  deleteByValue(value: V, eq?: IsEqual<V>): MapOfSimple<V>;
+  delete(key: string): MapOfSimple<V>;
 }
 /**
  * A simple immutable map of arrays, without events. It can store multiple values
@@ -3083,9 +2104,8 @@ declare class MapOfSimple<V> extends MapOfSimpleBase<V> implements IMapOf<V>, IM
  * @returns New instance
  */
 declare const ofSimple: <V>(groupBy?: ToString<V>, valueEq?: IsEqual<V>) => IMapOfImmutable<V>;
-//# sourceMappingURL=map-of-simple.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-multi-impl.d.ts
+//#region ../packages/collections/src/map/map-of-multi-impl.d.ts
 /**
  * @internal
  */
@@ -3122,16 +2142,19 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
   count(key: string): number;
   /**
    * Iterates over values stored under `key`
-   * An empty array is returned if there are no values
+   * If `key` is not found, no error is thrown - the iterator returns no values
+   *
+   * Alternatively use {@link valuesFor}
    */
-  get(key: string): IterableIterator<V>;
   /**
    * Iterate over the values stored under `key`.
-   * If key does not exist, iteration is essentially a no-op
+   * If key does not exist, iteration is essentially a no-op.
+   *
+   * Alternatively, use {@link valuesForAsArray} to get values as an array.
    * @param key
    * @returns
    */
-  valuesFor(key: string): Generator<V, void, any>;
+  valuesFor(key: string): Generator<V, void>;
   getSource(key: string): M | undefined;
   keys(): IterableIterator<string>;
   entriesFlat(): IterableIterator<[key: string, value: V]>;
@@ -3142,9 +2165,8 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
   get size(): number;
   get [Symbol.toStringTag](): string;
 }
-//# sourceMappingURL=map-of-multi-impl.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-multi-fns.d.ts
+//#region ../packages/collections/src/map/map-multi-fns.d.ts
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
  *
@@ -3166,9 +2188,12 @@ declare class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V
  */
 declare const firstEntry: <K, V>(map: IWithEntries<K, Iterable<V>>, predicate: (value: V, key: K) => boolean) => readonly [key: K, value: Iterable<V>] | undefined;
 /**
- * Returns the size of the largest key, or 0 if empty.
+ * Returns the entry with the largest count of elements,
+ * or _undefined_ if `map` is empty.
  */
-declare const lengthMax: <V>(map: IMapOf<V>) => number;
+declare const longestEntry: <K, V extends {
+  length: number;
+}>(map: IWithEntries<K, V>) => readonly [K, V] | undefined;
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
  *
@@ -3183,14 +2208,30 @@ declare const lengthMax: <V>(map: IMapOf<V>) => number;
  *
  * An alternative is {@link firstEntry} to search by predicate function.
  * @param map Map to search
- * @param value Value to seek
+ * @param soughtValue Value to seek
  * @param isEqual Filter function which checks equality. Uses JS comparer by default.
  * @returns Entry, or _undefined_ if `value` not found.
+ * @throws If 'map' doesn't seem like a map
  */
-declare const firstEntryByValue: <K, V>(map: IWithEntries<K, Iterable<V>>, value: V, isEqual?: IsEqual<V>) => readonly [key: K, value: Iterable<V>] | undefined;
-//# sourceMappingURL=map-multi-fns.d.ts.map
+declare const firstEntryByValue: <K, V>(map: IWithEntries<K, Iterable<V>>, soughtValue: V, isEqual?: IsEqual<V>) => readonly [key: K, value: Iterable<V>] | undefined;
+/**
+ * Returns a copy of `map`, with the internal arrays being a different object.
+ * Values contained inside are not copied.
+ * @param map
+ * @returns
+ */
+declare const cloneShallow: <K, V>(map: IWithEntries<K, Iterable<V>>) => Map<K, V[]>;
+/**
+ * Returns true if both sets of data have the same keys, and iterables at each key contain the same values, regardless of order.
+ * By default uses === comparison semantics.
+ * @param a
+ * @param b
+ * @param comparerOrKey
+ * @returns
+ */
+declare const equals: <K, V>(a: IWithEntries<K, Iterable<V>>, b: IWithEntries<K, Iterable<V>>, comparerOrKey?: IsEqual<V> | ((v: V) => string)) => boolean;
 //#endregion
-//#region ../collections/src/map/map-multi.d.ts
+//#region ../packages/collections/src/map/map-multi.d.ts
 /**
  * @private
  */
@@ -3198,7 +2239,7 @@ type MultiValue<V, M> = {
   get name(): string;
   has(source: M, value: V, eq: IsEqual<V>): boolean;
   addKeyedValues(destination: M | undefined, values: Iterable<V>): M;
-  toArray(source: M): readonly V[];
+  toArrayCopy(source: M): V[];
   iterable(source: M): IterableIterator<V>;
   find(source: M, predicate: (v: V) => boolean): V | undefined;
   filter(source: M, predicate: (v: V) => boolean): Iterable<V>;
@@ -3223,9 +2264,8 @@ type MapMultiOpts<V> = {
 type MapSetOpts<V> = MapMultiOpts<V> & {
   readonly hash: (value: V) => string;
 };
-//# sourceMappingURL=map-multi.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-set-mutable.d.ts
+//#region ../packages/collections/src/map/map-of-set-mutable.d.ts
 /**
  * Returns a {@link IMapOfMutableExtended} that uses a set to hold values.
  * This means that only unique values are stored under each key. By default it
@@ -3254,9 +2294,8 @@ type MapSetOpts<V> = MapMultiOpts<V> & {
  * @returns
  */
 declare const ofSetMutable: <V>(options?: MapSetOpts<V>) => IMapOfMutableExtended<V, ReadonlyMap<string, V>>;
-//# sourceMappingURL=map-of-set-mutable.d.ts.map
 //#endregion
-//#region ../collections/src/map/map-of-circular-mutable.d.ts
+//#region ../packages/collections/src/map/map-of-circular-mutable.d.ts
 type MapCircularOpts<V> = MapMultiOpts<V> & {
   readonly capacity: number;
 };
@@ -3271,19 +2310,15 @@ type MapCircularOpts<V> = MapMultiOpts<V> & {
  * @example Only store the most recent three items per key
  * ```js
  * const map = ofCircularMutable({capacity: 3});
- * map.add(`hello`, [1, 2, 3, 4, 5]);
- * const hello = map.get(`hello`); // [3, 4, 5]
+ * map.add(`hello`, 1, 2, 3, 4, 5);
+ * const hello = [...map.get(`hello`)]; // [3, 4, 5]
  * ```
- *
- *
  * @param options
  * @returns
  */
 declare const ofCircularMutable: <V>(options: MapCircularOpts<V>) => IMapOfMutableExtended<V, ICircularArray<V>>;
-//# sourceMappingURL=map-of-circular-mutable.d.ts.map
-
 //#endregion
-//#region ../collections/src/map/number-map.d.ts
+//#region ../packages/collections/src/map/number-map.d.ts
 /**
  * Simple map for numbers.
  *
@@ -3330,12 +2365,54 @@ declare class NumberMap<K> extends Map<K, number> {
   add(key: K, amount?: number): number;
   subtract(key: K, amount?: number): number;
 }
-//# sourceMappingURL=number-map.d.ts.map
+//#endregion
+//#region ../packages/collections/src/map/map-mutable-events.d.ts
+type MapWithEventsEvents<TKey, TValue> = {
+  'removed': {
+    key: TKey;
+    value: TValue;
+  };
+  'added': {
+    key: TKey;
+    value: TValue;
+  };
+  'key-added': {
+    key: TKey;
+    value: TValue;
+  };
+  'key-updated': {
+    key: TKey;
+    value: TValue;
+  };
+  'cleared': undefined;
+};
+/**
+ * A wrapper around a regular Map, but one that fires events when data changes.
+ *
+ * Events:
+ * * removed: Key/value removed
+ * * added: Key/value added/updated
+ * * key-added: Key/value pair added that resulted in a new key
+ * * key-updated: Value updated for an existing key
+ * * cleared: Map has been cleared
+ */
+declare class MapWithEvents<TKey, TValue> extends SimpleEventEmitter<MapWithEventsEvents<TKey, TValue>> implements IMapMutable<TKey, TValue> {
+  #private;
+  add(...itemsToAdd: EitherKey<TKey, TValue>): void;
+  set(key: TKey, value: TValue): void;
+  delete(key: TKey): void;
+  clear(): void;
+  get(key: TKey): TValue | undefined;
+  has(key: TKey): boolean;
+  isEmpty(): boolean;
+  entries(): IterableIterator<readonly [TKey, TValue]>;
+  values(): IterableIterator<TValue>;
+}
 declare namespace index_d_exports$1 {
-  export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, GetOrGenerate, GetOrGenerateSync, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapOfSimpleMutable, MapSetOpts, MergeReconcile, MultiValue, NumberMap, addObjectEntriesMutate, addValue, addValueMutate, addValueMutator, deleteByValueCompareMutate, create as expiringMap, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, firstEntry, firstEntryByValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, immutable, lengthMax, ofSimpleMutable as mapOfSimpleMutable, mapToArray, mapToObjectTransform, mergeByKey, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple, ofSimpleMutable, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue };
+  export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts, GetOrGenerate, GetOrGenerateSync, IMapImmutable, IMapMutable, IMapOf, IMapOfImmutable, IMapOfMutable, IMapOfMutableExtended, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutableImpl, MapOfSimple, MapOfSimpleMutable, MapSetOpts, MapWithEvents, MapWithEventsEvents, MergeReconcile, MultiValue, NumberMap, addObjectEntriesMutate, addValue$1 as addValue, addValueMutate, addValueMutator, cloneShallow, deleteByValueCompareMutate, equals, create as expiringMap, filterValues, findBySomeKey, findEntryByPredicate, findEntryByValue, findValue, firstEntry, firstEntryByValue, fromIterable, fromObject, getClosestIntegerKey, getOrGenerate, getOrGenerateSync, hasAnyValue, hasKeyValue, immutable, longestEntry, ofSimpleMutable as mapOfSimpleMutable, mapToArray, mapToObjectTransform, mergeByKey, mutable, ofArrayMutable, ofCircularMutable, ofSetMutable, ofSimple, ofSimpleMutable, some, sortByValue, sortByValueProperty, toArray, toObject, transformMap, zipKeyValue };
 }
 //#endregion
-//#region ../collections/src/table.d.ts
+//#region ../packages/collections/src/table.d.ts
 /**
  * Stores values in a table of rows (vertical) and columns (horizontal)
  */
@@ -3491,7 +2568,6 @@ declare class Table<V> {
    */
   setRow(row: number | string, value: V | undefined, length?: number): TableRow<V>;
 }
-//# sourceMappingURL=table.d.ts.map
 declare namespace directed_graph_d_exports {
   export { ConnectOptions$1 as ConnectOptions, DirectedGraph, DistanceCompute, Edge$1 as Edge, Vertex$1 as Vertex, adjacentVertices$1 as adjacentVertices, areAdjacent, bfs, clone, connect$1 as connect, connectTo$1 as connectTo, connectWithEdges$1 as connectWithEdges, createVertex$1 as createVertex, dfs, disconnect, distance, distanceDefault, dumpGraph$1 as dumpGraph, edges, get, getCycles, getOrCreate$1 as getOrCreate, getOrFail, graph$1 as graph, graphFromVertices, hasKey, hasNoOuts, hasOnlyOuts, hasOut, isAcyclic, pathDijkstra, toAdjacencyMatrix$1 as toAdjacencyMatrix, topologicalSort, transitiveReduction, updateGraphVertex$1 as updateGraphVertex, vertexHasOut, vertices };
 }
@@ -3849,7 +2925,6 @@ declare function getCycles(graph: DirectedGraph): Vertex$1[][];
 declare function transitiveReduction(graph: DirectedGraph): Readonly<{
   vertices: IMapImmutable<string, Vertex$1>;
 }>;
-//# sourceMappingURL=directed-graph.d.ts.map
 declare namespace undirected_graph_d_exports {
   export { ConnectOptions, Edge, Graph, Vertex, adjacentVertices, connect, connectTo, connectWithEdges, createVertex, dumpGraph, edgesForVertex, getConnection, getOrCreate, graph, hasConnection, toAdjacencyMatrix, updateGraphVertex };
 }
@@ -3954,6 +3029,8 @@ declare function toAdjacencyMatrix(graph: Graph): Table<boolean>;
 declare const dumpGraph: (graph: Graph) => string;
 /**
  * Iterate over all the vertices connectd to `context` vertex
+ *
+ * If `context` is _undefined_, returns nothing
  * @param graph Graph
  * @param context id or Vertex
  * @returns
@@ -3961,15 +3038,28 @@ declare const dumpGraph: (graph: Graph) => string;
 declare function adjacentVertices(graph: Graph, context: Vertex | string | undefined): Generator<Readonly<{
   id: string;
 }>, void, unknown>;
+/**
+ * Get all the edges for a vertex.
+ *
+ * ```js
+ * // Iterate all edges for vertex with id '0'
+ * for (const edge of edgesForVertex(graph, '0')) {
+ * }
+ * ```
+ *
+ * If the vertex has no edges, no values are returned. If the vertex was not found in the graph, an error is thrown.
+ * @throws Throws an error if `context` was not found, if it's _undefined_ or `graph` is invalid.
+ * @param graph
+ * @param context
+ * @returns
+ */
 declare function edgesForVertex(graph: Graph, context: Vertex | string | undefined): Generator<Readonly<{
   a: string;
   b: string;
   weight?: number;
 }>, void, unknown>;
-//# sourceMappingURL=undirected-graph.d.ts.map
 declare namespace index_d_exports {
   export { directed_graph_d_exports as Directed, undirected_graph_d_exports as Undirected };
 }
 //#endregion
-export { ArrayKeys, CircularArray, EitherKey, ExpiringMap, index_d_exports as Graphs, ICircularArray, type ISetImmutable, type ISetMutable, type IStackImmutable, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, MapOfSimpleMutable, index_d_exports$1 as Maps, ObjectKeys, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueOpts, index_d_exports$2 as Queues, SetStringImmutable, SetStringMutable, index_d_exports$3 as Sets, SimplifiedNode, StackImmutable, StackMutable, index_d_exports$4 as Stacks, Table, TableRow, TableValue, TraversableTree, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts, TreeNode, index_d_exports$5 as Trees, ValueSetEventMap, WrappedNode };
-//# sourceMappingURL=collections.d.ts.map
+export { ArrayKeys, CircularArray, EitherKey, ExpiringMap, index_d_exports as Graphs, ICircularArray, type ISetImmutable, type ISetMutable, IStackImmutable, LabelledNode, LabelledSingleValue, LabelledValue, LabelledValues, MapOfSimpleMutable, index_d_exports$1 as Maps, ObjectKeys, QueueDiscardPolicy, QueueImmutable, QueueMutable, QueueOpts, index_d_exports$2 as Queues, SetStringImmutable, SetStringMutable, index_d_exports$3 as Sets, SimplifiedNode, StackImmutable, StackMutable, index_d_exports$4 as Stacks, Table, TableRow, TableValue, TraversableTree, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts, TreeNode, index_d_exports$5 as Trees, ValueSetEventMap, WrappedNode, isObjectKeys };

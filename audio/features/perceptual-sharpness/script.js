@@ -2,7 +2,7 @@ import { CanvasHelper } from '@ixfx/visual.js';
 import * as Draw from './drawing.js';
 import * as Meyda from '../lib/index.js';
 import { clamp, movingAverage, scaler } from '@ixfx/numbers.js';
-import { Dom } from '@ixfx';
+import * as Dom from '@ixfx/dom.js';
 
 const settings = Object.freeze({
   // Meyda helper.

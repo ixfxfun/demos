@@ -1,15 +1,13 @@
-import { Points, Polar, Lines, radiansSum } from '@ixfx/geometry.js';
-import * as Util from './util.js';
+import { Polar, Lines, radiansSum } from '@ixfx/geometry.js';
 import { CanvasHelper, Colour } from '@ixfx/visual.js';
-import { Random } from '@ixfx';
-import { getCssVariable } from '@ixfx/dom.js';
-
+import * as Random from '@ixfx/random.js';
 const piPi = Math.PI * 2;
 
 /**
  * @typedef {Readonly<Polar.PolarRay & {
  * colour: string
  * line: Lines.Line
+ * offset:number
  * }>} Thing
  */
 

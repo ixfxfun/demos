@@ -1,30 +1,6 @@
-//#region ../guards/src/types.d.ts
-type NumberGuardRange =
-/**
- * No range checking
- */
-`` | `finite`
-/**
- * Can be any number, except zero
- */ | `nonZero` | `positive` | `negative`
-/**
- * Must be above zero
- */ | `aboveZero` | `belowZero` | `percentage` | `bipolar`;
-type ResultOk<TValue> = {
-  success: true;
-  value: TValue;
-  info?: string;
-};
-type ResultError<TError> = {
-  success: false;
-  error: TError;
-  info?: string;
-};
-type ResultOrFunction = Result<any, any> | (() => undefined | Result<any, any>);
-type Result<TValue, TError> = ResultOk<TValue> | ResultError<TError>;
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../guards/src/arrays.d.ts
+import { a as ResultOrFunction, i as ResultOk, n as Result, r as ResultError, t as NumberGuardRange } from "./types-CSh98G0p.js";
+
+//#region ../packages/guards/src/arrays.d.ts
 /**
  * Throws an error if parameter is not an array
  * @param value
@@ -44,20 +20,16 @@ declare const arrayIndexTest: <V>(array: ArrayLike<V>, index: number, name?: str
  * @returns
  */
 declare const arrayStringsTest: (value: unknown) => Result<string[], string>;
-//# sourceMappingURL=arrays.d.ts.map
 //#endregion
-//#region ../guards/src/empty.d.ts
+//#region ../packages/guards/src/empty.d.ts
 declare const nullUndefTest: <TValue>(value: TValue, parameterName?: string) => Result<TValue, string>;
 declare const isDefined: <T>(argument: T | undefined) => argument is T;
-//# sourceMappingURL=empty.d.ts.map
 //#endregion
-//#region ../guards/src/function.d.ts
+//#region ../packages/guards/src/function.d.ts
 declare const isFunction: (object: unknown) => object is (...args: any[]) => any;
 declare const functionTest: (value: unknown, parameterName?: string) => Result<Function, string>;
-//# sourceMappingURL=function.d.ts.map
-
 //#endregion
-//#region ../guards/src/numbers.d.ts
+//#region ../packages/guards/src/numbers.d.ts
 /**
  * Returns true if `x` is a power of two
  * @param x
@@ -182,9 +154,18 @@ declare const integerArrayTest: (numbers: Iterable<number>) => Result<Iterable<n
  */
 declare const isInteger: (value: number | string) => boolean;
 declare const numberInclusiveRangeTest: (value: number | undefined, min: number, max: number, parameterName?: string) => Result<number, string>;
-//# sourceMappingURL=numbers.d.ts.map
+/**
+ * Returns a success if values are equal, considering the set digits of precision (1..21)
+ *
+ * @param expected Expected value
+ * @param got Received value
+ * @param precision Precision in terms of decimal digits. 1...21, default 21
+ * @param parameterName
+ * @returns
+ */
+declare const equalWithPrecisionTest: (expected: number, got: number, precision?: number, parameterName?: string) => Result<number, string>;
 //#endregion
-//#region ../guards/src/object.d.ts
+//#region ../packages/guards/src/object.d.ts
 /**
  * Tests_if `value` is a plain object
  *
@@ -203,9 +184,8 @@ declare const testPlainObject: (value: unknown) => Result<object, string>;
  * @returns
  */
 declare const testPlainObjectOrPrimitive: (value: unknown) => Result<object | bigint | number | string | boolean, string>;
-//# sourceMappingURL=object.d.ts.map
 //#endregion
-//#region ../guards/src/range.d.ts
+//#region ../packages/guards/src/range.d.ts
 type ExpectedOpts = {
   minInclusive?: number;
   maxInclusive?: number;
@@ -222,9 +202,8 @@ declare const rangeIntegerTest: (v: Iterable<number>, expected: ExpectedOpts) =>
  * @returns
  */
 declare const rangeTest: (numbers: Iterable<number>, expected: ExpectedOpts) => Result<Iterable<number>, string>;
-//# sourceMappingURL=range.d.ts.map
 //#endregion
-//#region ../guards/src/result.d.ts
+//#region ../packages/guards/src/result.d.ts
 declare const getErrorMessage: (ex: unknown) => string;
 /**
  * Throws an error if any result is a failure.
@@ -258,6 +237,12 @@ declare function resultIsError<TValue, TError>(result: Result<TValue, TError>): 
  * @returns
  */
 declare function resultIsOk<TValue, TError>(result: Result<TValue, TError>): result is ResultOk<TValue>;
+declare class IxfxError extends Error {
+  cause: string | undefined;
+  constructor(message: string, cause?: string);
+  static fromError(error: Error, cause?: string): IxfxError;
+  static fromString(message: string, cause?: string): IxfxError;
+}
 /**
  * Gets the result as an Error
  * @param result
@@ -297,9 +282,8 @@ declare const resultsCollate: <TValue, TError>(...results: ResultOrFunction[]) =
  * @param callback
  */
 declare const resultWithFail: <TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void) => void;
-//# sourceMappingURL=result.d.ts.map
 //#endregion
-//#region ../guards/src/string.d.ts
+//#region ../packages/guards/src/string.d.ts
 type StringGuardRange = `` | `non-empty`;
 /**
  * Throws an error if parameter is not an string
@@ -307,8 +291,5 @@ type StringGuardRange = `` | `non-empty`;
  * @param parameterName
  */
 declare const stringTest: (value: unknown, range?: StringGuardRange, parameterName?: string) => Result<string, string>;
-//# sourceMappingURL=string.d.ts.map
-
 //#endregion
-export { ExpectedOpts, NumberGuardRange, Result, ResultError, ResultOk, ResultOrFunction, StringGuardRange, arrayIndexTest, arrayStringsTest, arrayTest, errorResult, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };
-//# sourceMappingURL=guards.d.ts.map
+export { ExpectedOpts, IxfxError, NumberGuardRange, Result, ResultError, ResultOk, ResultOrFunction, StringGuardRange, arrayIndexTest, arrayStringsTest, arrayTest, equalWithPrecisionTest, errorResult, functionTest, getErrorMessage, ifNaN, integerArrayTest, integerParse, integerTest, isDefined, isFunction, isInteger, isPowerOfTwo, nullUndefTest, numberDecimalTest, numberInclusiveRangeTest, numberTest, percentTest, rangeIntegerTest, rangeTest, resultErrorToString, resultFirstFail_, resultIsError, resultIsOk, resultThrow, resultThrowSingle, resultToError, resultToValue, resultWithFail, resultsCollate, stringTest, testPlainObject, testPlainObjectOrPrimitive, throwIfFailed };

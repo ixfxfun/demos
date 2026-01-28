@@ -39,6 +39,9 @@
   ],
   "exclude": [
     "node_modules",
-    "**/node_modules/*"
+    "ixfx/**/*",
+    "ixfx/*",
+    "ml/lib/**/*",
+    "node_modules/**/*"
   ]
 }

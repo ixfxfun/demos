@@ -2,7 +2,7 @@ import * as Modulation from '@ixfx/modulation.js';
 import * as Random from '@ixfx/random.js';
 import { Bipolar } from '@ixfx/numbers.js';
 import * as Util from './util.js';
-import { resolveFields } from '@ixfx/core.js';
+import { resolveFields } from '@ixfx/index.js';
 
 const settings = Object.freeze({
   minimumDistance: 0.1

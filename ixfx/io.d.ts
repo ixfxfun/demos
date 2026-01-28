@@ -1,19 +1,14 @@
-import "./ts-utility-DZKsU5oa.js";
-import "./is-equal-BzhoT7pd.js";
-import { Interval } from "./types-CcY4GIC4.js";
-import "./maps-Bm5z7qq5.js";
-import "./index-DTe1EM0y.js";
-import { Continuously } from "./index-Bne6KcmH.js";
-import "./key-value-ww1DZidG.js";
-import { QueueMutable } from "./index-BkFpdty_.js";
-import { ISimpleEventEmitter, SimpleEventEmitter } from "./index-CZIsUroQ.js";
-import "./index-0CFu-Nj7.js";
-import { Point, Rect } from "./index-Bu_Q0Nu0.js";
-import "./index-C8cro9Jz.js";
-import { StateChangeEvent, StateMachineWithEvents, Transitions } from "./index-1oZyS9hM.js";
-import { ManualCapturer } from "./index-BFy0kD2P.js";
+import { i as Interval } from "./types-DhLXV-YQ.js";
+import { t as Continuously } from "./continuously-BuE6tYiM.js";
+import { n as ISimpleEventEmitter, t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { r as QueueMutable } from "./index-Cmij82id.js";
+import { r as Point } from "./point-type-CAmjZfny.js";
+import { t as Rect } from "./rect-types-S6H0PcF2.js";
+import { t as NumberTracker } from "./number-tracker-ClwOej43.js";
+import { i as Transitions, n as StateChangeEvent, r as StateMachineWithEvents } from "./state-machine-yWXAvzqo.js";
+import { t as ManualCapturer } from "./video-D4ePLi--.js";
 
-//#region ../io/src/codec.d.ts
+//#region ../packages/io/src/codec.d.ts
 /**
  * Handles utf-8 text encoding/decoding
  */
@@ -25,7 +20,7 @@ declare class Codec {
    * @param text
    * @returns
    */
-  toBuffer(text: string): Uint8Array<ArrayBufferLike>;
+  toBuffer(text: string): Uint8Array<ArrayBuffer>;
   /**
    * Returns a string from a provided buffer
    * @param buffer
@@ -33,9 +28,8 @@ declare class Codec {
    */
   fromBuffer(buffer: AllowSharedBufferSource): string;
 }
-//# sourceMappingURL=codec.d.ts.map
 //#endregion
-//#region ../io/src/string-receive-buffer.d.ts
+//#region ../packages/io/src/string-receive-buffer.d.ts
 /**
  * Receives text
  */
@@ -52,9 +46,8 @@ declare class StringReceiveBuffer {
   addImpl(string_: string): string;
   add(string_: string): void;
 }
-//# sourceMappingURL=string-receive-buffer.d.ts.map
 //#endregion
-//#region ../io/src/string-write-buffer.d.ts
+//#region ../packages/io/src/string-write-buffer.d.ts
 type Opts = {
   readonly chunkSize?: number;
   readonly interval?: Interval;
@@ -143,18 +136,16 @@ declare class StringWriteBuffer {
    */
   add(stringToQueue: string): void;
 }
-//# sourceMappingURL=string-write-buffer.d.ts.map
 //#endregion
-//#region ../io/src/generic-state-transitions.d.ts
-declare const genericStateTransitionsInstance: Readonly<{
-  ready: "connecting";
-  connecting: string[];
-  connected: string[];
-  closed: "connecting";
-}>;
-//# sourceMappingURL=generic-state-transitions.d.ts.map
+//#region ../packages/io/src/generic-state-transitions.d.ts
+declare const genericStateTransitionsInstance: {
+  readonly ready: "connecting";
+  readonly connecting: readonly ["connected", "closed"];
+  readonly connected: readonly ["closed"];
+  readonly closed: "connecting";
+};
 //#endregion
-//#region ../io/src/types.d.ts
+//#region ../packages/io/src/types.d.ts
 type IoDataEvent = {
   readonly data: string;
 };
@@ -173,9 +164,8 @@ type BleDeviceOptions = {
   readonly debug: boolean;
 };
 type FrameProcessorSources = `` | `camera` | `video`;
-//# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region ../io/src/ble-device.d.ts
+//#region ../packages/io/src/ble-device.d.ts
 declare class BleDevice extends SimpleEventEmitter<IoEvents<GenericStateTransitions>> {
   private device;
   private config;
@@ -199,7 +189,6 @@ declare class BleDevice extends SimpleEventEmitter<IoEvents<GenericStateTransiti
   protected log(m: string): void;
   protected warn(m: unknown): void;
 }
-//# sourceMappingURL=ble-device.d.ts.map
 declare namespace nordic_ble_device_d_exports {
   export { NordicBleDevice, Opts$2 as Opts, defaultOpts };
 }
@@ -221,9 +210,8 @@ type Opts$2 = {
 declare class NordicBleDevice extends BleDevice {
   constructor(device: BluetoothDevice, opts?: Opts$2);
 }
-//# sourceMappingURL=nordic-ble-device.d.ts.map
 //#endregion
-//#region ../io/src/audio/visualiser.d.ts
+//#region ../packages/io/src/audio/visualiser.d.ts
 declare class AudioVisualiser {
   freqMaxRange: number;
   audio: AudioAnalyser;
@@ -233,8 +221,8 @@ declare class AudioVisualiser {
   pointerClicking: boolean;
   pointerClickDelayMs: number;
   pointerDelaying: boolean;
-  waveTracker: any;
-  freqTracker: any;
+  waveTracker: NumberTracker;
+  freqTracker: NumberTracker;
   el: HTMLElement;
   constructor(parentElement: HTMLElement, audio: AudioAnalyser);
   renderFreq(freq: readonly number[]): void;
@@ -249,9 +237,8 @@ declare class AudioVisualiser {
   };
   onPointer(event: MouseEvent | PointerEvent): void;
 }
-//# sourceMappingURL=visualiser.d.ts.map
 //#endregion
-//#region ../io/src/audio/analyser.d.ts
+//#region ../packages/io/src/audio/analyser.d.ts
 /**
  * Options for audio processing
  *
@@ -407,9 +394,8 @@ declare class AudioAnalyser {
    */
   getIndexForFrequency(freq: number): number;
 }
-//# sourceMappingURL=analyser.d.ts.map
 //#endregion
-//#region ../io/src/audio/types.d.ts
+//#region ../packages/io/src/audio/types.d.ts
 type AudioOscillatorOptions = {
   type: OscillatorType;
   frequency: number;
@@ -428,9 +414,8 @@ type BasicAudioElement = BasicAudio & {
 type BasicAudioOscillator = BasicAudio & {
   osc: OscillatorNode;
 };
-//# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region ../io/src/audio/from-audio-element.d.ts
+//#region ../packages/io/src/audio/from-audio-element.d.ts
 /**
  * Scans page for <AUDIO> elements and creates playable controllers for them.
  * It uses the element's 'id' attribute as a way of fetching one later.
@@ -463,21 +448,19 @@ declare class AudioElements {
  * @returns
  */
 declare function createFromAudioElement(audioElementOrQuery: HTMLMediaElement | string, filterType?: BiquadFilterType): BasicAudioElement;
-//# sourceMappingURL=from-audio-element.d.ts.map
 //#endregion
-//#region ../io/src/audio/from-oscillator.d.ts
+//#region ../packages/io/src/audio/from-oscillator.d.ts
 /**
  * Initialise audio with an oscillator source
  * @param oscillatorOptions
  * @returns BasicAudio instance
  */
 declare function createOscillator(oscillatorOptions?: Partial<AudioOscillatorOptions>): BasicAudioOscillator;
-//# sourceMappingURL=from-oscillator.d.ts.map
 declare namespace index_d_exports {
   export { AudioAnalyser, AudioElements, AudioOscillatorOptions, AudioVisualiser, BasicAudio, BasicAudioElement, BasicAudioOscillator, DataAnalyser, Opts$1 as Opts, analyserBasic, analyserFrequency, analyserPeakLevel, createFromAudioElement, createOscillator };
 }
 //#endregion
-//#region ../io/src/midi/types.d.ts
+//#region ../packages/io/src/midi/types.d.ts
 type MidiCommands = 'noteon' | 'noteoff' | 'pitchbend' | 'cc' | 'poly-at' | 'progchange' | 'at';
 type MidiMessage = {
   command: MidiCommands;
@@ -490,9 +473,8 @@ type NoteMidiMessage = MidiMessage & {
   noteName: string;
   frequency: number;
 };
-//# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region ../io/src/midi/midi-fns.d.ts
+//#region ../packages/io/src/midi/midi-fns.d.ts
 /**
  * Sends a note on and note off
  * @param port
@@ -536,10 +518,9 @@ declare const unpack: (data: Uint8Array) => MidiMessage;
  * @param message
  * @returns
  */
-declare const pack: (message: MidiMessage) => Uint8Array;
-//# sourceMappingURL=midi-fns.d.ts.map
+declare const pack: (message: MidiMessage) => number[];
 //#endregion
-//#region ../io/src/midi/manager.d.ts
+//#region ../packages/io/src/midi/manager.d.ts
 type MidiManagerState = {
   initialised: boolean;
   errorReason: string;
@@ -626,9 +607,8 @@ declare class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
   findInUsePort(fn: (p: MIDIPort) => boolean): MIDIPort | undefined;
   filterInUsePort(fn: (p: MIDIPort) => boolean): Generator<MIDIPort, void, unknown>;
 }
-//# sourceMappingURL=manager.d.ts.map
 //#endregion
-//#region ../io/src/midi/control.d.ts
+//#region ../packages/io/src/midi/control.d.ts
 type ControlEvents = {
   change: {
     velocity: number;
@@ -658,7 +638,7 @@ declare class Control extends SimpleEventEmitter<ControlEvents> {
   inputChannel: number;
   inputCommand?: MidiCommands;
   inputNote: number;
-  inputVelocityScale: number[];
+  inputVelocityScale: readonly [0, 127];
   feedbackChannel: number;
   feedbackCommand?: MidiCommands;
   feedbackNote: number;
@@ -668,9 +648,8 @@ declare class Control extends SimpleEventEmitter<ControlEvents> {
   onInputMessage(message: MidiMessage): boolean;
   get scaledVelocity(): number;
 }
-//# sourceMappingURL=control.d.ts.map
 //#endregion
-//#region ../io/src/midi/midi-fighter.d.ts
+//#region ../packages/io/src/midi/midi-fighter.d.ts
 /**
  * Events fired by a {@link MidiFighter}} instance
  */
@@ -965,9 +944,8 @@ declare class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEv
    */
   setSwitchEffect(kind: `none` | `strobe` | `pulse` | `rainbow`, value?: number): void;
 }
-//# sourceMappingURL=midi-fighter.d.ts.map
 //#endregion
-//#region ../io/src/midi/notes.d.ts
+//#region ../packages/io/src/midi/notes.d.ts
 type ParsedNote = [noteNumber: number, name: string, frequency: number];
 declare const getParsedNotes: () => ParsedNote[];
 declare const noteNameToNumber: (name: string) => number;
@@ -975,10 +953,10 @@ declare const noteNameToFrequency: (name: string) => number;
 declare const noteNumberToName: (number: number) => string;
 declare const noteNumberToFrequency: (number: number) => number;
 declare namespace index_d_exports$1 {
-  export { Control, ControlEvents, Feedback, MidiCommands, MidiFighter, MidiFighterEncoder, MidiFighterEncoderEvents, MidiFighterEvents, MidiFighterState, MidiManager, MidiManagerEvents, MidiManagerState, MidiMessage, NoteMidiMessage, getParsedNotes, noteNameToFrequency, noteNameToNumber, noteNumberToFrequency, noteNumberToName, pack, sendNote, unpack };
+  export { Control, ControlEvents, Feedback, MidiCommands, MidiFighter, MidiFighterEncoder, MidiFighterEncoderEvents, MidiFighterEvents, MidiFighterState, MidiManager, MidiManagerEvents, MidiManagerState, MidiMessage, NoteMidiMessage, ParsedNote, getParsedNotes, noteNameToFrequency, noteNameToNumber, noteNumberToFrequency, noteNumberToName, pack, sendNote, unpack };
 }
 //#endregion
-//#region ../io/src/espruino-ble-device.d.ts
+//#region ../packages/io/src/espruino-ble-device.d.ts
 /**
  * An Espruino BLE-connection
  *
@@ -1073,9 +1051,8 @@ declare class EspruinoBleDevice extends NordicBleDevice {
    */
   eval(code: string, opts?: EvalOpts, warn?: (message: string) => void): Promise<string>;
 }
-//# sourceMappingURL=espruino-ble-device.d.ts.map
 //#endregion
-//#region ../io/src/json-device.d.ts
+//#region ../packages/io/src/json-device.d.ts
 /**
  * Options for JsonDevice
  */
@@ -1136,7 +1113,7 @@ declare abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    * Writes text to output device
    * @param txt
    */
-  protected abstract writeInternal(txt: string): void;
+  protected abstract writeInternal(txt: string): Promise<void>;
   close(): Promise<void>;
   /**
    * Must change state
@@ -1153,7 +1130,6 @@ declare abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   protected log(m: string): void;
   protected warn(m: unknown): void;
 }
-//# sourceMappingURL=json-device.d.ts.map
 declare namespace serial_d_exports {
   export { Device, JsonDataEvent, JsonDeviceEvents, JsonDeviceOpts, SerialOpts };
 }
@@ -1207,7 +1183,7 @@ declare class Device extends JsonDevice {
   baudRate: number;
   constructor(config?: SerialOpts);
   /**
-   * Writes text collected in buffer
+   * Writes text to the underlying output
    * @param txt
    */
   protected writeInternal(txt: string): Promise<void>;
@@ -1216,7 +1192,7 @@ declare class Device extends JsonDevice {
   onConnectAttempt(): Promise<void>;
 }
 //#endregion
-//#region ../io/src/espruino-serial-device.d.ts
+//#region ../packages/io/src/espruino-serial-device.d.ts
 type EspruinoSerialDeviceOpts = SerialOpts & {
   readonly evalTimeoutMs?: number;
 };
@@ -1272,7 +1248,6 @@ declare class EspruinoSerialDevice extends Device {
    */
   eval(code: string, opts?: EvalOpts, warn?: (message: string) => void): Promise<string>;
 }
-//# sourceMappingURL=espruino-serial-device.d.ts.map
 declare namespace espruino_d_exports {
   export { EspruinoBleDevice, EspruinoBleOpts, EspruinoDevice, EspruinoSerialDevice, EspruinoSerialDeviceOpts, EspruinoStates, EvalOpts, Events, Options, bangle, connectBle, deviceEval, puck, serial };
 }
@@ -1525,7 +1500,6 @@ type EspruinoDevice = {
  * @returns
  */
 declare const deviceEval: (code: string, opts: EvalOpts | undefined, device: EspruinoDevice, evalReplyPrefix: string, debug: boolean, warn: (m: string) => void) => Promise<string>;
-//# sourceMappingURL=espruino.d.ts.map
 declare namespace camera_d_exports {
   export { Constraints, StartResult$1 as StartResult, dumpDevices, start$1 as start };
 }
@@ -1628,7 +1602,6 @@ type StartResult$1 = {
  * @returns Returns `{ videoEl, dispose }`, where `videoEl` is the created VIDEO element, and `dispose` is a function for removing the element and stopping the video.
  */
 declare const start$1: (constraints?: Constraints) => Promise<StartResult$1>;
-//# sourceMappingURL=camera.d.ts.map
 declare namespace video_file_d_exports {
   export { StartResult, start };
 }
@@ -1652,9 +1625,8 @@ type StartResult = {
  * @returns StartResult
  */
 declare const start: (file: File) => Promise<StartResult>;
-//# sourceMappingURL=video-file.d.ts.map
 //#endregion
-//#region ../io/src/frame-processor.d.ts
+//#region ../packages/io/src/frame-processor.d.ts
 /**
  * Frame procesor options
  */
@@ -1778,9 +1750,8 @@ declare class FrameProcessor {
   getTimestamp(): number;
   private getFrameCamera;
 }
-//# sourceMappingURL=frame-processor.d.ts.map
 //#endregion
-//#region ../io/src/reconnecting-web-socket.d.ts
+//#region ../packages/io/src/reconnecting-web-socket.d.ts
 type ReconnectingWebsocket = {
   /**
    * Sends data
@@ -1869,8 +1840,5 @@ type ReconnectingOptions = {
  * @returns
  */
 declare const reconnectingWebsocket: (url: string | URL, opts?: Partial<ReconnectingOptions>) => ReconnectingWebsocket;
-//# sourceMappingURL=reconnecting-web-socket.d.ts.map
-
 //#endregion
-export { index_d_exports as Audio, BleDeviceOptions, nordic_ble_device_d_exports as Bluetooth, camera_d_exports as Camera, Codec, espruino_d_exports as Espruino, FrameProcessor, type FrameProcessorOpts, FrameProcessorSources, GenericStateTransitions, IoDataEvent, IoEvents, index_d_exports$1 as Midi, ReconnectingOptions, ReconnectingWebsocket, ReconnectingWebsocketStates, serial_d_exports as Serial, type StateChangeEvent, StringReceiveBuffer, StringWriteBuffer, type Opts as StringWriteBufferOpts, video_file_d_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };
-//# sourceMappingURL=io.d.ts.map
+export { index_d_exports as Audio, BleDeviceOptions, nordic_ble_device_d_exports as Bluetooth, camera_d_exports as Camera, Codec, espruino_d_exports as Espruino, FrameProcessor, FrameProcessorOpts, FrameProcessorSources, GenericStateTransitions, IoDataEvent, IoEvents, index_d_exports$1 as Midi, ReconnectingOptions, ReconnectingWebsocket, ReconnectingWebsocketStates, serial_d_exports as Serial, type StateChangeEvent, StringReceiveBuffer, StringWriteBuffer, Opts as StringWriteBufferOpts, video_file_d_exports as VideoFile, genericStateTransitionsInstance, reconnectingWebsocket };

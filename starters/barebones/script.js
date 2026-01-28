@@ -1,4 +1,4 @@
-import { Random } from '@ixfx';
+import * as Random from '@ixfx/random.js';
 
 const settings = {
   el: /** @type HTMLElement */(document.querySelector(`#random`)),

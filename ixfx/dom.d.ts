@@ -1,14 +1,10 @@
-import "./is-equal-BzhoT7pd.js";
-import { Interval } from "./types-CcY4GIC4.js";
-import "./maps-Bm5z7qq5.js";
-import { Result } from "./index-DTe1EM0y.js";
-import "./key-value-ww1DZidG.js";
-import "./index-BkFpdty_.js";
-import "./index-CZIsUroQ.js";
-import { GridCardinalDirection, Point, Point3d, Rect, RectPositioned } from "./index-Bu_Q0Nu0.js";
-import "./index-C8cro9Jz.js";
+import { n as Result } from "./types-CSh98G0p.js";
+import { i as Point3d, r as Point } from "./point-type-CAmjZfny.js";
+import { o as GridCardinalDirection } from "./index-C6ZQ6KIU.js";
+import { a as RectPositioned } from "./rect-types-S6H0PcF2.js";
+import { n as ElementSizer, r as ElementSizerOptions, t as ElementResizeLogic } from "./element-sizing-Cgu8LbMr.js";
 
-//#region ../dom/src/data-table.d.ts
+//#region ../packages/dom/src/data-table.d.ts
 declare namespace data_table_d_exports {
   export { DataFormatter, DataTable, DataTableOpts, FormattingOptions, NumberFormattingOptions, fromList, fromObject };
 }
@@ -60,7 +56,6 @@ type DataFormatter = (data: object, path: string) => string | undefined;
  * ```
  */
 declare const fromObject: (parentOrQuery: HTMLElement | string, data?: object, opts?: Partial<DataTableOpts>) => DataTable<object>;
-//# sourceMappingURL=data-table.d.ts.map
 declare namespace drag_drop_d_exports {
   export { DragListener, DragOptions, DragProgress, DragStart, DragState, draggable };
 }
@@ -128,7 +123,6 @@ type DragOptions = {
   fenceViewport: RectPositioned;
 };
 declare const draggable: (elemOrQuery: SVGElement | HTMLElement | string, listener: DragListener, options?: Partial<DragOptions>) => () => void;
-//# sourceMappingURL=drag-drop.d.ts.map
 declare namespace forms_d_exports {
   export { SelectHandler, SelectOpts, button, buttonCreate, checkbox, numeric, select, textAreaKeyboard };
 }
@@ -263,7 +257,7 @@ declare const buttonCreate: (title: string, onClick?: () => void) => {
   /**
    * Sets text content of button
    */
-  set title(value: string);
+  set title(value: string): any;
   /**
    * Disposes the button.
    * Removes event handler and optionally removes from document
@@ -364,9 +358,8 @@ type SelectHandler = {
  * @return
  */
 declare const select: (domQueryOrEl: string | HTMLSelectElement, onChanged?: (currentValue: string) => void, options?: SelectOpts) => SelectHandler;
-//# sourceMappingURL=forms.d.ts.map
 //#endregion
-//#region ../dom/src/css-variables.d.ts
+//#region ../packages/dom/src/css-variables.d.ts
 /**
  * CSS Variable
  */
@@ -534,9 +527,8 @@ declare function setCssVariables<T extends Record<string, string | number>>(vari
  * @returns
  */
 declare function getCssVariablesFromStyles<T extends string | number>(styles: CSSStyleDeclaration, name: string, fallback: T): T;
-//# sourceMappingURL=css-variables.d.ts.map
 //#endregion
-//#region ../dom/src/resolve-el.d.ts
+//#region ../packages/dom/src/resolve-el.d.ts
 /**
  * Resolves either a string or HTML element to an element.
  * Useful when an argument is either an HTML element or query.
@@ -574,9 +566,8 @@ type QueryOrElements = string | Element[] | HTMLElement[] | HTMLElement | Elemen
  * @returns
  */
 declare const resolveEls: (selectors: QueryOrElements) => HTMLElement[];
-//# sourceMappingURL=resolve-el.d.ts.map
 //#endregion
-//#region ../dom/src/css.d.ts
+//#region ../packages/dom/src/css.d.ts
 type ComputedPixelsMap<T extends readonly (keyof CSSStyleDeclaration)[]> = Record<T[number], number>;
 /**
  * Returns the value of `getBoundingClientRect` plus the width of all the borders
@@ -638,9 +629,8 @@ declare const setCssToggle: (selectors: QueryOrElements, cssClass: string) => vo
  * @returns
  */
 declare const setCssDisplay: (selectors: QueryOrElements, value: string) => void;
-//# sourceMappingURL=css.d.ts.map
 //#endregion
-//#region ../dom/src/data-display.d.ts
+//#region ../packages/dom/src/data-display.d.ts
 type DataDisplayOptions = FormattingOptions & {
   theme?: `dark` | `light`;
 };
@@ -656,7 +646,7 @@ type DataDisplayOptions = FormattingOptions & {
  * ```
  */
 declare class DataDisplay {
-  dataTable: any;
+  dataTable: DataTable<object>;
   /**
    * Constructor
    * @param options Options
@@ -664,9 +654,8 @@ declare class DataDisplay {
   constructor(options?: Partial<DataDisplayOptions>);
   update(data: object): void;
 }
-//# sourceMappingURL=data-display.d.ts.map
 //#endregion
-//#region ../dom/src/el.d.ts
+//#region ../packages/dom/src/el.d.ts
 /**
  * Wraps an element (or set of elements) with handy functions
  * for manipulation.
@@ -735,76 +724,8 @@ type WrappedElement = {
  */
 declare const el: (selectors: QueryOrElements) => WrappedElement;
 declare const elRequery: (selectors: string) => WrappedElement;
-//# sourceMappingURL=el.d.ts.map
 //#endregion
-//#region ../dom/src/element-sizing.d.ts
-/**
- * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
- * * height: use height of parent, set width based on original aspect ratio of element. Assumes parent has a determined height.
- * * both: use height & width of parent, so the element adopts the ratio of the parent. Be sure that parent has a width and height set.
- * * min: use the smallest dimension of parent
- * * max: use the largest dimension of parent
- */
-type ElementResizeLogic = `width` | `height` | `both` | `none` | `min` | `max`;
-/**
- * Options
- */
-type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
-  /**
-   * @defaultValue 'none'
-   */
-  stretch?: ElementResizeLogic;
-  naturalSize?: Rect;
-  /**
-   * If not specified, the element's parent is used
-   */
-  containerEl?: HTMLElement | string | null;
-  onSizeChanging?: (size: Rect, el: T) => void;
-  onSizeDone?: (size: Rect, el: T) => void;
-  debounceTimeout?: Interval;
-};
-/**
- * Consider using static methods:
- *
- * ```js
- * // Resize an <SVG> element to match viewport
- * Dom.ElementSizer.svgViewport(svg);
- *
- * // Resize canvas to match its parent
- * Dom.ElementSizer.canvasParent(canvas);
- *
- * // Resize canvas to match viewport
- * Dom.ElementSizer.canvasViewport(canvas);
- * ```
- */
-declare class ElementSizer<T extends HTMLElement | SVGElement> {
-  #private;
-  constructor(elOrQuery: T | string, options: ElementSizerOptions<T>);
-  dispose(reason?: string): void;
-  static canvasParent(canvasElementOrQuery: HTMLCanvasElement | string, options: ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement>;
-  static canvasViewport(canvasElementOrQuery: HTMLCanvasElement | string, options: {
-    zIndex?: number;
-  } & ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement>;
-  /**
-   * Size an SVG element to match viewport
-   * @param svg
-   * @returns
-   */
-  static svgViewport(svg: SVGElement, onSizeSet?: (size: Rect) => void): ElementSizer<SVGElement>;
-  /**
-   * Sets the 'natural' size of an element.
-   * This can also be specified when creating ElementSizer.
-   * @param size
-   */
-  setNaturalSize(size: Rect): void;
-  get naturalSize(): Rect;
-  get viewport(): RectPositioned;
-  set size(size: Rect);
-  get size(): Rect;
-}
-//# sourceMappingURL=element-sizing.d.ts.map
-//#endregion
-//#region ../dom/src/error-handler.d.ts
+//#region ../packages/dom/src/error-handler.d.ts
 /**
  * Creates an error handler to show errors on-screen.
  * This is useful when testing on mobile devices that lack access to the console.
@@ -825,9 +746,8 @@ declare const defaultErrorHandler: () => {
   show: (ex: Error | string | Event) => void;
   hide: () => void;
 };
-//# sourceMappingURL=error-handler.d.ts.map
 //#endregion
-//#region ../dom/src/log.d.ts
+//#region ../packages/dom/src/log.d.ts
 type LogOpts = {
   readonly reverse?: boolean;
   readonly capacity?: number;
@@ -876,9 +796,8 @@ type Log = {
  * @param opts
  */
 declare const log: (domQueryOrElement: HTMLElement | string, opts?: LogOpts) => Log;
-//# sourceMappingURL=log.d.ts.map
 //#endregion
-//#region ../dom/src/inline-console.d.ts
+//#region ../packages/dom/src/inline-console.d.ts
 type InlineConsoleOptions = LogOpts & Partial<{
   /**
    * If true, styling is not applied
@@ -905,9 +824,8 @@ type InlineConsoleOptions = LogOpts & Partial<{
  * @param options
  */
 declare const inlineConsole: (options?: InlineConsoleOptions) => void;
-//# sourceMappingURL=inline-console.d.ts.map
 //#endregion
-//#region ../dom/src/query.d.ts
+//#region ../packages/dom/src/query.d.ts
 type ElementQueryOptions = {
   /**
    * If true, elements are only returned once, even if that match several queries
@@ -924,22 +842,19 @@ type ElementQueryOptions = {
  * @returns
  */
 declare function query(queryOrElement: string | HTMLElement | (string | HTMLElement)[] | AsyncGenerator<string | HTMLElement>, options?: Partial<ElementQueryOptions>): AsyncGenerator<HTMLElement>;
-//# sourceMappingURL=query.d.ts.map
 //#endregion
-//#region ../dom/src/set-property.d.ts
+//#region ../packages/dom/src/set-property.d.ts
 declare function setText(selectors: QueryOrElements): (value: any) => string;
 declare function setText(selectors: QueryOrElements, value?: any): string;
 declare function setHtml(selectors: QueryOrElements): (value: any) => string;
 declare function setHtml(selectors: QueryOrElements, value?: any): string;
 declare function setProperty(property: string, selectors: QueryOrElements): (value: any) => string;
 declare function setProperty(property: string, selectors: QueryOrElements, value: any): string;
-//# sourceMappingURL=set-property.d.ts.map
 //#endregion
-//#region ../dom/src/shadow-dom.d.ts
+//#region ../packages/dom/src/shadow-dom.d.ts
 declare const addShadowCss: (parentEl: Readonly<HTMLElement>, styles: string) => ShadowRoot;
-//# sourceMappingURL=shadow-dom.d.ts.map
 //#endregion
-//#region ../dom/src/tabbed-panel.d.ts
+//#region ../packages/dom/src/tabbed-panel.d.ts
 type Panel<TNotifyArgs> = {
   mount: (parentEl: HTMLElement) => void;
   dismount: () => void;
@@ -966,9 +881,8 @@ declare const tabSet: <TNotifyArgs>(options: {
   tabSetEl: HTMLElement;
   notify: (name: string, args: TNotifyArgs) => void;
 };
-//# sourceMappingURL=tabbed-panel.d.ts.map
 //#endregion
-//#region ../dom/src/utility.d.ts
+//#region ../packages/dom/src/utility.d.ts
 type PointSpaces = `viewport` | `screen` | `document`;
 /**
  * Convert an absolute point to relative, in different coordinate spaces.
@@ -1202,10 +1116,12 @@ type CreateUpdateElement<V> = (
 /**
  * Value to create/update for
  */
+
 item: V,
 /**
  * Element to update, or null if it needs to be created
  */
+
 el: HTMLElement | null) => HTMLElement;
 /**
  * Creates a DOM tree, based on provided data.
@@ -1225,8 +1141,5 @@ declare const reconcileChildren: <V>(parentEl: HTMLElement, list: Map<string, V>
  * @returns
  */
 declare const byId: <T extends HTMLElement>(id: string) => T;
-//# sourceMappingURL=utility.d.ts.map
-
 //#endregion
 export { ComputedPixelsMap, CreateUpdateElement, CssVariable, CssVariableByIdOption, CssVariableByObjectOption, CssVariableByQueryOption, CssVariableOption, DataDisplay, DataDisplayOptions, data_table_d_exports as DataTable, drag_drop_d_exports as DragDrop, ElPositionOpts, ElementQueryOptions, ElementResizeLogic, ElementSizer, ElementSizerOptions, forms_d_exports as Forms, InlineConsoleOptions, Log, LogOpts, Panel, PointSpaces, QueryOrElements, WrappedElement, addShadowCss, byId, cardinalPosition, clear, copyToClipboard, createAfter, createIn, cycleCssClass, defaultErrorHandler, el, elRequery, getBoundingClientRectWithBorder, getComputedPixels, getCssVariable, getCssVariablesFromStyles, getCssVariablesWithFallback, getTranslation, inlineConsole, insertSorted, log, parseCssVariablesAsAttributes, pointScaler, positionFn, positionFromMiddle, positionRelative, query, reconcileChildren, resolveEl, resolveElementTry, resolveEls, setCssClass, setCssDisplay, setCssToggle, setCssVariables, setFromCssVariables, setHtml, setProperty, setText, tabSet, viewportToSpace };
-//# sourceMappingURL=dom.d.ts.map

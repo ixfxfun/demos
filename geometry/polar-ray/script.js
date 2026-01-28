@@ -1,4 +1,4 @@
-import { continuously } from '@ixfx/core.js';
+import { continuously } from '@ixfx/index.js';
 import { Points } from '@ixfx/geometry.js';
 import { wave } from '@ixfx/modulation.js';
 import * as Things from './thing.js';

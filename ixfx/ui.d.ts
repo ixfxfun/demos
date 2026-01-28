@@ -1,25 +1,10 @@
-import { PathDataChange } from "./index-yI9sq57Z.js";
-import { RecursivePartial } from "./ts-utility-DZKsU5oa.js";
-import "./is-equal-BzhoT7pd.js";
-import { Interval } from "./types-CcY4GIC4.js";
-import "./maps-Bm5z7qq5.js";
-import "./index-DTe1EM0y.js";
-import "./comparers-C6kfLE-t.js";
-import "./index-Bne6KcmH.js";
-import "./key-value-ww1DZidG.js";
-import "./resolve-core-CYBLBOMw.js";
-import "./sleep-DiuAJS4P.js";
-import "./index-BkFpdty_.js";
-import "./index-CZIsUroQ.js";
-import "./index-0CFu-Nj7.js";
-import "./index-Bu_Q0Nu0.js";
-import "./index-C8cro9Jz.js";
-import "./index-DSIfkq7l.js";
-import "./index-1oZyS9hM.js";
-import { HslScalar } from "./index-BFy0kD2P.js";
-import { EventSourceOptions, ObjectFieldHandler, Reactive, ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveWritable } from "./index-BngJgbks.js";
+import { t as PathDataChange } from "./pathed-DaP_BCvN.js";
+import { n as RecursivePartial } from "./ts-utility-RjBTNYlE.js";
+import { i as Interval } from "./types-DhLXV-YQ.js";
+import { n as HslScalar } from "./index-BeGcvvBh.js";
+import { Bt as EventSourceOptions, Y as ObjectFieldHandler, ct as ReactiveNonInitial, ht as ReactiveWritable, it as ReactiveDiff, nt as Reactive, ot as ReactiveInitial } from "./index-Dl2oqI60.js";
 
-//#region ../ui/src/rx/browser-resize.d.ts
+//#region ../packages/ui/src/rx/browser-resize.d.ts
 /**
  * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.
  *
@@ -33,19 +18,15 @@ import { EventSourceOptions, ObjectFieldHandler, Reactive, ReactiveDiff, Reactiv
  * @param interval Tiemout before event gets triggered
  * @returns
  */
-declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => Reactive<ResizeObserverEntry[]>;
+declare const browserResizeObservable: (elem: Readonly<Element>, interval?: Interval) => any;
 /**
  * Returns an Reactive for window resize. Default 100ms debounce.
  * @param elapsed
  * @returns
  */
-declare const windowResize: (elapsed?: Interval) => Reactive<{
-  innerWidth: number;
-  innerHeight: number;
-}>;
-//# sourceMappingURL=browser-resize.d.ts.map
+declare const windowResize: (elapsed?: Interval) => any;
 //#endregion
-//#region ../ui/src/rx/browser-theme-change.d.ts
+//#region ../packages/ui/src/rx/browser-theme-change.d.ts
 /**
  * Observe when a class changes on a target element, by default the document.
  * Useful for tracking theme changes.
@@ -58,17 +39,15 @@ declare const windowResize: (elapsed?: Interval) => Reactive<{
  * ```
  */
 declare const cssClassChange: (target?: HTMLElement) => Reactive<MutationRecord[]>;
-//# sourceMappingURL=browser-theme-change.d.ts.map
 //#endregion
-//#region ../ui/src/rx/colour.d.ts
+//#region ../packages/ui/src/rx/colour.d.ts
 type ReactiveColour = ReactiveWritable<HslScalar> & {
   setHsl: (hsl: HslScalar) => void;
 };
 declare function colour(initialValue: HslScalar): ReactiveColour & ReactiveInitial<HslScalar>;
 declare function colour(): ReactiveColour & ReactiveNonInitial<HslScalar>;
-//# sourceMappingURL=colour.d.ts.map
 //#endregion
-//#region ../ui/src/rx/dom-types.d.ts
+//#region ../packages/ui/src/rx/dom-types.d.ts
 type DomBindValueTarget = {
   /**
    * If _true_ `innerHTML` is set (a shortcut for elField:`innerHTML`)
@@ -194,9 +173,8 @@ type DomNumberInputValueOptions = DomValueOptions & {
   inverted?: boolean;
   upstreamSource?: Reactive<number>;
 };
-//# sourceMappingURL=dom-types.d.ts.map
 //#endregion
-//#region ../ui/src/rx/dom-source.d.ts
+//#region ../packages/ui/src/rx/dom-source.d.ts
 /**
  * Reactive getting/setting of values to a HTML INPUT element.
  *
@@ -289,9 +267,8 @@ declare function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormE
   setNamedValue: (name: string, value: any) => void;
   el: HTMLFormElement;
 } & ReactiveInitial<T> & ReactiveWritable<T>;
-//# sourceMappingURL=dom-source.d.ts.map
 //#endregion
-//#region ../ui/src/rx/dom.d.ts
+//#region ../packages/ui/src/rx/dom.d.ts
 /**
  * Reactive stream of array of elements that match `query`.
  * @param query
@@ -572,10 +549,8 @@ declare function win(): {
     };
   };
 };
-//# sourceMappingURL=dom.d.ts.map
 declare namespace index_d_exports {
   export { BindUpdateOpts, DomBindInputOptions, DomBindResolvedSource, DomBindSourceValue, DomBindTargetNode, DomBindTargetNodeResolved, DomBindUnresolvedSource, DomBindValueTarget, DomCreateOptions, DomFormOptions, DomNumberInputValueOptions, DomValueOptions, ElementBind, ElementsOptions, PipeDomBinding, ReactiveColour, bind, bindDiffUpdate, bindElement, bindHtml, bindText, bindUpdate, bindValueText, browserResizeObservable, colour, cssClassChange, domForm, domHslInputValue, domInputValue, domNumberInputValue, elements, fromDomQuery, win, windowResize };
 }
 //#endregion
 export { index_d_exports as RxUi };
-//# sourceMappingURL=ui.d.ts.map

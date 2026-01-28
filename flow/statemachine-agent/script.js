@@ -1,6 +1,6 @@
 import { clamp } from '@ixfx/numbers.js';
 import { StateMachine } from '@ixfx/flow.js';
-import { continuously } from '@ixfx/core.js';
+import { continuously } from '@ixfx/index.js';
 
 // Settings
 const settings = Object.freeze({

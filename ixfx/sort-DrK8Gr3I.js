@@ -1,0 +1,1 @@
+import{y as e}from"./numbers-BlBexQl9.js";import{r as t}from"./arrays-BMWbmHtQ.js";const n=(n,r)=>[...n].sort((i,a)=>{e(t(n,`data`));let o=i[r],s=a[r];return o<s?-1:o>s?1:0}),r=(n,r,i)=>[...n].sort((a,o)=>{e(t(n,`data`));let s=a[r],c=o[r];return i===void 0?s<c?-1:s>c?1:0:i(s,c)});export{r as n,n as t};

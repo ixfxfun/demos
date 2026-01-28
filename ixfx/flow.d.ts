@@ -1,12 +1,14 @@
-import { BasicType, Interval } from "./types-CcY4GIC4.js";
-import { Result } from "./index-DTe1EM0y.js";
-import { Comparer } from "./comparers-C6kfLE-t.js";
-import { Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, HasCompletion, HasCompletionRunStates, LogOption, LogSet, OnStartCalled, continuously } from "./index-Bne6KcmH.js";
-import { ResolveToValue, ResolveToValueSync } from "./resolve-core-CYBLBOMw.js";
-import { sleep } from "./sleep-DiuAJS4P.js";
-import { SimpleEventEmitter } from "./index-CZIsUroQ.js";
+import { i as Interval, t as BasicType } from "./types-DhLXV-YQ.js";
+import { n as Result } from "./types-CSh98G0p.js";
+import { g as Comparer, i as ResolveToValueSync, n as ResolveToValue } from "./resolve-core-T6EujwCW.js";
+import { a as HasCompletion, c as continuously, i as ContinuouslySyncCallback, n as ContinuouslyAsyncCallback, o as HasCompletionRunStates, r as ContinuouslyOpts, s as OnStartCalled, t as Continuously } from "./continuously-BuE6tYiM.js";
+import { n as sleep } from "./sleep-Bk3U3SbC.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-BtWluHXl.js";
+import { c as LogSet } from "./logger-BKAIJOvg.js";
+import { a as TimerOpts, c as elapsedTicksAbsolute, d as ofTotal, f as ofTotalTicks, g as timerWithFunction, h as timerNeverDone, i as Timer, l as frequencyTimer, m as timerAlwaysDone, n as ModulationTimer, o as TimerSource, p as relative, r as RelativeTimerOpts, s as elapsedMillisecondsAbsolute, t as CompletionTimer, u as hasElapsed } from "./timer-7CRCFgKn.js";
+import { t as state_machine_d_exports } from "./state-machine-yWXAvzqo.js";
 
-//#region ../flow/src/behaviour-tree.d.ts
+//#region ../packages/flow/src/behaviour-tree.d.ts
 type TaskState = `Failed` | `Running` | `Success`;
 type Task = {
   readonly state: TaskState;
@@ -29,9 +31,8 @@ type SelNode = BtNodeBase & {
 type BtNode = SeqNode | SelNode | string;
 declare function iterateBreadth(t: BtNode, pathPrefix?: string): Generator<Traversal>;
 declare function iterateDepth(t: BtNode, pathPrefix?: string): Generator<Traversal>;
-//# sourceMappingURL=behaviour-tree.d.ts.map
 //#endregion
-//#region ../flow/src/delay.d.ts
+//#region ../packages/flow/src/delay.d.ts
 /**
  * Delay options
  */
@@ -128,9 +129,8 @@ declare const delay: <V>(callback: () => Promise<V>, optsOrMillis: DelayOpts | n
  * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
  */
 declare function delayLoop(timeout: Interval): AsyncGenerator<undefined, void, unknown>;
-//# sourceMappingURL=delay.d.ts.map
 //#endregion
-//#region ../flow/src/timeout.d.ts
+//#region ../packages/flow/src/timeout.d.ts
 type TimeoutSyncCallback = (elapsedMs?: number, ...args: readonly unknown[]) => void;
 type TimeoutAsyncCallback = (elapsedMs?: number, ...args: readonly unknown[]) => Promise<void>;
 /**
@@ -198,9 +198,8 @@ type Timeout = HasCompletion & {
  * @returns {@link Timeout}
  */
 declare const timeout: (callback: TimeoutSyncCallback | TimeoutAsyncCallback, interval: Interval) => Timeout;
-//# sourceMappingURL=timeout.d.ts.map
 //#endregion
-//#region ../flow/src/debounce.d.ts
+//#region ../packages/flow/src/debounce.d.ts
 /**
  * Returns a debounce function which acts to filter calls to a given function `fn`.
  *
@@ -268,12 +267,13 @@ declare const debounce: (callback: TimeoutSyncCallback | TimeoutAsyncCallback, i
  * Debounced function
  */
 type DebouncedFunction = (...args: readonly unknown[]) => void;
-//# sourceMappingURL=debounce.d.ts.map
 //#endregion
-//#region ../flow/src/dispatch-list.d.ts
-type Dispatch<V> = (value: V) => void;
+//#region ../packages/flow/src/dispatch-list.d.ts
+type Dispatch<V> = ((value: V) => void) | ((value: V) => boolean);
 /**
- * Maintains a list of listeners to receive data
+ * Maintains a list of listeners to receive data.
+ *
+ * Type parameter is the type of events sent.
  *
  * ```js
  * const d = new DispatchList();
@@ -286,6 +286,8 @@ type Dispatch<V> = (value: V) => void;
  * // Eg. send a value to all listeners
  * d.notify(`some value`);
  * ```
+ *
+ * If event handler returns true, additional handlers are not called.
  */
 declare class DispatchList<V> {
   #private;
@@ -301,6 +303,8 @@ declare class DispatchList<V> {
    *
    * Handlers can be added with 'once' flag set to _true_. This will
    * automatically remove them after the first value is sent to them.
+   *
+   * If handler returns _true_, subsequent handlers are not invoked.
    * @param handler
    * @param options
    * @returns
@@ -316,17 +320,18 @@ declare class DispatchList<V> {
   remove(id: string): boolean;
   /**
    * Emit a value to all handlers
+   * Returns _true_ if at least one handler reported 'true' as a response.
+   * Also returns true
    * @param value
    */
-  notify(value: V): void;
+  notify(value: V): boolean;
   /**
    * Remove all handlers
    */
   clear(): void;
 }
-//# sourceMappingURL=dispatch-list.d.ts.map
 //#endregion
-//#region ../flow/src/every.d.ts
+//#region ../packages/flow/src/every.d.ts
 /**
  * Returns true for every _n_th call, eg 2 for every second call.
  *
@@ -353,9 +358,8 @@ declare class DispatchList<V> {
  * @returns Function which in turn returns true if nth call has been hit, false otherwise
  */
 declare const everyNth: <T>(nth: number, callback?: (data: T) => void) => (data: T) => boolean;
-//# sourceMappingURL=every.d.ts.map
 //#endregion
-//#region ../flow/src/execute.d.ts
+//#region ../packages/flow/src/execute.d.ts
 type ExpressionOrResult<ArgsType, ResultType> = ResultType | ((args: ArgsType | undefined) => Promise<ResultType | undefined> | ResultType | undefined | void);
 type RunOpts<ResultType> = {
   /**
@@ -464,9 +468,8 @@ declare const run: <ArgsType, ResultType>(expressions: ExpressionOrResult<ArgsTy
  * @returns
  */
 declare const runSingle: <ArgsType, ResultType>(expressions: readonly ExpressionOrResult<ArgsType, ResultType>[], opts?: RunSingleOpts<ResultType>, args?: ArgsType) => Promise<ResultType | undefined>;
-//# sourceMappingURL=execute.d.ts.map
 //#endregion
-//#region ../flow/src/event-race.d.ts
+//#region ../packages/flow/src/event-race.d.ts
 /**
  * Subscribes to events on `target`, returning the event data
  * from the first event that fires.
@@ -489,9 +492,8 @@ declare const eventRace: (target: EventTarget, eventNames: string[], options?: P
   timeoutMs: number;
   signal: AbortSignal;
 }>) => Promise<Event>;
-//# sourceMappingURL=event-race.d.ts.map
 //#endregion
-//#region ../flow/src/moving-average.d.ts
+//#region ../packages/flow/src/moving-average.d.ts
 type MovingAverageTimedOptions = Readonly<{
   interval: Interval;
   default?: number;
@@ -519,9 +521,8 @@ type MovingAverageTimedOptions = Readonly<{
  * @returns
  */
 declare const movingAverageTimed: (options: MovingAverageTimedOptions) => (v: number) => number;
-//# sourceMappingURL=moving-average.d.ts.map
 //#endregion
-//#region ../flow/src/pool.d.ts
+//#region ../packages/flow/src/pool.d.ts
 /**
  * Policy for when the pool is fully used
  */
@@ -849,9 +850,8 @@ declare class Pool<V> {
  * @returns
  */
 declare const create: <V>(options?: PoolOptions<V>) => Pool<V>;
-//# sourceMappingURL=pool.d.ts.map
 //#endregion
-//#region ../flow/src/promise-with-resolvers.d.ts
+//#region ../packages/flow/src/promise-with-resolvers.d.ts
 /**
  * Creates a new Promise, returning the promise
  * along with its resolve and reject functions.
@@ -875,9 +875,8 @@ declare function promiseWithResolvers<T>(): {
   resolve: (value: T) => void;
   reject: (reason: any) => void;
 };
-//# sourceMappingURL=promise-with-resolvers.d.ts.map
 //#endregion
-//#region ../flow/src/rate-minimum.d.ts
+//#region ../packages/flow/src/rate-minimum.d.ts
 type RateMinimumOptions<TInput> = Readonly<{
   whatToCall: (args: TInput) => void;
   fallback: () => TInput;
@@ -932,9 +931,8 @@ type RateMinimumOptions<TInput> = Readonly<{
  * @returns
  */
 declare const rateMinimum: <TInput>(options: RateMinimumOptions<TInput>) => (args: TInput) => void;
-//# sourceMappingURL=rate-minimum.d.ts.map
 //#endregion
-//#region ../flow/src/repeat.d.ts
+//#region ../packages/flow/src/repeat.d.ts
 type RepeatDelayOpts = RepeatOpts & Readonly<Partial<{
   /**
   * Sleep a fixed period of time regardless of how long each invocation of 'produce' takes
@@ -1041,164 +1039,8 @@ declare function repeat<T extends BasicType>(produce: ResolveToValue<T> | ArrayL
  * @returns Returns value of `produce` function
  */
 declare function repeatSync<T extends BasicType>(produce: ResolveToValueSync<T> | ArrayLike<T>, opts: RepeatOpts): Generator<T, void, unknown>;
-/**
- * Logic for continuing repeats
- */
-/**
- * Calls and waits for the async function `fn` repeatedly, yielding each result asynchronously.
- * Use {@link repeat} if `fn` does not need to be awaited.
- *
- * ```js
- * // Eg. iterate
- * const r = Flow.repeat(5, async () => Math.random());
- * for await (const v of r) {
- *
- * }
- * // Eg read into array
- * const results = await Array.fromAsync(Flow.repeatAwait(5, async () => Math.random()));
- * ```
- *
- * The number of repeats is determined by the first parameter. If it's a:
- * - number: how many times to repeat
- * - function: it gets called before each repeat, if it returns _false_ repeating stops.
- *
- * Using a fixed number of repeats:
- * ```js
- * // Calls - and waits - for Flow.sleep(1) 5 times
- * await Flow.repeatAwait(5, async () => {
- *    // some kind of async function where we can use await
- *    // eg. sleep for 1s
- *    await Flow.sleep(1);
- * });
- * ```
- *
- * Using a function to dynamically determine number of repeats. The function gets
- * passed the number of repeats so far as well as the number of values produced. This
- * is count of non-undefined results from `cb` that is being repeated.
- *
- * ```js
- * async function task() {
- *  // do something
- * }
- *
- * await Flow.repeatAwait(
- *  (repeats, valuesProduced) => {
- *    // Logic for deciding whether to repeat or not
- *    if (repeats > 5) return false; // Stop repeating
- *  },
- *  task
- * );
- * ```
- *
- * In the above cases we're not using the return value from `fn`. This would look like:
- * ```js
- * const g = Flow.repeatAwait(5, async () => Math.random);
- * for await (const v of g) {
- *  // Loops 5 times, v is the return value of calling `fn` (Math.random)
- * }
- * ```
- * @param countOrPredicate Number of times to repeat, or a function that returns _false_ to stop the loop.
- * @param fn Function to execute. Asynchronous functions will be awited
- * @typeParam V - Return type of repeating function
- * @returns Asynchronous generator of `fn` results.
- */
-/**
- * Calls `fn` repeatedly, yielding each result.
- * Use {@link repeatAwait} if `fn` is asynchronous and you want to wait for it.
- *
- * The number of repeats is determined by the first parameter. If it's a:
- * - number: how many times to repeat
- * - function: it gets called before each repeat, if it returns _false_ repeating stops.
- *
- * Example: using a fixed number of repeats
- * ```js
- * // Results will be an array with five random numbers
- * const results = [...repeat(5, () => Math.random())];
- *
- * // Or as an generator (note also the simpler expression form)
- * for (const result of repeat(5, Math.random)) {
- * }
- * ```
- *
- * Example: Using a function to dynamically determine number of repeats
- * ```js
- * function task() {
- * }
- *
- * Flow.repeat(
- *  (repeats, valuesProduced) => {
- *    if (repeats > 5) return false; // Stop repeating
- *  },
- *  task
- * );
- * ```
- *
- * In the above cases we're not using the return value from `fn`. To do so,
- * this would look like:
- * ```js
- * const g = Flow.repeat(5, () => Math.random);
- * for (const v of g) {
- *  // Loops 5 times, v is the return value of calling `fn` (Math.random)
- * }
- * ```
- *
- * Alternatives:
- * * {@link Flow.forEach | Flow.forEach} - if you don't need return values
- * * {@link Flow.interval} - if you want to repeatedly call something with an interval between
- * @param countOrPredicate Numnber of repeats, or a function that returns _false_ for when to stop.
- * @param fn Function to execute. Asynchronous functions will be awited
- * @typeParam V - Return type of repeating function
- * @returns Asynchronous generator of `fn` results.
- */
-/**
- * Calls `fn` until `predicate` returns _false_. Awaits result of `fn` each time.
- * Yields result of `fn` asynchronously
- * @param predicate
- * @param fn
- * @typeParam V - Return type of repeating function
- */
-/**
- * Calls `fn` until `predicate` returns _false_. Yields result of `fn`.
- * @param predicate Determiner for whether repeating continues
- * @param fn Function to call
- * @typeParam V - Return type of repeating function
- */
-/**
- * Calls `fn`, `count` number of times, waiting for the result of `fn`.
- * Yields result of `fn` asynchronously
- * @param count Number of times to run
- * @param fn Function to run
- * @typeParam V - Return type of repeating function
- */
-/**
- * Calls `fn`, `count` times. Assumes a synchronous function. Yields result of `fn`.
- *
- * Note that if `fn` returns _undefined_ repeats will stop.
- * @typeParam V - Return type of repeating function
- * @param count Number of times to run
- * @param fn Function to run
- */
-/**
- * Repeatedly calls `fn`, reducing via `reduce`.
- *
- * ```js
- * repeatReduce(10, () => 1, (acc, v) => acc + v);
- * // Yields: 10
- *
- * // Multiplies random values against each other 10 times
- * repeatReduce(10, Math.random, (acc, v) => acc * v);
- * // Yields a single number
- * ```
- * @param countOrPredicate Number of times to run, or function to keep running
- * @param fn Function to call
- * @param initial Initial value
- * @param reduce Function to reduce value
- * @typeParam V - Return type of repeating function
- * @returns Final result
- */
-//# sourceMappingURL=repeat.d.ts.map
 //#endregion
-//#region ../flow/src/req-resp-match.d.ts
+//#region ../packages/flow/src/req-resp-match.d.ts
 type RequestResponseOptions<TRequest, TResp> = {
   timeoutMs: number;
   key: (requestOrResp: TRequest | TResp) => string;
@@ -1246,8 +1088,10 @@ type RequestResponseMatchEvents<TRequest, TResp> = {
  *  // Runs on success or failure
  * })
  * ```
+ *
  * It relies on creating an id of a request/response for them to be matched up. Use the `key`
- * option if the function can generate a key from either request or response. Or alternatively set both `keyRequest` and `keyResponse` for two functions that can generate a key for request and response respectively.
+ * option if the function can generate a key from either request or response.
+ * Or alternatively set both `keyRequest` and `keyResponse` for two functions that can generate a key for request and response respectively.
  *
  *
  * The easy case is if req & resp both have the same field:
@@ -1279,10 +1123,10 @@ type RequestResponseMatchEvents<TRequest, TResp> = {
  */
 declare class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<RequestResponseMatchEvents<TRequest, TResp>> {
   #private;
-  timeoutMs: any;
-  whenUnmatchedResponse: any;
-  keyRequest: any;
-  keyResponse: any;
+  timeoutMs: number;
+  whenUnmatchedResponse: "ignore" | "throw";
+  keyRequest: (request: TRequest) => string;
+  keyResponse: (resp: TResp) => string;
   constructor(options?: Partial<RequestResponseOptions<TRequest, TResp>>);
   debugDump(): void;
   /**
@@ -1308,9 +1152,8 @@ declare class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<R
    */
   response(response: TResp, keepAlive: boolean): boolean;
 }
-//# sourceMappingURL=req-resp-match.d.ts.map
 //#endregion
-//#region ../flow/src/retry.d.ts
+//#region ../packages/flow/src/retry.d.ts
 /**
  * Result of backoff
  */
@@ -1483,9 +1326,8 @@ declare const retryFunction: <T>(callback: () => Promise<T | undefined>, options
  * @returns
  */
 declare const retryTask: <V>(task: RetryTask<V>, opts?: Partial<RetryOpts<V>>) => Promise<RetryResult<V>>;
-//# sourceMappingURL=retry.d.ts.map
 //#endregion
-//#region ../flow/src/run-once.d.ts
+//#region ../packages/flow/src/run-once.d.ts
 /**
  * Runs a function once
  *
@@ -1501,10 +1343,8 @@ declare const retryTask: <V>(task: RetryTask<V>, opts?: Partial<RetryOpts<V>>) =
  * @returns
  */
 declare const runOnce: (onRun: () => boolean) => (() => boolean);
-//# sourceMappingURL=run-once.d.ts.map
-
 //#endregion
-//#region ../flow/src/sync-wait.d.ts
+//#region ../packages/flow/src/sync-wait.d.ts
 /**
  * Simple synchronisation. Supports only a single signal/waiter.
  * Expects one or more calls to .signal() for .forSignal() to resolve
@@ -1552,9 +1392,8 @@ declare class SyncWait {
    */
   didSignal(maximumWaitMs: number): Promise<boolean>;
 }
-//# sourceMappingURL=sync-wait.d.ts.map
 //#endregion
-//#region ../flow/src/task-queue-mutable.d.ts
+//#region ../packages/flow/src/task-queue-mutable.d.ts
 type AsyncTask = () => Promise<void>;
 type TaskQueueEvents = {
   /**
@@ -1614,8 +1453,8 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
    * ```
    * @param task Task to run
    */
-  enqueue(task: () => Promise<void>): any;
-  dequeue(): any;
+  enqueue(task: () => Promise<void>): number;
+  dequeue(): AsyncTask | undefined;
   private processQueue;
   /**
    * Clears all tasks, and stops any scheduled processing.
@@ -1626,15 +1465,14 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   /**
   * Returns true if queue is empty
   */
-  get isEmpty(): any;
+  get isEmpty(): boolean;
   /**
    * Number of items in queue
    */
-  get length(): any;
+  get length(): number;
 }
-//# sourceMappingURL=task-queue-mutable.d.ts.map
 //#endregion
-//#region ../flow/src/throttle.d.ts
+//#region ../packages/flow/src/throttle.d.ts
 /***
  * Throttles a function. Callback only allowed to run after minimum of `intervalMinMs`.
  *
@@ -1662,261 +1500,11 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
  * ```
  */
 declare const throttle: (callback: (elapsedMs: number, ...args: readonly unknown[]) => void | Promise<unknown>, intervalMinMs: number) => (...args: unknown[]) => Promise<void>;
-//# sourceMappingURL=throttle.d.ts.map
 //#endregion
-//#region ../flow/src/timer.d.ts
-/**
- * Creates a timer
- */
-type TimerSource = () => Timer;
-/**
- * A timer instance.
- * {@link CompletionTimer} also contains an 'isDone' field.
- *
- * Implementations: {@link elapsedMillisecondsAbsolute}, {@link elapsedTicksAbsolute}, {@link frequencyTimer}
- */
-type Timer = {
-  reset(): void;
-  get elapsed(): number;
-};
-/**
- * A {@link Timer} that has a sense of completion, when `isDone` returns _true_.
- * See {@link relative}
- */
-type CompletionTimer = Timer & {
-  /**
-   * Returns _true_ if this timer has completed.
-   */
-  get isDone(): boolean;
-};
-type ModulationTimer = CompletionTimer & {
-  mod(amt: number): void;
-};
-type TimerOpts = {
-  /**
-   * Timer to use. By default {@link elapsedMillisecondsAbsolute}.
-   */
-  readonly timer: Timer;
-};
-/**
- * Options for relative timer
- */
-type RelativeTimerOpts = TimerOpts & {
-  /**
-   * If true, returned value will be clamped to 0..1. False by default
-   */
-  readonly clampValue: boolean;
-  readonly wrapValue: boolean;
-};
-/**
- * A function that returns _true_ when an interval has elapsed
- *
- * ```js
- * const oneSecond = hasElapsed(1000);
- *
- * // Keep calling to check if time has elapsed.
- * // Will return _true_ when it has
- * oneSecond();
- * ```
- *
- * @param elapsed
- * @returns
- */
-declare function hasElapsed(elapsed: Interval): () => boolean;
-/**
- * Returns a function that returns the percentage of timer completion.
- * Starts when return function is first invoked.
- *
- * ```js
- * const timer = Flow.ofTotal(1000);
- *
- * // Call timer() to find out the completion
- * timer(); // Returns 0..1
- * ```
- *
- * Note that timer can exceed 1 (100%). To cap it:
- * ```js
- * Flow.ofTotal(1000, { clampValue: true });
- * ```
- *
- * Takes an {@link Interval} for more expressive time:
- * ```js
- * const timer = Flow.ofTotal({ mins: 4 });
- * ```
- *
- * Is a simple wrapper around {@link relative}.
- * @param duration
- * @see {@link ofTotalTicks} - Use ticks instead of time
- * @see {@link hasElapsed} - Simple _true/false_ if interval has elapsed
- * @returns
- */
-declare function ofTotal(duration: Interval, opts?: {
-  readonly clampValue?: boolean;
-  readonly wrapValue?: boolean;
-}): () => number;
-/**
- * Returns a function that returns the percentage (0..1) of timer completion.
- * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
- *
- * ```js
- * const timer = Flow.ofTotalTicks(1000);
- * timer(); // Returns 0..1
- * ```
- *
- * Note that timer can exceed 1 (100%). To cap it:
- * ```js
- * Flow.ofTotalTicks(1000, { clampValue: true });
- * ```
- *
- * This is a a simple wrapper around {@link relative}.
- * @see {@link ofTotal}
- * @see {@link hasElapsed}: Simple _true/false_ if interval has elapsed
- * @param totalTicks
- * @returns
- */
-declare function ofTotalTicks(totalTicks: number, opts?: {
-  readonly clampValue?: boolean;
-  readonly wrapValue?: boolean;
-}): () => number;
-/**
- * Returns a {@link ModulationTimer} that is always at 100%.
- * Opposite: {@link timerNeverDone}.
- * @returns
- */
-declare const timerAlwaysDone: () => ModulationTimer;
-/**
- * Returns a {@link ModulationTimer} that is always at 0%.
- * Opposite: {@link timerAlwaysDone}.
- * @returns
- */
-declare const timerNeverDone: () => ModulationTimer;
-/**
- * Wraps a timer, returning a relative elapsed value based on
- * a given total. ie. percentage complete toward a total value.
- * This is useful because other parts of code don't need to know
- * about the absolute time values, you get a nice relative completion number.
- *
- * If no timer is specified, a milliseconds-based timer is used.
- *
- * ```js
- * const t = relative(1000);
- * t.elapsed;   // returns % completion (0...1)
- * ```
- * It can also use a tick based timer
- * ```js
- * // Timer that is 'done' at 100 ticks
- * const t = relative(100, { timer: ticksElapsedTimer() });
- * ```
- *
- * Additional fields/methods on the timer instance
- * ```js
- * t.isDone;  // _true_ if .elapsed has reached (or exceeded) 1
- * t.reset(); // start from zero again
- * ```
- *
- * Options:
- * * timer: timer to use. If not specified, `elapsedMillisecondsAbsolute()` is used.
- * * clampValue: if _true_, return value is clamped to 0..1 (default: _false_)
- * * wrapValue: if _true_, return value wraps around continously from 0..1..0 etc. (default: _false_)
- *
- * Note that `clampValue` and `wrapValue` are mutually exclusive: only one can be _true_, but both can be _false_.
- *
- * With options
- * ```js
- * // Total duration of 1000 ticks
- * const t = Timer.relative(1000, { timer: ticksElapsedTimer(); clampValue:true });
- * ```
- *
- * If `total` is Infinity, a 'always completed; timer is returned. Use a value of `NaN` for a
- * timer that always returns 0.
- * @private
- * @param total Total (of milliseconds or ticks, depending on timer source)
- * @param options Options
- * @returns Timer
- */
-declare const relative: (total: number, options?: Partial<RelativeTimerOpts>) => ModulationTimer;
-/**
- * A timer based on frequency: cycles per unit of time. These timers return a number from
- * 0..1 indicating position with a cycle.
- *
- * In practice, timers are used to 'drive' something like an Oscillator.
- *
- * By default it uses elapsed clock time as a basis for frequency. ie., cycles per second.
- *
- * It returns a `ModulationTimer`, which allows for a modulation amount to be continually applied
- * to the calculation of the 'position' within a cycle.
- *
- * @example Prints around 0/0.5 each second, as timer is half a cycle per second
- * ```js
- * const t = frequencyTimer(0.5);
- * setInterval(() => {
- *  console.log(t.elapsed);
- * }, 1000);
- * ```
- * @param frequency Cycles
- * @param options Options for timer
- * @returns
- */
-declare const frequencyTimer: (frequency: number, options?: Partial<TimerOpts>) => ModulationTimer;
-/**
- * A timer that uses clock time. Start time is from the point of invocation.
- *
- * ```js
- * const t = elapsedMillisecondsAbsolute();
- * t.reset(); // reset start
- * t.elapsed; // milliseconds since start
- * ```
- * @returns {Timer}
- * @see {ticksElapsedTimer}
- */
-declare const elapsedMillisecondsAbsolute: () => Timer;
-/**
- * A timer that progresses with each call to `elapsed`.
- *
- * The first call to elapsed will return 1.
- *
- * ```js
- * const timer = elapsedTicksAbsolute();
- * timer.reset(); // Reset to 0
- * timer.elapsed; // Number of ticks (and also increment ticks)
- * timer.peek;    // Number of ticks (without incrementing)
- * ```
- *
- * Like other {@link Timer} functions, returns with a `isDone` field,
- * but this will always return _true_.
- * @returns {Timer}
- * @see {elapsedMillisecondsAbsolute}
- */
-declare const elapsedTicksAbsolute: () => Timer & {
-  peek: number;
-};
-/**
- * Wraps `timer`, computing a value based on its elapsed value.
- * `fn` creates this value.
- *
- * ```js
- * const t = timerWithFunction(v=>v/2, relativeTimer(1000));
- * t.compute();
- * ```
- *
- * In the above case, `relativeTimer(1000)` creates a timer that goes
- * from 0..1 over one second. `fn` will divide that value by 2, so
- * `t.compute()` will yield values 0..0.5.
- *
- * @param fn
- * @param timer
- * @returns
- */
-declare const timerWithFunction: (fn: ((v: number) => number), timer: CompletionTimer) => HasCompletion & CompletionTimer & {
-  compute: () => number;
-};
-//# sourceMappingURL=timer.d.ts.map
-//#endregion
-//#region ../flow/src/types.d.ts
+//#region ../packages/flow/src/types.d.ts
 type AsyncPromiseOrGenerator<V> = (() => Promise<V> | Promise<undefined>) | (() => V | undefined) | Generator<V> | IterableIterator<V> | AsyncIterableIterator<V> | AsyncGenerator<V> | AsyncIterable<V> | Iterable<V>;
-//# sourceMappingURL=types.d.ts.map
 //#endregion
-//#region ../flow/src/update-outdated.d.ts
+//#region ../packages/flow/src/update-outdated.d.ts
 type UpdateFailPolicy = `fast` | `slow` | `backoff`;
 /**
  * Calls the async `fn` to generate a value if there is no prior value or
@@ -1953,9 +1541,8 @@ type UpdateFailPolicy = `fast` | `slow` | `backoff`;
  * @returns Value
  */
 declare const updateOutdated: <V>(fn: (elapsedMs?: number) => Promise<V>, interval: Interval, updateFail?: UpdateFailPolicy) => (() => Promise<V>);
-//# sourceMappingURL=update-outdated.d.ts.map
 //#endregion
-//#region ../flow/src/wait-for-value.d.ts
+//#region ../packages/flow/src/wait-for-value.d.ts
 /**
  * Queue of a single item, only once, allows for simple synchronisation.
  *
@@ -2009,10 +1596,8 @@ declare class WaitForValue<T> {
  * {@inheritDoc WaitForValue}
  */
 declare const singleItem: <T>() => WaitForValue<T>;
-//# sourceMappingURL=wait-for-value.d.ts.map
-
 //#endregion
-//#region ../flow/src/wait-for.d.ts
+//#region ../packages/flow/src/wait-for.d.ts
 /**
  * Helper function for calling code that should fail after a timeout.
  * In short, it allows you to signal when the function succeeded, to cancel it, or
@@ -2092,396 +1677,5 @@ declare const singleItem: <T>() => WaitForValue<T>;
  * @returns
  */
 declare const waitFor: (timeoutMs: number, onAborted: (reason: string) => void, onComplete?: (success: boolean) => void) => (error?: string) => void;
-//# sourceMappingURL=wait-for.d.ts.map
 //#endregion
-//#region ../flow/src/state-machine/types.d.ts
-type DriverOptions<V extends Transitions> = {
-  readonly handlers: readonly DriverStatesHandler<V>[];
-  readonly debug?: LogOption;
-  /**
-   * If _true_ execution of handlers is shuffled each time
-   */
-  readonly shuffleHandlers?: boolean;
-};
-type DriverExpressionOrResult<T extends Transitions> = DriverResult<T> | ((machine?: MachineState<T>) => DriverResult<T> | undefined | void);
-type DriverStatesHandler<V extends Transitions> = {
-  readonly if: readonly StateNames<V>[] | StateNames<V>[] | StateNames<V>;
-  readonly then: readonly DriverExpressionOrResult<V>[] | DriverExpressionOrResult<V>;
-  /**
-   * Logic for choosing which result, if there are multiple expressions.
-   * By default 'highest' (for highest ranked result)
-   */
-  readonly resultChoice?: `first` | `highest` | `lowest` | `random`;
-};
-type DriverRunner<V extends Transitions> = {
-  readonly run: () => Promise<MachineState<V> | undefined>;
-  readonly getValue: () => StateNames<V>;
-  readonly reset: () => void;
-  readonly to: (state: StateNames<V>) => MachineState<V>;
-};
-type DriverResult<V extends Transitions> = {
-  /**
-   * Score of this result. This is used when a state
-   * has multiple handlers returning results separately.
-   * If not defined, 0 is used.
-   */
-  readonly score?: number;
-  /**
-   * If specified,the state to transition to. Use
-   * _true_ to attempt to automatically advance machine.
-   * This field is 2nd priority.
-   */
-  readonly next?: StateNames<V> | boolean;
-  /**
-   * If true, resets the machine.
-   * This flag is 1st priority, taking precedence over the `next` field.
-   */
-  readonly reset?: boolean;
-};
-/**
- * Transition result
- * * 'Ok': transition valid
- * * 'FromNotFound': the from state is missing from machine definition
- * * 'ToNotFound': the 'to' state is missing from machine definition
- * * 'Invalid': not allowed to transition to target state from the current state
- * * 'Terminal':  not allowed to transition because from state is the final state
- */
-type TransitionResult = `Ok` | `FromNotFound` | `ToNotFound` | `Invalid` | `Terminal`;
-type TransitionCondition<V extends Transitions> = {
-  readonly hasPriorState: readonly StateNames<V>[];
-  readonly isInState: StateNames<V>;
-};
-type StateTargetStrict<V extends Transitions> = {
-  readonly state: StateNames<V> | null;
-  readonly preconditions?: readonly TransitionCondition<V>[];
-};
-/**
- * Possible state transitions, or _null_ if final state.
- */
-type StateTarget<V extends Transitions> = string | string[] | readonly string[] | null | StateTargetStrict<V>;
-/**
- * Maps state to allowable next states
- */
-type Transitions = {
-  readonly [key: string]: StateTarget<Transitions>;
-};
-type TransitionsStrict = Readonly<Record<string, readonly StateTargetStrict<Transitions>[]>>;
-/**
- * List of possible states
- */
-type StateNames<V extends Transitions> = keyof V & string;
-type Machine<V extends Transitions> = {
-  /**
-   * Allowable state transitions
-   */
-  readonly states: V;
-};
-/**
- * Encapsulation of a 'running' machine description and state.
- *
- * See:
- * - {@link cloneState}
- */
-type MachineState<V extends Transitions> = {
-  /**
-   * Current state
-   */
-  readonly value: StateNames<V>;
-  /**
-   * List of unique states visited. Won't contain the current
-   * state unless it has already been visited.
-   */
-  readonly visited: readonly StateNames<V>[];
-  /**
-   * Definition of state machine
-   */
-  readonly machine: Readonly<Record<StateNames<V>, readonly StateTargetStrict<V>[]>>;
-};
-type StateEvent = (args: unknown, sender: any) => void;
-type StateHandler = string | StateEvent | null;
-type State = Readonly<Record<string, StateHandler>>;
-//# sourceMappingURL=types.d.ts.map
-//#endregion
-//#region ../flow/src/state-machine/driver.d.ts
-/**
- * Drives a state machine.
- *
- * [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/driver/)
- *
- * Uses a 'handlers' structure to determine when to change
- * state and actions to take.
- *
- * The structure is a set of logical conditions: if we're in
- * this state, then move to this other state etc.
- *
- * ```js
- * const handlers = [
- *  {
- *    // If we're in the 'sleeping' state, move to next state
- *    if: 'sleeping',
- *    then: { next: true }
- *  },
- *  {
- *    // If we're in the 'waking' state, randomly either go to 'resting' or 'sleeping' state
- *    if: 'waking',
- *    then: [
- *      () => {
- *        if (Math.random() > 0.5) {
- *          return { next: 'resting' }
- *        } else {
- *          return { next: 'sleeping' }
- *        }
- *      }
- *    ]
- *   }
- * ];
- * ```
- *
- * Set up the driver, and call `run()` when you want to get
- * the machine to change state or take action:
- *
- * ```js
- * const driver = await StateMachine.driver(states, handlers);
- * setInterval(async () => {
- *  await driver.run(); // Note use of 'await' again
- * }, 1000);
- * ```
- *
- * Essentially, the 'handlers' structure gets run through each time `run()`
- * is called.
- *
- * Defaults to selecting the highest-ranked result to determine
- * what to do next.
- * @param machine
- * @param handlersOrOpts
- * @returns
- */
-declare function driver<V extends Transitions>(machine: Machine<V> | Transitions, handlersOrOpts: readonly DriverStatesHandler<V>[] | DriverOptions<V>): Promise<DriverRunner<V>>;
-//# sourceMappingURL=driver.d.ts.map
-//#endregion
-//#region ../flow/src/state-machine/state-machine.d.ts
-/**
- * Clones machine state
- * @param toClone
- * @returns Cloned of `toClone`
- */
-declare const cloneState: <V extends Transitions>(toClone: MachineState<V>) => MachineState<V>;
-/**
- * Initialises a state machine. [Read more in the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
- *
- * ```js
- * const desc = {
- *  pants: ['shoes','socks'],
- *  socks: ['shoes', 'pants'],
- *  shoes: 'shirt',
- *  shirt: null
- * }
- *
- * // Defaults to first key, 'pants'
- * let sm = StateMachine.init(descr);
- *
- * // Move to 'shoes' state
- * sm = StateMachine.to(sm, 'shoes');
- * sm.state; // 'shoes'
- * sm.visited; // [ 'pants' ]
- *
- * StateMachine.isDone(sm); // false
- * StateMachine.possible(sm); // [ 'shirt' ]
- * ```
- * @param stateMachine Settings for state machine
- * @param initialState Initial state name
- * @returns
- */
-declare const init: <V extends Transitions>(stateMachine: Machine<V> | Transitions | TransitionsStrict, initialState?: StateNames<V>) => MachineState<V>;
-declare const reset: <V extends Transitions>(sm: MachineState<V>) => MachineState<V>;
-declare const validateMachine: <V extends Transitions>(smOrTransitions: Machine<V> | Transitions | TransitionsStrict) => [machine: Machine<V> | undefined, msg: string];
-/**
- * Returns _true_ if MachineState `sm` is in its final state.
- * @param sm
- * @returns
- */
-declare const isDone: <V extends Transitions>(sm: MachineState<V>) => boolean;
-/**
- * Returns a list of possible state targets for `sm`, or
- * an empty list if no transitions are possible.
- * @param sm
- * @returns
- */
-declare const possibleTargets: <V extends Transitions>(sm: MachineState<V>) => readonly StateTargetStrict<V>[];
-/**
- * Returns a list of possible state names for `sm`, or
- * an empty list if no transitions are possible.
- *
- * @param sm
- * @returns
- */
-declare const possible: <V extends Transitions>(sm: MachineState<V>) => (StateNames<V> | null)[];
-declare const normaliseTargets: <V extends Transitions>(targets: StateTarget<V> | readonly StateTargetStrict<V>[] | StateTargetStrict<V>) => StateTargetStrict<V>[] | null | undefined;
-/**
- * Attempts to transition to a new state. Either a new
- * `MachineState` is returned reflecting the change, or
- * an exception is thrown.
- *
- * @example Attempts to transition to 'name-of-state'
- * ```js
- * const newState = StateMachine.to(currentState, `name-of-state`);
- * ```
- *
- * Note that 'currentState' is not changed.
- * @param sm
- * @param toState
- * @returns
- */
-declare const to: <V extends Transitions>(sm: MachineState<V>, toState: StateNames<V>) => MachineState<V>;
-declare const next: <V extends Transitions>(sm: MachineState<V>) => MachineState<V>;
-/**
- * Returns _true_ if `toState` is a valid transition from current state of `sm`
- * @param sm
- * @param toState
- * @returns
- */
-declare const isValidTransition: <V extends Transitions>(sm: MachineState<V>, toState: StateNames<V>) => boolean;
-declare const validateTransition: <V extends Transitions>(sm: MachineState<V>, toState: StateNames<V>) => void;
-/**
- * Returns state transitions based on a list of strings.
- * The last string is the terminal state.
- *  A -> B -> C -> D
- *
- * See also: {@link fromListBidirectional}
- *
- * ```js
- * const transitions = fromList([`a`, `b`, `c`, `d`]);
- * // Object state machine with events
- * const sm = new StateMachine.WithEvents(transitions);
- * // OR, immutable state machine
- * const sm = StateMachine.init(transitions);
- * ```
- * @param states List of states
- * @return MachineDescription
- */
-declare const fromList: (...states: readonly string[]) => Transitions;
-/**
- * Returns a machine description based on a list of strings. Machine
- * can go back and forth between states:
- *  A <-> B <-> C <-> D
- *
- * See also {@link fromList}.
- *
- * ```js
- * const transitions = fromListBidirectional([`a`, `b`, `c`, `d`]);
- * // Object state machine with events
- * const sm = new StateMachine.WithEvents(transitions);
- * // OR, immutable state machine
- * const sm = StateMachine.init(transitions);
- * ```
- * @param states
- * @returns
- */
-declare const fromListBidirectional: (...states: readonly string[]) => Transitions;
-//# sourceMappingURL=state-machine.d.ts.map
-//#endregion
-//#region ../flow/src/state-machine/with-events.d.ts
-type StateChangeEvent<V extends Transitions> = {
-  readonly newState: StateNames<V>;
-  readonly priorState: StateNames<V>;
-};
-type StopEvent<V extends Transitions> = {
-  readonly state: StateNames<V>;
-};
-type StateMachineEventMap<V extends Transitions> = {
-  readonly change: StateChangeEvent<V>;
-  readonly stop: StopEvent<V>;
-};
-type StateMachineWithEventsOptions<V extends Transitions> = {
-  readonly debug?: boolean;
-  readonly initial?: StateNames<V>;
-};
-/**
- * A state machine that fires events when state changes.
- *
- * ```js
- * const transitions = StateMachine.fromList(`a`, `b`, `c`);
- * const m = new StateMachineWithEvents(transitions);
- * m.addEventListener(`change`, event => {
- *  console.log(`${event.priorState} -> ${event.newState}`);
- * });
- * m.addEventListener(`stop`, event => {
- *  console.log(`State machine has reached final state`);
- * });
- * ```
- */
-declare class StateMachineWithEvents<V extends Transitions> extends SimpleEventEmitter<StateMachineEventMap<V>> {
-  #private;
-  /**
-   * Create a state machine with initial state, description and options
-   * @param m Machine description
-   * @param opts Options for machine (defaults to `{debug:false}`)
-   */
-  constructor(m: V, opts?: StateMachineWithEventsOptions<V>);
-  /**
-   * Return a list of possible states from current state.
-   *
-   * If list is empty, no states are possible. Otherwise lists
-   * possible states, including 'null' for terminal
-   */
-  get statesPossible(): readonly (StateNames<V> | null)[];
-  /**
-   * Return a list of all defined states
-   */
-  get statesDefined(): readonly StateNames<V>[];
-  /**
-   * Moves to the next state if possible. If multiple states are possible, it will use the first.
-   * If machine is finalised, no error is thrown and null is returned.
-   *
-   * @returns {(string|null)} Returns new state, or null if machine is finalised
-   */
-  next(): string | null;
-  /**
-   * Returns _true_ if state machine is in its final state
-   *
-   * @returns
-   */
-  get isDone(): boolean;
-  /**
-   * Resets machine to initial state
-   */
-  reset(): void;
-  /**
-   * Throws if it's not valid to transition to `newState`
-   * @param newState
-   * @returns
-   */
-  validateTransition(newState: StateNames<V>): void;
-  /**
-   * Returns _true_ if `newState` is valid transition from current state.
-   * Use {@link validateTransition} if you want an explanation for the _false_ results.
-   * @param newState
-   * @returns
-   */
-  isValid(newState: StateNames<V>): boolean;
-  /**
-   * Gets or sets state. Throws an error if an invalid transition is attempted.
-   * Use `isValid()` to check validity without changing.
-   *
-   * If `newState` is the same as current state, the request is ignored silently.
-   */
-  set state(newState: StateNames<V>);
-  get state(): string;
-  /**
-   * Returns timestamp when state was last changed.
-   * See also `elapsed`
-   */
-  get changedAt(): number;
-  /**
-   * Returns milliseconds elapsed since last state change.
-   * See also `changedAt`
-   */
-  get elapsed(): number;
-}
-//# sourceMappingURL=with-events.d.ts.map
-declare namespace index_d_exports {
-  export { DriverExpressionOrResult, DriverOptions, DriverResult, DriverRunner, DriverStatesHandler, Machine, MachineState, State, StateChangeEvent, StateEvent, StateHandler, StateMachineEventMap, StateMachineWithEvents, StateMachineWithEventsOptions, StateNames, StateTarget, StateTargetStrict, StopEvent, TransitionCondition, TransitionResult, Transitions, TransitionsStrict, cloneState, driver, fromList, fromListBidirectional, init, isDone, isValidTransition, next, normaliseTargets, possible, possibleTargets, reset, to, validateMachine, validateTransition };
-}
-//#endregion
-export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, HasCompletion, HasCompletionRunStates, ModulationTimer, MovingAverageTimedOptions, OnStartCalled, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, index_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
-//# sourceMappingURL=flow.d.ts.map
+export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, HasCompletion, HasCompletionRunStates, ModulationTimer, MovingAverageTimedOptions, OnStartCalled, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, state_machine_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
