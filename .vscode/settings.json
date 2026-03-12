@@ -107,6 +107,7 @@
     "workbench.editor.limit.enabled":true,
   "workbench.editor.limit.value": 5,
   "chat.mcp.access": "none",
+  "chat.autopilot.enabled": false,
   "chat.mcp.autostart": "never",
   "chat.mcp.discovery.enabled": {
     "claude-desktop": false,

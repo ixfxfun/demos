@@ -5,8 +5,8 @@ import { t as Rect } from "./rect-types-C3cN9Uxl.js";
 import { a as RandomSource } from "./types-B4a9qJv9.js";
 import { n as interpolate } from "./interpolate-CCr7T6z3.js";
 import { r as Path } from "./path-type-CgxfTQlW.js";
-import { i as Timer } from "./timer-9dNlwelV.js";
-import { a as easing_d_exports, c as EasingTickOptions, d as ModSettable, f as ModSettableFeedback, g as SpringOptions, h as ModulatorTimed, i as interpolatorStepped, l as EasingTimeOptions, m as ModSource, n as interpolateAngle, o as EasingName, p as ModSettableOptions, r as interpolatorInterval, s as EasingOptions, t as InterpolateOptions, u as ModFunction } from "./interpolate-B5VRMXei.js";
+import { i as Timer } from "./timer-qdThNSnd.js";
+import { a as easing_d_exports, c as EasingTickOptions, d as ModSettable, f as ModSettableFeedback, g as SpringOptions, h as ModulatorTimed, i as interpolatorStepped, l as EasingTimeOptions, m as ModSource, n as interpolateAngle, o as EasingName, p as ModSettableOptions, r as interpolatorInterval, s as EasingOptions, t as InterpolateOptions, u as ModFunction } from "./interpolate-CY2TUf_R.js";
 
 //#region ../packages/modulation/src/source/ticks.d.ts
 type TicksModSettableOptions = ModSettableOptions & {

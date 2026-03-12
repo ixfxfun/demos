@@ -225,6 +225,7 @@ declare const frequency: <V>(keyString?: ToString<V>) => FrequencyTracker<V>;
 declare class IntervalTracker extends NumberTracker {
   lastMark: number;
   mark(): void;
+  onReset(): void;
 }
 /**
  * Returns a new {@link IntervalTracker} instance. IntervalTracker

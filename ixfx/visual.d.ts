@@ -1,5 +1,5 @@
 import { n as RecursivePartial } from "./ts-utility-RjBTNYlE.js";
-import { i as IStackImmutable } from "./index-DfUNo_FA.js";
+import { i as IStackImmutable } from "./index-DPbxZRux.js";
 import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
 import { r as Point } from "./point-type-DLbh1Hzz.js";
 import { B as Triangle, G as Line, J as CirclePositioned, N as PolarRay, S as GridWritable, c as GridCell, d as GridCellSetter, l as GridCellAccessor, r as Grid, u as GridCellAndValue, y as GridReadable } from "./index-3c5aUDaq.js";
@@ -8,7 +8,7 @@ import { n as NumberScaler } from "./types-DtDff87L.js";
 import { r as Path } from "./path-type-CgxfTQlW.js";
 import { a as EllipsePositioned, f as CubicBezier, m as QuadraticBezier, n as Scaler, t as ScaleBy, v as ArcPositioned } from "./scaler-DTKW-wSe.js";
 import { t as ElementResizeLogic } from "./element-sizing-DdN9JoCS.js";
-import { i as Rgb8Bit, r as Rgb, t as index_d_exports } from "./index-ZjzjeHix.js";
+import { i as Rgb8Bit, r as Rgb, t as index_d_exports } from "./index-Zce0Je5h.js";
 import { n as video_d_exports } from "./video-ClcsOgCa.js";
 
 //#region ../packages/visual/src/drawing.d.ts

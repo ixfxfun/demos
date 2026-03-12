@@ -875,19 +875,20 @@ declare const withoutUndefined: <V>(data: readonly V[] | V[]) => V[];
 declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], comparer?: IsEqual<V>) => V[];
 //#endregion
 //#region ../packages/arrays/src/zip.d.ts
+type ZippedTuple<T extends readonly (readonly unknown[])[]> = { [K in keyof T]: T[K] extends readonly (infer U)[] ? U : never };
 /**
  * Zip combines the elements of two or more arrays based on their index.
  *
  * ```js
- * const a = [1,2,3];
- * const b = [`red`, `blue`, `green`];
+ * const a = [ 1, 2, 3 ];
+ * const b = [ `red`, `blue`, `green` ];
  *
  * const c = Arrays.zip(a, b);
  * // Yields:
  * // [
- * //   [1, `red`],
- * //   [2, `blue`],
- * //   [3, `green`]
+ * //   [ 1, `red` ],
+ * //   [ 2, `blue` ],
+ * //   [ 3, `green` ]
  * // ]
  * ```
  *
@@ -896,7 +897,9 @@ declare const without: <V>(sourceArray: readonly V[] | V[], toRemove: V | V[], c
  * zipping we'd access it by `a[0]` and `b[0]`. After zipping, we'd have c[0], which is array of [1, `red`].
  * @param arrays
  * @returns Zipped together array
+ * @throws {TypeError} If any of the parameters are not arrays
+ * @throws {Error} If the arrays are not all of the same length
  */
-declare const zip: (...arrays: any[][] | readonly any[][] | readonly (readonly any[])[]) => any[];
+declare const zip: <T extends readonly (readonly unknown[])[]>(...arrays: T) => Array<ZippedTuple<T>>;
 //#endregion
-export { IsEqual, MergeReconcile, MovingWindowOptions, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, unique, until, without, withoutUndefined, zip };
+export { IsEqual, MergeReconcile, MovingWindowOptions, ZippedTuple, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, unique, until, without, withoutUndefined, zip };

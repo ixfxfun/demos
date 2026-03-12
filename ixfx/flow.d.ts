@@ -5,7 +5,7 @@ import { a as HasCompletion, c as continuously, i as ContinuouslySyncCallback, n
 import { n as sleep } from "./sleep-D5D313hw.js";
 import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
 import { c as LogSet } from "./logger-C2iNOtSg.js";
-import { a as TimerOpts, c as elapsedTicksAbsolute, d as ofTotal, f as ofTotalTicks, g as timerWithFunction, h as timerNeverDone, i as Timer, l as frequencyTimer, m as timerAlwaysDone, n as ModulationTimer, o as TimerSource, p as relative, r as RelativeTimerOpts, s as elapsedMillisecondsAbsolute, t as CompletionTimer, u as hasElapsed } from "./timer-9dNlwelV.js";
+import { a as TimerOpts, c as elapsedTicksAbsolute, d as ofTotal, f as ofTotalTicks, g as timerWithFunction, h as timerNeverDone, i as Timer, l as frequencyTimer, m as timerAlwaysDone, n as ModulationTimer, o as TimerSource, p as relative, r as RelativeTimerOpts, s as elapsedMillisecondsAbsolute, t as CompletionTimer, u as hasElapsed } from "./timer-qdThNSnd.js";
 import { t as state_machine_d_exports } from "./state-machine-Dc1dOahU.js";
 
 //#region ../packages/flow/src/behaviour-tree.d.ts
@@ -1128,6 +1128,14 @@ declare class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<R
   keyRequest: (request: TRequest) => string;
   keyResponse: (resp: TResp) => string;
   constructor(options?: Partial<RequestResponseOptions<TRequest, TResp>>);
+  /**
+   * Stops the maintenance loop and cleans up resources.
+   * Should be called when done using the matcher.
+   */
+  dispose(): void;
+  /**
+   * For debugging, logs all pending requests and their time to expiry
+   */
   debugDump(): void;
   /**
    * Make a request and get the outcome via a Promise
@@ -1394,18 +1402,37 @@ declare class SyncWait {
 }
 //#endregion
 //#region ../packages/flow/src/task-queue-mutable.d.ts
-type AsyncTask = () => Promise<void>;
+type AsyncTaskVoid = () => Promise<void>;
+type AsyncTaskResult<T> = () => Promise<T>;
+type AsyncTask = AsyncTaskVoid | AsyncTaskResult<any>;
 type TaskQueueEvents = {
   /**
-   * Task queue has emptied.
+   * Task queue has emptied: it has nothing left to do.
    * @returns
    */
   empty: any;
   /**
-   * Task queue was empty and now processing
+   * Task queue was empty and now processing. This does not fire for each task, only when the queue transitions from empty to non-empty.
    * @returns
    */
   started: any;
+  /**
+   * An error occurred when running a task
+   * @param error
+   * @returns
+   */
+  error: {
+    error: unknown;
+    task: AsyncTask;
+  };
+  /**
+   * Event fired when a task completes
+   */
+  progress: {
+    task: AsyncTask;
+    result?: any;
+    remaining: number;
+  };
 };
 /**
  * Simple task queue. Each task is awaited and run
@@ -1436,6 +1463,11 @@ type TaskQueueEvents = {
  * TaskQueueMutable.shared.addEventListener(`empty`, () => {
  *  // Queue has finished processing all items
  * });
+ *
+ * TaskQueueMutable.shared.addEventListener(`error`, ({error,task}) => {
+ *  // Reports if a task threw an exception
+ * });
+ *
  * ```
  */
 declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
@@ -1454,22 +1486,26 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
    * @param task Task to run
    */
   enqueue(task: () => Promise<void>): number;
-  dequeue(): AsyncTask | undefined;
   private processQueue;
   /**
    * Clears all tasks, and stops any scheduled processing.
    * Currently running tasks will continue.
+   * @fires empty event if queue was not already empty
    * @returns
    */
   clear(): void;
   /**
-  * Returns true if queue is empty
+  * Returns _true_ if queue is empty
   */
   get isEmpty(): boolean;
   /**
    * Number of items in queue
    */
   get length(): number;
+  /**
+   * Returns the run state of the procesing loop. This is `idle` when no processing is scheduled, `scheduled` when processing is scheduled, and `running` when actively running a task.
+   */
+  get runState(): HasCompletionRunStates;
 }
 //#endregion
 //#region ../packages/flow/src/throttle.d.ts
@@ -1678,4 +1714,4 @@ declare const singleItem: <T>() => WaitForValue<T>;
  */
 declare const waitFor: (timeoutMs: number, onAborted: (reason: string) => void, onComplete?: (success: boolean) => void) => (error?: string) => void;
 //#endregion
-export { AsyncPromiseOrGenerator, AsyncTask, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, HasCompletion, HasCompletionRunStates, ModulationTimer, MovingAverageTimedOptions, OnStartCalled, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, state_machine_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };
+export { AsyncPromiseOrGenerator, AsyncTask, AsyncTaskResult, AsyncTaskVoid, BackoffOptions, BtNode, BtNodeBase, CompletionTimer, Continuously, ContinuouslyAsyncCallback, ContinuouslyOpts, ContinuouslySyncCallback, DebouncedFunction, DelayOpts, Dispatch, DispatchList, ExpressionOrResult, FullPolicy, HasCompletion, HasCompletionRunStates, ModulationTimer, MovingAverageTimedOptions, OnStartCalled, Pool, PoolOptions, PoolState, PoolUser, PoolUserEventMap, RateMinimumOptions, RelativeTimerOpts, RepeatDelayOpts, RepeatOpts, RequestResponseMatch, RequestResponseMatchEvents, RequestResponseOptions, Resource, RetryOpts, RetryResult, RetryTask, RunOpts, RunSingleOpts, SelNode, SeqNode, state_machine_d_exports as StateMachine, SyncWait, Task, TaskQueueEvents, TaskQueueMutable, TaskState, Timeout, TimeoutAsyncCallback, TimeoutSyncCallback, Timer, TimerOpts, TimerSource, Traversal, UpdateFailPolicy, WaitForValue, backoffGenerator, continuously, create, debounce, delay, delayLoop, elapsedMillisecondsAbsolute, elapsedTicksAbsolute, eventRace, everyNth, frequencyTimer, hasElapsed, iterateBreadth, iterateDepth, movingAverageTimed, ofTotal, ofTotalTicks, promiseWithResolvers, rateMinimum, relative, repeat, repeatSync, retryFunction, retryTask, run, runOnce, runSingle, singleItem, sleep, throttle, timeout, timerAlwaysDone, timerNeverDone, timerWithFunction, updateOutdated, waitFor };

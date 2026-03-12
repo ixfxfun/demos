@@ -2,7 +2,7 @@ import { t as IsEqual } from "./is-equal--ZpQv_rE.js";
 import { f as ToString, i as Interval, r as IWithEntries } from "./types-DhLXV-YQ.js";
 import { A as transformMap, D as sortByValueProperty, E as sortByValue, O as toArray, S as mapToObjectTransform, T as some, _ as getOrGenerate, a as addValue$1, b as hasKeyValue, c as deleteByValueCompareMutate, d as findEntryByPredicate, f as findEntryByValue, g as getClosestIntegerKey, h as fromObject, i as addObjectEntriesMutate, j as zipKeyValue, k as toObject, l as filterValues, m as fromIterable, n as GetOrGenerateSync, o as addValueMutate, p as findValue, r as MergeReconcile, s as addValueMutator, t as GetOrGenerate, u as findBySomeKey, v as getOrGenerateSync, w as mergeByKey, x as mapToArray, y as hasAnyValue } from "./maps-HjV-V9da.js";
 import { a as SimplifiedNode, c as TraverseObjectEntryStatic, d as TreeNode, f as WrappedNode, i as LabelledValues, l as TraverseObjectEntryWithAncestors, n as LabelledSingleValue, o as TraversableTree, r as LabelledValue, s as TraverseObjectEntry, t as LabelledNode, u as TraverseObjectPathOpts } from "./types-BJU7cQJI.js";
-import { i as IStackImmutable, n as StackMutable, r as StackImmutable, t as index_d_exports$4 } from "./index-DfUNo_FA.js";
+import { i as IStackImmutable, n as StackMutable, r as StackImmutable, t as index_d_exports$4 } from "./index-DPbxZRux.js";
 import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
 import { n as ValueSetEventMap, t as ISetMutable } from "./ISetMutable-C1FvKxbn.js";
 import { a as QueueOpts, i as QueueDiscardPolicy, n as QueueImmutable, r as QueueMutable, t as index_d_exports$2 } from "./index-pq0-DnTO.js";
@@ -2325,7 +2325,7 @@ declare const ofCircularMutable: <V>(options: MapCircularOpts<V>) => IMapOfMutab
  * Keys not present in map return the `defaultValue` given in the constructor
  * ```js
  * // All keys default to zero.
- * const map = new NumberMap();
+ * const map = new Maps.NumberMap();
  * map.get(`hello`); // 0
  * ```
  *
@@ -2346,11 +2346,11 @@ declare const ofCircularMutable: <V>(options: MapCircularOpts<V>) => IMapOfMutab
  *
  * Different default value:
  * ```js
- * const map = new NumberMap(10);
+ * const map = new Maps.NumberMap(10);
  * map.get(`hello`); // 10
  * ```
  *
- * Regular `set` works as well:
+ * Regular `set` works, overriding the value to whatever is given:
  * ```js
  * map.set(`hello`, 5);
  * map.add(`hello`, 2); // 7
@@ -2358,11 +2358,102 @@ declare const ofCircularMutable: <V>(options: MapCircularOpts<V>) => IMapOfMutab
  */
 declare class NumberMap<K> extends Map<K, number> {
   readonly defaultValue: number;
+  /**
+   * Creates a NumberMap with default value of 0
+   */
   constructor(defaultValue?: number);
+  /**
+   * Gets the value at a key. If not found, returns the default value
+   * @param key
+   * @returns
+   */
   get(key: K): number;
+  /**
+   * Resets the key's value to the default value
+   * @param key
+   * @returns
+   */
   reset(key: K): number;
+  /**
+   * Multiplies the value of `key` by `amount`. If key is not found, it is treated as the default value.
+   * The new value is set and returned.
+   * @param key
+   * @param amount
+   * @returns
+   */
   multiply(key: K, amount: number): number;
+  /**
+  * Divides the value of `key` by `amount`. If key is not found, it is treated as the default value.
+  * The new value is set and returned.
+  * @param key
+  * @param amount
+  * @returns
+  */
+  divide(key: K, amount: number): number;
+  /**
+   * Applies a function to all values
+   * ```js
+   * // Round all the values
+   * map.mapValue((value,key)=> Math.round(value));
+   * ```
+   */
+  mapValue(fn: (value: number, key?: K) => number): void;
+  /**
+   * Returns the largest value in the map. If the map is empty, returns `NaN`.
+  * ```js
+   * // Eg find all the keys corresponding to the maximum value
+   * const largestKeys = [...map.keysByValue(map.findValueMax())];
+   * ```
+   * @returns
+   */
+  findValueMax(): number;
+  /**
+   * Returns the smallest value in the map. If the map is empty, returns `NaN`.
+   *
+   * ```js
+   * // Eg find all the keys corresponding to the minimum value
+   * const smallestKeys = [...map.keysByValue(map.findValueMin())];
+   * ```
+   * @returns
+   */
+  findValueMin(): number;
+  /**
+   * Iterates over all keys that have a corresponding value
+   * @param v
+   */
+  keysByValue(v: number): Generator<K, void, unknown>;
+  /**
+   * Iterates over entries, sorted by value. By default ascending order.
+   */
+  entriesSorted(sorter?: (a: [K, number], b: [K, number]) => number): Generator<[key: K, value: number]>;
+  /**
+   * Iterates over all keys that have a value matching `fn`.
+   * ```js
+   * // Iterate over all keys that store a value greater than 1
+   * const greaterThanOne = (v) => v > 1;
+   * for (const key of map.filterKeysByValue(greaterThanOne)) {
+   * }
+   * ```
+   * @param v
+   */
+  filterKeysByValue(fn: (value: number) => boolean): Generator<K, void, unknown>;
+  /**
+   * Deletes a set of keys
+   */
+  deleteKeys(keys: Iterable<K>): number;
+  /**
+   * Adds an amount to `key`'s value. If `key` is not found, it is treated as the default value. The new value is set and returned.
+   * @param key
+   * @param amount
+   * @returns
+   */
   add(key: K, amount?: number): number;
+  /**
+   * Subtracts an amount from `key`'s value. If `key` is not found, it is treated as the default value. The new value is set and returned.
+   * @param key
+   * @param amount
+   * @returns
+   */
   subtract(key: K, amount?: number): number;
 }
 //#endregion
