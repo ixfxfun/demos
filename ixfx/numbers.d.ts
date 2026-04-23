@@ -1,6 +1,6 @@
-import { n as MovingWindowOptions } from "./types-j4lP7di-.js";
-import { a as NumbersComputeResult, i as NumbersComputeOptions, n as NumberScaler, o as NumericRange, r as NumberScalerTwoWay, t as BipolarWrapper } from "./types-DtDff87L.js";
-import { i as interpolatorStepped, n as interpolate, r as interpolateAngle, t as BasicInterpolateOptions } from "./interpolate-CCr7T6z3.js";
+import { n as MovingWindowOptions } from "./types-BPLN2atw.js";
+import { a as NumbersComputeResult, i as NumbersComputeOptions, n as NumberScaler, o as NumericRange, r as NumberScalerTwoWay, s as RangeStream, t as BipolarWrapper } from "./types-BSqy-MaP.js";
+import { i as interpolatorStepped, n as interpolate, r as interpolateAngle, t as BasicInterpolateOptions } from "./interpolate-CHdwyCSK.js";
 
 //#region ../packages/numbers/src/apply-to-values.d.ts
 /**
@@ -107,7 +107,7 @@ declare const averageWeigher: (weigher: (arrayIndex: number) => number) => (data
  * @param max value (inclusive)
  * @returns Clamped value
  */
-declare const clamp: (value: number, min?: number, max?: number) => number;
+declare function clamp(value: number, min?: number, max?: number): number;
 /**
  * Returns a function that clamps values.
  *
@@ -120,7 +120,7 @@ declare const clamp: (value: number, min?: number, max?: number) => number;
  * @param min Minimum value. Default: 0
  * @param max Maximum value. Default: 1
  */
-declare const clamper: (min?: number, max?: number) => (v: number) => number;
+declare function clamper(min?: number, max?: number): (v: number) => number;
 /**
  * Clamps integer `v` between 0 (inclusive) and array length or length (exclusive).
  * Returns value then will always be at least zero, and a valid array index.
@@ -142,7 +142,7 @@ declare const clamper: (min?: number, max?: number) => (v: number) => number;
  * @param arrayOrLength Array, or length of bounds (must be an integer)
  * @returns Clamped value, minimum will be 0, maximum will be one less than `length`.
  */
-declare const clampIndex: (v: number, arrayOrLength: number | readonly any[]) => number;
+declare function clampIndex(v: number, arrayOrLength: number | readonly any[]): number;
 declare function maxAbs(values: Iterable<number>): number;
 declare function maxAbs(...values: number[]): number;
 //#endregion
@@ -1541,21 +1541,37 @@ declare const rangeIsEqual: (a: NumericRange | undefined, b: NumericRange | unde
 /**
  * Returns _true_ if range 'a' is within or same as range 'b'.
  * Returns _false_ if not or if either/both ranges are _undefined_
- * @param a
- * @param b
+ *
+ * ```js
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 0, max: 10 }); // true
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 6, max: 20 }); // false
+ * ```
+ *
+ * By default the matching is inclusive, in that `a` could share a min/max with `b`.
+ * If you want to check whether `a` is strictly within `b`, with a higher min and lower max, set `exclusive` to _true_.
+ *
+ * ```js
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 0, max: 10 }, true); // false
+ * rangeIsWithin({ min: 5, max: 9 }, { min: 0, max: 10 }, true); // true
+ * ```
+ *
+ * If either `a` or `b` is _undefined_, the function returns _false_.
+ * @param a Range
+ * @param b Parent
+ * @param exclusive If _true_,
  * @returns
  */
-declare const rangeIsWithin: (a: NumericRange | undefined, b: NumericRange | undefined) => boolean;
+declare const rangeIsWithin: (a: NumericRange | undefined, b: NumericRange | undefined, exclusive?: boolean) => boolean;
 /**
  * Keeps track of min/max values.
  *
  * ```js
  * const s = rangeStream();
- * s.seen(10);  // { min: 10, max: 10}
- * s.seen(5);   // { min:5, max: 10}
+ * s.seen(10);  // { min: 10, max: 10 }
+ * s.seen(5);   // { min: 5,  max: 10 }
  * ```
  *
- * When calling `seen`, non-numbers, or non-finite numbers are silently ignored.
+ * When calling `seen()`, non-numbers, or non-finite numbers are silently ignored.
  *
  * ```js
  * s.reset();   // Reset
@@ -1565,19 +1581,7 @@ declare const rangeIsWithin: (a: NumericRange | undefined, b: NumericRange | und
  * @param initWith
  * @returns
  */
-declare const rangeStream: (initWith?: NumericRange) => {
-  seen: (v: any) => {
-    min: number;
-    max: number;
-  };
-  reset: () => void;
-  readonly range: {
-    min: number;
-    max: number;
-  };
-  readonly min: number;
-  readonly max: number;
-};
+declare const rangeStream: (initWith?: NumericRange) => RangeStream;
 /**
  * Iterates over `values` finding the min/max.
  * By default non-numbers, as well as NaN and infinite values are skipped.
@@ -1646,9 +1650,10 @@ declare const scaler: (inMin: number, inMax: number, outMin?: number, outMax?: n
 declare const scalerNull: () => NumberScaler;
 /**
  * As {@link scale}, but result is clamped to be
- * within `outMin` and `outMax`.
+ * within `outMin` and `outMax`. Useful if you can't be sure
+ * that `v` is in 0..1 range.
  *
- * @param v
+ * @param value
  * @param inMin
  * @param inMax
  * @param outMin 1 by default
@@ -1656,7 +1661,7 @@ declare const scalerNull: () => NumberScaler;
  * @param easing
  * @returns
  */
-declare const scaleClamped: (v: number, inMin: number, inMax: number, outMin?: number, outMax?: number, easing?: (v: number) => number) => number;
+declare const scaleClamped: (value: number, inMin: number, inMax: number, outMin?: number, outMax?: number, easing?: (value: number) => number) => number;
 /**
  * Scales an input percentage to a new percentage range.
  *
@@ -1868,4 +1873,4 @@ declare const wrap: (v: number, min?: number, max?: number) => number;
  */
 declare const wrapRange: (min: number, max: number, fn: (distance: number) => number, a: number, b: number) => number;
 //#endregion
-export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, Kalman1dFilter, Kalman1dFilterOptions, MovingAverageNanOptions, MovingAverageOptions, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, applyToValues, average, averageWeigher, averageWeighted, clamp, clampIndex, clamper, computeIsOutlier, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, getQuantile, interpolate, interpolateAngle, interpolatorStepped, interquartileRange, isApprox, isCloseToAny, isValid, kalman1dFilter, linearSpace, max, maxAbs, maxFast, maxIndex, mean, median, min, minFast, minIndex, movingAverage, movingAverageLight, movingAverageWithContext, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, standardDeviation, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };
+export { BasicInterpolateOptions, bipolar_d_exports as Bipolar, BipolarWrapper, DifferenceKind, Kalman1dFilter, Kalman1dFilterOptions, MovingAverageNanOptions, MovingAverageOptions, normalise_d_exports as Normalise, NumberScaler, NumberScalerTwoWay, NumbersComputeOptions, NumbersComputeResult, NumericRange, RangeStream, applyToValues, average, averageWeigher, averageWeighted, clamp, clampIndex, clamper, computeIsOutlier, count, differenceFromFixed, differenceFromLast, dotProduct, filterIterable, flip, getQuantile, interpolate, interpolateAngle, interpolatorStepped, interquartileRange, isApprox, isCloseToAny, isValid, kalman1dFilter, linearSpace, max, maxAbs, maxFast, maxIndex, mean, median, min, minFast, minIndex, movingAverage, movingAverageLight, movingAverageWithContext, noiseFilter, numberArrayCompute, numericPercent, numericRange, numericRangeRaw, proportion, quantiseEvery, rangeCompute, rangeInclusive, rangeInit, rangeIsEqual, rangeIsWithin, rangeMergeRange, rangeMergeValue, rangeScaler, rangeStream, round, scale, scaleClamped, scalePercent, scalePercentages, scaler, scalerNull, scalerPercent, scalerTwoWay, softmax, standardDeviation, thresholdAtLeast, total, totalFast, trackSimple, validNumbers, weight, wrap, wrapInteger, wrapRange };

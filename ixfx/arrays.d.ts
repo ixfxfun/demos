@@ -1,44 +1,6 @@
-import { n as MovingWindowOptions, r as IsEqual, t as MergeReconcile } from "./types-j4lP7di-.js";
+import { n as MovingWindowOptions, r as IsEqual, t as MergeReconcile } from "./types-BPLN2atw.js";
+import { t as PartialBy } from "./ts-utility-BlSasc_P.js";
 
-//#region ../packages/arrays/src/cycle.d.ts
-/**
- * Returns a function that cycles through the contents of an array. By default starts at index 0.
- *
- * ```js
- * const c = arrayCycle([`apples`, `oranges`, `pears`]);
- * c.current; // `apples`
- * c.next();  // `oranges`
- * c.next();  // `pears`
- * c.next();  // `apples`
- * c.prev();  // `pears`
- * ```
- *
- * You can select an item by index or value:
- * ```
- * c.select(1); // `oranges`
- * c.select(`pears`); // `pears`
- * ```
- *
- * Other features:
- * ```js
- * c.current;   // Current value
- * c.toArray(); // Copy of array being cycled over
- * ```
- *
- * Additional info:
- * * Selecting by value uses === semantics.
- * * Works with a copy of input array
- * @param options Array to cycle over
- * @returns
- */
-declare const cycle: <T>(options: readonly T[] | T[]) => {
-  toArray: () => T[];
-  next: () => T;
-  prev: () => T;
-  readonly current: T;
-  select: (indexOrValue: number | T) => void;
-};
-//#endregion
 //#region ../packages/arrays/src/at-wrap.d.ts
 /**
  * Similar to Javascript's in-built Array.at function, but allows offsets
@@ -78,6 +40,37 @@ declare const atWrap: <V>(array: V[], index: number) => V;
  */
 declare function chunks<V>(array: readonly V[], size: number): V[][];
 //#endregion
+//#region ../packages/arrays/src/compare-to.d.ts
+/**
+ * Yields the result of comparing a value with a sibling.
+ *
+ * ```js
+ * const data = [ 1, 2, 4, 8, 16 ];
+ * // Compare values with its previous sibling (-1)
+ * // Since -1 is the offset, the first A and B values will be 2 and 1,
+ * // then 4 and 2, etc.
+ * compareTo(data, -1, (a, b) => b-a)];
+ * // Yields: -1, -2, -4, -8
+ * ```
+ *
+ * Note that one less value is yielded compared to the input array.
+ *
+ * You can just as well go forward as well:
+ * ```js
+ * const data = [ 1, 2, 4, 8, 16 ];
+ * // Compare values with its next-next sibling (2)
+ * // With an offset of 2, the first A and B values will be 1 and 4, then
+ * // 8 and 2 etc.
+ * // then 4 and 2, etc.
+ * compareTo(data, 2, (a, b) => b-a)];
+ * // Yields: 3, 6, 12
+ * ```
+ * @param data
+ * @param offset
+ * @param fn
+ */
+declare function compareTo<T>(data: T[], offset: number, fn: (a: T, b: T) => T): Generator<T>;
+//#endregion
 //#region ../packages/arrays/src/contains.d.ts
 /**
  * Returns _true_ if all value in `needles` is contained in `haystack`,
@@ -94,7 +87,7 @@ declare function chunks<V>(array: readonly V[], size: number): V[][];
  *
  * If `needles` is empty, `contains` will return true.
  *
- * Compare by value using ixfx's {@link isEqualValueDefault}, or a custom function of your own
+ * Compare by value using ixfx's `isEqualValueDefault`, or a custom function of your own
  * ```js
  * contains(a, b, isEqualValueDefault);
  * contains(a, b, (valueA, valueV) => {
@@ -151,6 +144,45 @@ declare const containsDuplicateValues: <V>(data: Iterable<V>, keyFunction?: (ite
  * @returns
  */
 declare const containsDuplicateInstances: <V>(array: V[] | readonly V[]) => boolean;
+//#endregion
+//#region ../packages/arrays/src/cycle.d.ts
+/**
+ * Returns a function that cycles through the contents of an array. By default starts at index 0.
+ *
+ * ```js
+ * const c = arrayCycle([`apples`, `oranges`, `pears`]);
+ * c.current; // `apples`
+ * c.next();  // `oranges`
+ * c.next();  // `pears`
+ * c.next();  // `apples`
+ * c.prev();  // `pears`
+ * ```
+ *
+ * You can select an item by index or value:
+ * ```
+ * c.select(1); // `oranges`
+ * c.select(`pears`); // `pears`
+ * ```
+ *
+ * Other features:
+ * ```js
+ * c.current;   // Current value
+ * c.toArray(); // Copy of array being cycled over
+ * ```
+ *
+ * Additional info:
+ * * Selecting by value uses === semantics.
+ * * Works with a copy of input array
+ * @param options Array to cycle over
+ * @returns
+ */
+declare const cycle: <T>(options: readonly T[] | T[]) => {
+  toArray: () => T[];
+  next: () => T;
+  prev: () => T;
+  readonly current: T;
+  select: (indexOrValue: number | T) => void;
+};
 //#endregion
 //#region ../packages/arrays/src/ensure-length.d.ts
 declare function ensureLength<V>(data: readonly V[] | V[], length: number, expand: `repeat` | `first` | `last`, truncate?: `from-end` | `from-start`): (V)[];
@@ -303,15 +335,97 @@ declare const mapWithEmptyFallback: <TValue, TReturn>(array: TValue[], fn: (valu
  *
  * const groupBy = v => v % 2 === 0 ? `even`:`odd`;
  *
- * const data = frequencyByGroup(groupBy, data);
+ * FrequencyByGroup.fromArray(data, groupBy);
  * // Yields map with:
  * //  key: 'even', value: 5
  * //  key: 'odd', value: 5
+ * ```
+ *
+ * Or for example, group by the value itself:
+ * ```js
+ * const data = [1,2,3,1,2,0];
+ * const groupBy = v => v.toString();
+ * FrequencyByGroup.fromArray(data, groupBy);
+ * // "1" = 2, "2" = 2, "3" = 1, "0" = 1
+ * ```
  * @param groupBy
  * @param data
- * @returns
  */
-declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy: ((value: TValue) => TGroup), data: TValue[]) => Map<TGroup, number>;
+declare class FrequencyByGroup<TValue, TGroup extends string | number> {
+  #private;
+  constructor(groupBy?: ((value: TValue) => TGroup));
+  add(data: TValue[]): void;
+  /**
+   * Creates a new FrequencyByGroup instance, adds data to it and returns the instance.
+   * If you just want the computed frequencies, consider using {@link entriesFromArray}.
+   * @param data
+   * @param groupBy
+   * @returns FrequencyGroup instance with data added
+   */
+  static fromArray<TValue, TGroup extends string | number>(data: any[], groupBy?: ((value: TValue) => TGroup)): FrequencyByGroup<TValue, TGroup>;
+  /**
+   * Computes the frequency of `data`, yielding results as entries consisting of the key and frequency.
+   * ```js
+   * const v = [...FrequencyByGroup.entriesFromArray([1, 2, 3, 1, 2, 3, 0, 1, 1, 1, 4], v => v.toString())];
+   * // Yields: [ ["1", 5], ["2", 2], ["3", 2], ["0", 1], ["4", 1] ]
+   * ```
+   *
+   * It's a generator, so you can also use it like this:
+   * ```js
+   * for (const [key,freq] of FrequencyByGroup.entriesFromArray(data, v => v.toString())) {
+   *   console.log(key, freq);// Logs key and frequency for each group
+   * }
+   * ```
+   * @param data
+   * @param groupBy
+   * @returns Iterator over entries
+   */
+  static entriesFromArray<TValue, TGroup extends string | number>(data: any[], groupBy?: ((value: TValue) => TGroup)): Generator<[TGroup, number]>;
+  /**
+   * Returns the relative frequency for a group, or _undefined_ if not found.
+   * @param group
+   * @returns Relative frequency or _undefined_ if not found
+   */
+  getRelative(group: TGroup): number | undefined;
+  /**
+   * Returns _true_ if group was found.
+   * @param group
+   * @returns _True_ if group was found
+   */
+  has(group: TGroup): boolean;
+  /**
+   * Gets the frequency for this group, or _undefined_ if the group does not exist
+   * @param group
+   * @returns Frequency for this group, or _undefined_ if the group does not exist
+   */
+  get(group: TGroup): number | undefined;
+  /**
+   * Returns an iterator over the entries, ie `[group, frequency]` pairs.
+   * Use {@link entriesRelative} to get the relative frequency instead of the absolute frequency.
+   * @returns Iterator
+   */
+  entries(): IterableIterator<[TGroup, number]>;
+  /**
+   * Returns an iterator over the entries, ie `[group, relativeFrequency]` pairs.
+   * Use {@link entries} to get the absolute frequency instead.
+   * @returns Iterator
+   */
+  entriesRelative(): Generator<[TGroup, number]>;
+  /**
+   * Returns an iterator over keys (ie. groups).
+   */
+  keys(): IterableIterator<TGroup>;
+  /**
+   * Returns an iterator over values (ie. absolute frequencies)
+   * @returns
+   */
+  values(): IterableIterator<number>;
+  /**
+   * Gets the average frequency across all groups.
+   * @returns Average frequency
+   */
+  averageFrequency(): number;
+}
 //#endregion
 //#region ../packages/arrays/src/group-by.d.ts
 /**
@@ -348,85 +462,6 @@ declare const frequencyByGroup: <TValue, TGroup extends string | number>(groupBy
  * @returns Map
  */
 declare const groupBy: <K, V>(array: Iterable<V>, grouper: (item: V) => K) => Map<K, V[]>;
-//#endregion
-//#region ../packages/arrays/src/unique.d.ts
-/**
- * Combines the values of one or more arrays, removing duplicates.
- *
- * ```js
- * const eq = (a, b) => {
- *  return a.name === b.name
- * }
- * const v = Arrays.unique([
- *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
- *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
- * ], eq);
- * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
- * ```
- *
- * A single array can be provided as well:
- *
- * ```js
- * const v = Arrays.unique([
- *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
- * ], eq);
- * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
- * ```
- *
- * See also:
- * * {@link intersection}: Get overlap between two arrays
- * * Iterables.additionalValues: Yield values from an iterable not present in the other
- * * {@link containsDuplicateValues}: Returns true if array contains duplicates
- * @param arrays
- * @param comparer
- * @returns
- */
-declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], comparer: IsEqual<V>): V[];
-/**
- * Combines the values of one or more arrays, removing duplicates.
- *
- * Compares based on a string representation of object. Uses a Set
- * to avoid unnecessary comparisons, perhaps faster than using a comparer function.
- *
- * ```js
- * const str = (v) => JSON.stringify(v);
- * const v = Arrays.unique([
- *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
- *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
- * ], str);
- * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
- * ```
- *
- * A single array can be provided as well:
- *
- * ```js
- * const v = Arrays.unique([
- *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
- * ], eq);
- * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
- * ```
- *
- * By default uses JSON.toString() to compare values.
- *
- * See also:
- * * {@link intersection}: Overlap between two arrays
- * * Iterables.additionalValues: Yield values from an iterable not present in the other
- * * {@link containsDuplicateValues}: Returns true if array contains duplicates
- * @param arrays Array (or array of arrays) to examine
- * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
- * @returns
- */
-declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], toString: (item: V) => string): V[];
-/**
- * Combines the values of one or more arrays, removing duplicates.
- *
- * By default compares values based on a JSON string representation.
- *
- * @param arrays Array (or array of arrays) to examine
- * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
- * @returns
- */
-declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[]): V[];
 //#endregion
 //#region ../packages/arrays/src/insert-at.d.ts
 /**
@@ -489,11 +524,17 @@ declare function intersection<V>(arrayA: V[], arrayB: V[], comparer: IsEqual<V>)
  * ```js
  * intersection(arrayA, arrayB, (v) => v.name)
  * ```
- * @param arrayA
- * @param arrayB
- * @param toString
+ * @param arrayA First array
+ * @param arrayB Second array
+ * @param toString Custom function to compare items by value
  */
 declare function intersection<V>(arrayA: V[], arrayB: V[], toString: (value: V) => string): V[];
+/**
+ * Returns the _intersection_ of two arrays: the elements that are in common. Duplicates are removed in the process.
+ * @param arrayA First array
+ * @param arrayB Second array
+ * @param comparerOrKey Comparer/stringify function
+ */
 declare function intersection<V>(arrayA: V[], arrayB: V[], comparerOrKey?: IsEqual<V> | ((value: V) => string)): V[];
 //#endregion
 //#region ../packages/arrays/src/merge-by-key.d.ts
@@ -708,7 +749,7 @@ declare const randomIndex: <V>(array: ArrayLike<V>, rand?: () => number) => numb
  * @typeParam V Type of array
  * @returns
  */
-declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
+declare function remove<V>(data: readonly V[] | V[], index: number): V[];
 /**
  * Removes items from `input` array that match `predicate`.
  * A modified array is returned along with the number of items removed.
@@ -719,7 +760,7 @@ declare const remove: <V>(data: readonly V[] | V[], index: number) => V[];
  * @param predicate
  * @returns
  */
-declare const removeByFilter: <T>(input: T[], predicate: (value: T) => boolean) => [changed: T[], removed: number];
+declare function removeByFilter<T>(input: T[], predicate: (value: T) => boolean): [changed: T[], removed: number];
 //#endregion
 //#region ../packages/arrays/src/sample.d.ts
 /**
@@ -798,6 +839,180 @@ declare const sortByNumericProperty: <V, K extends keyof V>(data: readonly V[] |
  */
 declare const sortByProperty: <V, K extends keyof V>(data: readonly V[] | V[], propertyName: K, comparer?: (a: any, b: any) => number) => V[];
 //#endregion
+//#region ../packages/arrays/src/traverse.d.ts
+type StepState = {
+  index: number;
+  incrementing: boolean;
+  done: boolean;
+};
+type StepContext = {
+  startIndex: number;
+  endIndex: number;
+};
+type StepArrayContext<T> = {
+  data: T[] | readonly T[];
+  startIndex: number;
+  endIndex: number;
+  randomSource: () => number;
+};
+type StepLoopLogic = `none` | `pingpong`;
+type StepOptions = {
+  /**
+   * Number of steps to take each time
+   */
+  steps: number;
+  /**
+   * What to do if limit is reached
+   */
+  loop: StepLoopLogic;
+  /**
+   * If _true_ increments indexes
+   */
+  forward: boolean;
+  /**
+   * Every time a step is taken, we flip the direction if the random number is less this value.
+   * Thus, a value of 0 means no random changes. A value of 1 means direction will change every time.
+   *
+   * This can create a 'drunken walk' style of traversal.
+   */
+  randomDirectionFlip: number;
+  /**
+   * If set to 0, does not use a random step length.
+   * Otherwise, this sets the chance of calculating a random step length.
+   * Eg. if the value is 0.1, 10% of the steps will use a random length.
+   * Eg. if the value is 1 every step will generate a random length.
+   *
+   */
+  randomChanceSteps: number;
+  /**
+   * The upper bound of random step length. Needs 'randomChanceSteps' to be set to a value greater than 0 to have an effect.
+   *
+   * The range of random steps will thus be between 'steps' and this value.
+   */
+  randomStepsMax: number;
+  repeatLoopedIndex: boolean;
+  debug?: boolean;
+};
+/**
+ * Given an input step state, take a step and return the new state.
+ * This is a lower-level function, you probably want to use {@link arrayIndexStepper} instead.
+ * @param state Current step state
+ * @param options How to step
+ * @param context Context in which we are stepping
+ * @returns New step state
+ */
+declare function step(state: PartialBy<StepState, `done`>, options: StepOptions, context: StepContext): StepState;
+/**
+ * Creates a generator to step through array indices.
+ *
+ * Supports moving forward/backward through an array, looping, 'drunken walk', and random step lengths.
+ *
+ * ```js
+ * const data [ `a`, `b`, `c`, `d`, `e` ];
+ *
+ * // Step one by one through each index
+ * for (const index of arrayIndexStepper({step:1, loop:`none`}, data)) {
+ *  console.log(`index: ${index} value: ${data[index]}`);
+ * }
+ * ```
+ *
+ * More examples:
+ * ```js
+ * // A generator that never ends, going back and forth between start and end
+ * arrayIndexStepper({ steps: 1, loop: `pingpong` }, data);
+ * // As above, but when we hit the end/start, repeat that index
+ * arrayIndexStepper({ steps: 1, loop: `pingpong`, repeatLoopedIndex:true }, data);
+ *
+ * // Move backwards. from the end, through the indicies, jumping by two
+ * arrayIndexStepper({ steps: 2, forward:false }, data);
+ *
+ * ```
+ * @param optionsP
+ * @param context
+ * @returns Iterator over array indicies
+ */
+declare function arrayIndexStepper<T>(optionsP: Partial<StepOptions>, context: Partial<StepArrayContext<T>> & {
+  data: T[] | readonly T[];
+}): () => Generator<number>;
+//#endregion
+//#region ../packages/arrays/src/unique.d.ts
+/**
+ * Combines the values of one or more arrays, removing duplicates.
+ *
+ * ```js
+ * const eq = (a, b) => {
+ *  return a.name === b.name
+ * }
+ * const v = Arrays.unique([
+ *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
+ *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
+ * ```
+ *
+ * A single array can be provided as well:
+ *
+ * ```js
+ * const v = Arrays.unique([
+ *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
+ * ```
+ *
+ * See also:
+ * * {@link intersection}: Get overlap between two arrays
+ * * Iterables.additionalValues: Yield values from an iterable not present in the other
+ * * {@link containsDuplicateValues}: Returns true if array contains duplicates
+ * @param arrays
+ * @param comparer
+ * @returns
+ */
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], comparer: IsEqual<V>): V[];
+/**
+ * Combines the values of one or more arrays, removing duplicates.
+ *
+ * Compares based on a string representation of object. Uses a Set
+ * to avoid unnecessary comparisons, perhaps faster than using a comparer function.
+ *
+ * ```js
+ * const str = (v) => JSON.stringify(v);
+ * const v = Arrays.unique([
+ *  [ {name:'jane'}, {name:'billy'}, {name:'thom'} ],
+ *  [ {name:'molly'}, {name:'jane'}, {name:'sally'}, {name:'thom'}]
+ * ], str);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'molly'}, , {name:'sally'} ]
+ * ```
+ *
+ * A single array can be provided as well:
+ *
+ * ```js
+ * const v = Arrays.unique([
+ *  {name:'jane'}, {name:'billy'}, {name:'thom'}, {name:'billy'},
+ * ], eq);
+ * // [ {name:'jane'}, {name:'billy'}, {name:'thom'} ]
+ * ```
+ *
+ * By default uses JSON.toString() to compare values.
+ *
+ * See also:
+ * * {@link intersection}: Overlap between two arrays
+ * * Iterables.additionalValues: Yield values from an iterable not present in the other
+ * * {@link containsDuplicateValues}: Returns true if array contains duplicates
+ * @param arrays Array (or array of arrays) to examine
+ * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
+ * @returns
+ */
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[], toString: (item: V) => string): V[];
+/**
+ * Combines the values of one or more arrays, removing duplicates.
+ *
+ * By default compares values based on a JSON string representation.
+ *
+ * @param arrays Array (or array of arrays) to examine
+ * @returns
+ */
+declare function unique<V>(arrays: V[][] | V[] | readonly V[] | readonly (readonly V[])[]): V[];
+//#endregion
 //#region ../packages/arrays/src/until.d.ts
 /**
  * Yields all items in the input array, stopping when `predicate` returns _true_.
@@ -822,6 +1037,12 @@ declare function until<V>(data: readonly V[] | V[], predicate: (v: V) => boolean
  * ```
  */
 declare function until<V, A>(data: readonly V[] | V[], predicate: (v: V, accumulator: A) => readonly [stop: boolean, acc: A], initial: A): Generator<V>;
+/**
+ * Returns up to `count` items from the generator. If the generator finishes before `count` items are returned, then only the available items are returned.
+ * @param generator
+ * @param count
+ */
+declare function takeFromGenerator<V>(generator: Generator<V>, count: number): V[];
 //#endregion
 //#region ../packages/arrays/src/without.d.ts
 /**
@@ -902,4 +1123,4 @@ type ZippedTuple<T extends readonly (readonly unknown[])[]> = { [K in keyof T]: 
  */
 declare const zip: <T extends readonly (readonly unknown[])[]>(...arrays: T) => Array<ZippedTuple<T>>;
 //#endregion
-export { IsEqual, MergeReconcile, MovingWindowOptions, ZippedTuple, atWrap, chunks, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, frequencyByGroup, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, unique, until, without, withoutUndefined, zip };
+export { FrequencyByGroup, IsEqual, MergeReconcile, MovingWindowOptions, StepArrayContext, StepContext, StepLoopLogic, StepOptions, StepState, ZippedTuple, arrayIndexStepper, atWrap, chunks, compareTo, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, step, takeFromGenerator, unique, until, without, withoutUndefined, zip };

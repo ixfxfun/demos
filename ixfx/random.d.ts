@@ -1,4 +1,4 @@
-import { a as RandomSource, i as RandomOptions, n as RandomBooleanOptions, o as StringOptions, r as RandomNumberOptions, s as WeightedOptions, t as GenerateRandomOptions } from "./types-B4a9qJv9.js";
+import { a as RandomSource, i as RandomOptions, n as RandomBooleanOptions, o as StringOptions, r as RandomNumberOptions, s as WeightedOptions, t as GenerateRandomOptions } from "./types-DVhUnHAs.js";
 
 //#region ../packages/random/src/arrays.d.ts
 /**
@@ -15,7 +15,7 @@ import { a as RandomSource, i as RandomOptions, n as RandomBooleanOptions, o as 
  * @param rand Random generator. `Math.random` by default.
  * @returns
  */
-declare const randomIndex: <V>(array: ArrayLike<V>, rand?: RandomSource) => number;
+declare function randomIndex<V>(array: ArrayLike<V>, rand?: RandomSource): number;
 /**
  * Returns a random value from `array`,
  * and removes it from the array.
@@ -65,7 +65,7 @@ declare function randomPluck<V>(array: readonly V[] | V[], options?: {
  * @param rand Random generator. `Math.random` by default.
  * @returns
  */
-declare const randomElement: <V>(array: ArrayLike<V>, rand?: RandomSource) => V;
+declare function randomElement<V>(array: ArrayLike<V>, rand?: RandomSource): V;
 /**
  * Selects a random array index, biased by the provided `weightings`.
  *
@@ -78,7 +78,7 @@ declare const randomElement: <V>(array: ArrayLike<V>, rand?: RandomSource) => V;
  * @param weightings
  * @param randomSource
  */
-declare const randomElementWeightedSource: <V>(array: ArrayLike<V>, weightings: number[], randomSource?: RandomSource) => () => V;
+declare function randomElementWeightedSource<V>(array: ArrayLike<V>, weightings: number[], randomSource?: RandomSource): () => V;
 /**
  * Returns a shuffled copy of the input array.
  * @example
@@ -92,7 +92,7 @@ declare const randomElementWeightedSource: <V>(array: ArrayLike<V>, weightings: 
  * @returns Copy with items moved around randomly
  * @typeParam V - Type of array items
  */
-declare const shuffle: <V>(dataToShuffle: readonly V[], rand?: RandomSource) => V[];
+declare function shuffle<V>(dataToShuffle: readonly V[], rand?: RandomSource): V[];
 //#endregion
 //#region ../packages/random/src/chance.d.ts
 /**

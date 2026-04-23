@@ -1,12 +1,13 @@
-import { i as Interval, t as BasicType } from "./types-DhLXV-YQ.js";
-import { n as Result } from "./types-CSh98G0p.js";
-import { g as Comparer, i as ResolveToValueSync, n as ResolveToValue } from "./resolve-core-Cpk_Q2hC.js";
-import { a as HasCompletion, c as continuously, i as ContinuouslySyncCallback, n as ContinuouslyAsyncCallback, o as HasCompletionRunStates, r as ContinuouslyOpts, s as OnStartCalled, t as Continuously } from "./continuously-BdZhuIkm.js";
-import { n as sleep } from "./sleep-D5D313hw.js";
-import { t as SimpleEventEmitter } from "./simple-event-emitter-B_mKSo1Q.js";
-import { c as LogSet } from "./logger-C2iNOtSg.js";
-import { a as TimerOpts, c as elapsedTicksAbsolute, d as ofTotal, f as ofTotalTicks, g as timerWithFunction, h as timerNeverDone, i as Timer, l as frequencyTimer, m as timerAlwaysDone, n as ModulationTimer, o as TimerSource, p as relative, r as RelativeTimerOpts, s as elapsedMillisecondsAbsolute, t as CompletionTimer, u as hasElapsed } from "./timer-qdThNSnd.js";
-import { t as state_machine_d_exports } from "./state-machine-Dc1dOahU.js";
+import { i as Interval, t as BasicType } from "./types-3GGyJ5V2.js";
+import { n as Result } from "./types-dWG7blMi.js";
+import { n as Comparer } from "./comparers-Dol1dwYT.js";
+import { a as HasCompletion, c as continuously, i as ContinuouslySyncCallback, n as ContinuouslyAsyncCallback, o as HasCompletionRunStates, r as ContinuouslyOpts, s as OnStartCalled, t as Continuously } from "./continuously-B8scsuYm.js";
+import { i as ResolveToValueSync, n as ResolveToValue } from "./resolve-core-DpRB-5UC.js";
+import { n as sleep } from "./sleep-BocNrqv_.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-Dk_RbOvo.js";
+import { c as LogSet } from "./logger-DntJD0qF.js";
+import { a as TimerOpts, c as elapsedTicksAbsolute, d as ofTotal, f as ofTotalTicks, g as timerWithFunction, h as timerNeverDone, i as Timer, l as frequencyTimer, m as timerAlwaysDone, n as ModulationTimer, o as TimerSource, p as relative, r as RelativeTimerOpts, s as elapsedMillisecondsAbsolute, t as CompletionTimer, u as hasElapsed } from "./timer-VQjhwfCU.js";
+import { t as state_machine_d_exports } from "./state-machine-b49kFUXT.js";
 
 //#region ../packages/flow/src/behaviour-tree.d.ts
 type TaskState = `Failed` | `Running` | `Success`;
@@ -1490,7 +1491,7 @@ declare class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   /**
    * Clears all tasks, and stops any scheduled processing.
    * Currently running tasks will continue.
-   * @fires empty event if queue was not already empty
+   * Fires: `empty` event if queue was not already empty
    * @returns
    */
   clear(): void;
