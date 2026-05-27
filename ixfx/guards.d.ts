@@ -1,4 +1,4 @@
-import { a as ResultOrFunction, i as ResultOk, n as Result, r as ResultError, t as NumberGuardRange } from "./types-dWG7blMi.js";
+import { a as ResultOrFunction, i as ResultOk, n as Result, r as ResultError, t as NumberGuardRange } from "./types-YI7_psgz.js";
 
 //#region ../packages/guards/src/arrays.d.ts
 /**
@@ -204,14 +204,13 @@ declare const rangeIntegerTest: (v: Iterable<number>, expected: ExpectedOpts) =>
 declare const rangeTest: (numbers: Iterable<number>, expected: ExpectedOpts) => Result<Iterable<number>, string>;
 //#endregion
 //#region ../packages/guards/src/result.d.ts
-declare const getErrorMessage: (ex: unknown) => string;
+declare function getErrorMessage(ex: unknown): string;
 /**
  * Throws an error if any result is a failure.
  * Error message will be the combined from all errors.
  * @param results
- * @returns
  */
-declare const throwIfFailed: (...results: Result<any, any>[]) => void;
+declare function throwIfFailed(...results: Array<Result<any, any>>): void;
 /**
  * If any of `results` is an error, throws it, otherwise ignored.
  * @param results
@@ -222,19 +221,16 @@ declare function resultThrowSingle<TValue>(result: Result<TValue, any>): result 
 /**
  * Returns the first failed result, or _undefined_ if there are no fails
  * @param results
- * @returns
  */
-declare const resultFirstFail_: <TError>(...results: ResultOrFunction[]) => ResultError<TError> | undefined;
+declare function resultFirstFail_<TError>(...results: ResultOrFunction[]): ResultError<TError> | undefined;
 /**
  * Returns _true_ if `result` is an error
  * @param result
- * @returns
  */
 declare function resultIsError<TValue, TError>(result: Result<TValue, TError>): result is ResultError<TError>;
 /**
  * Returns _true_ if `result` is OK and has a value
  * @param result
- * @returns
  */
 declare function resultIsOk<TValue, TError>(result: Result<TValue, TError>): result is ResultOk<TValue>;
 declare class IxfxError extends Error {
@@ -246,42 +242,37 @@ declare class IxfxError extends Error {
 /**
  * Gets the result as an Error
  * @param result
- * @returns
  */
 declare function resultToError(result: ResultError<any>): Error;
 /**
  * Unwraps the result, returning its value if OK.
  * If not, an exception is thrown.
  * @param result
- * @returns
  */
 declare function resultToValue<TValue, TError>(result: Result<TValue, TError>): TValue;
 /**
  * Returns the error as a string.
  * @param result
- * @returns
  */
 declare function resultErrorToString(result: ResultError<any>): string;
 /**
  * Returns a {@link ResultError} using 'error' as the message.
  * @param error
  * @param info
- * @returns
  */
 declare function errorResult(error: string, info?: string): ResultError<string>;
 /**
  * Returns first failed result or final value.
  * @param results
- * @returns
  */
-declare const resultsCollate: <TValue, TError>(...results: ResultOrFunction[]) => Result<TValue, TError>;
+declare function resultsCollate<TValue, TError>(...results: ResultOrFunction[]): Result<TValue, TError>;
 /**
  * If `result` is an error, calls `callback`, passing the error.
  * Otherwise does nothing
  * @param result
  * @param callback
  */
-declare const resultWithFail: <TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void) => void;
+declare function resultWithFail<TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void): void;
 //#endregion
 //#region ../packages/guards/src/string.d.ts
 type StringGuardRange = `` | `non-empty`;

@@ -1,14 +1,14 @@
 import { r as RecursivePartial } from "./ts-utility-BlSasc_P.js";
-import { i as IStackImmutable } from "./index-DXOvW4ko.js";
-import { t as SimpleEventEmitter } from "./simple-event-emitter-Dk_RbOvo.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-CUqmvSDk.js";
+import { i as IStackImmutable } from "./index-Bt_mCl7k.js";
 import { r as Point } from "./point-type-D6AGv-lh.js";
-import { B as Triangle, G as Line, J as CirclePositioned, N as PolarRay, S as GridWritable, c as GridCell, d as GridCellSetter, l as GridCellAccessor, r as Grid, u as GridCellAndValue, y as GridReadable } from "./index-BZBlTVQt.js";
+import { F as PolarRay, H as Triangle, S as GridWritable, X as CirclePositioned, c as GridCell, d as GridCellSetter, l as GridCellAccessor, q as Line, r as Grid, u as GridCellAndValue, w as UniformGrid, y as GridReadable } from "./index-CmzO5VO-.js";
 import { a as RectPositioned, t as Rect } from "./rect-types-CZBf-fvk.js";
 import { n as NumberScaler } from "./types-BSqy-MaP.js";
 import { r as Path } from "./path-type-DNE-wAUl.js";
-import { a as EllipsePositioned, f as CubicBezier, m as QuadraticBezier, n as Scaler, t as ScaleBy, v as ArcPositioned } from "./scaler-CnwmBxFh.js";
+import { a as EllipsePositioned, f as CubicBezier, m as QuadraticBezier, n as Scaler, t as ScaleBy, v as ArcPositioned } from "./scaler-B736behR.js";
 import { t as ElementResizeLogic } from "./element-sizing-pHbaqoHL.js";
-import { i as Rgb8Bit, r as Rgb, t as index_d_exports } from "./index-DnDevSAX.js";
+import { i as Rgb8Bit, r as Rgb, t as index_d_exports } from "./index-DesQvrKn.js";
 import { n as video_d_exports } from "./video-BttmQQAb.js";
 
 //#region ../packages/visual/src/drawing.d.ts
@@ -1369,7 +1369,7 @@ declare namespace image_data_grid_d_exports {
  * @param image ImageData
  * @returns Grid
  */
-declare const grid: (image: ImageData) => Grid;
+declare function grid(image: ImageData): UniformGrid;
 /**
  * Returns an object that allows get/set grid semantics on the underlying `image` data.
  * Uses 8-bit sRGB values, meaning 0..255 range for red, green, blue & opacity.
@@ -1389,26 +1389,23 @@ declare const grid: (image: ImageData) => Grid;
  * ctx.putImageData(imageData, 0, 0)
  * ```
  * @param image
- * @returns
  */
-declare const wrap: (image: ImageData) => GridWritable<Rgb8Bit> & GridReadable<Rgb8Bit>;
+declare function wrap(image: ImageData): GridWritable<Rgb8Bit> & GridReadable<Rgb8Bit>;
 /**
  * Returns a function to access pixel values by x,y
  * @param image
- * @returns
  */
-declare const accessor: (image: ImageData) => GridCellAccessor<Rgb8Bit>;
+declare function accessor(image: ImageData): GridCellAccessor<Rgb8Bit>;
 /**
  * Returns a function that sets pixel values
  * @param image
- * @returns
  */
-declare const setter: (image: ImageData) => GridCellSetter<Rgb>;
+declare function setter(image: ImageData): GridCellSetter<Rgb>;
 /**
  * Yields pixels of an image row by row
  * @param image
  */
-declare function byRow(image: ImageData): Generator<(Rgb8Bit | undefined)[], void, unknown>;
+declare function byRow(image: ImageData): Generator<Array<Rgb8Bit | undefined>, void, unknown>;
 /**
  * Yields pixels of an image column by column
  * @param image

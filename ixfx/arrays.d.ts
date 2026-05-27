@@ -259,6 +259,50 @@ declare const containsIdenticalValues: <V>(array: readonly V[] | V[], equality?:
 //#endregion
 //#region ../packages/arrays/src/filter.d.ts
 /**
+ * Like Array.findIndex but with optional `startAt` and `length` parameters to limit the search to a specific section of the array.
+ *
+ * ```js
+ * const data = ["red","blue","red","blue"]
+ * data.findIndex(v => v === `red`); // 0 - finds first match
+ * findIndex(data, v => v === `red`, 1); // 2 - finds first match after start index of 1
+ * ```
+ *
+ * Use {@link findIndexReverse} to search backwards through the array.
+ * @param array
+ * @param predicate
+ * @param startInclusive
+ * @param endExclusive End index (exclusive). By default, uses array.length
+ */
+declare function findIndex<V>(array: readonly V[], predicate: (value: V, index: number, obj: readonly V[]) => boolean, startInclusive?: number, endExclusive?: number): number;
+/**
+ * Returns a matching index, starting at index `start` and working backwards up until `end` (both inclusive).
+ * ```
+ * const data = ["red","blue","red","blue","red"];
+ * findIndexReverse(data, v=> v === `red`);     // 4
+ * findIndexReverse(data, v=> v === `red`, 3);  // 2
+ * findIndexReverse(data, v=> v === `red`, 2);  // 2
+ * ```
+ * @param array
+ * @param predicate
+ * @param startInclusive
+ * @param endInclusive
+ * @returns
+ */
+declare function findIndexReverse<V>(array: readonly V[], predicate: (value: V, index: number, obj: readonly V[]) => boolean, startInclusive?: number, endInclusive?: number): number;
+/**
+ * Enumerates the index of all array values that match `predicate`.
+ *
+ * ```js
+ * const data =  [`red`,`blue`,`red`,`blue`,`red`];
+ * for (const index of filterWithIndex(data, v=> v === `red`)) {
+ *  // Yields 0, 2, 4
+ * }
+ * ```
+ * @param array
+ * @param predicate
+ */
+declare function filterWithIndex<V>(array: readonly V[], predicate: (value: V, index: number, obj: readonly V[]) => boolean): Generator<number>;
+/**
  * Returns two separate arrays of everything that `filter` returns _true_,
  * and everything it returns _false_ on.
  *
@@ -273,7 +317,7 @@ declare const containsIdenticalValues: <V>(array: readonly V[] | V[], equality?:
  * @param filter Function which returns _true_ to add items to the A list, or _false_ for items to add to the B list
  * @returns Array of two elements. The first is items that match `filter`, the second is items that do not.
  */
-declare const filterAB: <V>(data: readonly V[], filter: (a: V) => boolean) => [a: V[], b: V[]];
+declare function filterAB<V>(data: readonly V[], filter: (a: V) => boolean): [a: V[], b: V[]];
 /**
  * Yields elements from `array` that match a given `predicate`, and moreover are between
  * the given `startIndex` (inclusive) and `endIndex` (exclusive).
@@ -1123,4 +1167,4 @@ type ZippedTuple<T extends readonly (readonly unknown[])[]> = { [K in keyof T]: 
  */
 declare const zip: <T extends readonly (readonly unknown[])[]>(...arrays: T) => Array<ZippedTuple<T>>;
 //#endregion
-export { FrequencyByGroup, IsEqual, MergeReconcile, MovingWindowOptions, StepArrayContext, StepContext, StepLoopLogic, StepOptions, StepState, ZippedTuple, arrayIndexStepper, atWrap, chunks, compareTo, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, flatten, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, step, takeFromGenerator, unique, until, without, withoutUndefined, zip };
+export { FrequencyByGroup, IsEqual, MergeReconcile, MovingWindowOptions, StepArrayContext, StepContext, StepLoopLogic, StepOptions, StepState, ZippedTuple, arrayIndexStepper, atWrap, chunks, compareTo, contains, containsDuplicateInstances, containsDuplicateValues, containsIdenticalValues, cycle, ensureLength, filterAB, filterBetween, filterWithIndex, findIndex, findIndexReverse, flatten, groupBy, insertAt, interleave, intersection, isEqual, isEqualIgnoreOrder, mapWithEmptyFallback, mergeByKey, movingWindow, movingWindowWithContext, pairwise, pairwiseReduce, randomElement, randomIndex, remove, removeByFilter, sample, shuffle, sortByNumericProperty, sortByProperty, step, takeFromGenerator, unique, until, without, withoutUndefined, zip };

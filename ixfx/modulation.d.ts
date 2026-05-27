@@ -1,5 +1,5 @@
 import { i as Interval } from "./types-3GGyJ5V2.js";
-import { t as SimpleEventEmitter } from "./simple-event-emitter-Dk_RbOvo.js";
+import { t as SimpleEventEmitter } from "./simple-event-emitter-CUqmvSDk.js";
 import { r as Point } from "./point-type-D6AGv-lh.js";
 import { t as Rect } from "./rect-types-CZBf-fvk.js";
 import { a as RandomSource } from "./types-DVhUnHAs.js";
