@@ -42,6 +42,9 @@
     "ixfx/**/*",
     "ixfx/*",
     "ml/lib/**/*",
-    "node_modules/**/*"
+    "node_modules/**/*",
+    "express-ws-server.js",
+    "ws-server.js",
+
   ]
 }
