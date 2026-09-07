@@ -17,8 +17,8 @@ const settings = Object.freeze({
  *  mass: number
  * },
  * pause:boolean
- * pendulumForce: Forces.ForceFn,
- * springForce: Forces.ForceFn
+ * pendulumForce: Forces.ForceFn<any>,
+ * springForce: Forces.ForceFn<any>
  * }>} State
  */
 
