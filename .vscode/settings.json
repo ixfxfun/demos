@@ -55,7 +55,7 @@
   "js/ts.format.insertSpaceAfterTypeAssertion": true,
   "js/ts.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
   "js/ts.format.indentSwitchCase": true,
-
+  "chat.agentsControl.enabled": "hidden",
   "json.schemas": [
     {
       "fileMatch": [
