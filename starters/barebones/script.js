@@ -1,9 +1,9 @@
 import * as Random from '@ixfx/random.js';
 
-const settings = {
+const settings = Object.freeze({
   el: /** @type HTMLElement */(document.querySelector(`#random`)),
   updateInterval: 500
-};
+});
 
 /**
  * Define the type for 'State'
@@ -45,13 +45,13 @@ function setup() {
 
 /**
  * Saves the state
- * @param {Partial<State>} s 
- * @returns 
+ * @param {Partial<State>} changes 
+ * @returns Changed state
  */
-function saveState(s) {
+function saveState(changes) {
   state = Object.freeze({
     ...state,
-    ...s
+    ...changes
   });
   return state;
 }
