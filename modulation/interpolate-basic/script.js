@@ -1,4 +1,4 @@
-import { interpolatorInterval } from '@ixfx/modulation.js';
+import { interpolatorNumberInterval } from '@ixfx/modulation.js';
 
 const settings = Object.freeze({
   // How long to interpolate
@@ -20,7 +20,7 @@ const settings = Object.freeze({
 let state = {
   // Start saturation with an interval of 1ms,
   // essentially starting the interpolator at its final value
-  saturationInterpolator: interpolatorInterval(1),
+  saturationInterpolator: interpolatorNumberInterval(1),
   // Hue (0..1)
   hue: Math.random(),
   // Current computed saturation (0..1)
@@ -63,7 +63,7 @@ function resetInterpolator() {
     // Reset saturation
     saturation: 0,
     // Create a new interpolator
-    saturationInterpolator: interpolatorInterval(interpolateDuration)
+    saturationInterpolator: interpolatorNumberInterval(interpolateDuration)
   });
 }
 
