@@ -9,12 +9,13 @@ pointerVisualise(document.body);
 // Setings
 const settings = Object.freeze({
   containerEl: /** @type HTMLElement */(document.querySelector(`#container`)),
-  thingEl: /** @type HTMLElement */(document.querySelector(`#thing`))
+  thingEl: /** @type HTMLElement */(document.querySelector(`#thing`)),
+  // Track pointer locations
+  pointers: new PointsTracker()
 });
 
 /**
  * @typedef {{
- * pointers: PointsTracker
  * twoFingerDistance: Trackers.NumberTracker
  * scale: number
  * }} State
@@ -22,8 +23,6 @@ const settings = Object.freeze({
 
 /** @type State */
 let state = Object.freeze({
-  // Track pointer locations
-  pointers: new PointsTracker(),
   // Track how the distance between two pointers changes
   twoFingerDistance: Trackers.number(),
   // Current text scaling value
@@ -35,7 +34,8 @@ let state = Object.freeze({
  * @param {PointerEvent} event 
  */
 const onPointerMove = (event) => {
-  const { pointers, twoFingerDistance } = state;
+  const { pointers } = settings;
+  const { twoFingerDistance } = state;
   let { scale } = state;
 
   event.preventDefault();
@@ -104,7 +104,7 @@ const use = (state) => {
  * @param {PointerEvent} event 
  */
 const onLostPointer = (event) => {
-  const { pointers } = state;
+  const { pointers } = settings;
   event.preventDefault();
 
   // Delete the pointer
