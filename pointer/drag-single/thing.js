@@ -107,7 +107,7 @@ export const create = () => {
   element.style.width = `${size}px`;
   element.style.height = `${size}px`;
 
-  const position = { x: Math.random(), y: Math.random() };
+  const position = { x: 0.5, y: 0.5 };
   return {
     cursorDragNow: Points.Placeholder,
     cursorDragStart: Points.Placeholder,
