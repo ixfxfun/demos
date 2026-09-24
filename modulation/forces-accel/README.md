@@ -13,5 +13,5 @@ number of things.
 
 See also:
 * [`PointTracker`](https://api.ixfx.fun/_ixfx/geometry/PointTracker/)
-* [ixfx trackers](https://ixfx.fun/data/trackers/)
+* [ixfx trackers](https://ixfx.fun/geometry/points/tracking/)
 * [ixfx forces](https://ixfx.fun/modulation/forces/)

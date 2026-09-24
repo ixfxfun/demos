@@ -7,4 +7,4 @@ This sketch demonstrates using key events to make a very simple typewriter. By a
 Demonstrates:
 * [`Trackers.interval`](https://api.ixfx.fun/_ixfx/trackers/interval/)
 
-[Read more about ixfx trackers](https://ixfx.fun/data/trackers/)
+[Read more about ixfx trackers](https://ixfx.fun/data/interval/#tracking)

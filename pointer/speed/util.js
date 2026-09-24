@@ -26,6 +26,6 @@ export const setFontVariation = (id, width, weight) => {
   const wght = `'wght' ` + weight;
 
   // Apply to element
-  // Note that axies must be in alphabetical order (!)
+  // Note that axes must be in alphabetical order (!)
   element.style.fontVariationSettings = `${wdth}, ${wght}`;
 };

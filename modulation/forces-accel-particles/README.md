@@ -11,7 +11,7 @@ For a simpler version, see `forces-accel`.
 
 See also:
 * [`PointTracker`](https://api.ixfx.fun/_ixfx/geometry/PointsTracker/)
-* [ixfx trackers](https://ixfx.fun/data/trackers/)
+* [ixfx trackers](https://ixfx.fun/geometry/points/tracking/)
 * [ixfx forces](https://ixfx.fun/modulation/forces/)
 
 ## Tracking pointer movement

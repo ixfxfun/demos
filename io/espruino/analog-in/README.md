@@ -49,7 +49,7 @@ An even smarter approach would be to track values on the Espruino and only send 
 
 # Things to try
 
-- [Normalise](https://ixfx.fun/data/normalising/) data to
+- [Normalise](https://ixfx.fun/cleaning/normal/) data to
   relative values
-- [Average](https://ixfx.fun/data/averaging/) data to smooth
+- [Average](https://ixfx.fun/cleaning/averaging/) data to smooth
   out jitter

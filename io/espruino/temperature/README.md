@@ -28,7 +28,7 @@ NRF.on('disconnect', () => reset());
 
 # Things to try
 
-* [Normalise](https://ixfx.fun/data/normalising/) data to relative values
+* [Normalise](https://ixfx.fun/cleaning/normal/) data to relative values
 * Can you use the temperature sensor with motion sensors to detect whether the Puck is being held or not?
 * Send back gyro information along with temperature to steer the visual effect instead of the pointer
 

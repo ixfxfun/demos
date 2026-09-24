@@ -104,12 +104,12 @@ const onPointerMove = (event) => {
 };
 
 // Scale & clamp speed with an input range of 0..maxSpeed. This yields a value of 0..1
-const scale = (v) => scaleClamped(v, 0, settings.maxSpeed);
+const scale = (/** @type number */v) => scaleClamped(v, 0, settings.maxSpeed);
 
 const setup = () => {
   document.addEventListener(`pointermove`, onPointerMove);
 
-  // Update speed every 50ms
+  // Run in a loop according to defined speed
   setInterval(() => {
     update();
     use(state);
